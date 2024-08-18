@@ -4,7 +4,7 @@ import { Box } from '@mui/material'; // Material-UI의 Box 컴포넌트 가져�
 // ContentWrapper 컴포넌트는 자식 요소를 감싸고 레이아웃 및 스타일링을 적용하는 역할을 함
 function ContentWrapper({ children }) {
     return (
-        <Box sx={{ flexGrow: 1, padding: '20px', marginLeft: '300px', marginRight: '100px' }}>
+        <Box sx={{ flexGrow: 1, padding: '30px' }}>
             {children} {/* 전달된 자식 요소들을 이 위치에 렌더링 */}
         </Box>
     );
