@@ -1,12 +1,11 @@
-import HomeIcon from '@mui/icons-material/Home';
-import InboxIcon from '@mui/icons-material/Inbox';
+import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 
 export const menuItems = [
-    { text: '마이페이지', icon: <HomeIcon /> },
+    { text: '그룹웨어', icon: <FeaturedPlayListIcon /> },
     { text: '재무/회계', icon: <AttachMoneyIcon /> },
     { text: '인사관리', icon: <GroupsIcon /> },
     { text: '물류관리', icon: <LocalShippingIcon /> },
@@ -14,7 +13,7 @@ export const menuItems = [
 ];
 
 export const subMenuItems = {
-    '마이페이지': [
+    '그룹웨어': [
         {
             text: '기초정보관리',
             items: ['회사정보수정']
@@ -41,7 +40,7 @@ export const subMenuItems = {
         },
         {
             text: '전기분재무제표',
-            items: ['전기분재무상태표', '전기분손익계산서', '전기분우너가명세서', '전기분잉여금처분계산서', '거래처별초기이월', '마감후이월']
+            items: ['전기분재무상태표', '전기분손익계산서', '전기분원가명세서', '전기분잉여금처분계산서', '거래처별초기이월', '마감후이월']
         },
         {
             text: '고정자산및감가상각',
@@ -55,7 +54,7 @@ export const subMenuItems = {
     '인사관리': [
         {
             text: '기초 정보 관리',
-            items: ['사원 관리', '사용자 관리', '부서 관리', '발령 관리', '성과 평가 관리', '퇴사자 관리']
+            items: ['민성이', '사원 관리', '사용자 관리', '부서 관리', '발령 관리', '성과 평가 관리', '퇴사자 관리']
         },
         {
             text: '출결 관리',
@@ -69,7 +68,7 @@ export const subMenuItems = {
     '물류관리': [
         {
             text: '기초정보관리',
-            items: ['품목 관리', '품목 그룹 관리']
+            items: ['품목 관리', '품목 그룹 관리', '창고등록']
         },
         {
             text: '영업 관리',
@@ -82,6 +81,26 @@ export const subMenuItems = {
         {
             text: '반품 관리',
             items: ['반품 접수', '반품 현황']
+        },
+        {
+            text: '출하지시서',
+            items: ['출하지시서조회', '출하지시서입력']
+        },
+        {
+            text: '출하',
+            items: ['출하조회', '출하입력', '출하현황']
+        },
+        {
+            text: '입고관리',
+            items: ['입고예정', '입고처리']
+        },
+        {
+            text: '출고관리',
+            items: ['출고예정', '출고예정현황', '출고처리']
+        },
+        {
+            text: '재고조정',
+            items: ['재고조정진행단계', '재고실사조회', '재고실사현황', '재고조정현황']
         }
     ],
     '생산관리': [

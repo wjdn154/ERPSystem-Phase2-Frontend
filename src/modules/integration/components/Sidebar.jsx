@@ -42,6 +42,7 @@ const Sidebar = ({
     const handleSubMenuClick = (subMenu) => {
         if (selectedSubMenu === subMenu) {
             setSelectedSubMenu('');
+            setSelectedSubSubMenu('');
             return;
         }
 
@@ -104,11 +105,13 @@ const Sidebar = ({
                         <List sx={{ overflow: 'auto', padding: '0px'}}>
                             {subMenuItems[selectedMenu].map((subItem, subIndex) => (
                                 <React.Fragment key={subIndex}>
-                                    <Divider />
+                                    <Divider sx={{light: false, margin: '0px 20px 0px 10px'}} />
                                     <ListItem
                                         button
                                         onClick={() => handleSubMenuClick(subItem.text)}
                                         sx={{
+                                            width: '90%',
+                                            margin: '5px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             backgroundColor: selectedSubMenu === subItem.text ? '#D7EDFA' : 'inherit',
@@ -126,7 +129,7 @@ const Sidebar = ({
                                         <ListItemText
                                             primary={subItem.text}
                                             primaryTypographyProps={{
-                                                sx: { fontSize: '0.9rem', fontWeight: '700' }
+                                                sx: { fontSize: '0.9rem', fontWeight: '400' }
                                             }}
                                         />
                                         {subItem.items && (
@@ -135,42 +138,45 @@ const Sidebar = ({
                                     </ListItem>
                                     {subItem.items && (
                                         <Collapse in={subOpen[subItem.text]} timeout="auto" unmountOnExit>
-                                            <List component="div" disablePadding sx={{ pl: 4 }}>
-                                                {subItem.items.map((item, index) => (
-                                                    <ListItem
-                                                        button
-                                                        key={index}
-                                                        onClick={() => handleSubSubMenuClick(item)}
-                                                        sx={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            marginTop: index === 0 ? '10px' : '0px',
-                                                            marginBottom: index === subItem.items.length - 1 ? '10px' : '0px',
-                                                            backgroundColor: selectedSubSubMenu === item ? '#D7EDFA' : 'inherit',
-                                                            color: selectedSubSubMenu === item ? '#076EA8' : 'inherit',
-                                                            borderRadius: selectedSubSubMenu === item ? '15px' : '0px',
-                                                            transition: 'background-color 0.3s, border-radius 0.3s',
-                                                            '&:hover': {
-                                                                backgroundColor: '#D7EDFA',
-                                                                color: '#076EA8',
-                                                                borderRadius: '15px',
+                                            <Box sx={{display: 'flex'}}>
+                                            <Divider orientation="vertical" flexItem sx={{ margin: '10px 0px 10px 15px' }} />
+                                                <List component="div" disablePadding sx={{ width: '80%' }}>
+                                                    {subItem.items.map((item, index) => (
+                                                        <ListItem
+                                                            button
+                                                            key={index}
+                                                            onClick={() => handleSubSubMenuClick(item)}
+                                                            sx={{
+                                                                display: 'flex',
+                                                                marginLeft: '5%',
+                                                                alignItems: 'center',
+                                                                marginTop: index === 0 ? '10px' : '0px',
+                                                                marginBottom: index === subItem.items.length - 1 ? '10px' : '0px',
+                                                                backgroundColor: selectedSubSubMenu === item ? '#D7EDFA' : 'inherit',
+                                                                color: selectedSubSubMenu === item ? '#076EA8' : 'inherit',
+                                                                borderRadius: selectedSubSubMenu === item ? '15px' : '0px',
                                                                 transition: 'background-color 0.3s, border-radius 0.3s',
-                                                            },
-                                                        }}
-                                                    >
-                                                        <Divider orientation="vertical" flexItem sx={{ mr: 2 }} />
-                                                        <ListItemIcon sx={{ color: '#000', minWidth: '20px' }}>
-                                                            <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
-                                                        </ListItemIcon>
-                                                        <ListItemText
-                                                            primary={item}
-                                                            primaryTypographyProps={{
-                                                                sx: { fontSize: '0.7rem', fontWeight: '700' }
+                                                                '&:hover': {
+                                                                    backgroundColor: '#D7EDFA',
+                                                                    color: '#076EA8',
+                                                                    borderRadius: '15px',
+                                                                    transition: 'background-color 0.3s, border-radius 0.3s',
+                                                                },
                                                             }}
-                                                        />
-                                                    </ListItem>
-                                                ))}
-                                            </List>
+                                                        >
+                                                            <ListItemIcon sx={{ color: '#000', minWidth: '20px' }}>
+                                                                <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
+                                                            </ListItemIcon>
+                                                            <ListItemText
+                                                                primary={item}
+                                                                primaryTypographyProps={{
+                                                                    sx: { fontSize: '0.8rem', fontWeight: '400' }
+                                                                }}
+                                                            />
+                                                        </ListItem>
+                                                    ))}
+                                                </List>
+                                            </Box>
                                         </Collapse>
                                     )}
                                 </React.Fragment>

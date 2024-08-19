@@ -2,21 +2,27 @@ import React from 'react';
 import { AppBar, Toolbar, Box, IconButton, Typography, Breadcrumbs } from '@mui/material';
 import SearchBar from './SearchBar';
 import SettingsIcon from '@mui/icons-material/Settings';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Logo from '../../../assets/favicon/OMZ.svg';
 
 function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
+
     const renderBreadcrumb = () => {
         return (
-            <Breadcrumbs aria-label="breadcrumb" sx={{ color: 'text.secondary', overflow: 'hidden', display: 'flex',
+            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb" sx={{ color: 'text.secondary', overflow: 'hidden', display: 'flex',
                                                        textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {selectedMenu && (
-                    <Typography>{selectedMenu}</Typography>
+                    <Typography sx={{ fontWeight: selectedSubMenu === '' ? selectedSubSubMenu === '' ? '700' : '400' : '400',
+                                      color: selectedSubMenu === '' ? selectedSubSubMenu === '' ? 'text.primary' : 'text.secondary' : 'text.secondary' }}>
+                        {selectedMenu}</Typography>
                 )}
                 {selectedSubMenu && (
-                    <Typography>{selectedSubMenu}</Typography>
+                    <Typography sx={{ fontWeight: selectedSubSubMenu === '' ? '700' : '400',
+                                      color: selectedSubSubMenu === '' ? 'text.primary' : 'text.secondary'}}>
+                        {selectedSubMenu}</Typography>
                 )}
                 {selectedSubSubMenu && (
-                    <Typography color="text.primary">{selectedSubSubMenu}</Typography>
+                    <Typography sx={{fontWeight: '700', color: 'text.primary'}}>{selectedSubSubMenu}</Typography>
                 )}
             </Breadcrumbs>
         );
@@ -26,8 +32,13 @@ function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
         <AppBar position="static" color="default" elevation={0} sx={{ backgroundColor: '#ffffff' }}>
             <Toolbar sx={{ justifyContent: 'space-between', padding: { xs: '0 10px', sm: '0 20px', md: '0 30px', lg: '0 40px' }, alignItems: 'center' }}>
                 {/* 로고 영역 */}
-                <Box sx={{ display: 'flex', alignItems: 'center', flexBasis: '200px' }}>
-                    <img src={Logo} alt="로고" style={{ height: '50px', maxHeight: '10vh', maxWidth: '100%', width: 'auto' }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', flexBasis: '200px',
+                    '&:hover': {
+                        cursor: 'pointer'
+                    }}}>
+                    <img src={Logo}
+                         alt="로고"
+                         style={{ height: '80px', maxHeight: '10vh', maxWidth: '100%', width: 'auto'}} />
                 </Box>
 
                 {/* 검색바 영역 */}
