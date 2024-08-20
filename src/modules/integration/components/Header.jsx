@@ -29,10 +29,10 @@ function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
     };
 
     return (
-        <AppBar position="static" color="default" elevation={0} sx={{ backgroundColor: '#ffffff' }}>
-            <Toolbar sx={{ justifyContent: 'space-between', padding: { xs: '0 10px', sm: '0 20px', md: '0 30px', lg: '0 40px' }, alignItems: 'center' }}>
+        <AppBar position="static" color="default" elevation={0} sx={{ backgroundColor: '#ffffff'}}>
+            <Toolbar sx={{ justifyContent: 'space-between', padding : '0px !important', alignItems: 'center' }}>
                 {/* 로고 영역 */}
-                <Box sx={{ display: 'flex', alignItems: 'center', flexBasis: '200px',
+                <Box sx={{ display: 'flex', alignItems: 'center', paddingLeft: '30px', minWidth: '450px',
                     '&:hover': {
                         cursor: 'pointer'
                     }}}>
@@ -41,20 +41,23 @@ function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
                          style={{ height: '80px', maxHeight: '10vh', maxWidth: '100%', width: 'auto'}} />
                 </Box>
 
-                {/* 검색바 영역 */}
-                <Box sx={{ display: 'flex', alignItems: 'center', flexBasis: '300px', justifyContent: 'flex-start',
-                    border: '1px solid #000', borderRadius: '5px' }}>
-                    <Box sx={{ width: '100%', maxWidth: '300px', mr: 2 }}>
-                        <SearchBar />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    {/* 검색바 영역 */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', minWidth: '300px', justifyContent: 'flex-start',
+                        border: '1px solid #818181', borderRadius: '5px' }}>
+                        <Box sx={{ width: '100%', maxWidth: '300px', mr: 2 }}>
+                            <SearchBar />
+                        </Box>
                     </Box>
-                </Box>
 
-                {/* 브레드크럼 및 설정 아이콘 영역 */}
-                <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', maxWidth: '600px', flexShrink: 1 }}>
-                    {renderBreadcrumb()} {/* 브레드크럼 렌더링 */}
-                    <IconButton sx={{ ml: 2 }}>
-                        <SettingsIcon />
-                    </IconButton>
+                    {/* 브레드크럼 및 설정 아이콘 영역 */}
+                    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', minWidth: '500px',
+                               maxWidth: '600px', flexShrink: 1, paddingRight: '30px' }}>
+                        {renderBreadcrumb()} {/* 브레드크럼 렌더링 */}
+                        <IconButton sx={{ ml: 2 }}>
+                            <SettingsIcon />
+                        </IconButton>
+                    </Box>
                 </Box>
             </Toolbar>
         </AppBar>

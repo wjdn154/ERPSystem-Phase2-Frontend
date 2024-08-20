@@ -62,7 +62,7 @@ const Sidebar = ({
     return (
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             {/* 대분류 메뉴 영역 */}
-            <Box sx={{ width: '200px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
+            <Box sx={{ minWidth: '200px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
                 <List sx={{ flexGrow: 1, overflow: 'auto' }}>
                     {menuItems.map((item, index) => (
                         <React.Fragment key={index}>
@@ -78,6 +78,7 @@ const Sidebar = ({
                                         color: '#076EA8',
                                         borderRadius: '15px',
                                         transition: 'background-color 0.3s, border-radius 0.3s',
+                                        fill: '#076EA8',
                                     },
                                     backgroundColor: selectedMenu === item.text ? '#D7EDFA' : 'inherit',
                                     color: selectedMenu === item.text ? '#076EA8' : 'inherit',
@@ -85,7 +86,10 @@ const Sidebar = ({
                                     transition: 'background-color 0.3s, border-radius 0.3s',
                                 }}
                             >
-                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                {/*<ListItemIcon sx={{ fill: selectedMenu === item.text ? 'red' : 'inherit' }}>{item.icon}</ListItemIcon>*/}
+                                <ListItemIcon>
+                                    {React.cloneElement(item.icon, { style: { fill: selectedMenu === item.text ? '#076EA8' : 'inherit' } })}
+                                </ListItemIcon>
                                 <ListItemText
                                     primary={item.text}
                                     primaryTypographyProps={{
@@ -100,7 +104,7 @@ const Sidebar = ({
 
             {/* 중분류 및 소분류 메뉴 영역 */}
             {selectedMenu && subMenuItems[selectedMenu] && (
-                <Box sx={{ width: '250px', display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ minWidth: '250px', display: 'flex', flexDirection: 'column' }}>
                     <Collapse in={open[selectedMenu]} timeout="auto" unmountOnExit>
                         <List sx={{ overflow: 'auto', padding: '0px'}}>
                             {subMenuItems[selectedMenu].map((subItem, subIndex) => (

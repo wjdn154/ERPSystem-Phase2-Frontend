@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material'; // 필요한 Material-UI 컴포넌트들 가져옴
 
 function AccountSubjectDetail({ data }) {
+    console.log(data);
     // 데이터가 없을 경우 아무것도 렌더링하지 않음
     if (!data) return null;
 

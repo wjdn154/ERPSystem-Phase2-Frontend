@@ -28,10 +28,10 @@ function App() {
                 selectedSubMenu={selectedSubMenu} // 현재 선택된 중분류 메뉴 상태
                 selectedSubSubMenu={selectedSubSubMenu} // 현재 선택된 소분류 메뉴 상태
             /> {/* 상단 헤더 컴포넌트 렌더링 */}
-            <Box sx={{ display: 'flex', width: '100%', height: '90vh', backgroundColor: '#f7f8fa' }}>
+            <Box sx={{ display: 'flex', width: '100%', height: '90vh', backgroundColor: '#fff' }}>
                 {/* Sidebar 영역: 좌측 고정된 사이드바 */}
-                <Box sx={{ backgroundColor: '#fff', flexShrink: 0 }}>
-                    <Sidebar
+                <Box sx={{ flexShrink: 0 }}>
+                    <Sidebar sx={{ width: '30vw' }}
                         selectedMenu={selectedMenu} // 현재 선택된 대분류 메뉴 상태
                         setSelectedMenu={setSelectedMenu} // 대분류 메뉴 선택 상태 업데이트 함수
                         selectedSubMenu={selectedSubMenu} // 현재 선택된 중분류 메뉴 상태

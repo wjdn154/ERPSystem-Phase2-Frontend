@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Box, Skeleton, Stack } from '@mui/material';
 import axios from 'axios';
-import AccountSubjectDetail from '../../financial/components/AccountSubjectDetail.jsx';  // 컴포넌트를 가져옴
+import AccountSubjectDetail2 from '../../financial/components/AccountSubjectDetail2.jsx';  // 컴포넌트를 가져옴
 
 const baseUrl = 'http://localhost:8080/api';  // API 기본 URL
 
@@ -73,7 +73,7 @@ function MainContent({ selectedSubSubMenu }) {
     };
 
     return (
-        <Box sx={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '8px', height: '80vh', overflow: 'auto' }}>
+        <Box >
             {loading ? (
                 renderSkeleton()  // 로딩 중일 때 Skeleton UI 표시
             ) : error ? (
@@ -81,7 +81,7 @@ function MainContent({ selectedSubSubMenu }) {
                     {error}
                 </Typography>
             ) : (
-                <AccountSubjectDetail data={data} />  // 데이터를 컴포넌트에 전달하여 렌더링
+                <AccountSubjectDetail2 data={data} />  // 데이터를 컴포넌트에 전달하여 렌더링
             )}
         </Box>
     );
