@@ -59,7 +59,7 @@ const Sidebar = ({
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', height: '90vh'}}>
             {/* 대분류 메뉴 영역 */}
             <Box sx={{ minWidth: '50px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
                 <List sx={{ flexGrow: 1, overflow: 'auto' }}>
@@ -69,6 +69,7 @@ const Sidebar = ({
                                 button
                                 onClick={() => handleMenuClick(item.text)}
                                 sx={{
+                                    marginBottom: index === item.length - 1 ? '0px' : '5px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     height: '70px',
@@ -86,8 +87,8 @@ const Sidebar = ({
                                 }}
                             >
                                 <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                                    <ListItemIcon>
-                                        {React.cloneElement(item.icon, { style: { width: '100%', fill: selectedMenu === item.text ? '#076EA8' : 'inherit' } })}
+                                    <ListItemIcon >
+                                        {React.cloneElement(item.icon, { style: {width: '100%', fill: selectedMenu === item.text ? '#076EA8' : 'inherit' } })}
                                     </ListItemIcon>
                                     <ListItemText
                                         primary={item.text}
@@ -104,7 +105,7 @@ const Sidebar = ({
 
             {/* 중분류 및 소분류 메뉴 영역 */}
             {selectedMenu && subMenuItems[selectedMenu] && (
-                <Box sx={{ minWidth: '250px', display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ minWidth: '250px', display: 'flex', flexDirection: 'column', overflow: "auto" }}>
                     <Collapse in={open[selectedMenu]} timeout="auto" unmountOnExit>
                         <List sx={{ overflow: 'auto', padding: '0px'}}>
                             {subMenuItems[selectedMenu].map((subItem, subIndex) => (
@@ -155,7 +156,7 @@ const Sidebar = ({
                                                                 marginLeft: '5%',
                                                                 alignItems: 'center',
                                                                 marginTop: index === 0 ? '10px' : '0px',
-                                                                marginBottom: index === subItem.items.length - 1 ? '10px' : '0px',
+                                                                marginBottom: index === subItem.items.length - 1 ? '10px' : '5px',
                                                                 backgroundColor: selectedSubSubMenu === item ? '#D7EDFA' : 'inherit',
                                                                 color: selectedSubSubMenu === item ? '#076EA8' : 'inherit',
                                                                 borderRadius: selectedSubSubMenu === item ? '15px' : '0px',
