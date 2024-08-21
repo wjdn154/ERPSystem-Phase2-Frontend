@@ -7,6 +7,8 @@ import Sidebar from './modules/integration/components/Sidebar.jsx'; // Sidebar �
 import MainContent from './modules/integration/pages/MainContent.jsx'; // MainContent 컴포넌트 가져옴
 import Header from './modules/integration/components/Header'; // Header 컴포넌트 가져옴
 import { menuItems, subMenuItems } from './modules/integration/utils/menuItems'; // 메뉴 데이터 가져옴
+import "@blueprintjs/core/lib/css/blueprint.css";
+import "@blueprintjs/table/lib/css/table.css";
 
 const theme = createTheme({
     typography: {

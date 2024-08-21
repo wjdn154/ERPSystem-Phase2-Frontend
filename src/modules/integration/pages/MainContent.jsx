@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Box, Skeleton, Stack } from '@mui/material';
 import axios from 'axios';
-import AccountSubjectDetail2 from '../../financial/components/AccountSubjectDetail2.jsx';  // 컴포넌트를 가져옴
+import AccountSubjectDetail from '../../financial/components/AccountSubjectDetail2.jsx';  // 컴포넌트를 가져옴
 
 const baseUrl = 'http://localhost:8080/api';  // API 기본 URL
 
@@ -81,7 +81,7 @@ function MainContent({ selectedSubSubMenu }) {
                     {error}
                 </Typography>
             ) : (
-                <AccountSubjectDetail2 data={data} />  // 데이터를 컴포넌트에 전달하여 렌더링
+                <AccountSubjectDetail data={data} />  // 데이터를 컴포넌트에 전달하여 렌더링
             )}
         </Box>
     );

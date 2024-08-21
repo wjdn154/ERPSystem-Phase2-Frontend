@@ -46,7 +46,6 @@ const Sidebar = ({
             return;
         }
 
-
         setSelectedSubMenu(subMenu);
         setSelectedSubSubMenu(''); // 소분류 초기화
 
@@ -62,7 +61,7 @@ const Sidebar = ({
     return (
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             {/* 대분류 메뉴 영역 */}
-            <Box sx={{ minWidth: '200px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
+            <Box sx={{ minWidth: '50px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
                 <List sx={{ flexGrow: 1, overflow: 'auto' }}>
                     {menuItems.map((item, index) => (
                         <React.Fragment key={index}>
@@ -86,16 +85,17 @@ const Sidebar = ({
                                     transition: 'background-color 0.3s, border-radius 0.3s',
                                 }}
                             >
-                                {/*<ListItemIcon sx={{ fill: selectedMenu === item.text ? 'red' : 'inherit' }}>{item.icon}</ListItemIcon>*/}
-                                <ListItemIcon>
-                                    {React.cloneElement(item.icon, { style: { fill: selectedMenu === item.text ? '#076EA8' : 'inherit' } })}
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={item.text}
-                                    primaryTypographyProps={{
-                                        sx: { fontSize: '0.9rem', fontWeight: '700' }
-                                    }}
-                                />
+                                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                    <ListItemIcon>
+                                        {React.cloneElement(item.icon, { style: { width: '100%', fill: selectedMenu === item.text ? '#076EA8' : 'inherit' } })}
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={item.text}
+                                        primaryTypographyProps={{
+                                            sx: { fontSize: '0.9rem', fontWeight: '700' }
+                                        }}
+                                    />
+                                </Box>
                             </ListItem>
                         </React.Fragment>
                     ))}
@@ -109,7 +109,7 @@ const Sidebar = ({
                         <List sx={{ overflow: 'auto', padding: '0px'}}>
                             {subMenuItems[selectedMenu].map((subItem, subIndex) => (
                                 <React.Fragment key={subIndex}>
-                                    <Divider sx={{light: false, margin: '0px 20px 0px 10px'}} />
+                                    {subIndex !== 0 && <Divider sx={{light: false, margin: '0px 20px 0px 10px'}} />}
                                     <ListItem
                                         button
                                         onClick={() => handleSubMenuClick(subItem.text)}
@@ -143,7 +143,7 @@ const Sidebar = ({
                                     {subItem.items && (
                                         <Collapse in={subOpen[subItem.text]} timeout="auto" unmountOnExit>
                                             <Box sx={{display: 'flex'}}>
-                                            <Divider orientation="vertical" flexItem sx={{ margin: '10px 0px 10px 15px' }} />
+                                                <Divider orientation="vertical" flexItem sx={{ margin: '10px 0px 10px 15px' }} />
                                                 <List component="div" disablePadding sx={{ width: '80%' }}>
                                                     {subItem.items.map((item, index) => (
                                                         <ListItem
