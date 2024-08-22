@@ -1,5 +1,4 @@
 import React from "react";
-import { Cell, Column, Table2 } from "@blueprintjs/table";
 import { Box } from "@mui/material";
 
 function AccountSubjectDetail3({ data }) {

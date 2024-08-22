@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Box, Skeleton, Stack } from '@mui/material';
 import axios from 'axios';
-import AccountSubjectDetail from '../../financial/components/AccountSubjectDetail2.jsx';  // 컴포넌트를 가져옴
+import AccountSubjectDetail from '../../financial/components/AccountSubjectDetail.jsx';  // 컴포넌트를 가져옴
 
 const baseUrl = 'http://localhost:8080/api';  // API 기본 URL
 

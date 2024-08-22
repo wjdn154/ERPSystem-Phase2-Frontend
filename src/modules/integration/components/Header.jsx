@@ -31,19 +31,18 @@ function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
     };
 
     return (
-        <AppBar position="static" color="default" elevation={0} sx={{ backgroundColor: '#ffffff'}}>
-            <Toolbar sx={{ justifyContent: 'space-between', padding : '0px !important', alignItems: 'center' }}>
+        <AppBar position="static" color="default" elevation={0} sx={{ height: '100%', backgroundColor: '#fff' }}>
+            <Toolbar sx={{ justifyContent: 'space-between', padding : '0px !important', alignItems: 'center'}}>
                 {/* 로고 영역 */}
                 <Box sx={{ display: 'flex', alignItems: 'center', paddingLeft: '30px', minWidth: '350px', maxWidth: '30vw',
-                    '&:hover': {
-                        cursor: 'pointer'
-                    }}}>
+                    }}>
                     <img src={Logo}
                          alt="로고"
-                         style={{ height: '80px', maxHeight: '10vh', maxWidth: '100%', width: 'auto'}} />
+                         style={{ height: '80px', maxHeight: '10vh', maxWidth: '100%', width: 'auto'}}
+                    />
                 </Box>
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px', width: '100%' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px', width: '100%', alignItems: 'center' }}>
                     {/* 검색바 영역 */}
                     {/*<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start',*/}
                     {/*    border: '1px solid #818181', borderRadius: '5px' }}>*/}

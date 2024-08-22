@@ -6,7 +6,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 
 export const menuItems = [
     { text: '그룹웨어', icon: <FeaturedPlayListIcon /> },
-    { text: '재무/회계', icon: <AttachMoneyIcon /> },
+    { text: '재무회계', icon: <AttachMoneyIcon /> },
     { text: '인사관리', icon: <GroupsIcon /> },
     { text: '물류관리', icon: <LocalShippingIcon /> },
     { text: '생산관리', icon: <PrecisionManufacturingIcon /> },
@@ -19,7 +19,7 @@ export const subMenuItems = {
             items: ['회사정보수정']
         }
     ],
-    '재무/회계': [
+    '재무회계': [
         {
             text: '기초정보관리',
             items: ['거래처등록', '계정과목및적요등록', '환경등록', '업무용승용차등록']

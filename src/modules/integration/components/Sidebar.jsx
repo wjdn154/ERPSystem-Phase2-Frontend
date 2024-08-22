@@ -59,10 +59,10 @@ const Sidebar = ({
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row', height: '90vh'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', height: '90vh', marginTop: '20px' }}>
             {/* 대분류 메뉴 영역 */}
-            <Box sx={{ minWidth: '50px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
-                <List sx={{ flexGrow: 1, overflow: 'auto' }}>
+            <Box sx={{ minWidth: '100px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
+                <List className="mui-scrollbar" sx={{ flexGrow: 1, overflow: 'auto' }}>
                     {menuItems.map((item, index) => (
                         <React.Fragment key={index}>
                             <ListItem
@@ -74,15 +74,17 @@ const Sidebar = ({
                                     alignItems: 'center',
                                     height: '70px',
                                     '&:hover': {
-                                        backgroundColor: '#D7EDFA',
-                                        color: '#076EA8',
-                                        borderRadius: '15px',
+                                        backgroundColor: '#d3daf7',
+                                        color: '#19358c',
+                                        borderRadius: '10px',
+                                        boxShadow: 1,
                                         transition: 'background-color 0.3s, border-radius 0.3s',
-                                        fill: '#076EA8',
+                                        fill: '#19358c',
                                     },
-                                    backgroundColor: selectedMenu === item.text ? '#D7EDFA' : 'inherit',
-                                    color: selectedMenu === item.text ? '#076EA8' : 'inherit',
-                                    borderRadius: selectedMenu === item.text ? '15px' : '0px',
+                                    backgroundColor: selectedMenu === item.text ? '#d3daf7' : 'inherit',
+                                    color: selectedMenu === item.text ? '#19358c' : 'inherit',
+                                    borderRadius: selectedMenu === item.text ? '10px' : '0px',
+                                    boxShadow: selectedMenu === item.text ? 1 : 0,
                                     transition: 'background-color 0.3s, border-radius 0.3s',
                                 }}
                             >
@@ -105,9 +107,9 @@ const Sidebar = ({
 
             {/* 중분류 및 소분류 메뉴 영역 */}
             {selectedMenu && subMenuItems[selectedMenu] && (
-                <Box sx={{ minWidth: '250px', display: 'flex', flexDirection: 'column', overflow: "auto" }}>
+                <Box className="mui-scrollbar" sx={{ minWidth: '250px', display: 'flex', flexDirection: 'column', overflow: "auto" }}>
                     <Collapse in={open[selectedMenu]} timeout="auto" unmountOnExit>
-                        <List sx={{ overflow: 'auto', padding: '0px'}}>
+                        <List className="mui-scrollbar" sx={{ overflow: 'auto', padding: '0px'}}>
                             {subMenuItems[selectedMenu].map((subItem, subIndex) => (
                                 <React.Fragment key={subIndex}>
                                     {subIndex !== 0 && <Divider sx={{light: false, margin: '0px 20px 0px 10px'}} />}
@@ -119,14 +121,16 @@ const Sidebar = ({
                                             margin: '5px',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            backgroundColor: selectedSubMenu === subItem.text ? '#D7EDFA' : 'inherit',
-                                            color: selectedSubMenu === subItem.text ? '#076EA8' : 'inherit',
-                                            borderRadius: selectedSubMenu === subItem.text ? '15px' : '0px',
+                                            backgroundColor: selectedSubMenu === subItem.text ? '#d3daf7' : 'inherit',
+                                            color: selectedSubMenu === subItem.text ? '#19358c' : 'inherit',
+                                            borderRadius: selectedSubMenu === subItem.text ? '10px' : '0px',
+                                            boxShadow: selectedSubMenu === subItem.text ? 1 : 0,
                                             transition: 'background-color 0.3s, border-radius 0.3s',
                                             '&:hover': {
-                                                backgroundColor: '#D7EDFA',
-                                                color: '#076EA8',
-                                                borderRadius: '15px',
+                                                backgroundColor: '#d3daf7',
+                                                color: '#19358c',
+                                                boxShadow: 1,
+                                                borderRadius: '10px',
                                                 transition: 'background-color 0.3s, border-radius 0.3s',
                                             },
                                         }}
@@ -134,7 +138,7 @@ const Sidebar = ({
                                         <ListItemText
                                             primary={subItem.text}
                                             primaryTypographyProps={{
-                                                sx: { fontSize: '0.9rem', fontWeight: '400' }
+                                                sx: { fontSize: '0.9rem', fontWeight: '500' }
                                             }}
                                         />
                                         {subItem.items && (
@@ -157,14 +161,16 @@ const Sidebar = ({
                                                                 alignItems: 'center',
                                                                 marginTop: index === 0 ? '10px' : '0px',
                                                                 marginBottom: index === subItem.items.length - 1 ? '10px' : '5px',
-                                                                backgroundColor: selectedSubSubMenu === item ? '#D7EDFA' : 'inherit',
-                                                                color: selectedSubSubMenu === item ? '#076EA8' : 'inherit',
-                                                                borderRadius: selectedSubSubMenu === item ? '15px' : '0px',
+                                                                backgroundColor: selectedSubSubMenu === item ? '#d3daf7' : 'inherit',
+                                                                color: selectedSubSubMenu === item ? '#19358c' : 'inherit',
+                                                                boxShadow: selectedSubSubMenu === item ? 1 : 0,
+                                                                borderRadius: selectedSubSubMenu === item ? '10px' : '0px',
                                                                 transition: 'background-color 0.3s, border-radius 0.3s',
                                                                 '&:hover': {
-                                                                    backgroundColor: '#D7EDFA',
-                                                                    color: '#076EA8',
-                                                                    borderRadius: '15px',
+                                                                    backgroundColor: '#d3daf7',
+                                                                    color: '#19358c',
+                                                                    borderRadius: '10px',
+                                                                    boxShadow: 1,
                                                                     transition: 'background-color 0.3s, border-radius 0.3s',
                                                                 },
                                                             }}
