@@ -23,7 +23,7 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline /> {/* Material-UI의 기본 스타일을 초기화하여 브라우저 간 일관성을 유지 */}
-            <Box sx={{ boxShadow: 1, zIndex: 1000, height: '10vh', position: 'relative' }}>
+            <Box sx={{ boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", zIndex: 1000, height: { xs: '60px', sm: '8vh', md: '10vh', lg: '12vh', xl: '90px' }, position: 'relative' }}>
                 <Header
                     selectedMenu={selectedMenu} // 현재 선택된 대분류 메뉴 상태
                     selectedSubMenu={selectedSubMenu} // 현재 선택된 중분류 메뉴 상태

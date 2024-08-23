@@ -1,123 +1,326 @@
-import React from "react";
-import { Box } from "@mui/material";
+import React, { useState } from "react";
+import { Table as AntTable, Form, Row, Col, Input, Table, Button} from 'antd';
+import { Typography, Grid, Box, Paper, Table as MuiTable, TableRow, TableBody, TableCell } from '@mui/material';
+import axios from 'axios';
+import { FINANCIAL_API } from '../../../config/apiConstants.jsx';
 
 function AccountSubjectDetail3({ data }) {
     if (!data) return null;
+    const [selectedRow, setSelectedRow] = useState(null);
+    const [accountSubjectDetail, setAccountSubjectDetail] = useState(null);
 
-    const { structures, accountSubjects, accountSubjectDetail } = data;
-
-    const renderStructureCell = (rowIndex, columnIndex) => {
-        const columnKeys = ["code", "name", "min", "max"];
-        return <Cell>{structures[rowIndex][columnKeys[columnIndex]]}</Cell>;
+    // 팝업 클릭 시 실행되는 함수
+    const handlePopupClick = (field) => {
+        // 팝업 로직
+        console.log(`${field} 팝업 실행`);
+    };
+    // 계정과목 상세 정보를 가져오는 함수
+    const fetchAccountSubjectDetail = async (code) => {
+        try {
+            const response = await axios.post(FINANCIAL_API.ACCOUNT_SUBJECT_DETAIL_API(code));
+            setAccountSubjectDetail(response.data);
+            console.log("계정과목 상세 정보:", accountSubjectDetail);
+        } catch (error) {
+            console.error("계정과목 상세 정보를 가져오는 중 오류 발생:", error);
+        }
+    };
+    // Input 값이 변경될 때 실행되는 함수
+    const handleInputChange = (e) => {
+        setAccountSubjectDetail({
+            ...accountSubjectDetail,
+            englishName: e.target.value,
+        });
+    };
+    // 수정 불가능한 계정과목은 빨간색으로 표시
+    const getRowClassName = (record) => {
+        return record.modificationType === false ? 'red-text' : '';
     };
 
-    const renderAccountSubjectCell = (rowIndex, columnIndex) => {
-        const columnKeys = ["code", "name", "natureCode", "parentCode"];
-        return <Cell>{accountSubjects[rowIndex][columnKeys[columnIndex]]}</Cell>;
-    };
 
-    const renderAccountSubjectDetailCell = (rowIndex, columnIndex) => {
-        const columnKeys = ["code", "name", "parentCode", "parentName", "englishName", "isActive",
-            "modificationType", "structureCode", "isForeignCurrency", "isBusinessCar"];
-        return <Cell>{accountSubjectDetail[columnKeys[columnIndex]]?.toString() || ''}</Cell>;
+    // 계정과목 목록 컬럼
+    const accountSubjectsColumns = [
+        {
+            title: <span>코드번호</span>,
+            dataIndex: 'code',
+            align: 'center',
+            width: '20%',
+        },
+        {
+            title: <span>계정과목명</span>,
+            dataIndex: 'name',
+            align: 'center',
+            width: '40%',
+        },
+        {
+            title: <span>성격</span>,
+            dataIndex: 'natureCode',
+            align: 'center',
+            width: '20%',
+        },
+        {
+            title: <span>관계</span>,
+            dataIndex: 'parentCode',
+            align: 'center',
+            width: '20%',
+        },
+    ];
+    // 현금적요 컬럼
+    const cashMemosColumns = [
+        {
+            title: <span>적요번호</span>,
+            dataIndex: 'id',
+            align: 'center',
+            width: '20%',
+        },
+        {
+            title: <span>현금적요</span>,
+            dataIndex: 'content',
+            align: 'center',
+            width: '80%',
+            render: (text, record) => <Input value={text} />,
+        },
+    ];
+    // 대체적요 컬럼
+    const transferMemosColumns = [
+        {
+            title: <span>적요번호</span>,
+            dataIndex: 'id',
+            align: 'center',
+            width: '20%',
+        },
+        {
+            title: <span>대체적요</span>,
+            dataIndex: 'content',
+            align: 'center',
+            width: '80%',
+            render: (text, record) => <Input value={text} />,
+        },
+    ];
+    // 고정적요 컬럼
+    const fixedMemos = [
+        {
+            title: <span>적요번호</span>,
+            dataIndex: 'id',
+            align: 'center',
+            width: '20%',
+        },
+        {
+            title: <span>구분</span>,
+            dataIndex: 'category',
+            align: 'center',
+            width: '20%',
+        },
+        {
+            title: <span>고정적요</span>,
+            dataIndex: 'content',
+            align: 'center',
+            width: '60%',
+        },
+    ];
+    // 계정과목 목록 테이블의 rowSelection
+    const rowSelection = {
+        type: 'radio',
+        selectedRowKeys: selectedRow ? [selectedRow.id] : [],
+        onChange: async (selectedRowKeys, selectedRows) => {
+            setSelectedRow(selectedRows[0]);
+            await fetchAccountSubjectDetail(selectedRows[0].code); // 선택된 코드로 계정과목 상세 정보를 가져옴
+        },
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <h3>Structures</h3>
-            <Box sx={{ maxHeight: '80vh', overflowY: 'auto', width: '50vw' }}>
-                <Table2 numRows={structures.length} enableRowHeader={true} columnWidths={[100, 200, 100, 100]} enableColumnResizing={false}>
-                    <Column name="Code" cellRenderer={renderStructureCell} />
-                    <Column name="Name" cellRenderer={renderStructureCell} />
-                    <Column name="Min" cellRenderer={renderStructureCell} />
-                    <Column name="Max" cellRenderer={renderStructureCell} />
-                </Table2>
-            </Box>
+        <Box sx={{ flexGrow: 1, p: 3 }}>
+            <Grid container spacing={2}>
+                {/* 계정 체계 섹션 */}
+                <Grid item xs={3}>
+                    <Paper elevation={3} sx={{ height: '100%', p: 2 }}>
+                        <Typography variant="h6" marginBottom={'20px'}>계정 체계</Typography>
+                        <MuiTable size="small">
+                            <TableBody>
+                                {data.structures.map((structure) => (
+                                    <TableRow key={structure.code}>
+                                        <TableCell>{structure.name}</TableCell>
+                                        <TableCell>{`${structure.min} - ${structure.max}`}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </MuiTable>
+                    </Paper>
+                </Grid>
 
-            <h3>Account Subjects</h3>
-            <Box sx={{ maxHeight: '80vh', overflowY: 'auto', width: '50vw' }}>
-                <Table2
-                    numRows={accountSubjects.length}
-                    // scrollToRow={accountSubjects.length - 1} // 이 줄을 주석 처리하거나 제거합니다.
-                    enableRowHeader={false}  // Row Header 문제일 수 있으므로 비활성화합니다.
-                    columnWidths={[100, 200, 150, 150]}
-                    enableColumnResizing={false}
-                    forceRenderGrid={true}  // 강제 렌더링을 위해 추가합니다.
-                    useInteractionBar={false}  // 렌더링 문제를 해결하기 위해 이 속성도 추가할 수 있습니다.
-                >
-                    <Column name="Code" cellRenderer={renderAccountSubjectCell} />
-                    <Column name="Name" cellRenderer={renderAccountSubjectCell} />
-                    <Column name="Nature Code" cellRenderer={renderAccountSubjectCell} />
-                    <Column name="Parent Code" cellRenderer={renderAccountSubjectCell} />
-                </Table2>
-            </Box>
+                {/* 계정과목 목록 섹션 */}
+                <Grid item xs={9}>
+                    <Paper elevation={3} sx={{ height: '100%', p: 2 }}>
+                        <Typography variant="h6" marginBottom={'20px'}>계정과목 목록</Typography>
+                        <AntTable
+                            columns={accountSubjectsColumns}
+                            dataSource={data.accountSubjects}
+                            pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                            rowSelection={rowSelection}
+                            rowKey="id"
+                            onRow={(record) => ({
+                                onClick: () => {
+                                    setSelectedRow(record);
+                                    fetchAccountSubjectDetail(record.code);
+                                },
+                                style: { cursor: 'pointer' },
+                            })}
+                            rowClassName={getRowClassName}
+                        />
+                    </Paper>
+                </Grid>
+            </Grid>
 
-            <Box sx={{ width: '50vw' }}>
-                <h3>Account Subject Detail</h3>
-                <Table2 numRows={1}>
-                    <Column name="Code" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Name" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Parent Code" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Parent Name" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="English Name" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Is Active" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Modification Type" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Structure Code" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Is Foreign Currency" cellRenderer={renderAccountSubjectDetailCell} />
-                    <Column name="Is Business Car" cellRenderer={renderAccountSubjectDetailCell} />
-                </Table2>
-            </Box>
+            {/* 선택된 계정과목의 상세 내용 섹션 */}
+            {accountSubjectDetail && (
+                <Box sx={{ mt: 2 }}>
+                    <Paper elevation={3} sx={{ p: 2 }}>
+                        <Typography variant="h6" marginBottom={'20px'}>계정과목 상세 내용</Typography>
+                        <Box sx={{ backgroundColor: '#fff', padding: '20px', borderRadius: '10px', boxShadow: 1, mt: 2 }}>
+                            <Form layout="vertical">
+                                <Row gutter={16}>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="계정과목코드(명)"
+                                            onClick={() => handlePopupClick('계정과목코드')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value={`${accountSubjectDetail.code}`} style={{ marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6 !important' }} readOnly />
+                                                <Input value={`${accountSubjectDetail.name}`} style={{ flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="성격"
+                                            onClick={() => handlePopupClick('성격')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value={`성격코드`} style={{ marginRight: '10px', flex: 1 }} readOnly />
+                                                <Input value={`성격명`} style={{ flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row gutter={16}>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="관계코드(명)"
+                                            onClick={() => handlePopupClick('관계코드')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value={`${accountSubjectDetail.parentCode || '없음'}`} style={{ marginRight: '10px', flex: 1 }} />
+                                                <Input value={`${accountSubjectDetail.parentCode || '없음'}`} style={{ flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item label="영문명" >
+                                            <Input value={accountSubjectDetail.englishName || ''}
+                                                   onChange={handleInputChange}   />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row gutter={16}>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="계정사용여부"
+                                            onClick={() => handlePopupClick('계정사용여부')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value={accountSubjectDetail.isActive ? '여' : '부'} style={{ flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="계정수정구분"
+                                            onClick={() => handlePopupClick('계정수정구분')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value={accountSubjectDetail.modificationType ? '수정 가능' : '수정 불가'} style={{ flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row gutter={16}>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="표준재무제표코드(명)"
+                                            onClick={() => handlePopupClick('표준재무제표')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value="표준재무제표 코드" style={{ marginRight: '10px', flex: 1 }} readOnly />
+                                                <Input value="표준재무제표명" style={{ marginRight: '10px', flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="외화사용여부"
+                                            onClick={() => handlePopupClick('외화사용여부')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value={accountSubjectDetail.isForeignCurrency ? '여' : '부'} style={{ flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row gutter={16}>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="업무용차 여부"
+                                            onClick={() => handlePopupClick('업무용차 여부')}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Input value={accountSubjectDetail.isBusinessCar ? '여' : '부'} style={{ flex: 1 }} readOnly />
+                                            </div>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Form>
 
-            <h3>Standard Financial Statements</h3>
-            <Box sx={{ maxHeight: '80vh', overflowY: 'auto', width: '50vw' }}>
-                <Table2 numRows={accountSubjectDetail.standardFinancialStatement.length} enableRowHeader={true}>
-                    <Column name="Code" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.standardFinancialStatement[rowIndex].code}</Cell>
-                    )} />
-                    <Column name="Name" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.standardFinancialStatement[rowIndex].name}</Cell>
-                    )} />
-                </Table2>
-            </Box>
+                            {/* 현금적요 테이블 */}
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="h6">현금적요</Typography>
+                                <Table
+                                    rowKey="id"
+                                    pagination={false}
+                                    bordered={true}
+                                    size="small"
+                                    columns={cashMemosColumns}
+                                    dataSource={accountSubjectDetail.cashMemos}
+                                />
+                            </Box>
 
-            <h3>Cash Memos</h3>
-            <Box sx={{ maxHeight: '80vh', overflowY: 'auto', width: '50vw' }}>
-                <Table2 numRows={accountSubjectDetail.cashMemos.length} enableRowHeader={true}>
-                    <Column name="ID" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.cashMemos[rowIndex].id}</Cell>
-                    )} />
-                    <Column name="Content" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.cashMemos[rowIndex].content}</Cell>
-                    )} />
-                </Table2>
-            </Box>
+                            {/* 대체적요 테이블 */}
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="h6">대체적요</Typography>
+                                <Table
+                                    rowKey="id"
+                                    pagination={false}
+                                    bordered={true}
+                                    size="small"
+                                    columns={transferMemosColumns}
+                                    dataSource={accountSubjectDetail.transferMemos}
+                                />
+                            </Box>
 
-            <h3>Transfer Memos</h3>
-            <Box sx={{ maxHeight: '80vh', overflowY: 'auto', width: '50vw' }}>
-                <Table2 numRows={accountSubjectDetail.transferMemos.length} enableRowHeader={true}>
-                    <Column name="ID" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.transferMemos[rowIndex].id}</Cell>
-                    )} />
-                    <Column name="Content" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.transferMemos[rowIndex].content}</Cell>
-                    )} />
-                </Table2>
-            </Box>
-
-            <h3>Fixed Memos</h3>
-            <Box sx={{ maxHeight: '80vh', overflowY: 'auto', width: '50vw' }}>
-                <Table2 numRows={accountSubjectDetail.fixedMemos.length} enableRowHeader={true}>
-                    <Column name="ID" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.fixedMemos[rowIndex].id}</Cell>
-                    )} />
-                    <Column name="Content" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.fixedMemos[rowIndex].content}</Cell>
-                    )} />
-                    <Column name="Category" cellRenderer={(rowIndex) => (
-                        <Cell>{accountSubjectDetail.fixedMemos[rowIndex].category}</Cell>
-                    )} />
-                </Table2>
-            </Box>
+                            {/* 고정적요 테이블 */}
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="h6">고정적요</Typography>
+                                <Table
+                                    rowKey="id"
+                                    pagination={false}
+                                    bordered={true}
+                                    size="small"
+                                    columns={fixedMemos}
+                                    dataSource={accountSubjectDetail.fixedMemos}
+                                />
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Box>
+            )}
         </Box>
     );
 }

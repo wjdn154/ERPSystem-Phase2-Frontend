@@ -48,26 +48,48 @@
 }
 /* 스크롤바 영역 끝 */
 
-/* 테이블 영역 시작 */
+/* antd 테이블 영역 시작 */
+.ant-table-tbody > tr.ant-table-row-selected > td {
+  background-color: #d3daf7 !important;
+}
+.ant-radio-wrapper-checked .ant-radio .ant-radio-inner {
+  border-color: #6d84ec !important;
+  background-color: #6d84ec !important;
+}
+
 .table-header-span {
   font-size: 0.7rem;
 }
 .table-span {
   font-size: 0.7rem;
 }
-.table-title {
-  /*background-color: #f5f5f5;*/
-  /*background-color: #d3daf7;*/
-  background-color: #1677ff;
-  padding: 5px;
-  margin-bottom: 20px;
-  text-align: center;
-  border-radius: 10px;
+
+.red-text {
+  color: red !important;
 }
-.table-title-span {
-  /*color: #19358c;*/
-  /*color: #fff;*/
-  font-size: 1.2rem;
-  font-weight: 700;
-}
+
 /* 테이블 영역 끝 */
+
+/* 버튼 영역 시작  */
+.ant-btn:focus {
+  outline: none !important; /* 포커스 시 외곽선 제거 */
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2) !important; /* 포커스 시 쉐도우 증가 */
+}
+/* 버튼 영역 끝  */
+
+/* antd Form 영역 시작  */
+.ant-form-item-label > label {
+  font-weight: 600;
+}
+
+.ant-input {
+  /*text-align: center;*/
+}
+
+.ant-input[readonly] {
+  background-color: #f0f0f0 !important;
+}
+.ant-input-fix {
+  background-color: #f6a6a6 !important;
+}
+/* antd Form 영역 끝  */
