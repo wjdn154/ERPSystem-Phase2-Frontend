@@ -1,14 +1,17 @@
 import React from 'react';
+// MUI 및 Ant Design 컴포넌트를 임포트
 import { AppBar, Toolbar, Box, IconButton, Typography, Breadcrumbs } from '@mui/material';
 import { SearchOutlined } from '@ant-design/icons';
 import { Button, Input, Select, Space } from 'antd';
-import SearchBar from './SearchBar';
-import SettingsIcon from '@mui/icons-material/Settings';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import Logo from '../../../assets/favicon/OMZ.svg';
+import SearchBar from './SearchBar.jsx'; // 검색바 컴포넌트 임포트
+import SettingsIcon from '@mui/icons-material/Settings'; // 설정 아이콘 임포트
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'; // 네비게이션 아이콘 임포트
+import Logo from '../../../../assets/favicon/OMZ.svg'; // 로고 이미지 파일 임포트
 
+// Header 컴포넌트 정의, 메뉴 선택 상태를 props로 받음
 function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
 
+    // 브레드크럼을 렌더링하는 함수 정의
     const renderBreadcrumb = () => {
         return (
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb" sx={{ color: 'text.secondary', overflow: 'hidden', display: 'flex',
@@ -44,17 +47,11 @@ function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px', width: '100%', alignItems: 'center' }}>
                     {/* 검색바 영역 */}
-                    {/*<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start',*/}
-                    {/*    border: '1px solid #818181', borderRadius: '5px' }}>*/}
-                        {/*<Box sx={{ width: '100%', maxWidth: '300px', mr: 2 }}>*/}
-                            {/*<SearchBar />*/}
-                            <Space direction="vertical" size="middle">
-                                <Space.Compact >
-                                    <Input addonBefore={<SearchOutlined />} placeholder="검색어를 입력하세요." />
-                                </Space.Compact>
-                            </Space>
-                        {/*</Box>*/}
-                    {/*</Box>*/}
+                    <Space direction="vertical" size="middle">
+                        <Space.Compact >
+                            <Input addonBefore={<SearchOutlined />} placeholder="검색어를 입력하세요." />
+                        </Space.Compact>
+                    </Space>
 
                     {/* 브레드크럼 및 설정 아이콘 영역 */}
                     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', minWidth: '500px',

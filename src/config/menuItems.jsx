@@ -1,9 +1,11 @@
+// MUI 아이콘 모듈에서 필요한 아이콘들을 임포트
 import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 
+// 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
     { text: '그룹웨어', icon: <FeaturedPlayListIcon /> },
     { text: '재무회계', icon: <AttachMoneyIcon /> },
@@ -12,6 +14,7 @@ export const menuItems = [
     { text: '생산관리', icon: <PrecisionManufacturingIcon /> },
 ];
 
+// 서브 메뉴 아이템 객체를 정의, 메인 메뉴별로 다양한 서브 메뉴 항목들을 배열로 관리
 export const subMenuItems = {
     '그룹웨어': [
         {

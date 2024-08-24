@@ -6,12 +6,11 @@ function FinancialDashboard() {
         <Card>
             <CardContent>
                 <Typography variant="h5" component="div">
-                    Financial Dashboard
+                    재무회계 대시보드
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                    Financial Overview and Metrics
+                    재무회계 대시보드
                 </Typography>
-                {/* 추가적인 내용이나 차트, 데이터 등을 여기에 넣을 수 있음 */}
             </CardContent>
         </Card>
     );
