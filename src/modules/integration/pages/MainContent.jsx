@@ -1,6 +1,7 @@
 import React from 'react';
 import { Typography, Box, Skeleton } from '@mui/material';
 import AccountSubjectPage from '../../financial/pages/AccountSubjectPage.jsx';
+import WorkcenterManagementPage from '../../production/pages/Workcenter/WorkcenterManagementPage.jsx'; // 작업장 관리 페이지 임포트
 import MainContentHook from '../hooks/MainContentHook.jsx';
 
 // MainContent 컴포넌트는 선택된 서브메뉴에 따라 관련 계정과목 데이터를 표시.
@@ -20,6 +21,16 @@ function MainContent({ selectedSubSubMenu }) {
         }
         // 데이터 로딩이 성공적으로 완료되면 AccountSubjectPage 컴포넌트에 데이터를 전달하여 렌더링
         return <AccountSubjectPage data={data} />;
+        // return <WorkcenterManagementPage data={data} />;
+
+        switch (selectedSubSubMenu) {
+            case '계정과목및적요등록':
+                return <AccountSubjectPage data={data} />;
+            case '작업장 관리':
+                return <WorkcenterManagementPage data={data} />;
+            default:
+                return <Typography>선택된 메뉴에 해당하는 콘텐츠가 없습니다.</Typography>;
+        }
     };
 
     // 최종적으로 콘텐츠를 Box 컴포넌트 안에 렌더링

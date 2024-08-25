@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FINANCIAL_API } from '../../../config/apiConstants';
+import { FINANCIAL_API, PRODUCTION_API } from '../../../config/apiConstants';
 
 const MainContentHook = (selectedSubSubMenu) => {
     const [data, setData] = useState(null);
@@ -33,6 +33,10 @@ const MainContentHook = (selectedSubSubMenu) => {
                 return `${FINANCIAL_API.ACCOUNT_SUBJECTS_API}`;
             case '다른메뉴':
                 return 'anotherMenu';
+            case '작업장 관리': 
+                return `${PRODUCTION_API.WORKCENTER_API}`;
+            case '공정 세부정보 관리': 
+                return `${PRODUCTION_API.WORKCENTER_API}`;
             default:
                 return 'default';
         }
