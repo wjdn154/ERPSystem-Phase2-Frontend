@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FINANCIAL_API } from '../../../config/apiConstants';
 
 const MainContentHook = (selectedSubSubMenu) => {
-    const [data, setData] = useState(null);
+    const [initialData, setInitialData] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -15,12 +15,12 @@ const MainContentHook = (selectedSubSubMenu) => {
 
         axios.post(endpoint)
             .then(response => {
-                setData(response.data);
+                setInitialData(response.data);
                 setError(null);
             })
             .catch(err => {
                 setError('데이터 로딩 중 오류가 발생했습니다.');
-                setData(null);
+                setInitialData(null);
             })
             .finally(() => {
                 setLoading(false);
@@ -38,7 +38,7 @@ const MainContentHook = (selectedSubSubMenu) => {
         }
     }
 
-    return { data, error, loading };
+    return { initialData, error, loading };
 }
 
 export default MainContentHook;

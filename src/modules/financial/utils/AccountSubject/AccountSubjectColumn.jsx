@@ -13,7 +13,7 @@ export const accountSubjectColumn = [
     },
     {
         title: <span>성격</span>,  // 컬럼 제목
-        dataIndex: 'natureCode',  // 데이터 인덱스: 이 필드는 데이터 객체의 'natureCode' 속성과 연결됩니다.
+        dataIndex: 'natureName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'natureCode' 속성과 연결됩니다.
         align: 'center',  // 컬럼 내용을 중앙 정렬
         width: '20%',  // 컬럼 너비 설정
     },
