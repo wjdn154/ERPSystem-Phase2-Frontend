@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import { Box, Grid } from '@mui/material';
 import AccountSubjectStructureSection from '../components/AccountSubject/AccountSubjectStructureSection.jsx';
 import AccountSubjectListSection from '../components/AccountSubject/AccountSubjectListSection.jsx';
@@ -7,10 +7,27 @@ import { accountSubjectHook } from '../hooks/AccountSubjectHook';
 import {accountSubjectColumn} from "../utils/AccountSubject/AccountSubjectColumn.jsx";
 import {getRowClassName} from "../utils/AccountSubject/AccountSubjectUtil.jsx";
 
-const AccountSubjectPage = ({ data }) => {
-    const { selectedRow, setSelectedRow, accountSubjectDetail, setAccountSubjectDetail, handleRowSelection, handleInputChange,
-            handleInputChange2, handleAddNewMemo, handleDeleteMemo, handleSelectedRow, handlePopupClick, isModalVisible,
-            selectedFinancialStatement, showModal, handleClose, selectFinancialStatement } = accountSubjectHook();
+const AccountSubjectPage = ({ initialData }) => {
+    const memoizedData = useMemo(() => initialData, [initialData]);
+    console.log(memoizedData);
+    const {
+        data,
+        accountSubjectDetail,
+        setAccountSubjectDetail,
+        handleRowSelection,
+        handleInputChange,
+        handleInputChange2,
+        handleAddNewMemo,
+        handleDeleteMemo,
+        handleSelectedRow,
+        handlePopupClick,
+        isFinancialStatementModalVisible,
+        isRelationCodeModalVisible,
+        handleClose,
+        selectFinancialStatement,
+        selectRelationCode,
+        handleSave
+    } = accountSubjectHook(initialData);
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -29,9 +46,11 @@ const AccountSubjectPage = ({ data }) => {
             {/*계정과목 상세 영역*/}
             {accountSubjectDetail && (
                 <SelectedAccountSubjectDetailSection
+                    data={data}
                     accountSubjectDetail={accountSubjectDetail}
                     handlePopupClick ={handlePopupClick}
-                    isModalVisible ={isModalVisible}
+                    isFinancialStatementModalVisible = {isFinancialStatementModalVisible}
+                    isRelationCodeModalVisible = {isRelationCodeModalVisible}
                     handleClose ={handleClose}
                     selectFinancialStatement ={selectFinancialStatement}
                     handleInputChange ={handleInputChange}
@@ -39,6 +58,8 @@ const AccountSubjectPage = ({ data }) => {
                     handleDeleteMemo ={handleDeleteMemo}
                     handleAddNewMemo ={handleAddNewMemo}
                     setAccountSubjectDetail ={setAccountSubjectDetail}
+                    selectRelationCode ={selectRelationCode}
+                    handleSave = {handleSave}
                 />
             )}
         </Box>

@@ -1,13 +1,31 @@
 import React from 'react';
-import {Box, Paper, Typography, Modal, TableContainer, Table as MuiTable, TableBody, TableRow, TableCell, Button } from '@mui/material';
-import {Col, Form, Row, Input, Table as AntTable} from "antd";
+import {Box, Paper, Typography, Modal, TableContainer, Table as MuiTable, TableBody, TableRow, TableCell } from '@mui/material';
+import {Button, Col, Form, Row, Input, Table as AntTable, Switch, Select} from "antd";
+const { Option } = Select;
 import {cashMemoColumn} from "../../utils/AccountSubject/CashMemoColumn.jsx";
 import {transferMemosColumn} from "../../utils/AccountSubject/TransferMemosColumn.jsx";
+import {FinancialStatementColumn} from "../../utils/AccountSubject/FinancialStatementColumn.jsx";
+import {RelationCodeColumn} from "../../utils/AccountSubject/RelationCodeColumn.jsx";
 import {fixedMemoColumn} from "../../utils/AccountSubject/FixedMemoColumn.jsx";
 
 
-const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopupClick, isModalVisible, handleClose,
-    selectFinancialStatement, handleInputChange, handleInputChange2, handleDeleteMemo, handleAddNewMemo, setAccountSubjectDetail }) => (
+const SelectedAccountSubjectDetailSection = ({
+    data,
+    accountSubjectDetail,
+    handlePopupClick,
+    isFinancialStatementModalVisible,
+    isRelationCodeModalVisible,
+    handleClose,
+    selectFinancialStatement,
+    handleInputChange,
+    handleInputChange2,
+    handleDeleteMemo,
+    handleAddNewMemo,
+    setAccountSubjectDetail,
+    selectRelationCode,
+    handleSave
+}) => (
+
     <Box sx={{ mt: 2 }}>
         <Paper elevation={3} sx={{ p: 2 }}>
             <Typography variant="h6" marginBottom={'20px'}>계정과목 상세 내용</Typography>
@@ -17,22 +35,22 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                         <Col span={12}>
                             <Form.Item
                                 label="계정과목코드(명)"
-                                onClick={() => handlePopupClick('계정과목코드')}
+                                onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('계정과목코드') : undefined}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <Input value={accountSubjectDetail.code} style={{ marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6 !important' }} readOnly />
-                                    <Input value={accountSubjectDetail.name} style={{ flex: 1 }} readOnly />
+                                    <Input value={accountSubjectDetail.name} style={{ flex: 1 }} onChange={(e) => handleInputChange(e, 'name')} readOnly={!accountSubjectDetail.modificationType} />
                                 </div>
                             </Form.Item>
                         </Col>
                         <Col span={12}>
                             <Form.Item
                                 label="성격"
-                                onClick={() => handlePopupClick('성격')}
+                                onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('성격') : undefined}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <Input value={'성격코드'} style={{ marginRight: '10px', flex: 1 }} readOnly />
-                                    <Input value={'성격명'} style={{ flex: 1 }} readOnly />
+                                    <Input value={accountSubjectDetail.natureCode} style={{ marginRight: '10px', flex: 1 }} readOnly={!accountSubjectDetail.modificationType}/>
+                                    <Input value={accountSubjectDetail.natureName} style={{ flex: 1 }} readOnly={!accountSubjectDetail.modificationType}/>
                                 </div>
                             </Form.Item>
                         </Col>
@@ -41,18 +59,57 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                         <Col span={12}>
                             <Form.Item
                                 label="관계코드(명)"
-                                onClick={() => handlePopupClick('관계코드')}
+                                onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('관계코드') : undefined}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <Input value={accountSubjectDetail.parentCode || '없음'} style={{ marginRight: '10px', flex: 1 }} readOnly />
-                                    <Input value={accountSubjectDetail.parentCode || '없음'} style={{ flex: 1 }} readOnly />
+                                    <Input value={accountSubjectDetail.parentCode || '없음'} style={{ marginRight: '10px', flex: 1 }} readOnly={!accountSubjectDetail.modificationType} />
+                                    <Input value={accountSubjectDetail.parentName || '없음'} style={{ flex: 1 }} readOnly={!accountSubjectDetail.modificationType} />
                                 </div>
                             </Form.Item>
                         </Col>
+                        <Modal
+                            open={isRelationCodeModalVisible || false}
+                            onClose={() => handleClose()}
+                            aria-labelledby="select-relation-code-modal"
+                            aria-describedby="select-a-relation-code-from-list"
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Box sx={{ minWidth: '60vw', minHeight: '60vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
+                                <Typography id="modal-modal-title" variant="h6" component="h2">
+                                    관계 코드 선택
+                                </Typography>
+
+                                {/* antd Table 사용 */}
+                                <AntTable
+                                    columns={RelationCodeColumn()}
+                                    dataSource={data.accountSubjects}
+                                    rowKey="code"
+                                    size={'small'}
+                                    pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
+                                    onRow={(record) => ({
+                                        style: { cursor: 'pointer' },
+                                        onClick: () => {
+                                            selectRelationCode(record);
+                                            handleClose();
+                                        },
+                                    })}
+                                    style={{ marginTop: 16 }}
+                                />
+
+                                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                    <Button onClick={handleClose} variant="contained" color="primary" sx={{ mr: 1 }}>
+                                        닫기
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </Modal>
                         <Col span={12}>
                             <Form.Item label="영문명" >
-                                <Input value={accountSubjectDetail.englishName || ''}
-                                       onChange={(e) => handleInputChange(e, 'englishName')} />
+                                <Input value={accountSubjectDetail.englishName || ''} onChange={(e) => handleInputChange(e, 'englishName')} readOnly={!accountSubjectDetail.modificationType}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -60,17 +117,34 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                         <Col span={12}>
                             <Form.Item
                                 label="계정사용여부"
-                                onClick={() => handlePopupClick('계정사용여부')}
+                                onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('계정사용여부') : undefined}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <Input value={accountSubjectDetail.isActive ? '여' : '부'} style={{ flex: 1 }} readOnly />
+                                    {/* 현재 상태를 확인할 수 있는 Input */}
+                                    {!accountSubjectDetail.modificationType && (
+                                        <Input
+                                            value={accountSubjectDetail.isActive ? '여' : '부'}
+                                            style={{ flex: 1, marginRight: '10px' }}
+                                            readOnly
+                                        />
+                                    )}
+                                    {/* 수정 가능한 Select */}
+                                    {accountSubjectDetail.modificationType && (
+                                        <Select
+                                            value={accountSubjectDetail.isActive}
+                                            onChange={(value) => handleInputChange({ target: { value } }, 'isActive')}
+                                            style={{ flex: 1 }}
+                                        >
+                                            <Option value={true}>여</Option>
+                                            <Option value={false}>부</Option>
+                                        </Select>
+                                    )}
                                 </div>
                             </Form.Item>
                         </Col>
                         <Col span={12}>
                             <Form.Item
                                 label="계정수정구분"
-                                onClick={() => handlePopupClick('계정수정구분')}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <Input value={accountSubjectDetail.modificationType ? '수정 가능' : '수정 불가'} style={{ flex: 1 }} readOnly />
@@ -82,49 +156,55 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                         <Col span={12}>
                             <Form.Item
                                 label="표준재무제표코드(명)"
-                                onClick={() => handlePopupClick('표준재무제표')}
+                                onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('표준재무제표') : undefined}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <Input value="표준재무제표 코드" style={{ marginRight: '10px', flex: 1 }} />
-                                    <Input value="표준재무제표명" style={{ marginRight: '10px', flex: 1 }} readOnly />
+                                    <Input
+                                        value={accountSubjectDetail.standardFinancialStatementCode}
+                                        style={{ marginRight: '10px', flex: 1 }}
+                                        readOnly={!accountSubjectDetail.modificationType}
+                                    />
+                                    <Input
+                                        value={accountSubjectDetail.standardFinancialStatementName}
+                                        style={{ marginRight: '10px', flex: 1 }}
+                                        readOnly
+                                    />
                                 </div>
                             </Form.Item>
                         </Col>
                         <Modal
-                            open={isModalVisible}
-                            onClose={handleClose}
+                            open={isFinancialStatementModalVisible}
+                            onClose={() => handleClose()}
                             aria-labelledby="select-financial-statement-modal"
                             aria-describedby="select-a-financial-statement-from-list"
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
                             }}
                         >
-                            <Box sx={{ width: 'auto', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, maxWidth: '80vw', maxHeight: '80vh', overflow: 'auto' }}>
+                            <Box sx={{ minWidth: '60vw', minHeight: '60vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
                                 <Typography id="modal-modal-title" variant="h6" component="h2">
                                     표준재무제표 선택
                                 </Typography>
-                                <TableContainer component={Paper}>
-                                    <MuiTable size="small">
-                                        <TableBody>
-                                            {accountSubjectDetail.standardFinancialStatement.map((item, index) => (
-                                                <TableRow
-                                                    hover
-                                                    key={index}
-                                                    onClick={() => {
-                                                        selectFinancialStatement(item);
-                                                        handleClose();
-                                                    }}
-                                                    sx={{ cursor: 'pointer' }}
-                                                >
-                                                    <TableCell component="th" scope="row" sx={{ fontSize: '0.7rem' }}>{item.code}</TableCell>
-                                                    <TableCell sx={{ fontSize: '0.7rem' }} >{item.name}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </MuiTable>
-                                </TableContainer>
+
+                                {/* antd Table 사용 */}
+                                <AntTable
+                                    columns={FinancialStatementColumn()}
+                                    dataSource={accountSubjectDetail.standardFinancialStatement}
+                                    rowKey="code"
+                                    size={'small'}
+                                    pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
+                                    onRow={(record) => ({
+                                        style: { cursor: 'pointer' },
+                                        onClick: () => {
+                                            selectFinancialStatement(record);
+                                            handleClose();
+                                        },
+                                    })}
+                                    style={{ marginTop: 16 }}
+                                />
+
                                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
                                     <Button onClick={handleClose} variant="contained" color="primary" sx={{ mr: 1 }}>
                                         닫기
@@ -135,7 +215,7 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                         <Col span={12}>
                             <Form.Item
                                 label="외화사용여부"
-                                onClick={() => handlePopupClick('외화사용여부')}
+                                onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('외화사용여부') : undefined}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <Input value={accountSubjectDetail.isForeignCurrency ? '여' : '부'} style={{ flex: 1 }} readOnly />
@@ -146,8 +226,8 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                     <Row gutter={16}>
                         <Col span={12}>
                             <Form.Item
-                                label="업무용차 여부"
-                                onClick={() => handlePopupClick('업무용차 여부')}
+                                label="업무용차여부"
+                                onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('업무용차여부') : undefined}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <Input value={accountSubjectDetail.isBusinessCar ? '여' : '부'} style={{ flex: 1 }} readOnly />
@@ -161,7 +241,7 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6">현금적요</Typography>
                     <AntTable
-                        rowKey="id"
+                        rowKey="code"
                         pagination={false}
                         bordered={true}
                         size="small"
@@ -176,7 +256,7 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6">대체적요</Typography>
                     <AntTable
-                        rowKey="id"
+                        rowKey="code"
                         pagination={false}
                         bordered={true}
                         size="small"
@@ -191,7 +271,7 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6">고정적요</Typography>
                     <AntTable
-                        rowKey="id"
+                        rowKey="code"
                         pagination={false}
                         bordered={true}
                         size="small"
@@ -201,6 +281,11 @@ const SelectedAccountSubjectDetailSection = ({ accountSubjectDetail, handlePopup
                         }
                     />
                 </Box>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '30px'}}>
+                <Button onClick={handleSave} type="primary" >
+                    저장
+                </Button>
             </Box>
         </Paper>
     </Box>
