@@ -9,7 +9,7 @@ const MainContentHook = (selectedSubSubMenu) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!selectedSubSubMenu || selectedSubSubMenu === "회사정보수정") return;
+        if (!selectedSubSubMenu || selectedSubSubMenu.text === "회사정보수정") return;
 
         setLoading(true);
 
