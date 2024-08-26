@@ -1,42 +1,102 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* 스크롤바 영역 시작 */
+.mui-scrollbar::-webkit-scrollbar,
+.ant-table-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.mui-scrollbar::-webkit-scrollbar-thumb,
+.ant-table-body::-webkit-scrollbar-thumb {
+  background-color: #888;
+  transition: background-color 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 0; /* 기본적으로 스크롤바를 투명하게 설정 */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.mui-scrollbar:hover::-webkit-scrollbar-thumb,
+.ant-table-body:hover::-webkit-scrollbar-thumb {
+  background-color: #555;
+  opacity: 1; /* 호버 시 스크롤바 나타나게 */
 }
 
-.card {
-  padding: 2em;
+.mui-scrollbar::-webkit-scrollbar-thumb:hover,
+.ant-table-body::-webkit-scrollbar-thumb:hover {
+  background-color: #333;
+  transition: background-color 0.3s ease-in-out; /* 동일한 애니메이션 */
 }
 
-.read-the-docs {
-  color: #888;
+.mui-scrollbar::-webkit-scrollbar-button,
+.ant-table-body::-webkit-scrollbar-button {
+  display: none; /* 상단 및 하단 화살표 없애기 */
 }
+
+/* Firefox에서 스크롤바 스타일링 */
+.MuiBox-root,
+.mui-scrollbar,
+.ant-table-body {
+  scrollbar-width: thin;
+  scrollbar-color: #e3e2e2 #f1f1f1; /* 스크롤바 색상 */
+  transition: scrollbar-color 0.3s ease-in-out; /* 동일한 애니메이션 */
+}
+
+.MuiBox-root:hover,
+.mui-scrollbar:hover,
+.ant-table-body:hover {
+  scrollbar-color: #888 #f1f1f1; /* 호버 시 스크롤바 색상 */
+  transition: scrollbar-color 0.3s ease-in-out; /* 동일한 애니메이션 */
+}
+/* 스크롤바 영역 끝 */
+
+/* antd 테이블 영역 시작 */
+.ant-table-tbody > tr.ant-table-row-selected > td {
+  background-color: #d3daf7 !important;
+}
+.ant-radio-wrapper-checked .ant-radio .ant-radio-inner {
+  border-color: #6d84ec !important;
+  background-color: #6d84ec !important;
+}
+
+.table-header-span {
+  font-size: 0.7rem;
+}
+.table-span {
+  font-size: 0.7rem;
+}
+
+.red-text {
+  color: #f85252 !important;
+}
+
+/* 테이블 영역 끝 */
+
+/* 버튼 영역 시작  */
+.ant-btn-primary {
+  background-color: #6d84ec !important;
+  /*box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2) !important; !* 포커스 시 쉐도우 증가 *!*/
+}
+
+.ant-btn-danger {
+  background-color: #ee8484 !important;
+  color: #fff;
+}
+
+/* 버튼 영역 끝  */
+
+/* antd Form 영역 시작  */
+.ant-form-item-label > label {
+  font-weight: 600;
+}
+
+.ant-input {
+  /*text-align: center;*/
+}
+.ant-input[readonly] {
+  background-color: #f0f0f0 !important;
+}
+.ant-input-fix {
+  background-color: #f6a6a6 !important;
+}
+/* antd Form 영역 끝  */
