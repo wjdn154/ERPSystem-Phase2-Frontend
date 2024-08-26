@@ -10,7 +10,6 @@ import Logo from '../../../../assets/favicon/OMZ.svg'; // 로고 이미지 파�
 
 // Header 컴포넌트 정의, 메뉴 선택 상태를 props로 받음
 function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
-
     // 브레드크럼을 렌더링하는 함수 정의
     const renderBreadcrumb = () => {
         return (
@@ -27,7 +26,7 @@ function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
                         {selectedSubMenu}</Typography>
                 )}
                 {selectedSubSubMenu && (
-                    <Typography sx={{fontWeight: '700', color: 'text.primary'}}>{selectedSubSubMenu}</Typography>
+                    <Typography sx={{fontWeight: '700', color: 'text.primary'}}>{selectedSubSubMenu.text}</Typography>
                 )}
             </Breadcrumbs>
         );
