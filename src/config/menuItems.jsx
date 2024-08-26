@@ -22,7 +22,9 @@ export const subMenuItems = {
     '그룹웨어': [
         {
             text: '기초정보관리',
-            items: ['회사정보수정']
+            items: [
+                { text: '회사정보수정', component: null, apiPath: null },
+            ]
         }
     ],
     '재무회계': [

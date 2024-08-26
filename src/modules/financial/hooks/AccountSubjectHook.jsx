@@ -97,15 +97,6 @@ export const accountSubjectHook = (initialData) => {
                     [field]: newMemos
                 };
             } else {
-                // 기존 필드에서 가장 큰 code 값을 찾음
-                const maxCode = Math.max(...currentField.map(memo => memo.code));
-                const newCode = maxCode + 1;  // 가장 큰 code 값에 1을 더함
-
-                const newMemo = { code: newCode, content: '' };
-                return {
-                    ...prevState,
-                    [field]: [...currentField, newMemo]
-                };
             }
         });
     };
