@@ -179,7 +179,7 @@ const Sidebar = ({
                                                                 <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
                                                             </ListItemIcon>
                                                             <ListItemText
-                                                                primary={item}
+                                                                primary={item.text}
                                                                 primaryTypographyProps={{
                                                                     sx: { fontSize: '0.8rem', fontWeight: '400' }
                                                                 }}

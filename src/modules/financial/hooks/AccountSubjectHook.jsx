@@ -11,6 +11,7 @@ import {FinancialStatementColumn} from "../utils/AccountSubject/FinancialStateme
 export const accountSubjectHook = (initialData) => {
     // 선택된 행과 계정과목 상세 정보를 관리하는 상태
     const [data, setData] = useState(initialData);
+    const [showDetail, setShowDetail] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
     const [accountSubjectDetail, setAccountSubjectDetail] = useState(initialData.accountSubjectDetail);
     const [isFinancialStatementModalVisible, setIsFinancialStatementModalVisible] = useState(false);
@@ -19,6 +20,12 @@ export const accountSubjectHook = (initialData) => {
     const memoizedData = useMemo(() => data, [data]);
 
     useEffect(() => {
+        if (accountSubjectDetail) {
+            setShowDetail(false); // 기존 컴포넌트를 사라지게 함
+            setTimeout(() => {
+                setShowDetail(true); // 새 컴포넌트를 나타나게 함
+            }, 0); // 0ms의 지연 시간 후에 나타나도록 설정
+        }
     }, [accountSubjectDetail]);
 
     // 행 선택 핸들러 설정
@@ -159,18 +166,28 @@ export const accountSubjectHook = (initialData) => {
         });
     };
 
+    // 관계코드 삭제 버튼 선택 클릭 시 실행되는 함수
+    const deleteRelationCode = () => {
+        setAccountSubjectDetail(prevState => {
+            return {
+                ...prevState,
+                parentCode: null,
+                parentName: null
+            };
+        });
+        setIsRelationCodeModalVisible(false);
+    };
+
     // 저장 버튼 클릭 시 실행되는 함수
     const handleSave = async () => {
         try {
             const confirmSave = window.confirm("정말로 저장하시겠습니까?");
-            console.log(accountSubjectDetail);
 
             if (!confirmSave) return;
 
             await updateAccountSubjectDetail(accountSubjectDetail.code, accountSubjectDetail);
             const updatedData = await fetchAccountSubject();
             setData(updatedData);
-            console.log(accountSubjectDetail);
         } catch (error) {
             console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
         }
@@ -194,5 +211,7 @@ export const accountSubjectHook = (initialData) => {
         selectFinancialStatement,
         selectRelationCode,
         handleSave,
+        showDetail,
+        deleteRelationCode,
     };
 };
