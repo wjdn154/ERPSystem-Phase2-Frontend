@@ -12,7 +12,7 @@ export const accountSubjectHook = (initialData) => {
     // 선택된 행과 계정과목 상세 정보를 관리하는 상태
     const [data, setData] = useState(initialData);
     const [selectedRow, setSelectedRow] = useState(null);
-    const [accountSubjectDetail, setAccountSubjectDetail] = useState(null);
+    const [accountSubjectDetail, setAccountSubjectDetail] = useState(initialData.accountSubjectDetail);
     const [isFinancialStatementModalVisible, setIsFinancialStatementModalVisible] = useState(false);
     const [isRelationCodeModalVisible, setIsRelationCodeModalVisible] = useState(false);
 
