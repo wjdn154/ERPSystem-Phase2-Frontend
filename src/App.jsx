@@ -11,9 +11,9 @@ import { CssBaseline, Box } from '@mui/material';
 import { menuItems, subMenuItems } from './config/menuItems.jsx';
 
 //components
-import ContentWrapper from './modules/integration/components/ContentWrapper.jsx';
-import Sidebar from './modules/integration/components/Sidebar.jsx';
-import MainContent from './modules/integration/pages/MainContent.jsx';
+import ContentWrapper from './modules/integration/components/MainContent/ContentWrapper.jsx';
+import Sidebar from './modules/integration/components/Slidbar/Sidebar.jsx';
+import MainContentPage from './modules/integration/pages/MainContentPage.jsx';
 import Header from './modules/integration/components/Header/Header.jsx';
 
 // hooks
@@ -44,7 +44,7 @@ const App = () => {
                 />
                 <Box sx={{ flexGrow: 1, overflowY: 'auto', height: '90vh', backgroundColor: '#f5f5f5' }}>
                     <ContentWrapper>
-                        <MainContent selectedSubSubMenu={selectedSubSubMenu} />
+                        <MainContentPage selectedSubSubMenu={selectedSubSubMenu} />
                     </ContentWrapper>
                 </Box>
             </Box>

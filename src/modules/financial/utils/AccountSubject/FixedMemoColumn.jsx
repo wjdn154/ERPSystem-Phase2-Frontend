@@ -1,7 +1,7 @@
 export const fixedMemoColumn = [
     {
         title: <span>적요번호</span>,  // 적요번호 컬럼의 제목
-        dataIndex: 'id', // 데이터 객체의 'id' 속성과 연결, 각 행의 고유 번호를 나타냄
+        dataIndex: 'code', // 데이터 객체의 'id' 속성과 연결, 각 행의 고유 번호를 나타냄
         align: 'center', // 셀 내용을 중앙 정렬
         width: '20%', // 이 컬럼의 너비를 전체 테이블 너비의 20%로 설정
     },
