@@ -34,7 +34,8 @@ const SelectedAccountSubjectDetailSection = ({
     handleAddNewMemo,
     setAccountSubjectDetail,
     selectRelationCode,
-    handleSave
+    handleSave,
+    deleteRelationCode
 }) => (
     <Paper elevation={3} sx={{ p: 2 }}>
         <Typography variant="h6" marginBottom={'20px'}>계정과목 상세 내용</Typography>
@@ -113,7 +114,10 @@ const SelectedAccountSubjectDetailSection = ({
                             />
 
                             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button onClick={handleClose} variant="contained" color="primary" sx={{ mr: 1 }}>
+                                <Button onClick={deleteRelationCode} variant="contained" type="danger" style={{ marginRight: '20px' }} sx={{ mr: 1 }}>
+                                    삭제
+                                </Button>
+                                <Button onClick={handleClose} variant="contained" type="danger" sx={{ mr: 1 }}>
                                     닫기
                                 </Button>
                             </Box>
@@ -322,11 +326,13 @@ const SelectedAccountSubjectDetailSection = ({
                 />
             </Box>
         </Box>
-        <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '30px'}}>
-            <Button onClick={handleSave} type="primary" >
-                저장
-            </Button>
-        </Box>
+        {accountSubjectDetail.modificationType && (
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '30px'}}>
+                    <Button onClick={handleSave} type="primary" >
+                        저장
+                    </Button>
+            </Box>
+        )}
     </Paper>
 );
 
