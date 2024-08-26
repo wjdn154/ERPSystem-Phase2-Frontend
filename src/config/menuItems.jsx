@@ -6,6 +6,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 import {FINANCIAL_API} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
+import EnvironmentalRegistrationPage from "../modules/financial/pages/EnvironmentalRegistrationPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
@@ -33,7 +34,7 @@ export const subMenuItems = {
             items: [
                 { text: '거래처등록', component: null, apiPath: null },
                 { text: '계정과목및적요등록', component: AccountSubjectPage, apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API },
-                { text: '환경등록', component: null, apiPath: null },
+                { text: '환경등록', component: EnvironmentalRegistrationPage, apiPath: FINANCIAL_API.SHOW_JOURNAL_ENTRY_TYPE_SETUP_API },
                 { text: '업무용승용차등록', component: null, apiPath: null },
             ]
         },
