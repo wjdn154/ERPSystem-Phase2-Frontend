@@ -17,7 +17,7 @@ export const transferMemosColumn = (
             width: '20%', // 컬럼의 너비 설정
         },
         {
-            title: <span>대체적요</span>, // '대체적요' 컬럼 제목
+            title: <span>내용</span>, // '대체적요' 컬럼 제목
             dataIndex: 'content', // 데이터의 'content' 필드와 매핑, 대체적요 내용을 표시
             align: 'center', // 셀 내용을 가운데 정렬
             width: accountSubjectDetail.modificationType ? '60%' : '80%', // 컬럼의 너비 설정 (생성/삭제 버튼에 따라 조정)

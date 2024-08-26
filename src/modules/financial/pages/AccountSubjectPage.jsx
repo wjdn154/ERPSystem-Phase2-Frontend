@@ -32,36 +32,44 @@ const AccountSubjectPage = ({ initialData }) => {
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
             <Grid container spacing={2}>
-                {/*계정과목 체계 영역*/}
-                <AccountSubjectStructureSection data={data} />
-                {/*계정과목 리스트 영역*/}
-                <AccountSubjectListSection
-                    columns={accountSubjectColumn}
-                    data={data}
-                    handleRowSelection={handleRowSelection}
-                    handleSelectedRow={handleSelectedRow}
-                    rowClassName={getRowClassName}
-                />
+                <Grid item xs={12}>
+                    {/* 계정과목 체계 영역 */}
+                    <AccountSubjectStructureSection data={data} />
+                </Grid>
             </Grid>
-            {/*계정과목 상세 영역*/}
-            {accountSubjectDetail && (
-                <SelectedAccountSubjectDetailSection
-                    data={data}
-                    accountSubjectDetail={accountSubjectDetail}
-                    handlePopupClick ={handlePopupClick}
-                    isFinancialStatementModalVisible = {isFinancialStatementModalVisible}
-                    isRelationCodeModalVisible = {isRelationCodeModalVisible}
-                    handleClose ={handleClose}
-                    selectFinancialStatement ={selectFinancialStatement}
-                    handleInputChange ={handleInputChange}
-                    handleInputChange2 ={handleInputChange2}
-                    handleDeleteMemo ={handleDeleteMemo}
-                    handleAddNewMemo ={handleAddNewMemo}
-                    setAccountSubjectDetail ={setAccountSubjectDetail}
-                    selectRelationCode ={selectRelationCode}
-                    handleSave = {handleSave}
-                />
-            )}
+            <Grid container spacing={2} sx={{ marginTop: 2 }}>
+                {/* 계정과목 리스트 영역 */}
+                <Grid item xs={12} md={5}>
+                    <AccountSubjectListSection
+                        columns={accountSubjectColumn}
+                        data={data}
+                        handleRowSelection={handleRowSelection}
+                        handleSelectedRow={handleSelectedRow}
+                        rowClassName={getRowClassName}
+                    />
+                </Grid>
+                {/* 계정과목 상세 영역 */}
+                <Grid item xs={12} md={7}>
+                    {accountSubjectDetail && (
+                        <SelectedAccountSubjectDetailSection
+                            data={data}
+                            accountSubjectDetail={accountSubjectDetail}
+                            handlePopupClick={handlePopupClick}
+                            isFinancialStatementModalVisible={isFinancialStatementModalVisible}
+                            isRelationCodeModalVisible={isRelationCodeModalVisible}
+                            handleClose={handleClose}
+                            selectFinancialStatement={selectFinancialStatement}
+                            handleInputChange={handleInputChange}
+                            handleInputChange2={handleInputChange2}
+                            handleDeleteMemo={handleDeleteMemo}
+                            handleAddNewMemo={handleAddNewMemo}
+                            setAccountSubjectDetail={setAccountSubjectDetail}
+                            selectRelationCode={selectRelationCode}
+                            handleSave={handleSave}
+                        />
+                    )}
+                </Grid>
+            </Grid>
         </Box>
     );
 }

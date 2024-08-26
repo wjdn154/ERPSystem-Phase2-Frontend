@@ -17,7 +17,7 @@ export const cashMemoColumn = (
             width: '20%', // 컬럼 너비를 20%로 설정
         },
         {
-            title: <span>현금적요</span>, // 현금 적요 내용을 입력하는 컬럼
+            title: <span>내용</span>, // 현금 적요 내용을 입력하는 컬럼
             dataIndex: 'content', // 각 행에서 'content' 데이터 필드를 참조
             align: 'center', // 텍스트를 가운데 정렬
             width: accountSubjectDetail.modificationType ? '60%' : '80%', // 컬럼의 너비 설정 (생성/삭제 버튼에 따라 조정)
@@ -41,7 +41,7 @@ export const cashMemoColumn = (
                 <Button type="primary" onClick={() => handleAddNewMemo('cashMemos')}>
                     생성
                 </Button>,
-            dataIndex: 'action', // 각 행에서 'action' 데이터 필드를 참조
+            dataIndex: 'code', // 각 행에서 'code' 데이터 필드를 참조
             align: 'center', // 텍스트를 가운데 정렬
             width: '20%', // 컬럼 너비를 20%로 설정
             render: (_, record) => (
