@@ -7,24 +7,23 @@ const AccountSubjectListSection = ({ columns, data, handleRowSelection, handleSe
         return null;
     }
     return (
-        <Grid item xs={8}>
-            <Paper elevation={3} sx={{ height: '100%', p: 2 }}>
-                <Typography variant="h6" marginBottom={'20px'}>계정과목 목록</Typography>
-                <AntTable
-                    columns={columns}
-                    dataSource={data.accountSubjects}
-                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                    rowSelection={handleRowSelection}
-                    size="small"
-                    rowKey="id"
-                    onRow={(record) => ({
-                        onClick: () => handleSelectedRow(record),
-                        style: { cursor: 'pointer' },
-                    })}
-                    rowClassName={rowClassName}
-                />
-            </Paper>
-        </Grid>
+        <Paper elevation={3} sx={{ height: '100%', p: 2 }}>
+            <Typography variant="h6" marginBottom={'20px'}>계정과목 목록</Typography>
+            <AntTable
+                style={{ padding: '20px' }}
+                columns={columns}
+                dataSource={data.accountSubjects}
+                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                rowSelection={handleRowSelection}
+                size="small"
+                rowKey="id"
+                onRow={(record) => ({
+                    onClick: () => handleSelectedRow(record),
+                    style: { cursor: 'pointer' },
+                })}
+                rowClassName={rowClassName}
+            />
+        </Paper>
     )
 }
 
