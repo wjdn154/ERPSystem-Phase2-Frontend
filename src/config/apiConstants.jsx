@@ -12,6 +12,11 @@ export const FINANCIAL_API = {
 
 // 인사관리
 export const HR_API = {
+    Employee_API: `${API_BASE_URL}/api/hr/employee/all`, // 사원 목록 조회 API
+    EmployeeONE_API: `${API_BASE_URL}/api/employee/${id}`, // 사원 상세 조회 API
+    CREATEEmployee_API: `${API_BASE_URL}/api/employee/createEmployee`, // 사원 등록 API
+    UPDATEEmployee_API: `${API_BASE_URL}/employee/updateEmployee/${id}`, // 사원 수정 API
+    DELETEEmployee_API: `${API_BASE_URL}/api/employee/del/${id}`,
 };
 
 // 물류관리
