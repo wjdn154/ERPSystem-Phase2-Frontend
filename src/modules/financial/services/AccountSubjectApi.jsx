@@ -6,10 +6,10 @@ import { accountSubjectHook } from '../hooks/AccountSubjectHook.jsx';
 export const fetchAccountSubject = async () => {
     try {
         const response = await axios.post(FINANCIAL_API.ACCOUNT_SUBJECTS_API);
-        return response.data; // 데이터를 반환
+        return response.data;
     } catch (error) {
-        console.error("계정과목 상세 정보를 가져오는 중 오류 발생:", error);
-        throw error; // 호출한 곳에서 에러 처리
+        console.error("계정과목 정보를 가져오는 중 오류 발생:", error);
+        throw error;
     }
 };
 
@@ -17,9 +17,33 @@ export const fetchAccountSubject = async () => {
 export const fetchAccountSubjectDetail = async (code) => {
     try {
         const response = await axios.post(FINANCIAL_API.ACCOUNT_SUBJECT_DETAIL_API(code));
-        return response.data; // 데이터를 반환
+        return response.data;
     } catch (error) {
         console.error("계정과목 상세 정보를 가져오는 중 오류 발생:", error);
-        throw error; // 호출한 곳에서 에러 처리
+        throw error;
+    }
+};
+
+// 계정과목 수정 함수
+export const updateAccountSubjectDetail = async (code, accountSubjectDetail) => {
+    try {
+        await axios.put(FINANCIAL_API.UPDATE_ACCOUNT_SUBJECT_API(code),
+            accountSubjectDetail
+        );
+    } catch (error) {
+        console.error("계정과목 정보를 업데이트 하는 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 적요 수정 함수
+export const updateAccountSubjectMemo = async (code, accountSubjectDetail) => {
+    try {
+        await axios.put(FINANCIAL_API.UPDATE_ACCOUNT_SUBJECT_API(code),
+            accountSubjectDetail
+        );
+    } catch (error) {
+        console.error("계정과목 정보를 업데이트 하는 중 오류 발생:", error);
+        throw error;
     }
 };
