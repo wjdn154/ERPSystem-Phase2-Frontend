@@ -6,7 +6,7 @@ const AppHook = () => {
     // 중분류 메뉴 상태 관리
     const [selectedSubMenu, setSelectedSubMenu] = useState('기초정보관리');
     // 소분류 메뉴 상태 관리
-    const [selectedSubSubMenu, setSelectedSubSubMenu] = useState('회사정보수정');
+    const [selectedSubSubMenu, setSelectedSubSubMenu] = useState({ text: '회사정보수정', component: null, apiPath: null });
 
     return {
         selectedMenu,
