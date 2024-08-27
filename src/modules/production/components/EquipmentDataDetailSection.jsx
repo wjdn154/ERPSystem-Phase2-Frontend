@@ -2,7 +2,7 @@ import React from 'react';
 import {Grid,Paper,Typography}  from "@mui/material";
 import {Table as AntTable} from "antd";
 
-const EquipmentDataListSection = ({columns, data, handleRowSelection, handleSelectedRow}) => {
+const EquipmentDataDetailSection = ({columns, data, handleRowSelection, handleSelectedRow}) => {
     if(!data) return null;
 
     return (
@@ -25,4 +25,4 @@ const EquipmentDataListSection = ({columns, data, handleRowSelection, handleSele
     )
 }
 
-export default EquipmentDataListSection;
+export default EquipmentDataDetailSection;
