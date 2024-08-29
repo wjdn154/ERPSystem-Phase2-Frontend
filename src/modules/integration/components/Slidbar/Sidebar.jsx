@@ -59,7 +59,7 @@ const Sidebar = ({
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row', height: '90vh', marginTop: '20px' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
             {/* 대분류 메뉴 영역 */}
             <Box sx={{ minWidth: '100px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
                 <List className="mui-scrollbar" sx={{ flexGrow: 1, overflow: 'auto' }}>
@@ -161,10 +161,10 @@ const Sidebar = ({
                                                                 alignItems: 'center',
                                                                 marginTop: index === 0 ? '10px' : '0px',
                                                                 marginBottom: index === subItem.items.length - 1 ? '10px' : '5px',
-                                                                backgroundColor: selectedSubSubMenu === item ? '#d3daf7' : 'inherit',
-                                                                color: selectedSubSubMenu === item ? '#19358c' : 'inherit',
-                                                                boxShadow: selectedSubSubMenu === item ? 1 : 0,
-                                                                borderRadius: selectedSubSubMenu === item ? '10px' : '0px',
+                                                                backgroundColor: selectedSubSubMenu.text === item.text ? '#d3daf7' : 'inherit',
+                                                                color: selectedSubSubMenu.text === item.text ? '#19358c' : 'inherit',
+                                                                boxShadow: selectedSubSubMenu.text === item.text ? 1 : 0,
+                                                                borderRadius: selectedSubSubMenu.text === item.text ? '10px' : '0px',
                                                                 transition: 'background-color 0.3s, border-radius 0.3s',
                                                                 '&:hover': {
                                                                     backgroundColor: '#d3daf7',
@@ -179,7 +179,7 @@ const Sidebar = ({
                                                                 <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
                                                             </ListItemIcon>
                                                             <ListItemText
-                                                                primary={item}
+                                                                primary={item.text}
                                                                 primaryTypographyProps={{
                                                                     sx: { fontSize: '0.8rem', fontWeight: '400' }
                                                                 }}

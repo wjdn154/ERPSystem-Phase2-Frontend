@@ -100,3 +100,11 @@
   background-color: #f6a6a6 !important;
 }
 /* antd Form 영역 끝  */
+
+/* Paper 영역 시작 */
+.paper-header {
+  padding : 16px;
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #eaeded;
+}
+/* Paper 영역 끝 */

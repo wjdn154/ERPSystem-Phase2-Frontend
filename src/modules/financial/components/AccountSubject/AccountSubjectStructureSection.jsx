@@ -8,7 +8,7 @@ import {
     TableRow,
     TableCell,
     TableHead,
-    Divider
+    Divider, Box
 } from '@mui/material';
 
 const AccountSubjectStructureSection = ({ data }) => {
@@ -17,78 +17,75 @@ const AccountSubjectStructureSection = ({ data }) => {
     }
     return(
         <Grid item xs={12}>
-            <Paper elevation={3} sx={{ height: '100%', p: 2 }}>
-                <Typography variant="h6" marginBottom={'20px'}>계정 체계</Typography>
-                <MuiTable size="small" sx={{ borderCollapse: 'collapse' }}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem' }}>체계명</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderRight: '1px solid #e0e0e0' }}>체계범위</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem' }}>체계명</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderRight: '1px solid #e0e0e0' }}>체계범위</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem' }}>체계명</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderRight: '1px solid #e0e0e0' }}>체계범위</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem' }}>체계명</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderRight: '1px solid #e0e0e0' }}>체계범위</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem' }}>체계명</TableCell>
-                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem' }}>체계범위</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {data.structures.map((structure, index) => (
-                            index % 4 === 0 ? (
-                                <TableRow key={structure.code} sx={{ height: 'auto', borderBottom: 'none' }}>
-                                    <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none' }}>
-                                        {structure.name}
-                                    </TableCell>
-                                    <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none', borderRight: '1px solid #e0e0e0' }}>
-                                        {`${structure.min} - ${structure.max}`}
-                                    </TableCell>
-                                    {data.structures[index + 1] && (
-                                        <>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none' }}>
-                                                {data.structures[index + 1].name}
-                                            </TableCell>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none', borderRight: '1px solid #e0e0e0' }}>
-                                                {`${data.structures[index + 1].min} - ${data.structures[index + 1].max}`}
-                                            </TableCell>
-                                        </>
-                                    )}
-                                    {data.structures[index + 2] && (
-                                        <>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none' }}>
-                                                {data.structures[index + 2].name}
-                                            </TableCell>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none', borderRight: '1px solid #e0e0e0' }}>
-                                                {`${data.structures[index + 2].min} - ${data.structures[index + 2].max}`}
-                                            </TableCell>
-                                        </>
-                                    )}
-                                    {data.structures[index + 3] && (
-                                        <>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none' }}>
-                                                {data.structures[index + 2].name}
-                                            </TableCell>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none', borderRight: '1px solid #e0e0e0' }}>
-                                                {`${data.structures[index + 2].min} - ${data.structures[index + 2].max}`}
-                                            </TableCell>
-                                        </>
-                                    )}
-                                    {data.structures[index + 4] && (
-                                        <>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none' }}>
-                                                {data.structures[index + 3].name}
-                                            </TableCell>
-                                            <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.85rem', borderBottom: 'none' }}>
-                                                {`${data.structures[index + 3].min} - ${data.structures[index + 3].max}`}
-                                            </TableCell>
-                                        </>
-                                    )}
+            <Paper elevation={3} sx={{ height: '100%' }}>
+                <Typography variant="h6" marginBottom={'20px'} className="paper-header">계정 체계</Typography>
+                <Box sx={{ padding: 2 }}>
+                    <MuiTable size="small" sx={{ borderCollapse: 'collapse' }}>
+                        <TableHead>
+                            <TableRow>
+                                {[...Array(6)].map((_, index) => (
+                                    <React.Fragment key={index}>
+                                        <TableCell sx={{ padding: '2px', textAlign: 'center', fontSize: '0.8rem' }}>체계명</TableCell>
+                                        <TableCell
+                                            sx={{
+                                                padding: '2px',
+                                                textAlign: 'center',
+                                                fontSize: '0.8rem',
+                                                borderRight: index < 5 ? '1px solid #e0e0e0' : 'none', // 마지막 컬럼 제외
+                                            }}
+                                        >
+                                            체계범위
+                                        </TableCell>
+                                    </React.Fragment>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.from({ length: 4 }).map((_, rowIndex) => (
+                                <TableRow key={rowIndex} sx={{ height: 'auto', borderBottom: 'none' }}>
+                                    {Array.from({ length: 6 }).map((_, colIndex) => {
+                                        const dataIndex = rowIndex + colIndex * 4;
+                                        return dataIndex < data.structures.length ? (
+                                            <React.Fragment key={dataIndex}>
+                                                <TableCell
+                                                    sx={{ padding: '2px', textAlign: 'center', fontSize: '0.7rem', borderBottom: 'none' }}
+                                                >
+                                                    {data.structures[dataIndex].name}
+                                                </TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        padding: '2px',
+                                                        textAlign: 'center',
+                                                        fontSize: '0.7rem',
+                                                        borderBottom: 'none',
+                                                        borderRight: colIndex < 5 ? '1px solid #e0e0e0' : 'none',
+                                                    }}
+                                                >
+                                                    {`${data.structures[dataIndex].min} - ${data.structures[dataIndex].max}`}
+                                                </TableCell>
+                                            </React.Fragment>
+                                        ) : (
+                                            <React.Fragment key={`empty-${dataIndex}`}>
+                                                <TableCell
+                                                    sx={{ padding: '2px', textAlign: 'center', fontSize: '0.7rem', borderBottom: 'none' }}
+                                                />
+                                                <TableCell
+                                                    sx={{
+                                                        padding: '2px',
+                                                        textAlign: 'center',
+                                                        fontSize: '0.8rem',
+                                                        borderBottom: 'none',
+                                                        borderRight: colIndex < 5 ? '1px solid #e0e0e0' : 'none',
+                                                    }}
+                                                />
+                                            </React.Fragment>
+                                        );
+                                    })}
                                 </TableRow>
-                            ) : null
-                        ))}
-                    </TableBody>
-                </MuiTable>
+                            ))}
+                        </TableBody>
+                    </MuiTable>
+                </Box>
             </Paper>
         </Grid>
     )

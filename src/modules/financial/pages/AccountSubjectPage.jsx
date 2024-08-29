@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import { Box, Grid } from '@mui/material';
+import { Box, Grid, Grow } from '@mui/material';
 import AccountSubjectStructureSection from '../components/AccountSubject/AccountSubjectStructureSection.jsx';
 import AccountSubjectListSection from '../components/AccountSubject/AccountSubjectListSection.jsx';
 import SelectedAccountSubjectDetailSection from '../../financial/components/AccountSubject/SelectedAccountSubjectDetailSection';
@@ -9,7 +9,6 @@ import {getRowClassName} from "../utils/AccountSubject/AccountSubjectUtil.jsx";
 
 const AccountSubjectPage = ({ initialData }) => {
     const memoizedData = useMemo(() => initialData, [initialData]);
-    console.log(memoizedData);
     const {
         data,
         accountSubjectDetail,
@@ -26,7 +25,9 @@ const AccountSubjectPage = ({ initialData }) => {
         handleClose,
         selectFinancialStatement,
         selectRelationCode,
-        handleSave
+        handleSave,
+        showDetail,
+        deleteRelationCode
     } = accountSubjectHook(initialData);
 
     return (
@@ -34,40 +35,53 @@ const AccountSubjectPage = ({ initialData }) => {
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     {/* 계정과목 체계 영역 */}
-                    <AccountSubjectStructureSection data={data} />
+                    <Grow in={true} timeout={200}>
+                        <div>
+                            <AccountSubjectStructureSection data={data} />
+                        </div>
+                    </Grow>
                 </Grid>
             </Grid>
             <Grid container spacing={2} sx={{ marginTop: 2 }}>
                 {/* 계정과목 리스트 영역 */}
                 <Grid item xs={12} md={5}>
-                    <AccountSubjectListSection
-                        columns={accountSubjectColumn}
-                        data={data}
-                        handleRowSelection={handleRowSelection}
-                        handleSelectedRow={handleSelectedRow}
-                        rowClassName={getRowClassName}
-                    />
+                    <Grow in={true} timeout={200}>
+                        <div>
+                            <AccountSubjectListSection
+                                columns={accountSubjectColumn}
+                                data={data}
+                                handleRowSelection={handleRowSelection}
+                                handleSelectedRow={handleSelectedRow}
+                                rowClassName={getRowClassName}
+                            />
+                        </div>
+                    </Grow>
                 </Grid>
                 {/* 계정과목 상세 영역 */}
                 <Grid item xs={12} md={7}>
-                    {accountSubjectDetail && (
-                        <SelectedAccountSubjectDetailSection
-                            data={data}
-                            accountSubjectDetail={accountSubjectDetail}
-                            handlePopupClick={handlePopupClick}
-                            isFinancialStatementModalVisible={isFinancialStatementModalVisible}
-                            isRelationCodeModalVisible={isRelationCodeModalVisible}
-                            handleClose={handleClose}
-                            selectFinancialStatement={selectFinancialStatement}
-                            handleInputChange={handleInputChange}
-                            handleInputChange2={handleInputChange2}
-                            handleDeleteMemo={handleDeleteMemo}
-                            handleAddNewMemo={handleAddNewMemo}
-                            setAccountSubjectDetail={setAccountSubjectDetail}
-                            selectRelationCode={selectRelationCode}
-                            handleSave={handleSave}
-                        />
-                    )}
+                    <Grow in={showDetail} timeout={200} key={accountSubjectDetail.code}  >
+                        <div>
+                            {accountSubjectDetail && (
+                                <SelectedAccountSubjectDetailSection
+                                    data={data}
+                                    accountSubjectDetail={accountSubjectDetail}
+                                    handlePopupClick={handlePopupClick}
+                                    isFinancialStatementModalVisible={isFinancialStatementModalVisible}
+                                    isRelationCodeModalVisible={isRelationCodeModalVisible}
+                                    handleClose={handleClose}
+                                    selectFinancialStatement={selectFinancialStatement}
+                                    handleInputChange={handleInputChange}
+                                    handleInputChange2={handleInputChange2}
+                                    handleDeleteMemo={handleDeleteMemo}
+                                    handleAddNewMemo={handleAddNewMemo}
+                                    setAccountSubjectDetail={setAccountSubjectDetail}
+                                    selectRelationCode={selectRelationCode}
+                                    handleSave={handleSave}
+                                    deleteRelationCode={deleteRelationCode}
+                                />
+                            )}
+                        </div>
+                    </Grow>
                 </Grid>
             </Grid>
         </Box>

@@ -34,7 +34,8 @@ const SelectedAccountSubjectDetailSection = ({
     handleAddNewMemo,
     setAccountSubjectDetail,
     selectRelationCode,
-    handleSave
+    handleSave,
+    deleteRelationCode
 }) => (
     <Paper elevation={3} sx={{ p: 2 }}>
         <Typography variant="h6" marginBottom={'20px'}>계정과목 상세 내용</Typography>
@@ -55,7 +56,7 @@ const SelectedAccountSubjectDetailSection = ({
                     </Col>
                     <Col span={12}>
                         <Form.Item
-                            label="성격"
+                            label="성격코드(명)"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('성격') : undefined}
                             style={{ marginBottom: '4px' }}
                         >
@@ -90,7 +91,7 @@ const SelectedAccountSubjectDetailSection = ({
                             justifyContent: 'center',
                         }}
                     >
-                        <Box sx={{ minWidth: '60vw', minHeight: '60vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
+                        <Box sx={{ minWidth: '50vw', minHeight: '40vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 관계 코드 선택
                             </Typography>
@@ -113,7 +114,10 @@ const SelectedAccountSubjectDetailSection = ({
                             />
 
                             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button onClick={handleClose} variant="contained" color="primary" sx={{ mr: 1 }}>
+                                <Button onClick={deleteRelationCode} variant="contained" type="danger" style={{ marginRight: '20px' }} sx={{ mr: 1 }}>
+                                    삭제
+                                </Button>
+                                <Button onClick={handleClose} variant="contained" type="danger" sx={{ mr: 1 }}>
                                     닫기
                                 </Button>
                             </Box>
@@ -181,7 +185,7 @@ const SelectedAccountSubjectDetailSection = ({
                                 <Input
                                     value={accountSubjectDetail.standardFinancialStatementName}
                                     style={{ marginRight: '10px', flex: 1 }}
-                                    readOnly
+                                    readOnly={!accountSubjectDetail.modificationType}
                                 />
                             </div>
                         </Form.Item>
@@ -197,7 +201,7 @@ const SelectedAccountSubjectDetailSection = ({
                             justifyContent: 'center',
                         }}
                     >
-                        <Box sx={{ minWidth: '60vw', minHeight: '60vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
+                        <Box sx={{ minWidth: '40vw', minHeight: '40vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 표준재무제표 선택
                             </Typography>
@@ -220,7 +224,7 @@ const SelectedAccountSubjectDetailSection = ({
                             />
 
                             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button onClick={handleClose} variant="contained" color="primary" sx={{ mr: 1 }}>
+                                <Button onClick={handleClose} variant="contained" type="danger" sx={{ mr: 1 }}>
                                     닫기
                                 </Button>
                             </Box>
@@ -322,11 +326,13 @@ const SelectedAccountSubjectDetailSection = ({
                 />
             </Box>
         </Box>
-        <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '30px'}}>
-            <Button onClick={handleSave} type="primary" >
-                저장
-            </Button>
-        </Box>
+        {accountSubjectDetail.modificationType && (
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
+                    <Button onClick={handleSave} type="primary" >
+                        저장
+                    </Button>
+            </Box>
+        )}
     </Paper>
 );
 
