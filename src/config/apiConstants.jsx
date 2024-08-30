@@ -2,7 +2,7 @@ const API_BASE_URL = "http://localhost:8080";
 
 // 재무회계
 export const FINANCIAL_API = {
-    ACCOUNT_SUBJECTS_API: `${API_BASE_URL}/api/financial/accountSubjects`, // 계정과목 목록 조회 API
+    ACCOUNT_SUBJECTS_API: `${API_BASE_URL}/api/financial/accountSubjects/`, // 계정과목 목록 조회 API
     ACCOUNT_SUBJECT_DETAIL_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/${code}`, // 계정과목 상세 조회 API
     SAVE_MEMO_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/saveMemo/${code}`, // 적요 저장 API
     SAVE_ACCOUNT_SUBJECT_API: `${API_BASE_URL}/api/financial/accountSubjects/saveAccountSubject`, // 계정과목 저장 API

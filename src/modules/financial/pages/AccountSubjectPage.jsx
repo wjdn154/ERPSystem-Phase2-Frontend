@@ -87,5 +87,4 @@ const AccountSubjectPage = ({ initialData }) => {
         </Box>
     );
 }
-
 export default AccountSubjectPage;
