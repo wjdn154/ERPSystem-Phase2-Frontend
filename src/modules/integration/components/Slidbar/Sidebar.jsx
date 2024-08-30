@@ -59,7 +59,7 @@ const Sidebar = ({
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row', height: '90vh', marginTop: '20px' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
             {/* 대분류 메뉴 영역 */}
             <Box sx={{ minWidth: '100px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
                 <List className="mui-scrollbar" sx={{ flexGrow: 1, overflow: 'auto' }}>

@@ -85,19 +85,15 @@ export const accountSubjectHook = (initialData) => {
         setAccountSubjectDetail(prevState => {
             const currentField = prevState[field] || [];
 
-            // 현재 필드에 아무것도 없는 경우 3개의 적요 추가.
-            if (currentField.length === 0) {
-                const newMemos = [
-                    { code: 1, content: '' },
-                    { code: 2, content: '' },
-                    { code: 3, content: '' }
-                ];
-                return {
-                    ...prevState,
-                    [field]: newMemos
-                };
-            } else {
-            }
+            // 기존 필드에서 가장 큰 code 값을 찾음
+            const maxCode = Math.max(...currentField.map(memo => memo.code)) > 0 ? Math.max(...currentField.map(memo => memo.code)) : 0;
+            const newCode = maxCode + 1;  // 가장 큰 code 값에 1을 더함
+
+            const newMemo = { code: newCode, content: '' };
+            return {
+                ...prevState,
+                [field]: [...currentField, newMemo]
+            };
         });
     };
 
