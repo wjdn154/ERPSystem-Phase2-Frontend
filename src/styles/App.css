@@ -73,10 +73,16 @@
 /* 테이블 영역 끝 */
 
 /* 버튼 영역 시작  */
-.ant-btn {
-  /*background-color: #6d84ec !important;*/
+.ant-btn-primary {
+  background-color: #6d84ec !important;
   /*box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2) !important; !* 포커스 시 쉐도우 증가 *!*/
 }
+
+.ant-btn-danger {
+  background-color: #ee8484 !important;
+  color: #fff;
+}
+
 /* 버튼 영역 끝  */
 
 /* antd Form 영역 시작  */
@@ -87,7 +93,6 @@
 .ant-input {
   /*text-align: center;*/
 }
-
 .ant-input[readonly] {
   background-color: #f0f0f0 !important;
 }
@@ -95,3 +100,11 @@
   background-color: #f6a6a6 !important;
 }
 /* antd Form 영역 끝  */
+
+/* Paper 영역 시작 */
+.paper-header {
+  padding : 16px;
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #eaeded;
+}
+/* Paper 영역 끝 */

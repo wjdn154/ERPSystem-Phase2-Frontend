@@ -1,44 +1,33 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FINANCIAL_API } from '../../../config/apiConstants';
+import { subMenuItems } from '../../../config/menuItems.jsx';
+import {Typography} from "@mui/material";
 
 const MainContentHook = (selectedSubSubMenu) => {
-    const [data, setData] = useState(null);
+    const [initialData, setInitialData] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!selectedSubSubMenu || selectedSubSubMenu === "회사정보수정") return;
+        if (!selectedSubSubMenu || selectedSubSubMenu.text === "회사정보수정") return;
 
         setLoading(true);
-        const endpoint = getApiEndpoint(selectedSubSubMenu);
 
-        axios.post(endpoint)
+        axios.post(selectedSubSubMenu.apiPath)
             .then(response => {
-                setData(response.data);
+                setInitialData(response.data);
                 setError(null);
             })
             .catch(err => {
                 setError('데이터 로딩 중 오류가 발생했습니다.');
-                setData(null);
+                setInitialData(null);
             })
             .finally(() => {
                 setLoading(false);
             });
     }, [selectedSubSubMenu]);
 
-    function getApiEndpoint(subSubMenu) {
-        switch (subSubMenu) {
-            case '계정과목및적요등록':
-                return `${FINANCIAL_API.ACCOUNT_SUBJECTS_API}`;
-            case '다른메뉴':
-                return 'anotherMenu';
-            default:
-                return 'default';
-        }
-    }
-
-    return { data, error, loading };
+    return { initialData, error, loading };
 }
 
 export default MainContentHook;
