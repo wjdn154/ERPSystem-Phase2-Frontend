@@ -2,7 +2,7 @@ const API_BASE_URL = "http://localhost:8080";
 
 // 재무회계
 export const FINANCIAL_API = {
-    ACCOUNT_SUBJECTS_API: `${API_BASE_URL}/api/financial/accountSubjects`, // 계정과목 목록 조회 API
+    ACCOUNT_SUBJECTS_API: `${API_BASE_URL}/api/financial/accountSubjects/`, // 계정과목 목록 조회 API
     ACCOUNT_SUBJECT_DETAIL_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/${code}`, // 계정과목 상세 조회 API
     SAVE_MEMO_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/saveMemo/${code}`, // 적요 저장 API
     SAVE_ACCOUNT_SUBJECT_API: `${API_BASE_URL}/api/financial/accountSubjects/saveAccountSubject`, // 계정과목 저장 API
@@ -11,12 +11,12 @@ export const FINANCIAL_API = {
 };
 
 // 인사관리
-export const HR_API = {
-    Employee_API: `${API_BASE_URL}/api/hr/employee/all`, // 사원 목록 조회 API
-    EmployeeONE_API: `${API_BASE_URL}/api/employee/${id}`, // 사원 상세 조회 API
-    CREATEEmployee_API: `${API_BASE_URL}/api/employee/createEmployee`, // 사원 등록 API
-    UPDATEEmployee_API: `${API_BASE_URL}/employee/updateEmployee/${id}`, // 사원 수정 API
-    DELETEEmployee_API: `${API_BASE_URL}/api/employee/del/${id}`,
+export const EMPLOYEE_API = {
+    EMPLOYEE_DATA_API: `${API_BASE_URL}/api/hr/employee/all`, // 사원 목록 조회 API
+    EMPLOYEE_DATA_DETAIL_API:(id) =>`${API_BASE_URL}/api/employee/${id}`, // 사원 상세 조회 API
+    SAVE_EMPLOYEE_DATA_API: `${API_BASE_URL}/api/employee/createEmployee`, // 사원 등록 API
+    UPDATE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/employee/updateEmployee/${id}`, // 사원 수정 API
+    DELETE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/employee/del/${id}`,
 };
 
 // 물류관리

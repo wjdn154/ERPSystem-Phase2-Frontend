@@ -4,11 +4,12 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
-import {FINANCIAL_API, PRODUCTION_API} from "./apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API, PRODUCTION_API} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
+import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
@@ -110,8 +111,7 @@ export const subMenuItems = {
         {
             text: '기초 정보 관리',
             items: [
-                { text: '민성이', component: null, apiPath: null },
-                { text: '사원', component: null, apiPath: null },
+                { text: '사원 관리', component: EmployeeDataPage, apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API },
                 { text: '사용자 관리', component: null, apiPath: null },
                 { text: '부서 관리', component: null, apiPath: null },
                 { text: '발령 관리', component: null, apiPath: null },
@@ -124,6 +124,7 @@ export const subMenuItems = {
             items: [
                 { text: '근태 관리', component: null, apiPath: null },
                 { text: '휴가 관리', component: null, apiPath: null },
+                { text: '초과근무 관리', component: null, apiPath: null},
             ]
         },
         {
