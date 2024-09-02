@@ -222,7 +222,6 @@ export const subMenuItems = {
       text: "기초정보관리",
       items: [
         { text: "작업장 관리", component: WorkcenterManagementPage, apiPath: PRODUCTION_API.WORKCENTER_API },
-        // { text: "LOT 관리", component: null, apiPath: null },
         { text: "LOT 관리", component: null, apiPath: null },
         { text: "Serial No 관리", component: null, apiPath: null },
       ],
@@ -247,7 +246,7 @@ export const subMenuItems = {
     {
       text: "공정 경로 관리",
       items: [
-        { text: "공정 세부정보 관리", component: null, apiPath: null },
+        { text: "계정과목및적요등록", component: AccountSubjectPage, apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API },
         { text: "Routing 관리", component: null, apiPath: null },
       ],
     },

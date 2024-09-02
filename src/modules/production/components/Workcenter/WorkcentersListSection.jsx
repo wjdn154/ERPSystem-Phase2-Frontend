@@ -20,8 +20,6 @@ const WorkcenterListSection = () => {
   const [workcenterList, setWorkcenterList] = useState([]);
 
   useEffect(() => {
-    console.log("useEffect 실행됨");
-
     const loadWorkcenters = async () => {
       try {
         const data = await fetchWorkcenters();
