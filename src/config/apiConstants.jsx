@@ -10,6 +10,9 @@ export const FINANCIAL_API = {
     DELETE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/deleteAccountSubject/${code}`, // 계정과목 삭제 API
     SHOW_JOURNAL_ENTRY_TYPE_SETUP_API: `${API_BASE_URL}/api/financial/journal_entry_type_setup/show`,
     UPDATE_JOURNAL_ENTRY_TYPE_SETUP_API: `${API_BASE_URL}/api/financial/journal_entry_type_setup/update`
+    SAVE_ACCOUNT_SUBJECT_API: `${API_BASE_URL}/api/financial/accountSubjects/save`, // 계정과목 저장 API
+    UPDATE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/update/${code}`, // 계정과목 수정 API
+    DELETE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/delete/${code}`, // 계정과목 삭제 API
 };
 
 // 인사관리
