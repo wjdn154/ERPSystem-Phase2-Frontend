@@ -31,7 +31,7 @@ export const usersDataHook = (initialData) => {
         },
     };
 
-// 행 선택 시 사원정보 상세 정보를 가져오는 로직
+// 행 선택 시 사용자정보 상세 정보를 가져오는 로직
 const handleSelectedRow = async (selectedRow) => {
     setSelectedRow(selectedRow);
     try{
