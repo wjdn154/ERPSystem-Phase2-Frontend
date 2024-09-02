@@ -1,52 +1,36 @@
-import * as React from 'react';
-import { Divider, Table } from 'antd';
-import {useMemo} from "react";
-import EnvironmentalRegistrationHook from "../hooks/EnvironmentalRegistrationHook.jsx";
+import React, { useEffect, useState } from 'react';
+import { Table, Divider, Spin, Alert } from 'antd';
+import axios from 'axios';
 
+// Define the columns for the Table
 const columns = [
     {
-        title: 'Name',
-        dataIndex: 'name',
+        title: 'Journal Entry Type Name',
+        dataIndex: 'journalEntryTypeName'
     },
     {
-        title: 'Age',
-        dataIndex: 'age',
+        title: 'Account Subject Name',
+        dataIndex: 'accountSubjectName'
     },
     {
-        title: 'Address',
-        dataIndex: 'address',
+        title: 'Account Subject Code',
+        dataIndex: 'accountSubjectCode'
     },
 ];
-const data = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sydney No. 1 Lake Park',
-    },
-];
-// Define the EnvironmentalRegistrationPage component
-const EnvironmentalRegistrationPage = ({ initialData }) => {
+
+const EnvironmentalRegistrationPage = ({ initData }) => {
+    const [data, setData] = useState([]);
+
+
     return (
-        <>
-            <Divider>Middle size table</Divider>
-            <Table columns={columns} dataSource={data} size="middle" />
-            <Divider>Small size table</Divider>
-            <Table columns={columns} dataSource={data} size="small" />
-        </>
+        <div>
+            <Divider>2. 분개 유형 설정</Divider>
+            <Table
+                columns={columns}
+                dataSource={initData}
+                size="small"
+            />
+        </div>
     );
 };
-
 export default EnvironmentalRegistrationPage;

@@ -1,9 +1,8 @@
-import {useState} from "react";
+export const EnvironmentalRegistrationHook = (initialData) => {
 
 
-const EnvironmentalRegistrationHook = (initialData) => {
-    const [data, setData] = useState(initialData);
+
+    return {
+
+    }
 }
-
-
-export default EnvironmentalRegistrationHook;
