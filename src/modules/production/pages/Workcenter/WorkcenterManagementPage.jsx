@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import WorkcenterDetailSection from "../../components/Workcenter/WorkcenterDetailSection.jsx";
-import WorkcenterListSection from "../../components/Workcenter/WorkcentersList.jsx";
+import WorkcenterListSection from "../../components/Workcenter/WorkcentersListSection.jsx";
 import WorkcenterDashboard from "./WorkcenterDashboard.jsx";
 import { Grid } from "@mui/material";
 
@@ -15,7 +15,7 @@ const WorkcenterManagementPage = ({ data }) => {
     <div>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <WorkcenterDashboard /> 
+          <WorkcenterDashboard />
         </Grid>
         <Grid item xs={12}>
           {!selectedWorkcenter ? (

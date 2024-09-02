@@ -31,4 +31,11 @@ export const PRODUCTION_API = {
     SAVE_MAINTENANCE_HISTORY_API: `${API_BASE_URL}/api/production/maintenanceHistory/createMaintenance`,    //유지보수 이력 등록 API
     UPDATE_MAINTENANCE_HISTORY_API: (id) => `${API_BASE_URL}/api/production/maintenanceHistory/updateMaintenance/${id}`, //유지보수 이력 수정 API
     DELETE_MAINTENANCE_HISTORY_API:(id) => `${API_BASE_URL}/api/production/maintenanceHistory/deleteMaintenance/${id}`,  //유지보수 이력 삭제 API
+
+    WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters`, // 작업장 목록 조회 API
+    WORKCENTER_DETAILS_API: (code) => `${API_BASE_URL}/api/production/workcenters/details/${code}`, // 작업장 세부정보 조회 API
+    WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search`, // 작업장 이름검색 API
+    SAVE_WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters/create`, // 새 작업장 저장 API
+    UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}`, // 작업장 수정 API
+    DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete`, // 작업장 삭제 API
 };

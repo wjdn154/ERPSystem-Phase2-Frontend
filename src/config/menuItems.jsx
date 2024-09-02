@@ -9,6 +9,7 @@ import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.js
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
+import WorkcenterManagementPage from "../modules/production/pages/Workcenter/WorkcenterManagementPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
@@ -220,7 +221,8 @@ export const subMenuItems = {
     {
       text: "기초정보관리",
       items: [
-        { text: "작업장 관리", component: null, apiPath: null },
+        { text: "작업장 관리", component: WorkcenterManagementPage, apiPath: PRODUCTION_API.WORKCENTER_API },
+        // { text: "LOT 관리", component: null, apiPath: null },
         { text: "LOT 관리", component: null, apiPath: null },
         { text: "Serial No 관리", component: null, apiPath: null },
       ],

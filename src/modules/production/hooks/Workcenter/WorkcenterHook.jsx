@@ -28,11 +28,11 @@ export const useWorkcenter = () => {
     };
 
     // 특정 작업장을 선택하고 상세 정보를 가져오는 함수
-    const selectWorkcenter = async (id) => {
+    const selectWorkcenter = async (code) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await fetchWorkcenterDetails(id);
+            const data = await fetchWorkcenterDetails(code);
             setSelectedWorkcenter(data);
         } catch (err) {
             setError(err);
@@ -56,15 +56,15 @@ export const useWorkcenter = () => {
     };
 
     // 작업장을 수정하는 함수
-    const updateSelectedWorkcenter = async (id, updatedWorkcenter) => {
+    const updateSelectedWorkcenter = async (code, updatedWorkcenter) => {
         setLoading(true);
         setError(null);
         try {
-            const updated = await updateWorkcenter(id, updatedWorkcenter);
+            const updated = await updateWorkcenter(code, updatedWorkcenter);
             setWorkcenters(prevWorkcenters =>
-                prevWorkcenters.map(wc => (wc.id === id ? updated : wc))
+                prevWorkcenters.map(wc => (wc.code === code ? updated : wc))
             );
-            if (selectedWorkcenter && selectedWorkcenter.id === id) {
+            if (selectedWorkcenter && selectedWorkcenter.code === code) {
                 setSelectedWorkcenter(updated);
             }
         } catch (err) {
@@ -75,13 +75,13 @@ export const useWorkcenter = () => {
     };
 
     // 작업장을 삭제하는 함수
-    const removeWorkcenter = async (id) => {
+    const removeWorkcenter = async (code) => {
         setLoading(true);
         setError(null);
         try {
             await deleteWorkcenter(id);
-            setWorkcenters(prevWorkcenters => prevWorkcenters.filter(wc => wc.id !== id));
-            if (selectedWorkcenter && selectedWorkcenter.id === id) {
+            setWorkcenters(prevWorkcenters => prevWorkcenters.filter(wc => wc.code !== code));
+            if (selectedWorkcenter && selectedWorkcenter.code === code) {
                 setSelectedWorkcenter(null);
             }
         } catch (err) {
