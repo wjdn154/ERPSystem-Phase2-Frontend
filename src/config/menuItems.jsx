@@ -246,7 +246,7 @@ export const subMenuItems = {
     {
       text: "공정 경로 관리",
       items: [
-        { text: "계정과목및적요등록", component: AccountSubjectPage, apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API },
+        { text: "공정세부정보 관리", component: ProcessDetailsPage, apiPath: PRODUCTION_API.PROCESS_LIST_API },
         { text: "Routing 관리", component: null, apiPath: null },
       ],
     },

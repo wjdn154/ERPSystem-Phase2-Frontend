@@ -1,54 +1,41 @@
-import React, {useMemo} from 'react';
+import React, { useMemo } from 'react';
 import { Box, Grid, Grow } from '@mui/material';
-import AccountSubjectStructureSection from '../components/AccountSubject/AccountSubjectStructureSection.jsx';
-import AccountSubjectListSection from '../components/AccountSubject/AccountSubjectListSection.jsx';
-import SelectedAccountSubjectDetailSection from '../../../financial/components/AccountSubject/SelectedAccountSubjectDetailSection.jsx';
-import { accountSubjectHook } from '../hooks/AccountSubjectHook';
-import {accountSubjectColumn} from "../utils/AccountSubject/AccountSubjectColumn.jsx";
-import {getRowClassName} from "../utils/AccountSubject/AccountSubjectUtil.jsx";
+import ProcessDetailsListSection from '../../components/ProcessDetails/ProcessDetailsListSection.jsx';
+import SelectedProcessDetailsSection from '../../components/ProcessDetails/SelectedProcessDetailsSection.jsx';
+import { useProcessDetails } from '../../hooks/ProcessDetails/ProcessDetailsHook.jsx';
+import { processDetailsColumn } from '../../utils/ProcessDetails/ProcessDetailsColumn.jsx';
 
 const ProcessDetailsPage = ({ initialData }) => {
     const memoizedData = useMemo(() => initialData, [initialData]);
+
     const {
         data,
-        accountSubjectDetail,
-        setAccountSubjectDetail,
+        processDetail,
+        setProcessDetail,
         handleRowSelection,
         handleInputChange,
         handleInputChange2,
-        handleAddNewMemo,
-        handleDeleteMemo,
+        handleAddNewDetail,
+        handleDeleteDetail,
         handleSelectedRow,
         handlePopupClick,
-        isFinancialStatementModalVisible,
-        isRelationCodeModalVisible,
+        isProcessModalVisible,
         handleClose,
-        selectFinancialStatement,
-        selectRelationCode,
+        selectProcessDetail,
         handleSave,
         showDetail,
-        deleteRelationCode
-    } = accountSubjectHook(initialData);
+        deleteProcessDetail,
+    } = useProcessDetails(memoizedData);
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    {/* 계정과목 체계 영역 */}
-                    <Grow in={true} timeout={200}>
-                        <div>
-                            <AccountSubjectStructureSection data={data} />
-                        </div>
-                    </Grow>
-                </Grid>
-            </Grid>
             <Grid container spacing={2} sx={{ marginTop: 2 }}>
-                {/* 계정과목 리스트 영역 */}
+                {/* 공정 리스트 영역 */}
                 <Grid item xs={12} md={5}>
                     <Grow in={true} timeout={200}>
                         <div>
-                            <AccountSubjectListSection
-                                columns={accountSubjectColumn}
+                            <ProcessDetailsListSection
+                                columns={processDetailsColumn}
                                 data={data}
                                 handleRowSelection={handleRowSelection}
                                 handleSelectedRow={handleSelectedRow}
@@ -57,27 +44,25 @@ const ProcessDetailsPage = ({ initialData }) => {
                         </div>
                     </Grow>
                 </Grid>
-                {/* 계정과목 상세 영역 */}
+                {/* 공정 상세 영역 */}
                 <Grid item xs={12} md={7}>
-                    <Grow in={showDetail} timeout={200} key={accountSubjectDetail.code}  >
+                    <Grow in={showDetail} timeout={200} key={processDetail.code}>
                         <div>
-                            {accountSubjectDetail && (
-                                <SelectedAccountSubjectDetailSection
+                            {processDetail && (
+                                <SelectedProcessDetailsSection
                                     data={data}
-                                    accountSubjectDetail={accountSubjectDetail}
+                                    processDetail={processDetail}
                                     handlePopupClick={handlePopupClick}
-                                    isFinancialStatementModalVisible={isFinancialStatementModalVisible}
-                                    isRelationCodeModalVisible={isRelationCodeModalVisible}
+                                    isProcessModalVisible={isProcessModalVisible}
                                     handleClose={handleClose}
-                                    selectFinancialStatement={selectFinancialStatement}
+                                    selectProcessDetail={selectProcessDetail}
                                     handleInputChange={handleInputChange}
                                     handleInputChange2={handleInputChange2}
-                                    handleDeleteMemo={handleDeleteMemo}
-                                    handleAddNewMemo={handleAddNewMemo}
-                                    setAccountSubjectDetail={setAccountSubjectDetail}
-                                    selectRelationCode={selectRelationCode}
+                                    handleDeleteDetail={handleDeleteDetail}
+                                    handleAddNewDetail={handleAddNewDetail}
+                                    setProcessDetail={setProcessDetail}
                                     handleSave={handleSave}
-                                    deleteRelationCode={deleteRelationCode}
+                                    deleteProcessDetail={deleteProcessDetail}
                                 />
                             )}
                         </div>
@@ -86,6 +71,6 @@ const ProcessDetailsPage = ({ initialData }) => {
             </Grid>
         </Box>
     );
-}
+};
 
 export default ProcessDetailsPage;
