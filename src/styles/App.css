@@ -2,6 +2,19 @@
   width: 100%;
 }
 
+.background-color-header {
+  background-color: #152937;
+}
+.background-color-sidebar {
+  background-color: #122330;
+}
+.background-color-content {
+  background-color: #0E1B25;
+}
+.background-color-sidebar-selected {
+  background-color: #0E4351 !important;
+}
+
 /* 스크롤바 영역 시작 */
 .mui-scrollbar::-webkit-scrollbar,
 .ant-table-body::-webkit-scrollbar {
@@ -108,3 +121,79 @@
   border-bottom: 1px solid #eaeded;
 }
 /* Paper 영역 끝 */
+
+
+/* 사이드바 영역 시작 */
+/* Sidebar.css */
+
+/* 기본 상태의 사이드바 */
+.custom-sidebar {
+  width: 80px !important; /* 기본 너비 */
+  transition: width 0.3s ease; /* 부드러운 확장/축소 애니메이션 */
+  flex: auto !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+  border-right: solid 5px #000;
+}
+
+/* 사이드바를 호버했을 때 */
+.custom-sidebar:hover {
+  width: 200px !important; /* 호버 시 확장된 너비 */
+  min-width: 200px !important;
+  max-width: 200px !important;
+}
+
+/* 메뉴 아이템의 텍스트와 아이콘을 가운데 정렬 */
+.custom-sidebar .ant-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: justify-content 0.3s ease;
+  overflow: hidden; /* 텍스트 오버플로우 숨기기 */
+}
+
+/* 기본 상태에서 텍스트 숨기기 */
+.custom-sidebar .ant-menu-item .ant-menu-title-content {
+  visibility: hidden;
+}
+
+/* 사이드바 호버 시 텍스트 정렬 변경 */
+.custom-sidebar:hover .ant-menu-item .ant-menu-title-content {
+  justify-content: flex-start;
+  padding-left: 16px; /* 텍스트와 아이콘 사이에 간격 추가 */
+  visibility: visible;
+}
+
+/* 아이콘 크기 조정 */
+.custom-sidebar .ant-menu-item .anticon {
+  font-size: 18px;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #0E4351 !important; /* 선택된 항목의 배경색 */
+  color: #fff !important;               /* 선택된 항목의 텍스트 색 */
+  border-radius: 0px;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+}
+
+/* 비선택 항목의 텍스트 색상 */
+.ant-menu-dark .ant-menu-item {
+  /*color: #bfbfbf !important;*/
+  color: #bfbfbf !important;
+  border-radius: 0px;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+}
+.ant-menu-item:hover {
+    background-color: #0E4351 !important;
+    width: 100%;
+}
+
+  /* 선택된 아이템에 대한 텍스트 색상 */
+.ant-menu-dark .ant-menu-item-selected > .ant-menu-title-content {
+  color: #ffffff !important;
+}
+/* 사이드바 영역 끝 */

@@ -14,42 +14,49 @@ import { menuItems, subMenuItems } from './config/menuItems.jsx';
 import ContentWrapper from './modules/integration/components/MainContent/ContentWrapper.jsx';
 import Sidebar from './modules/integration/components/Slidbar/Sidebar.jsx';
 import MainContentPage from './modules/integration/pages/MainContentPage.jsx';
-import Header from './modules/integration/components/Header/Header.jsx';
+const { Header } = Layout;
 
 // hooks
 import AppHook from './modules/integration/hooks/AppHook';
+import {Col, Layout, Row} from "antd";
+import Logo from "./assets/favicon/OMZ.svg";
+import Headers from "./modules/integration/components/Header/Headers.jsx";
+import Sider from "antd/es/layout/Sider.js";
+import {Content} from "antd/es/layout/layout.js";
 
 // App 컴포넌트 정의
 const App = () => {
-    const { selectedMenu, setSelectedMenu, selectedSubMenu, setSelectedSubMenu, selectedSubSubMenu, setSelectedSubSubMenu } = AppHook();
-
+    const { selectedSubSubMenu } = AppHook();
     const theme = createTheme(themeSettings);
 
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Box sx={{ boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", zIndex: 1000, height: '10vh', position: 'relative' }}>
-                <Header selectedMenu={selectedMenu} selectedSubMenu={selectedSubMenu} selectedSubSubMenu={selectedSubSubMenu} />
-            </Box>
-            <Box sx={{ backgroundColor: '#fff', display: 'flex', width: '100%', height: '90vh' }}>
-                <Sidebar
-                    selectedMenu={selectedMenu} // 현재 선택된 대분류 메뉴 상태
-                    setSelectedMenu={setSelectedMenu} // 대분류 메뉴 선택 상태 업데이트 함수
-                    selectedSubMenu={selectedSubMenu} // 현재 선택된 중분류 메뉴 상태
-                    setSelectedSubMenu={setSelectedSubMenu} // 중분류 메뉴 선택 상태 업데이트 함수
-                    selectedSubSubMenu={selectedSubSubMenu} // 현재 선택된 소분류 메뉴 상태
-                    setSelectedSubSubMenu={setSelectedSubSubMenu} // 소분류 메뉴 선택 상태 업데이트 함수
-                    menuItems={menuItems} // 대분류 메뉴 항목 데이터
-                    subMenuItems={subMenuItems} // 중분류 및 소분류 메뉴 항목 데이터
-                />
-                <Box sx={{ flexGrow: 1, overflowY: 'auto', height: '90vh', backgroundColor: '#f5f5f5' }}>
-                    <ContentWrapper>
-                        <MainContentPage selectedSubSubMenu={selectedSubSubMenu} />
-                    </ContentWrapper>
-                </Box>
-            </Box>
-        </ThemeProvider>
+        <Layout style={{ minHeight: '100vh' }}>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                {/* 헤더 영역 시작 */}
+                <Headers />
+                {/* 헤더 영역 끝 */}
+
+                <Layout>
+                    {/* 사이드바 영역 시작 */}
+                    <Sider className="custom-sidebar">
+                        <Sidebar />
+                    </Sider>
+                    {/* 사이드바 영역 끝 */}
+
+                    {/* 메인 컨텐츠 영역 시작 */}
+                    <Content>
+                        <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#0E1B25' }}>
+                            <ContentWrapper>
+                                <MainContentPage selectedSubSubMenu={selectedSubSubMenu} />
+                            </ContentWrapper>
+                        </Box>
+                    </Content>
+                    {/* 메인 컨텐츠 영역 끝 */}
+                </Layout>
+            </ThemeProvider>
+        </Layout>
     );
-}
+};
 
 export default App;

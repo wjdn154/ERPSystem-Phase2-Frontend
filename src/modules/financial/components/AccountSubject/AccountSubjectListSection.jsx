@@ -6,10 +6,10 @@ const AccountSubjectListSection = ({ columns, data, handleRowSelection, handleSe
     if (!data) {
         return null;
     }
-    console.log(data);
+    // console.log(data);
     return (
         <Paper elevation={3} sx={{ height: '100%' }}>
-            <Typography variant="h6" marginBottom={'20px'} className="paper-header">계정과목 목록</Typography>
+            <Typography variant="h6" className="paper-header">계정과목 목록</Typography>
             <AntTable
                 style={{ padding: '20px' }}
                 columns={columns}

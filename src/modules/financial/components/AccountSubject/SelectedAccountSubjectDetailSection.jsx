@@ -37,8 +37,8 @@ const SelectedAccountSubjectDetailSection = ({
     handleSave,
     deleteRelationCode
 }) => (
-    <Paper elevation={3} sx={{ p: 2 }}>
-        <Typography variant="h6" marginBottom={'20px'}>계정과목 상세 내용</Typography>
+    <Paper elevation={3}>
+        <Typography variant="h6" className="paper-header">계정과목 상세 내용</Typography>
         <Box sx={{ padding: '20px' }}>
             <Form layout="vertical">
                 <Row gutter={16}>
@@ -328,7 +328,7 @@ const SelectedAccountSubjectDetailSection = ({
         </Box>
         {accountSubjectDetail.modificationType && (
             <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
-                    <Button onClick={handleSave} type="primary" >
+                    <Button onClick={handleSave} type="primary" style={{ marginBottom: '20px' }} >
                         저장
                     </Button>
             </Box>
