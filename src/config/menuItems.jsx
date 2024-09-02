@@ -4,9 +4,11 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
-import {FINANCIAL_API} from "./apiConstants.jsx";
+import {FINANCIAL_API, PRODUCTION_API} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
+import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
@@ -226,8 +228,8 @@ export const subMenuItems = {
             items: [
                 { text: '작업자 관리', component: null, apiPath: null },
                 { text: '자재 정보 관리', component: null, apiPath: null },
-                { text: '설비 정보 관리', component: null, apiPath: null },
-                { text: '유지보수 이력 관리', component: null, apiPath: null },
+                { text: '설비 정보 관리', component: EquipmentDataPage, apiPath: PRODUCTION_API.EQUIPMENT_DATA_API },
+                { text: '유지보수 이력 관리', component: MaintenanceHistoryPage, apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API },
             ]
         },
         {
