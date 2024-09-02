@@ -2,6 +2,10 @@
   width: 100%;
 }
 
+* {
+  scrollbar-width: none !important;
+}
+
 .background-color-header {
   background-color: #152937;
 }
@@ -14,54 +18,6 @@
 .background-color-sidebar-selected {
   background-color: #0E4351 !important;
 }
-
-/* 스크롤바 영역 시작 */
-.mui-scrollbar::-webkit-scrollbar,
-.ant-table-body::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.mui-scrollbar::-webkit-scrollbar-thumb,
-.ant-table-body::-webkit-scrollbar-thumb {
-  background-color: #888;
-  transition: background-color 0.3s ease-in-out, opacity 0.3s ease-in-out;
-  opacity: 0; /* 기본적으로 스크롤바를 투명하게 설정 */
-}
-
-.mui-scrollbar:hover::-webkit-scrollbar-thumb,
-.ant-table-body:hover::-webkit-scrollbar-thumb {
-  background-color: #555;
-  opacity: 1; /* 호버 시 스크롤바 나타나게 */
-}
-
-.mui-scrollbar::-webkit-scrollbar-thumb:hover,
-.ant-table-body::-webkit-scrollbar-thumb:hover {
-  background-color: #333;
-  transition: background-color 0.3s ease-in-out; /* 동일한 애니메이션 */
-}
-
-.mui-scrollbar::-webkit-scrollbar-button,
-.ant-table-body::-webkit-scrollbar-button {
-  display: none; /* 상단 및 하단 화살표 없애기 */
-}
-
-/* Firefox에서 스크롤바 스타일링 */
-.MuiBox-root,
-.mui-scrollbar,
-.ant-table-body {
-  scrollbar-width: thin;
-  scrollbar-color: #e3e2e2 #f1f1f1; /* 스크롤바 색상 */
-  transition: scrollbar-color 0.3s ease-in-out; /* 동일한 애니메이션 */
-}
-
-.MuiBox-root:hover,
-.mui-scrollbar:hover,
-.ant-table-body:hover {
-  scrollbar-color: #888 #f1f1f1; /* 호버 시 스크롤바 색상 */
-  transition: scrollbar-color 0.3s ease-in-out; /* 동일한 애니메이션 */
-}
-/* 스크롤바 영역 끝 */
 
 /* antd 테이블 영역 시작 */
 .ant-table-tbody > tr.ant-table-row-selected > td {
@@ -138,9 +94,9 @@
 
 /* 사이드바를 호버했을 때 */
 .custom-sidebar:hover {
-  width: 200px !important; /* 호버 시 확장된 너비 */
-  min-width: 200px !important;
-  max-width: 200px !important;
+  width: 350px !important; /* 호버 시 확장된 너비 */
+  min-width: 350px !important;
+  max-width: 350px !important;
 }
 
 /* 메뉴 아이템의 텍스트와 아이콘을 가운데 정렬 */
@@ -195,5 +151,14 @@
   /* 선택된 아이템에 대한 텍스트 색상 */
 .ant-menu-dark .ant-menu-item-selected > .ant-menu-title-content {
   color: #ffffff !important;
+}
+
+.custom-sidebar .ant-menu-submenu-arrow {
+  display: none;
+}
+
+/* 서브메뉴 중 하나라도 호버되었을 때 모든 화살표 표시 */
+.custom-sidebar:hover .ant-menu-submenu-arrow {
+  display: block;
 }
 /* 사이드바 영역 끝 */

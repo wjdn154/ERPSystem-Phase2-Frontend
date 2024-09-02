@@ -21,8 +21,8 @@ import AppHook from './modules/integration/hooks/AppHook';
 import {Col, Layout, Row} from "antd";
 import Logo from "./assets/favicon/OMZ.svg";
 import Headers from "./modules/integration/components/Header/Headers.jsx";
-import Sider from "antd/es/layout/Sider.js";
-import {Content} from "antd/es/layout/layout.js";
+
+const { Sider, Content } = Layout;
 
 // App 컴포넌트 정의
 const App = () => {
@@ -45,7 +45,7 @@ const App = () => {
                     {/* 사이드바 영역 끝 */}
 
                     {/* 메인 컨텐츠 영역 시작 */}
-                    <Content>
+                    <Content style={{ transition: 'margin-left 0.3s ease' }}>
                         <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#0E1B25' }}>
                             <ContentWrapper>
                                 <MainContentPage selectedSubSubMenu={selectedSubSubMenu} />

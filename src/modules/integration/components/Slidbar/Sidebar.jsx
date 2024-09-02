@@ -1,64 +1,69 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Layout, Menu } from 'antd';
 import '../../../../styles/App.css';
 import { menuItems, subMenuItems } from '../../../../config/menuItems.jsx';
 const { Sider } = Layout;
+const { SubMenu } = Menu;
 
 const Sidebar = () => {
-    const [hoveredKey, setHoveredKey] = useState(null);
-    const [openKeys, setOpenKeys] = useState([]); // 열려 있는 SubMenu의 키를 관리
-    const closeTimeout = useRef(null); // 타이머를 관리하기 위한 ref
+    const sidebarRef = useRef(null);
 
-    const handleMouseEnter = (key) => {
-        if (closeTimeout.current) {
-            clearTimeout(closeTimeout.current); // 기존 타이머를 취소
-        }
-        setHoveredKey(key);
-        setOpenKeys((prevOpenKeys) => [...prevOpenKeys, key]); // 현재 열려있는 키를 유지하며 새 키 추가
-    };
+    useEffect(() => {
+        const sidebar = sidebarRef.current;
+        const submenuArrows = sidebar.querySelectorAll('.ant-menu-submenu-arrow');
 
-    const handleMouseLeave = () => {
-        closeTimeout.current = setTimeout(() => {
-            setHoveredKey(null);
-            setOpenKeys([]); // 모든 SubMenu를 닫음
-        }, 3000); // 1초 뒤에 메뉴 닫기
-    };
+        const handleMouseEnter = () => {
+            submenuArrows.forEach(arrow => {
+                arrow.style.display = 'block';
+            });
+        };
 
-    const generateMenuItems = () => {
-        return menuItems.map((item, index) => {
-            const key = `sub${index + 1}`;
-            return {
-                key,
-                icon: item.icon,
-                label: item.text,
-                onMouseEnter: () => handleMouseEnter(key),
-                onMouseLeave: handleMouseLeave,
-                children: subMenuItems[item.text]?.map((subItem, subIndex) => ({
-                    key: `${key}-${subIndex + 1}`,
-                    label: subItem.text,
-                    onMouseEnter: () => handleMouseEnter(`${key}-${subIndex + 1}`),
-                    onMouseLeave: handleMouseLeave,
-                    children: subItem.items.map((subSubItem, subSubIndex) => ({
-                        key: `${key}-${subIndex + 1}-${subSubIndex + 1}`,
-                        label: subSubItem.text,
-                        onMouseEnter: () => handleMouseEnter(`${key}-${subIndex + 1}-${subSubIndex + 1}`),
-                        onMouseLeave: handleMouseLeave,
-                    })),
-                })),
-            };
-        });
-    };
+        const handleMouseLeave = () => {
+            submenuArrows.forEach(arrow => {
+                arrow.style.display = 'none';
+            });
+        };
+
+        sidebar.addEventListener('mouseenter', handleMouseEnter);
+        sidebar.addEventListener('mouseleave', handleMouseLeave);
+
+        return () => {
+            sidebar.removeEventListener('mouseenter', handleMouseEnter);
+            sidebar.removeEventListener('mouseleave', handleMouseLeave);
+        };
+    }, []);
 
     return (
-        <Sider className="custom-sidebar">
+        <Sider className="custom-sidebar" ref={sidebarRef}>
             <Menu
                 mode="inline"
-                items={generateMenuItems()} // items 속성 사용
-                selectedKeys={hoveredKey ? [hoveredKey] : []} // 선택된 키 설정
-                openKeys={openKeys} // 열려 있는 SubMenu의 키 설정
+                defaultSelectedKeys={['1']}
                 style={{ height: 'calc(100vh - 64px)', overflowY: 'auto', borderRight: 0 }}
                 theme="dark"
-            />
+            >
+                {menuItems.map((item, index) => (
+                    <SubMenu
+                        key={`sub${index + 1}`}
+                        icon={item.icon}
+                        title={item.text}
+                    >
+                        {subMenuItems[item.text] && subMenuItems[item.text].map((subItem, subIndex) => (
+                            <SubMenu
+                                key={`sub${index + 1}-${subIndex + 1}`}
+                                title={subItem.text}
+                            >
+                                {subItem.items.map((subSubItem, subSubIndex) => (
+                                    <Menu.Item
+                                        key={`sub${index + 1}-${subIndex + 1}-${subSubIndex + 1}`}
+                                    >
+                                        {subSubItem.text}
+                                    </Menu.Item>
+                                ))}
+                            </SubMenu>
+                        ))}
+                    </SubMenu>
+                ))}
+            </Menu>
         </Sider>
     );
 };
