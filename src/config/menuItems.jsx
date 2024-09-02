@@ -9,6 +9,7 @@ import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.js
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
+import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
 
@@ -145,7 +146,7 @@ export const subMenuItems = {
             items: [
                 { text: '품목 관리', component: null, apiPath: null },
                 { text: '품목 그룹 관리', component: null, apiPath: null },
-                { text: '창고등록', component: null, apiPath: null },
+                { text: '창고등록', component: WarehouseListPage, apiPath: LOGISTICS_API.WAREHOUSE_LIST_API },
             ]
         },
         {
