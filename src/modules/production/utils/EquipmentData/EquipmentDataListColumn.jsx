@@ -1,4 +1,5 @@
-export const equipmentDataListColumn = [
+export const
+    equipmentDataListColumn = [
     {
         title: <span>설비번호</span>,  // 컬럼 제목
         dataIndex: 'equipmentNum',  // 데이터 인덱스: 이 필드는 데이터 객체의 'equipmentNum' 속성과 연결됩니다.
