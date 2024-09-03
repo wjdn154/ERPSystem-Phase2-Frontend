@@ -4,11 +4,12 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
-import {FINANCIAL_API, PRODUCTION_API} from "./apiConstants.jsx";
+import {FINANCIAL_API, PRODUCTION_API, LOGISTICS_API} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
+import ProductPage from "../modules/logistics/pages/ProductPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
@@ -141,7 +142,7 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '품목 관리', component: null, apiPath: null },
+                { text: '품목 관리', component: ProductPage, apiPath: LOGISTICS_API.PRODUCT_LIST_API },
                 { text: '품목 그룹 관리', component: null, apiPath: null },
                 { text: '창고등록', component: null, apiPath: null },
             ]

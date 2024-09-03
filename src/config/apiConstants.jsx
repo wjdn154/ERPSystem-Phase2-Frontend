@@ -16,6 +16,8 @@ export const HR_API = {
 
 // 물류관리
 export const LOGISTICS_API = {
+    PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/product-list`, // 품목 목록 조회 API
+    PRODUCT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/product-detail/${id}`, // 품목 상세 조회 API
 };
 
 // 생산관리
