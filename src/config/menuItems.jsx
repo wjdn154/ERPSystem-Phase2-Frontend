@@ -4,10 +4,13 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
-import {FINANCIAL_API, PRODUCTION_API} from "./apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API, PRODUCTION_API, USERS_API} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
+import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
+import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
+import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
 import EnvironmentalRegistrationPage from "../modules/financial/pages/EnvironmentalRegistrationPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
