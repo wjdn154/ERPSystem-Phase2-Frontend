@@ -1,6 +1,7 @@
 import React from 'react';
-import { Paper, Typography } from '@mui/material';
-import { Table as AntTable } from 'antd';
+import { Table, Button, Space, Modal } from 'antd';
+
+const { confirm } = Modal;
 
 const ProcessDetailsListSection = ({ columns, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
     if (!data) {
@@ -8,23 +9,22 @@ const ProcessDetailsListSection = ({ columns, data, handleRowSelection, handleSe
     }
 
     return (
-        <Paper elevation={3} sx={{ height: '100%' }}>
-            <Typography variant="h6" marginBottom={'20px'} className="paper-header">프로세스 상세 목록</Typography>
-            <AntTable
-                style={{ padding: '20px' }}
+        <div style={{ padding: '20px' }}>
+            <Table
                 columns={columns}
-                dataSource={data.processDetails}
+                dataSource={data}
                 pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                rowSelection={handleRowSelection}
+                rowSelection={handleSelectedRow} // checkbox or radio btn active
                 size="small"
-                rowKey="id"
+                rowKey="code"
                 onRow={(record) => ({
-                    onClick: () => handleSelectedRow(record),
+                    onClick: () => handleSelectedRow(record), // 행 클릭 시 해당 공정 선택
                     style: { cursor: 'pointer' },
                 })}
                 rowClassName={rowClassName}
             />
-        </Paper>
+        </div>
+
     );
 };
 
