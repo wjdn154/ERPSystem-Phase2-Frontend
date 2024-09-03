@@ -16,7 +16,14 @@ const EquipmentDataPage = ({initialData}) => {
         handleRowSelection,
         equipmentDataDetail,
         setEquipmentDataDetail,
-        handleInputChange
+        handleInputChange,
+        handleSave,
+        handleUpdate,
+        handleDelete,
+        isModalVisible,
+        showModal,
+        handleOk,
+        handleCancel
 
     } = equipmentDataHook(initialData);
 
@@ -48,7 +55,7 @@ const EquipmentDataPage = ({initialData}) => {
                 </Grid>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={{ marginTop: 3 }}>
                 {equipmentDataDetail && (
                 <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
                     <div>
@@ -57,7 +64,13 @@ const EquipmentDataPage = ({initialData}) => {
                                 equipmentDataDetail={equipmentDataDetail}
                                 handleInputChange={handleInputChange}
                                 setEquipmentDataDetail={setEquipmentDataDetail}
-
+                                handleSave={handleSave}
+                                handleUpdate={handleUpdate}
+                                handleDelete={handleDelete}
+                                isModalVisible={isModalVisible}
+                                showModal={showModal}
+                                handleOk={handleOk}
+                                handleCancel={handleCancel}
                             />
                     </div>
                 </Grow>
