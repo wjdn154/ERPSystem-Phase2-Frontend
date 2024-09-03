@@ -34,10 +34,10 @@ export const PRODUCTION_API = {
 
     WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters`, // 작업장 목록 조회 API
     WORKCENTER_DETAILS_API: (code) => `${API_BASE_URL}/api/production/workcenters/details/${code}`, // 작업장 세부정보 조회 API
-    WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search`, // 작업장 이름검색 API
+    WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search?name=${name}`, // 작업장 이름검색 API
     SAVE_WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters/create`, // 새 작업장 저장 API
     UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}`, // 작업장 수정 API
-    DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete`, // 작업장 삭제 API
+    DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete?code=${code}`, // 작업장 삭제 API
 
     PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails`, // 생산공정 목록 조회 API
     PROCESS_DETAILS_API: (code) => `${API_BASE_URL}/api/production/processDetails/details/${code}`, // 생산공정 세부정보 조회 API

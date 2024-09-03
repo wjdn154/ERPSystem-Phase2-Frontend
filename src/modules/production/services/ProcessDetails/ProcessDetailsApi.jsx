@@ -60,3 +60,14 @@ export const deleteProcessDetail = async (code) => {
         throw new Error(errorMessage);
     }
 };
+
+// 공정 이름으로 검색하는 함수
+export const searchProcessDetails = async (name) => {
+    try {
+        const response = await axios.post(PRODUCTION_API.PROCESS_SEARCH_API(name));
+        return response.data;
+    } catch (error) {
+        console.error("공정 정보를 검색하는 중 오류 발생:", error);
+        throw error;
+    }
+};

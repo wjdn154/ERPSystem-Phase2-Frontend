@@ -5,7 +5,10 @@ import {
     updateProcessDetail,
     deleteProcessDetail,
     createProcessDetail,
+    searchProcessDetails,
 } from '../../services/ProcessDetails/ProcessDetailsApi.jsx';
+import { filterProcessDetails  } from '../../utils/ProcessDetails/ProcessDetailsUtil.jsx';
+
 import {Modal} from "antd";
 
 
@@ -15,6 +18,8 @@ export const useProcessDetails = (initialData) => {
     const [selectedRow, setSelectedRow] = useState(null);
     const [isProcessModalVisible, setIsProcessModalVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [searchData, setSearchData] = useState([]);
+    const [isSearchActive, setIsSearchActive] = useState(false);
 
     // 초기 데이터 로딩
     useEffect(() => {
@@ -162,7 +167,32 @@ export const useProcessDetails = (initialData) => {
         setIsProcessModalVisible(true);
     };
 
+    // // 기존 백엔드 구현 활용한 검색 핸들러
+    // const handleSearch = async (name) => {
+    //     try {
+    //         setIsSearchActive(true); // 검색이 실행됨을 표시
+    //         const results = await searchProcessDetails(name);
+    //         setSearchData(results);
+    //     } catch (error) {
+    //         console.error("검색 중 오류 발생:", error);
+    //         setSearchData([]); // 검색 오류 시 빈 결과로 설정
+    //     }
+    // };
 
+
+    // 클라이언트에서 필터링
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleSearch = (term) => {
+        try {
+            setIsSearchActive(true);
+            const filteredData = filterProcessDetails(data, term);
+            setSearchData(filteredData);
+        } catch (error) {
+            console.error("검색 중 오류 발생:", error);
+            setSearchData([]); // 검색 오류 시 빈 결과로 설정
+        }
+    };
 
     return {
         data,
@@ -175,5 +205,10 @@ export const useProcessDetails = (initialData) => {
         handleSave,
         handleClose,
         handleAddProcess,
+        handleSearch,
+        searchData,
+        isSearchActive,
+        setIsSearchActive,
+        setSearchData,
     };
 };

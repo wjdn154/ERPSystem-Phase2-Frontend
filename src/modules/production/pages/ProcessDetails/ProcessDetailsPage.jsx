@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { Row, Col, Button, Modal } from 'antd';
+import React from 'react';
+import { Row, Col, Button, Modal, Typography } from 'antd';
+import SearchBar from '../../components/ProcessDetails/SearchBar.jsx';
 import ProcessDetailsListSection from '../../components/ProcessDetails/ProcessDetailsListSection.jsx';
 import SelectedProcessDetailsSection from '../../components/ProcessDetails/SelectedProcessDetailsSection.jsx';
 import { useProcessDetails } from '../../hooks/ProcessDetails/ProcessDetailsHook.jsx';
 import { processDetailsColumn } from '../../utils/ProcessDetails/ProcessDetailsColumn.jsx';
-import { getRowClassName } from '../../utils/ProcessDetails/ProcessDetailsUtil.jsx';
+import { getRowClassName, filterProcessDetails } from '../../utils/ProcessDetails/ProcessDetailsUtil.jsx';
+
+const { Text } = Typography;
 
 const ProcessDetailsPage = ({ initialData }) => {
     const {
@@ -17,25 +20,57 @@ const ProcessDetailsPage = ({ initialData }) => {
         handleClose,
         handleInputChange,
         handleAddProcess,
+        handleSearch,
+        searchData,
+        isSearchActive,
     } = useProcessDetails(initialData);
-
-
 
     return (
         <div style={{ padding: '24px' }}>
-            <Row gutter={16}>
+            {/* 검색 바 */}
+            <Row gutter={16} style={{ marginBottom: '16px' }}>
+                <Col span={8}>
+                    <SearchBar onSearch={handleSearch} />
+                </Col>
+            </Row>
+
+            {/* 검색 결과 목록 또는 경고 메시지 */}
+            {isSearchActive && (
+                <>
+                    {searchData && searchData.length > 0 ? (
+                        <Row gutter={16} style={{ marginBottom: '16px' }}>
+                            <Col span={24}>
+                                <ProcessDetailsListSection
+                                    columns={processDetailsColumn}
+                                    data={searchData}
+                                    handleSelectedRow={handleSelectedRow}
+                                    rowClassName={getRowClassName}
+                                />
+                            </Col>
+                        </Row>
+                    ) : (
+                        <Text type="warning">검색하신 공정명을 찾을 수 없습니다.</Text>
+                    )}
+                </>
+            )}
+
+            {/* 기본 데이터 목록 */}
+            <Row gutter={16} style={{ marginTop: isSearchActive && searchData && searchData.length > 0 ? '16px' : '0' }}>
                 <Col span={24}>
                     <ProcessDetailsListSection
                         columns={processDetailsColumn}
                         data={data}
-                        handleSelectedRow={handleSelectedRow} // 행 클릭 시 모달 열자 ㅏ
+                        handleSelectedRow={handleSelectedRow}
                         rowClassName={getRowClassName}
                     />
                 </Col>
             </Row>
-            <Button type="primary" onClick={handleAddProcess} style={{ marginBottom: '16px' }}>
+
+            {/* 공정 추가 버튼 */}
+            <Button type="primary" onClick={handleAddProcess} style={{ marginTop: '16px' }}>
                 등록
             </Button>
+
             {/* 모달 컴포넌트 */}
             {processDetail && (
                 <Modal
