@@ -9,21 +9,25 @@ import {
 
 export const equipmentDataHook = (initialData) => {
 
-    const [data, setData] = useState(initialData);
+    const [data, setData] = useState(initialData || {});
     const [showDetail, setShowDetail] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
-    const [equipmentDataDetail, setEquipmentDataDetail] = useState(initialData.equipmentDataDetail);
+    const [equipmentDataDetail, setEquipmentDataDetail] = useState({});
 
     const equipmentMemoizedData = useMemo(() => data, [data]);
-
+    console.log(data);
+    console.log(equipmentDataDetail);
+    console.log("hook",initialData);
     useEffect(() => {
-        if (equipmentDataDetail) {
-            setShowDetail(false); // 기존 컴포넌트를 사라지게 함
-            setTimeout(() => {
-                setShowDetail(true); // 새 컴포넌트를 나타나게 함
-            }, 0); // 0ms의 지연 시간 후에 나타나도록 설정
+        if(selectedRow !==null){
+            const seletedData = data.find(item => item.id === selectedRow);
+            if(seletedData){
+                setEquipmentDataDetail(seletedData);
+                setShowDetail(true);
+            }
         }
-    }, [equipmentDataDetail]);
+
+    }, [selectedRow, data]);
 
     // 행 선택 핸들러 설정
     const handleRowSelection = {
