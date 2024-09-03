@@ -4,7 +4,6 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
-import {FINANCIAL_API, PRODUCTION_API, LOGISTICS_API} from "./apiConstants.jsx";
 import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API, PRODUCTION_API, USERS_API} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
