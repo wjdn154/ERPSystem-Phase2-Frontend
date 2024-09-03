@@ -16,6 +16,7 @@ const MainContentHook = (selectedSubSubMenu) => {
         axios.post(selectedSubSubMenu.apiPath)
             .then(response => {
                 setInitialData(response.data);
+                console.log(response.data);
                 setError(null);
             })
             .catch(err => {
