@@ -1,9 +1,9 @@
 import React, {useMemo} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
-import {employeeDataHook} from '../hooks/EmployeeDataHook.jsx';
+import {employeeDataHook} from '../hooks/EmployeeDataHook';
 import EmployeeDataListSection from '../components/Employee/EmployeeDataListSection.jsx';
 import {employeeDataListColumn} from '../utils/EmployeeData/EmployeeDataListColumn.jsx';
-import EmployeeDataDetailSection from '../components/Employee/EmployeeDataDetailSection.jsx';
+import EmployeeDataDetailSection from '../../hr/components/Employee/EmployeeDataDetailSection';
 import {getRowClassName} from "../utils/EmployeeData/EmployeeDataUtil.jsx";
 
 const EmployeeDataPage = ({ initialData }) => {
@@ -56,7 +56,7 @@ const EmployeeDataPage = ({ initialData }) => {
                                     handleInputChange2={handleInputChange2}
                                     handleDeleteMemo={handleDeleteMemo}
                                     handleAddNewMemo={handleAddNewMemo}
-                                    setEquipmentDataDetail={setEquipmentDataDetail}
+                                    setEquipmentDataDetail={setEmployeeDataDetail}
                                     selectRelationCode={selectRelationCode}
                                     handleSave={handleSave}
                                     deleteRelationCode={deleteRelationCode}

@@ -7,7 +7,7 @@ export const employeeDataListColumn = [
     {
         title: <span>사원번호</span>, // 컬럼 제목
         dataIndex: 'employeeNumber', // 데이터 인덱스: 이 필드는 데이터 객체의 'employeeNumber' 속성과 연결됩니다.
-        width: '10%', // 사원번호: 보통 숫자는 짧으므로 너비를 줄입니다.
+        width: '5%', // 사원번호: 보통 숫자는 짧으므로 너비를 줄입니다.
     },
     {
         title: <span>성</span>, // 컬럼 제목
@@ -20,9 +20,14 @@ export const employeeDataListColumn = [
         width: '5%', // 이름: 이름은 보통 짧기 때문에 너비를 줄입니다.
     },
     {
+        title: <span>부서번호</span>, // 컬럼 제목
+        dataIndex: 'departmentCode', // 데이터 인덱스: 이 필드는 데이터 객체의 'departmentName' 속성과 연결됩니다.
+        width: '10%', // 부서명: 부서명은 중간 길이이므로 적절한 너비를 줍니다.
+    },
+    {
         title: <span>부서명</span>, // 컬럼 제목
         dataIndex: 'departmentName', // 데이터 인덱스: 이 필드는 데이터 객체의 'departmentName' 속성과 연결됩니다.
-        width: '10%', // 부서명: 부서명은 중간 길이이므로 적절한 너비를 줍니다.
+        width: '7%', // 부서명: 부서명은 중간 길이이므로 적절한 너비를 줍니다.
     },
     {
         title: <span>고용 상태</span>, // 컬럼 제목

@@ -26,7 +26,10 @@ export const USERS_API = {
     UPDATE_USERS_DATA_API: (id)=> `${API_BASE_URL}/api/hr/users/put/${id}`,
     DELETE_USERS_DATA_API: (id) =>`${API_BASE_URL}/api/hr/users/del/${id}`,
 }
-
+// 인사관리 - 부서
+export const DEPARTMENT_API = {
+    DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/all`,
+}
 // 물류관리
 export const LOGISTICS_API = {
     WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse` // 창고 목록 조회 API
