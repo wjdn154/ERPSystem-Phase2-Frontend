@@ -1,7 +1,5 @@
 import React from "react";
 import { Typography, Box, Skeleton } from "@mui/material";
-import AccountSubjectPage from "../../financial/pages/AccountSubjectPage.jsx";
-import WorkcenterManagementPage from "../../production/pages/Workcenter/WorkcenterManagementPage.jsx"; // 작업장 관리 페이지 임포트
 import MainContentHook from "../hooks/MainContentHook.jsx";
 import AntdSkeleton from "../components/MainContent/AntdSkeleton.jsx";
 import { subMenuItems } from "../../../config/menuItems.jsx";

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography, Grid } from "@mui/material";
+import { Card, Typography, Row, Col } from "antd";
 import { fetchWorkcenters } from "../../services/Workcenter/WorkcenterApi";
 
-function WorkcenterDashboard() {
+const WorkcenterDashboard = () => {
   const [workcenters, setWorkcenters] = useState([]);
   const [activeRate, setActiveRate] = useState(0);
 
   useEffect(() => {
+    console.log("WorkcenterDashboard 컴포넌트 시작");
+
     const loadWorkcenters = async () => {
       try {
         const data = await fetchWorkcenters();
@@ -17,8 +19,9 @@ function WorkcenterDashboard() {
         const totalCount = data.length;
 
         // 활성화율 계산 (백분율)
-        const activeRate = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
-        setActiveRate(activeRate);
+        const calculatedActiveRate = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
+        console.log("계산된 활성화율:", calculatedActiveRate);
+        setActiveRate(calculatedActiveRate);
       } catch (error) {
         console.error("작업장 데이터를 불러오는 중 오류 발생:", error);
       }
@@ -28,52 +31,39 @@ function WorkcenterDashboard() {
   }, []);
 
   return (
-      <div>
-        <Typography variant="h4" gutterBottom>
+      <div style={{ marginBottom: '16px' }}>
+        <Typography.Title level={4} style={{ marginBottom: '16px' }}>
           작업장 대시보드
-        </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
+        </Typography.Title>
+        <Row gutter={16}>
+          <Col xs={24} sm={12} md={6}>
             <Card>
-              <CardContent>
-                <Typography variant="h6" component="div">
-                  전체 작업장 수
-                </Typography>
-                <Typography variant="h4" color="primary">
-                  {workcenters.length}
-                </Typography>
-              </CardContent>
+              <Typography.Title level={5}>전체 작업장 수</Typography.Title>
+              <Typography.Title level={2} style={{ color: '#1890ff' }}>
+                {workcenters.length}
+              </Typography.Title>
             </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
             <Card>
-              <CardContent>
-                <Typography variant="h6" component="div">
-                  활성화율
-                </Typography>
-                <Typography variant="h4" color="primary">
-                  {activeRate.toFixed(2)}%
-                </Typography>
-              </CardContent>
+              <Typography.Title level={5}>활성화율</Typography.Title>
+              <Typography.Title level={2} style={{ color: '#1890ff' }}>
+                {activeRate.toFixed(2)}%
+              </Typography.Title>
             </Card>
-          </Grid>
-          {/*{workcenters.map((wc) => (*/}
-          {/*    <Grid item xs={12} sm={6} md={3} key={wc.code}>*/}
-          {/*      <Card>*/}
-          {/*        <CardContent>*/}
-          {/*          <Typography variant="h6" component="div">*/}
-          {/*            {wc.name}*/}
-          {/*          </Typography>*/}
-          {/*          <Typography variant="body2" color="text.secondary">*/}
-          {/*            활성화 상태: {wc.isActive ? "활성화" : "비활성화"}*/}
-          {/*          </Typography>*/}
-          {/*        </CardContent>*/}
-          {/*      </Card>*/}
-          {/*    </Grid>*/}
-          {/*))}*/}
-        </Grid>
+          </Col>
+          {/*
+        필요한 경우, 추가 작업장 정보를 여기에 더 표시할 수 있습니다.
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Typography.Title level={5}>작업장 이름</Typography.Title>
+            <Typography.Text>추가 정보</Typography.Text>
+          </Card>
+        </Col>
+        */}
+        </Row>
       </div>
   );
-}
+};
 
 export default WorkcenterDashboard;

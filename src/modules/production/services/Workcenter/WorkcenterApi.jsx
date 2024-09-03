@@ -3,68 +3,61 @@ import { PRODUCTION_API } from '../../../../config/apiConstants.jsx';
 
 // 작업장 목록 조회 함수
 export const fetchWorkcenters = async () => {
+    console.log("fetchWorkcenters 호출됨"); // 추가된 로그
+    console.log("API 요청 URL:", PRODUCTION_API.WORKCENTER_LIST_API); // API URL 확인 로그
+
     try {
-        const response = await axios.post(PRODUCTION_API.WORKCENTER_API);
-        console.log("API 응답 데이터:", response.data); // API 응답 데이터를 콘솔에 출력
+        const response = await axios.post(PRODUCTION_API.WORKCENTER_LIST_API);
+        console.log("응답 데이터:", response.data); // 응답 데이터 확인용 로그
         return response.data;
     } catch (error) {
-        console.error("작업장 목록을 가져오는 중 오류 발생:", error);
+        console.error("작업장 정보를 가져오는 중 오류 발생:", error);
         throw error;
     }
 };
 
-// 작업장 상세 정보 조회 함수
-export const fetchWorkcenterDetails = async (code) => {
+// 특정 ID로 작업장 상세 정보 조회 함수
+export const fetchWorkcenter = async (code) => {
     try {
-        const response = await axios.post(PRODUCTION_API.WORKCENTER_DETAILS_API.replace(code));
-        return response.data; // 데이터를 반환
-        console.log(data);
-
+        const response = await axios.post(PRODUCTION_API.WORKCENTER_DETAILS_API(code));
+        console.log("ID로 상세 정보 조회 데이터 로그: ", response.data)
+        return response.data;
     } catch (error) {
         console.error("작업장 상세 정보를 가져오는 중 오류 발생:", error);
-        throw error; // 호출한 곳에서 에러 처리
-    }
-};
-
-// 작업장 이름 검색 함수
-export const searchWorkcenterByName = async (name) => {
-    try {
-        const response = await axios.post(PRODUCTION_API.WORKCENTER_SEARCH_API, { name });
-        return response.data;
-    } catch (error) {
-        console.error("검색한 키워드를 포함한 작업장명을 가져오는 중 오류 발생:", error);
         throw error;
     }
-}
+};
 
-// 새 작업장 저장 함수
-export const createWorkcenter = async (newWorkcenter) => {
+// 작업장 정보 생성 함수
+export const createWorkcenter = async (workcenter) => {
     try {
-        const response = await axios.post(PRODUCTION_API.SAVE_WORKCENTER_API, newWorkcenter);
-        return response.data; // 생성된 작업장 데이터를 반환
+        const response = await axios.post(PRODUCTION_API.SAVE_WORKCENTER_API, workcenter);
+        return response.data;
     } catch (error) {
-        console.error("작업장을 생성하는 중 오류 발생:", error);
-        throw error; // 호출한 곳에서 에러 처리
+        console.error("작업장 정보를 생성하는 중 오류 발생:", error);
+        throw error;
     }
 };
 
-// 작업장 수정 함수
-export const updateWorkcenter = async (code, updatedWorkcenter) => {
+// 작업장 정보 수정 함수
+export const updateWorkcenter = async (code, workcenter) => {
     try {
-        const response = await axios.post(PRODUCTION_API.UPDATE_WORKCENTER_API.replace(code));
-        return response.data; // 수정된 작업장 데이터를 반환
+        const response = await axios.post(PRODUCTION_API.UPDATE_WORKCENTER_API(code), workcenter);
+        return response.data;
     } catch (error) {
-        console.error("작업장을 수정하는 중 오류 발생:", error);
-        throw error; // 호출한 곳에서 에러 처리
+        console.error("작업장 정보를 업데이트 하는 중 오류 발생:", error);
+        throw error;
     }
 };
 
-// 작업장 삭제 함수
+// 작업장 정보 삭제 함수
 export const deleteWorkcenter = async (code) => {
     try {
-        await axios.post(PRODUCTION_API.DELETE_WORKCENTER_API(code));
+        const response = await axios.post(PRODUCTION_API.DELETE_WORKCENTER_API(code));
+        return response.data;
     } catch (error) {
-        console.error("작업장을 삭제하는 중 오류 발생:", error);
-        throw error; // 호출한 곳에서 에러 처리
+        // 백엔드에서 반환된 오류 메시지 추출
+        const errorMessage = error.response?.data?.message || '삭제 중 오류가 발생했습니다.';
+        throw new Error(errorMessage);
     }
 };
