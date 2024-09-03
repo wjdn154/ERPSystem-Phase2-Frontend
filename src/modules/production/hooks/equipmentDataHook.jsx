@@ -16,8 +16,10 @@ export const equipmentDataHook = (initialData) => {
 
     const equipmentMemoizedData = useMemo(() => data, [data]);
 
+    console.log("hook 호출됨");
     //데이터가 변경될 때마다 컴포넌트를 새로 렌더링
     useEffect(() => {
+        console.log('equipmentdata 변경됨 : ',equipmentDataDetail);
         if (equipmentDataDetail) {
             setShowDetail(true);
         } else {
@@ -26,20 +28,33 @@ export const equipmentDataHook = (initialData) => {
     }, [equipmentDataDetail]);
 
     // 행 선택 핸들러 설정
-    const handleRowSelection = (selectedRowKeys, selectedRows) => {
+    const handleRowSelection =  {
+        type:'radio',
+        selectedRowKeys: selectedRow ? [selectedRow.id] : [],
+        onChange: (selectedRowKeys, selectedRows) => {
             if (selectedRows.length > 0) {
                 handleSelectedRow(selectedRows[0]);
+            } else{
+                console.warn("비어있음.");
             }
+        },
     };
 
     // 행 선택 시 설비정보 상세 정보를 가져오는 로직
     const handleSelectedRow = async (selectedRow) => {
+
+        console.log('선택된 행 : ',selectedRow);
         if(!selectedRow) return;
         setSelectedRow(selectedRow);
         setShowDetail(false);   //상세정보 로딩중일때 기존 상세정보 숨기기
+
+        console.log('selected row : ',selectedRow);
         try {
+            console.log('selectedRow.id : ',selectedRow.id);
             const detail = await fetchEquipmentDataDetail(selectedRow.id);     //비동기 api 호출
+            console.log('fetch detail : ',detail);
             setEquipmentDataDetail(detail);      //상세정보 설정
+
         } catch (error) {
             console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
         }

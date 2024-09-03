@@ -15,7 +15,7 @@ export const fetchEquipmentData = async () => {
 //설비정보 상세 호출 함수
 export const fetchEquipmentDataDetail = async (id) => {
     try {
-        const response = await axios.post(PRODUCTION_API.EQUIPMENT_DATA_DETAIL_API);
+        const response = await axios.post(PRODUCTION_API.EQUIPMENT_DATA_DETAIL_API(id));
         return response.data;
     } catch (error){
         console.error("설비 상세 정보를 가져오는 중 오류 발생 : " + error);

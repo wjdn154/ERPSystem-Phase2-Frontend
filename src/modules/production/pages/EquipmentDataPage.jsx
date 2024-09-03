@@ -19,9 +19,11 @@ const EquipmentDataPage = ({initialData}) => {
         handleInputChange
 
     } = equipmentDataHook(initialData);
+
     console.log('rendered data:',data);
     console.log('initialData : ',initialData);
     console.log(data.equipmentDataDetail);
+    console.log(equipmentDataDetail);
 
 
     if(!data || data.length === 0) {
@@ -45,31 +47,21 @@ const EquipmentDataPage = ({initialData}) => {
                     </Grow>
                 </Grid>
             </Grid>
-             설비정보 상세 영역
+
             <Grid item xs={12}>
+                {equipmentDataDetail && (
                 <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
                     <div>
-                        {equipmentDataDetail && (
                             <EquipmentDataDetailSection
                                 data={data}
                                 equipmentDataDetail={equipmentDataDetail}
-                                handlePopupClick={handlePopupClick}
-                                isFinancialStatementModalVisible={isFinancialStatementModalVisible}
-                                isRelationCodeModalVisible={isRelationCodeModalVisible}
-                                handleClose={handleClose}
-                                selectFinancialStatement={selectFinancialStatement}
                                 handleInputChange={handleInputChange}
-                                handleInputChange2={handleInputChange2}
-                                handleDeleteMemo={handleDeleteMemo}
-                                handleAddNewMemo={handleAddNewMemo}
                                 setEquipmentDataDetail={setEquipmentDataDetail}
-                                selectRelationCode={selectRelationCode}
-                                handleSave={handleSave}
-                                deleteRelationCode={deleteRelationCode}
+
                             />
-                        )}
                     </div>
                 </Grow>
+                )}
             </Grid>
         </Box>
     )
