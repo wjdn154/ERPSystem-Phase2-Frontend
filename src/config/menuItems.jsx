@@ -34,7 +34,7 @@ export const subMenuItems = {
             text: '기초정보관리',
             items: [
                 { text: '거래처등록', component: null, apiPath: null },
-                { text: '계정과목및적요등록', component: AccountSubjectPage, apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API },
+                { text: '계정과목및적요등록', component: 'AccountSubjectPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API },
                 { text: '환경등록', component: null, apiPath: null },
                 { text: '업무용승용차등록', component: null, apiPath: null },
             ]
@@ -228,8 +228,8 @@ export const subMenuItems = {
             items: [
                 { text: '작업자 관리', component: null, apiPath: null },
                 { text: '자재 정보 관리', component: null, apiPath: null },
-                { text: '설비 정보 관리', component: EquipmentDataPage, apiPath: PRODUCTION_API.EQUIPMENT_DATA_API },
-                { text: '유지보수 이력 관리', component: MaintenanceHistoryPage, apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API },
+                { text: '설비 정보 관리', component: 'EquipmentDataPage', apiPath: PRODUCTION_API.EQUIPMENT_DATA_API },
+                { text: '유지보수 이력 관리', component: 'MaintenanceHistoryPage', apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API },
             ]
         },
         {

@@ -5,7 +5,7 @@ import {Box} from "@mui/material";
 // antd의 Skeleton 컴포넌트를 사용하여 MUI의 스켈레톤과 유사한 형태로 설정
 function AntdSkeleton() {
     return (
-        <Box  style={{ height: '90vh' }}>
+        <>
         <Skeleton
             active
             paragraph={{
@@ -16,7 +16,7 @@ function AntdSkeleton() {
             style={{
                 width: '100%', // 카드의 너비 설정
                 height: '30%', // 카드의 높이 설정
-                backgroundColor: '#fff',
+                backgroundColor: '#0E1B25',
                 padding: '24px', // 카드 내의 여백 설정
             }}
         />
@@ -30,7 +30,7 @@ function AntdSkeleton() {
             style={{
                 width: '100%', // 카드의 너비 설정
                 height: '30%', // 카드의 높이 설정
-                backgroundColor: '#fff',
+                backgroundColor: '#0E1B25',
                 padding: '24px', // 카드 내의 여백 설정
             }}
         />
@@ -43,12 +43,12 @@ function AntdSkeleton() {
                 title={{ width: '60%' }} // 제목 스켈레톤의 너비를 설정
                 style={{
                     width: '100%', // 카드의 너비 설정
-                    height: '40%', // 카드의 높이 설정
-                    backgroundColor: '#fff',
+                    height: '30%', // 카드의 높이 설정
+                    backgroundColor: '#0E1B25',
                     padding: '24px', // 카드 내의 여백 설정
                 }}
             />
-        </Box>
+        </>
     );
 }
 

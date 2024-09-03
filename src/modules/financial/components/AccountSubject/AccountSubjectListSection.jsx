@@ -9,12 +9,12 @@ const AccountSubjectListSection = ({ columns, data, handleRowSelection, handleSe
     // console.log(data);
     return (
         <Paper elevation={3} sx={{ height: '100%' }}>
-            <Typography variant="h6" className="paper-header">계정과목 목록</Typography>
+            <Typography variant="h6" >계정과목 목록</Typography>
             <AntTable
                 style={{ padding: '20px' }}
                 columns={columns}
                 dataSource={data.accountSubjects}
-                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                pagination={{ pageSize: 15, position: ['bottomRight'], showSizeChanger: false }}
                 rowSelection={handleRowSelection}
                 size="small"
                 rowKey="id"
