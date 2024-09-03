@@ -5,17 +5,31 @@ export const FINANCIAL_API = {
     ACCOUNT_SUBJECTS_API: `${API_BASE_URL}/api/financial/accountSubjects/`, // 계정과목 목록 조회 API
     ACCOUNT_SUBJECT_DETAIL_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/${code}`, // 계정과목 상세 조회 API
     SAVE_MEMO_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/saveMemo/${code}`, // 적요 저장 API
-    SAVE_ACCOUNT_SUBJECT_API: `${API_BASE_URL}/api/financial/accountSubjects/saveAccountSubject`, // 계정과목 저장 API
-    UPDATE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/updateAccountSubject/${code}`, // 계정과목 수정 API
-    DELETE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/deleteAccountSubject/${code}`, // 계정과목 삭제 API
+    SAVE_ACCOUNT_SUBJECT_API: `${API_BASE_URL}/api/financial/accountSubjects/save`, // 계정과목 저장 API
+    UPDATE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/update/${code}`, // 계정과목 수정 API
+    DELETE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/delete/${code}`, // 계정과목 삭제 API
 };
 
-// 인사관리
-export const HR_API = {
+// 인사관리 - 사원
+export const EMPLOYEE_API = {
+    EMPLOYEE_DATA_API: `${API_BASE_URL}/api/hr/employee/all`, // 사원 목록 조회 API
+    EMPLOYEE_DATA_DETAIL_API:(id) =>`${API_BASE_URL}/api/employee/${id}`, // 사원 상세 조회 API
+    SAVE_EMPLOYEE_DATA_API: `${API_BASE_URL}/api/employee/createEmployee`, // 사원 등록 API
+    UPDATE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/employee/updateEmployee/${id}`, // 사원 수정 API
+    DELETE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/employee/del/${id}`,
 };
+// 인사관리 - 사용자
+export const USERS_API = {
+    USERS_DATA_API: `${API_BASE_URL}/api/hr/users/all`,
+    USERS_DATA_DETAIL_API: (id) => `${API_BASE_URL}/api/hr/users/${id}`,
+    SAVE_USERS_DATA_API: `${API_BASE_URL}/api/hr/users/create`,
+    UPDATE_USERS_DATA_API: (id)=> `${API_BASE_URL}/api/hr/users/put/${id}`,
+    DELETE_USERS_DATA_API: (id) =>`${API_BASE_URL}/api/hr/users/del/${id}`,
+}
 
 // 물류관리
 export const LOGISTICS_API = {
+    WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse` // 창고 목록 조회 API
 };
 
 // 생산관리
