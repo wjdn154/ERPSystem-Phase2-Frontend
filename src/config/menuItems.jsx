@@ -4,11 +4,12 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
-import {EMPLOYEE_API, FINANCIAL_API, PRODUCTION_API, USERS_API} from "./apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API, PRODUCTION_API, USERS_API} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
+import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
 
@@ -145,7 +146,7 @@ export const subMenuItems = {
             items: [
                 { text: '품목 관리', component: null, apiPath: null },
                 { text: '품목 그룹 관리', component: null, apiPath: null },
-                { text: '창고등록', component: null, apiPath: null },
+                { text: '창고등록', component: WarehouseListPage, apiPath: LOGISTICS_API.WAREHOUSE_LIST_API },
             ]
         },
         {
