@@ -52,12 +52,11 @@ export const updateProcessDetail = async (code, processDetail) => {
 // 공정 정보 삭제 함수
 export const deleteProcessDetail = async (code) => {
     try {
-        console.log(`삭제하려는 공정 코드: ${code}`); // 확인 로그
-        const response = await axios.post(PRODUCTION_API.DELETE_PROCESS_API, { code });
-        console.log("삭제 요청에 대한 응답:", response.data); // 응답 로그
+        const response = await axios.post(PRODUCTION_API.DELETE_PROCESS_API(code));
         return response.data;
     } catch (error) {
-        console.error("공정 정보를 삭제하는 중 오류 발생:", error);
-        throw error;
+        // 백엔드에서 반환된 오류 메시지 추출
+        const errorMessage = error.response?.data?.message || '삭제 중 오류가 발생했습니다.';
+        throw new Error(errorMessage);
     }
 };

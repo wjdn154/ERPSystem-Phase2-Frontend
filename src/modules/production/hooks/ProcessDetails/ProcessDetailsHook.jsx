@@ -38,7 +38,6 @@ export const useProcessDetails = (initialData) => {
     const handleDeleteProcessDetail = async (code) => {
 
         try {
-            console.log("삭제 프로세스가 시작되었습니다.:", code); // 확인 로그 추가
             await deleteProcessDetail(code);
 
             // 성공적으로 삭제되었을 경우, 사용자에게 알리고 화면을 업데이트합니다.
@@ -68,10 +67,12 @@ export const useProcessDetails = (initialData) => {
             setData(updatedDetails);
 
         } catch (error) {
-            console.error("공정 정보를 삭제하는 중 오류 발생:", error)
+            // 백엔드에서 받은 메시지를 사용자에게 알림
             Modal.error({
-                content: '삭제 중 오류가 발생했습니다. 다시 시도해주세요.',
-            })
+                content: error.message.includes('사용 중이므로 삭제할 수 없습니다')
+                    ? '해당 공정은 현재 사용 중이므로 삭제할 수 없습니다.'
+                    : '삭제 중 오류가 발생했습니다. 다시 시도해주세요.',
+            });
         }
     };
 
