@@ -32,6 +32,7 @@ export const DEPARTMENT_API = {
 }
 // 물류관리
 export const LOGISTICS_API = {
+    WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse` // 창고 목록 조회 API
 };
 
 // 생산관리
