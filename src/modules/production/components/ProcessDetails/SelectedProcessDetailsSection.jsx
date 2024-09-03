@@ -1,7 +1,9 @@
 import React from 'react';
 import {
-    Box, Paper, Typography, Modal, Input, Row, Col, Select, Button
+    Box, Paper, Typography, Modal, Input, Select, Button
 } from '@mui/material';
+import { Row, Col } from 'antd';
+
 import { Form, Table as AntTable } from 'antd';
 const { Option } = Select;
 

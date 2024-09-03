@@ -4,6 +4,7 @@ import ProcessDetailsListSection from '../../components/ProcessDetails/ProcessDe
 import SelectedProcessDetailsSection from '../../components/ProcessDetails/SelectedProcessDetailsSection.jsx';
 import { useProcessDetails } from '../../hooks/ProcessDetails/ProcessDetailsHook.jsx';
 import { processDetailsColumn } from '../../utils/ProcessDetails/ProcessDetailsColumn.jsx';
+import { getRowClassName } from '../../utils/ProcessDetails/ProcessDetailsUtil.jsx';
 
 const ProcessDetailsPage = ({ initialData }) => {
     const memoizedData = useMemo(() => initialData, [initialData]);
@@ -46,7 +47,7 @@ const ProcessDetailsPage = ({ initialData }) => {
                 </Grid>
                 {/* 공정 상세 영역 */}
                 <Grid item xs={12} md={7}>
-                    <Grow in={showDetail} timeout={200} key={processDetail.code}>
+                    <Grow in={showDetail} timeout={200} key={processDetail}>
                         <div>
                             {processDetail && (
                                 <SelectedProcessDetailsSection

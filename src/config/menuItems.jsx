@@ -10,6 +10,7 @@ import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
 import WorkcenterManagementPage from "../modules/production/pages/Workcenter/WorkcenterManagementPage.jsx";
+import ProcessDetailsPage from "../modules/production/pages/ProcessDetails/ProcessDetailsPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [

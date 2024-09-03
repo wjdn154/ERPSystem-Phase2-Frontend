@@ -3,7 +3,7 @@ import {
     fetchProcessDetails,
     fetchProcessDetail,
     updateProcessDetail
-} from '../../services/ProcessDetailsApi.jsx';
+} from '../../services/ProcessDetails/ProcessDetailsApi.jsx';
 
 export const useProcessDetails = (initialData) => {
     const [data, setData] = useState(initialData);
@@ -37,11 +37,15 @@ export const useProcessDetails = (initialData) => {
         setSelectedRow(selectedRow);
         try {
             const detail = await fetchProcessDetail(selectedRow.code);
+            if (!detail) {
+                throw new Error('선택한 공정의 세부정보 데이터가 없음');
+            }
             setProcessDetail(detail);
         } catch (error) {
             console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
         }
     };
+
 
     const handleInputChange = (e, key) => {
         const value = e.target.value;
