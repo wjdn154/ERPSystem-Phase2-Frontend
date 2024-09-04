@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, Space, Modal, Form, Input } from 'antd';
-
-const { confirm } = Modal;
+import { Form, Input, Select } from 'antd';
+import { ActionButtons, showDeleteConfirm } from '../../utils/commonActions';  // 공통 버튼 및 다이얼로그
+import { isActiveOptions, workcenterTypeOptions } from '../../utils/dropdownOptions';  // 공통 드롭다운 옵션
 
 const SelectedWorkcenterSection = ({
                                      workcenter,
@@ -10,22 +10,12 @@ const SelectedWorkcenterSection = ({
                                      handleDeleteWorkcenter,
                                    }) => {
 
-  // 삭제 확인 다이얼로그 함수
-  const showDeleteConfirm = () => {
-    confirm({
-      title: '삭제하시겠습니까?',
-      content: '이 작업은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?',
-      okText: '예',
-      okType: 'danger',
-      cancelText: '아니오',
-      onOk() {
-        console.log("삭제 확인 버튼이 눌렸습니다."); // 확인 로그 추가
-        handleDeleteWorkcenter(workcenter.code);
-      },
-      onCancel() {
-        console.log('취소됨');
-      },
-    });
+  // 삭제 확인 다이얼로그 호출
+  const handleDelete = () => {
+    showDeleteConfirm(
+        '이 작업은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?',
+        () => handleDeleteWorkcenter(workcenter.code)
+    );
   };
 
   if (!workcenter) {
@@ -34,72 +24,74 @@ const SelectedWorkcenterSection = ({
 
   return (
       <div style={{ padding: '20px', position: 'relative' }}>
-        {/* 작업장 상세 정보를 표시하는 Form */}
-        <Form
-            layout="vertical"
-            initialValues={workcenter}
-        >
+        <Form layout="vertical" initialValues={workcenter}>
+
+          {/* 작업장 코드 */}
           <Form.Item label="작업장 코드">
             <Input
                 value={workcenter.code}
                 onChange={(e) => handleInputChange(e, 'code')}
+                disabled
             />
           </Form.Item>
+
+          {/* 작업장명 */}
           <Form.Item label="작업장명">
             <Input
                 value={workcenter.name}
                 onChange={(e) => handleInputChange(e, 'name')}
             />
           </Form.Item>
+
+          {/* 작업장 유형 (공통 Enum 드롭다운 사용) */}
           <Form.Item label="작업장 유형">
-            <Input
+            <Select
                 value={workcenter.workcenterType}
-                onChange={(e) => handleInputChange(e, 'workcenterType')}
+                options={workcenterTypeOptions}  // 공통 드롭다운 옵션 사용
+                onChange={(value) => handleInputChange({ target: { value } }, 'workcenterType')}
             />
           </Form.Item>
-          <Form.Item label="설명">
-            <Input
-                value={workcenter.description}
-                onChange={(e) => handleInputChange(e, 'description')}
-            />
-          </Form.Item>
+
+          {/* 활성 상태 (공통 드롭다운 사용) */}
           <Form.Item label="활성 상태">
-            <Input
+            <Select
                 value={workcenter.isActive ? 'Y' : 'N'}
-                onChange={(e) => handleInputChange(e, 'isActive')}
+                options={isActiveOptions}  // 공통 드롭다운 옵션 사용
+                onChange={(value) => handleInputChange({ target: { value } }, 'isActive')}
             />
           </Form.Item>
-          <Form.Item label="공장 코드">
+
+          {/* 공장 코드 */}
+          <Form.Item label="공장명">
             <Input
-                value={workcenter.factoryCode ? workcenter.factoryCode.code : ''}
-                onChange={(e) => handleInputChange(e, 'factoryCode')}
+                value={workcenter.factoryName || ''}
+                onChange={(e) => handleInputChange(e, 'factoryName')}
             />
           </Form.Item>
-          <Form.Item label="공정 코드">
+
+          {/* 공정 코드 */}
+          <Form.Item label="생산공정 코드">
             <Input
-                value={workcenter.processCode ? workcenter.processCode.code : ''}
+                value={workcenter.processCode || ''}
                 onChange={(e) => handleInputChange(e, 'processCode')}
+            />
+          </Form.Item>
+          {/* 공정 코드 */}
+          <Form.Item label="생산공정명">
+            <Input
+                value={workcenter.processName || ''}
+                onChange={(e) => handleInputChange(e, 'processName')}
             />
           </Form.Item>
 
         </Form>
 
-        {/* 저장 및 삭제 버튼 */}
-        <Space style={{ position: 'absolute', right: 0, bottom: 0 }}>
-          <Button type="primary" onClick={handleSave} style={{ marginTop: '16px' }}>
-            저장
-          </Button>
-          <Button
-              type="primary"
-              danger
-              onClick={showDeleteConfirm}
-              style={{ marginTop: '16px' }}
-          >
-            삭제
-          </Button>
-        </Space>
+        {/* 공통 ActionButtons 컴포넌트 사용 */}
+        <ActionButtons
+            onSave={handleSave}
+            onDelete={handleDelete}
+        />
       </div>
-
   );
 };
 
