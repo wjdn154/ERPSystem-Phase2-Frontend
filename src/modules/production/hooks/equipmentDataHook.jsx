@@ -13,6 +13,8 @@ export const equipmentDataHook = (initialData) => {
     const [showDetail, setShowDetail] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);    //선택된 행
     const [equipmentDataDetail, setEquipmentDataDetail] = useState(null);   //상세정보
+    const [isInsertModalVisible, setIsInsertModalVisible] = useState(false); //삭제 모달 상태
+    const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
 
     const equipmentMemoizedData = useMemo(() => data, [data]);
 
@@ -68,18 +70,101 @@ export const equipmentDataHook = (initialData) => {
             ...prevState,
             [key] : value,
         }));
+
     }
 
-return {
-    data,
-    showDetail,
-    selectedRow,
-    handleSelectedRow,
-    handleRowSelection,
-    equipmentDataDetail,
-    setEquipmentDataDetail,
-    handleInputChange
-};
+    // 저장 버튼 클릭 시 실행되는 함수
+    const handleSave = async () => {
+        try {
+            const confirmSave = window.confirm("저장하시겠습니까?");
+
+            if (!confirmSave) return;
+            console.log("저장버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
+            await saveEquipmentDataDetail(equipmentDataDetail);
+            const savedData = await fetchEquipmentData();
+            setData(savedData);
+            window.alert("저장되었습니다.");
+        } catch (error) {
+            console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
+        }
+    };
+
+    //등록 버튼 클릭 시 모달 창 띄우는 함수
+    const insertEquipmentModal = () => {
+        setIsInsertModalVisible(true);
+    };
+    //등록 취소 버튼 클릭 함수
+    const handleInsertCancel = () => {
+        setIsInsertModalVisible(false);
+    }
+    const handleInsertOk = async () => {
+        setIsInsertModalVisible(false);
+        await handleSave();
+    }
+
+    //수정 버튼 클릭 시 모달창 띄우는 함수
+    const showModal = () => {
+        setIsUpdateModalVisible(true);
+    };
+
+    const handleUpdateOk = async () => {
+        setIsUpdateModalVisible(false);
+        await handleUpdate();
+        // 여기서 수정 작업을 진행하거나 저장할 수 있습니다.
+    };
+
+    const handleUpdateCancel = () => {
+        setIsUpdateModalVisible(false);
+    };
+
+    // 수정 버튼 클릭 시 실행되는 함수
+    const handleUpdate = async () => {
+        try {
+            console.log("수정버튼 클릭시 id : ",equipmentDataDetail.id);
+            console.log("수정버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
+
+            await updateEquipmentDataDetail(equipmentDataDetail.id, equipmentDataDetail);
+            const updatedData = await fetchEquipmentData();
+            setData(updatedData);
+        } catch (error) {
+            console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
+        }
+    }
+
+    //삭제 버튼 선택 클릭 시 실행되는 함수
+    const handleDelete = async () => {
+        const confirmDelete = window.confirm("정말로 삭제 하시겠습니까?");
+        try{
+            await deleteEquipmentDataDetail(equipmentDataDetail.id);
+            const deletedData = await fetchEquipmentData();
+            window.alert('삭제 완료되었습니다.');
+        }catch (error){
+            console.error("API에서 데이터를 삭제하는 중 오류 발생:", error);
+        }
+    }
+
+
+    return {
+        data,
+        showDetail,
+        selectedRow,
+        handleSelectedRow,
+        handleRowSelection,
+        equipmentDataDetail,
+        setEquipmentDataDetail,
+        handleInputChange,
+        handleSave,
+        handleUpdate,
+        handleDelete,
+        showModal,
+        handleUpdateOk,
+        handleUpdateCancel,
+        insertEquipmentModal,
+        handleInsertOk,
+        isInsertModalVisible,
+        isUpdateModalVisible,
+        handleInsertCancel
+    };
 
 };
 
