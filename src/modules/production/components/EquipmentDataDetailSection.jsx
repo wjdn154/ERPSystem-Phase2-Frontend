@@ -5,19 +5,17 @@ import {Form, Row, Col, Input, Button, Select, Modal, DatePicker} from 'antd';
 import moment from 'moment';
 
 const EquipmentDataDetailSection = ({
-    data,
-    equipmentDataDetail,
-    handleRowSelection,
-    handleSelectedRow,
-    handleInputChange,
-    handleSave,
-    handleUpdate,
-    handleDelete,
-    isModalVisible,
-    showModal,
-    handleOk,
-    handleCancel
-}) => (
+                                        data,
+                                        equipmentDataDetail,
+                                        handleRowSelection,
+                                        handleSelectedRow,
+                                        handleInputChange,
+                                        handleDelete,
+                                        showModal,
+                                        handleUpdateOk,
+                                        handleUpdateCancel,
+                                        isUpdateModalVisible
+                                    }) => (
     <Paper elevation={3} sx={{p: 2}}>
         <Typography variant="h6" marginBottom={'20px'}>설비정보 상세 정보</Typography>
         <Box sx={{padding: '20px'}}>
@@ -27,7 +25,7 @@ const EquipmentDataDetailSection = ({
                         <Form.Item>
                             <div style={{display: 'flex', alignItems: 'center'}}>
                                 <Input value={"설치된 작업장"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={equipmentDataDetail.workcenterName} style={{marginRight: '50px', flex: 1}} onChange={(e) => handleInputChange(e, 'workcenterName')}/>
+                                <Input value={equipmentDataDetail.workcenterName} style={{marginRight: '50px', flex: 1}} onChange={(e) => handleInputChange(e.target.value, 'workcenterName')}/>
                                 <Input value={"설치된 공장"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
                                 <Input value={equipmentDataDetail.factoryName} style={{flex: 1}} onChange={(e) => handleInputChange(e, 'factoryName')}/>
                             </div>
@@ -70,52 +68,41 @@ const EquipmentDataDetailSection = ({
         </Box>
         <div style={{display: 'flex', justifyContent: 'flex-end', marginRight:'20px'}}>
             <Button onClick={showModal} type="primary" style={{marginRight:'10px'}}>수정</Button>
-            <Button onClick={handleDelete} type="primary" style={{backgroundColor:"red"}}>삭제</Button>
+            <Button onClick={handleDelete} type="danger">삭제</Button>
         </div>
 
 
         <Modal
             title="설비 정보 수정"
-            visible={isModalVisible}
-            onOk={handleOk}
-            onCancel={handleCancel}
+            open={isUpdateModalVisible}
+            onOk={handleUpdateOk}
+            onCancel={handleUpdateCancel}
             width={700} // 너비를 800px로 설정
         >
 
             <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"설치된 작업장"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.workcenterName} style={{marginRight: '30px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'workcenterName')}/>
-                <Input value={"설치된 공장"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.factoryName} style={{flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'factoryName')}/>
+                <Input value={"설치된 작업장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
+                <Input value={equipmentDataDetail.workcenterCode} style={{marginRight: '30px', flex: 1}}
+                       onChange={(e) => handleInputChange(e.target.value, 'workcenterCode')}/>
+                <Input value={"설치된 공장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
+                <Input value={equipmentDataDetail.factoryCode} style={{flex: 1}}
+                       onChange={(e) => handleInputChange(e.target.value, 'factoryCode')}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"설비 번호"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={equipmentDataDetail.equipmentNum}
-                       style={{marginTop: '20px', flex: 1, backgroundColor: '#F5F5F5'}}
-                       onChange={(e) => handleInputChange(e, 'equipmentNum')} readOnly/>
+                <Input value={"설비 번호"} style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}} readOnly/>
+                <Input value={equipmentDataDetail.equipmentNum} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e.target.value, 'equipmentNum')}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"설비 명"}
                        style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.equipmentName}
-                       style={{marginRight: '30px', marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'equipmentName')}/>
+                <Input value={equipmentDataDetail.equipmentName} style={{marginRight: '30px', marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e.target.value, 'equipmentName')}/>
                 <Input value={"모델 명"}
                        style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.modelName} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'modelName')}/>
+                <Input value={equipmentDataDetail.modelName} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e.target.value, 'modelName')}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"유형"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                {equipmentDataDetail.equipmentType && (
-                    <Select
-                        value={equipmentDataDetail.equipmentType}
-                        onChange={(value) => handleInputChange({target: {value}}, 'equipmentType')}
+                <Input value={"유형"} style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
+                    <Select value={equipmentDataDetail.equipmentType} onChange={(value) => handleInputChange({target: {value}}, 'equipmentType')}
                         style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
                     >
                         <Option value={"ASSEMBLY"}>조립 설비</Option>
@@ -123,15 +110,11 @@ const EquipmentDataDetailSection = ({
                         <Option value={"INSPECTION"}>검사 설비</Option>
                         <Option value={"PACKAGING"}>포장 설비</Option>
                     </Select>
-                )}
-                <Input value={"제조사"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.manufacturer} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'manufacturer')}/>
+                <Input value={"제조사"} style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
+                <Input value={equipmentDataDetail.manufacturer} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e.target.value, 'manufacturer')}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"구매 날짜"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
+                <Input value={"구매 날짜"} style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
                 <DatePicker
                     value={equipmentDataDetail.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
                     style={{ marginRight: '30px', marginTop: '20px', flex: 1 }}
@@ -148,7 +131,6 @@ const EquipmentDataDetailSection = ({
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"가동 상태"}
                        style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                {equipmentDataDetail.operationStatus && (
                     <Select
                         value={equipmentDataDetail.operationStatus}
                         onChange={(value) => handleInputChange({target: {value}}, 'operationStatus')}
@@ -160,18 +142,17 @@ const EquipmentDataDetailSection = ({
                         <Option value={"FAILURE"}>고장</Option>
                         <Option value={"REPAIRING"}>수리 중</Option>
                     </Select>
-                )}
                 <Input value={"구매 비용"}
                        style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.cost+'원'} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'cost')}/>
+                <Input value={equipmentDataDetail.cost} style={{marginTop: '20px', flex: 1}}
+                       onChange={(e) => handleInputChange(e.target.value, 'cost')}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"설비 이미지"}
                        style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}}
                        readOnly/>
                 <Input value={equipmentDataDetail.equipmentImg} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'equipmentImg')}/>
+                       onChange={(e) => handleInputChange(e.target.value, 'equipmentImg')}/>
             </div>
         </Modal>
     </Paper>

@@ -20,10 +20,14 @@ const EquipmentDataPage = ({initialData}) => {
         handleSave,
         handleUpdate,
         handleDelete,
-        isModalVisible,
         showModal,
-        handleOk,
-        handleCancel
+        handleInsertOk,
+        handleUpdateCancel,
+        insertEquipmentModal,
+        handleUpdateOk,
+        isInsertModalVisible,
+        isUpdateModalVisible,
+        handleInsertCancel
 
     } = equipmentDataHook(initialData);
 
@@ -47,8 +51,15 @@ const EquipmentDataPage = ({initialData}) => {
                             <EquipmentDataListSection
                                 columns={equipmentDataListColumn}
                                 data={data}
+                                equipmentDataDetail={equipmentDataDetail}
+                                setEquipmentDataDetail={setEquipmentDataDetail}
                                 handleRowSelection={handleRowSelection}
                                 handleSelectedRow={handleSelectedRow}
+                                insertEquipmentModal={insertEquipmentModal}
+                                handleInsertOk={handleInsertOk}
+                                handleInsertCancel={handleInsertCancel}
+                                isInsertModalVisible={isInsertModalVisible}
+
                             />
                         </div>
                     </Grow>
@@ -57,23 +68,21 @@ const EquipmentDataPage = ({initialData}) => {
 
             <Grid item xs={12} sx={{ marginTop: 3 }}>
                 {equipmentDataDetail && (
-                <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
-                    <div>
+                    <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
+                        <div>
                             <EquipmentDataDetailSection
                                 data={data}
                                 equipmentDataDetail={equipmentDataDetail}
                                 handleInputChange={handleInputChange}
                                 setEquipmentDataDetail={setEquipmentDataDetail}
-                                handleSave={handleSave}
-                                handleUpdate={handleUpdate}
                                 handleDelete={handleDelete}
-                                isModalVisible={isModalVisible}
+                                isUpdateModalVisible={{isUpdateModalVisible}}
                                 showModal={showModal}
-                                handleOk={handleOk}
-                                handleCancel={handleCancel}
+                                handleUpdateOk={handleUpdateOk}
+                                handleUpdateCancel={handleUpdateCancel}
                             />
-                    </div>
-                </Grow>
+                        </div>
+                    </Grow>
                 )}
             </Grid>
         </Box>

@@ -39,7 +39,7 @@ export const updateEquipmentDataDetail = async (id , equipmentDataDetail) => {
     try {
         await axios.put(PRODUCTION_API.UPDATE_EQUIPMENT_DATA_API(id),
             equipmentDataDetail
-            );
+        );
         console.log('응답 데이터:', response.data);
     } catch (error){
         console.error("설비정보를 업데이트 하는 중 오류 발생 : " + error);
