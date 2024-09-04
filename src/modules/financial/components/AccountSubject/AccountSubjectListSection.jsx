@@ -1,7 +1,6 @@
 import React from 'react';
 import {Box, Grid, Paper, Typography} from '@mui/material';
 import {Table as AntTable} from "antd";
-import {getRowClassName} from "../../utils/AccountSubject/AccountSubjectUtil.jsx";
 
 const AccountSubjectListSection = ({ columns, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
     if (!data) {

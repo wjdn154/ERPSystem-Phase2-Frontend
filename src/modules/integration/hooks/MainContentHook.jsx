@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { subMenuItems } from '../../../config/menuItems.jsx';
-import {Typography} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { subMenuItems } from "../../../config/menuItems.jsx";
+import { Typography } from "@mui/material";
 
 const MainContentHook = (selectedSubSubMenu) => {
     const [initialData, setInitialData] = useState(null);
@@ -10,6 +10,7 @@ const MainContentHook = (selectedSubSubMenu) => {
 
     useEffect(() => {
         let isMounted = true; // 컴포넌트 마운트 상태 확인
+
 
         const fetchData = () => {
             if (selectedSubSubMenu && selectedSubSubMenu.apiPath) {
@@ -44,7 +45,7 @@ const MainContentHook = (selectedSubSubMenu) => {
         };
     }, [selectedSubSubMenu]);
 
-    return { initialData, error, loading };
-}
+  return { initialData, error, loading };
+};
 
 export default MainContentHook;

@@ -121,7 +121,7 @@ input.ant-input[readonly] {
   font-size: 0.7rem;
 }
 
-.red-text {
+.red-text > td{
   color: #F7614E !important;
 }
 .ant-pagination {
@@ -510,3 +510,9 @@ input.ant-input[readonly] {
 
 
 /* Ant Modal 영역 끝 */
+
+/* Ant Typography 영역 시작 */
+.ant-typography {
+  color: #CFDFE1 !important;
+}
+/* Ant Typography 영역 끝 */

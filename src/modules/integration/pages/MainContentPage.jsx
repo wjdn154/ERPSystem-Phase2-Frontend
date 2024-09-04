@@ -7,12 +7,16 @@ import AntdSkeleton from "../components/MainContent/AntdSkeleton.jsx";
 import AccountSubjectPage from "../../financial/pages/AccountSubjectPage.jsx";
 import EquipmentDataPage from "../../production/pages/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../../production/pages/MaintenanceHistoryPage.jsx";
+import WarehouseListPage from "../../logistics/pages/WarehouseListPage.jsx";
+import ClientRegistrationPage from "../../financial/pages/ClientRegistrationPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
     AccountSubjectPage,
     EquipmentDataPage,
     MaintenanceHistoryPage,
+    WarehouseListPage,
+    ClientRegistrationPage,
     // 필요한 경우 다른 컴포넌트도 여기에 추가
 };
 

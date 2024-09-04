@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
-import { Box, Grid, Grow } from '@mui/material';
+import {Box, Grid, Grow, Typography} from '@mui/material';
 import AccountSubjectStructureSection from '../components/AccountSubject/AccountSubjectStructureSection.jsx';
 import AccountSubjectListSection from '../components/AccountSubject/AccountSubjectListSection.jsx';
 import SelectedAccountSubjectDetailSection from '../../financial/components/AccountSubject/SelectedAccountSubjectDetailSection';
-import WelcomeSection from '../../financial/components/AccountSubject/WelcomeSection';
-import { accountSubjectHook } from '../hooks/AccountSubjectHook';
+import WelcomeSection from '../../../modules/Common/components/WelcomeSection.jsx';
+import { accountSubjectHook } from '../hooks/AccountSubjectHook.jsx';
 import { accountSubjectColumn } from '../utils/AccountSubject/AccountSubjectColumn.jsx';
 import { getRowClassName } from '../utils/AccountSubject/AccountSubjectUtil.jsx';
 import { Button } from 'antd';
+import {tabItems} from "../utils/AccountSubject/AccountSubjectUtil.jsx";
 
 const AccountSubjectPage = ({ initialData }) => {
     const memoizedData = useMemo(() => initialData, [initialData]);
@@ -36,13 +37,27 @@ const AccountSubjectPage = ({ initialData }) => {
         activeTabKey, // 탭 상태
     } = accountSubjectHook(initialData);
 
-    // console.log(data);
+    console.log(getRowClassName);
     return (
         <Box sx={{ margin: '20px' }}>
             {/* 계정과목 관리 제목과 환영 메시지 */}
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
-                    <WelcomeSection handleTabChange={handleTabChange} activeTabKey={activeTabKey} />
+                    <WelcomeSection
+                        title="계정과목 및 적요등록"
+                        description={(
+                            <Typography>
+                                계정과목 및 적요 등록 페이지는 재무 관리 시스템에서{' '}
+                                <span style={{ color: '#00C1D8' }}>계정과목과 적요</span>
+                                (거래의 내역이나 설명)를 <span style={{ color: '#00C1D8' }}>관리하고 등록</span>하는 중요한 기능을 제공하는 페이지임.
+                                <br />
+                                이 페이지는 기업의 재무 데이터를 정확하게 기록하고 관리하는 데 필수적인 역할을 함.
+                            </Typography>
+                        )}
+                        tabItems={tabItems()}
+                        activeTabKey={activeTabKey}
+                        handleTabChange={handleTabChange}
+                    />
                 </Grid>
             </Grid>
 
