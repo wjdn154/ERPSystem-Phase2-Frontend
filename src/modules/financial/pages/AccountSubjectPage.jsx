@@ -24,9 +24,11 @@ const AccountSubjectPage = ({ initialData }) => {
         handlePopupClick,
         isFinancialStatementModalVisible,
         isRelationCodeModalVisible,
+        isNatureModalVisible,
         handleClose,
         selectFinancialStatement,
         selectRelationCode,
+        selectNature,
         handleSave,
         showDetail,
         deleteRelationCode,
@@ -34,6 +36,7 @@ const AccountSubjectPage = ({ initialData }) => {
         activeTabKey, // 탭 상태
     } = accountSubjectHook(initialData);
 
+    // console.log(data);
     return (
         <Box sx={{ margin: '20px' }}>
             {/* 계정과목 관리 제목과 환영 메시지 */}
@@ -46,7 +49,7 @@ const AccountSubjectPage = ({ initialData }) => {
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     {/* 계정과목 상세 영역 */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={4} sx={{ minWidth: '500px' }}>
                         <Grow in={showDetail} timeout={200} key={accountSubjectDetail?.code}>
                             <div>
                                 {accountSubjectDetail && (
@@ -56,6 +59,7 @@ const AccountSubjectPage = ({ initialData }) => {
                                         handlePopupClick={handlePopupClick}
                                         isFinancialStatementModalVisible={isFinancialStatementModalVisible}
                                         isRelationCodeModalVisible={isRelationCodeModalVisible}
+                                        isNatureModalVisible={isNatureModalVisible}
                                         handleClose={handleClose}
                                         selectFinancialStatement={selectFinancialStatement}
                                         handleInputChange={handleInputChange}
@@ -64,6 +68,7 @@ const AccountSubjectPage = ({ initialData }) => {
                                         handleAddNewMemo={handleAddNewMemo}
                                         setAccountSubjectDetail={setAccountSubjectDetail}
                                         selectRelationCode={selectRelationCode}
+                                        selectNature={selectNature}
                                         handleSave={handleSave}
                                         deleteRelationCode={deleteRelationCode}
                                     />
@@ -72,7 +77,7 @@ const AccountSubjectPage = ({ initialData }) => {
                         </Grow>
                     </Grid>
                     {/* 계정과목 리스트 영역 */}
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} md={3} sx={{ minWidth: '400px' }}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <AccountSubjectListSection

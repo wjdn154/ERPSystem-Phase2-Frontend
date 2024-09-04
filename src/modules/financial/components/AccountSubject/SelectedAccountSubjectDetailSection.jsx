@@ -17,6 +17,7 @@ import {cashMemoColumn} from "../../utils/AccountSubject/CashMemoColumn.jsx";
 import {transferMemosColumn} from "../../utils/AccountSubject/TransferMemosColumn.jsx";
 import {FinancialStatementColumn} from "../../utils/AccountSubject/FinancialStatementColumn.jsx";
 import {RelationCodeColumn} from "../../utils/AccountSubject/RelationCodeColumn.jsx";
+import {NatureColumn} from "../../utils/AccountSubject/NatureColumn.jsx";
 import {fixedMemoColumn} from "../../utils/AccountSubject/FixedMemoColumn.jsx";
 
 
@@ -26,6 +27,7 @@ const SelectedAccountSubjectDetailSection = ({
     handlePopupClick,
     isFinancialStatementModalVisible,
     isRelationCodeModalVisible,
+    isNatureModalVisible,
     handleClose,
     selectFinancialStatement,
     handleInputChange,
@@ -34,6 +36,7 @@ const SelectedAccountSubjectDetailSection = ({
     handleAddNewMemo,
     setAccountSubjectDetail,
     selectRelationCode,
+    selectNature,
     handleSave,
     deleteRelationCode
 }) => (
@@ -68,6 +71,46 @@ const SelectedAccountSubjectDetailSection = ({
                             </div>
                         </Form.Item>
                     </Col>
+                    <AntModal
+                        open={isNatureModalVisible}
+                        onCancel={handleClose}
+                        footer={null}
+                        centered
+                        width="40vw"
+                    >
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            계정과목 성격 선택
+                        </Typography>
+
+                        {/* antd Table 사용 */}
+                        <AntTable
+                            columns={NatureColumn()}
+                            dataSource={data.accountSubjectDetail.natures}
+                            rowKey="code"
+                            size={'small'}
+                            pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
+                            onRow={(record) => ({
+                                style: { cursor: 'pointer' },
+                                onClick: () => {
+                                    selectNature(record);
+                                    handleClose();
+                                },
+                            })}
+                            locale={{
+                                emptyText: '데이터가 없습니다.',
+                            }}
+                            style={{ marginTop: 16 }}
+                        />
+
+                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button onClick={deleteRelationCode} variant="contained" type="danger" style={{ marginRight: '20px' }} sx={{ mr: 1 }}>
+                                삭제
+                            </Button>
+                            <Button onClick={handleClose} variant="contained" type="danger" sx={{ mr: 1 }}>
+                                닫기
+                            </Button>
+                        </Box>
+                    </AntModal>
                 </Row>
                 <Row gutter={16}>
                     {/*관계명 / 관계코드*/}

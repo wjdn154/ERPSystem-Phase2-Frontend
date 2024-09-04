@@ -96,6 +96,7 @@ input.ant-input[readonly] {
   color: #CFDFE1;
 }
 .ant-table-cell {
+  color: #97a1a2;
   border-bottom: 1px solid #213849 !important;
 }
 .ant-table-thead > tr > th {
@@ -428,10 +429,13 @@ input.ant-input[readonly] {
 }
 
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-table > .ant-table-container > .ant-table-content > table > .ant-table-thead > tr > .ant-table-cell {
-  color: #DEDEDE !important;
   background-color: #131313 !important;
   border-bottom: 1px solid #000 !important;
   border-radius: 1px;
+}
+.ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-table > .ant-table-container > .ant-table-content > table > .ant-table-thead > tr > .ant-table-cell > span {
+  color: #DEDEDE !important;
+  background-color: #131313 !important;
 }
 
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-table > .ant-table-container > .ant-table-content > table > .ant-table-tbody > tr > .ant-table-cell {
@@ -486,18 +490,22 @@ input.ant-input[readonly] {
 
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-prev,
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-next {
-  background-color: #DEDEDE;
+  background-color: #1c1c1c;
   border: 2px solid #000 !important;
+}
+.ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-prev:hover,
+.ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-next:hover {
+    background-color: #DEDEDE !important;
+    border: 2px solid #000 !important;
 }
 
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-prev:hover > a > div > span,
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-next:hover > a > div > span {
-  background-color: #DEDEDE;
   color: #000 !important;
 }
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-prev > a > div > span,
 .ant-modal-body > .ant-table-wrapper > .ant-spin-nested-loading > .ant-spin-container > .ant-pagination > .ant-pagination-jump-next > a > div > span {
-  color: #000 !important;
+  color: #DEDEDE !important;
 }
 
 
