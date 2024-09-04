@@ -3,9 +3,8 @@ import {
     fetchDepartmentData,
     fetchDepartmentDataDetail,
 } from "../services/DepartmentDataApi.jsx"
-import {fetchUsersDataDetail} from "../services/UsersDataApi.jsx";
 
-export const DepartmentDataHook = (initialData) => {
+export const departmentDataHook = (initialData) => {
     const [data, setData] = useState(initialData);
     const [showDetail, setShowDetail] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
