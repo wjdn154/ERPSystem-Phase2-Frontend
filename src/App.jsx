@@ -30,8 +30,6 @@ const App = () => {
     const selectedSubSubMenu = useSelector((state) => state.menu.selectedSubSubMenu);
     const memoizedSubSubMenu = useMemo(() => selectedSubSubMenu, [selectedSubSubMenu]);
 
-    console.log('ParentComponent rendered');
-
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -48,6 +46,7 @@ const App = () => {
                     {/* 메인 컨텐츠 영역 */}
                     <Content style={{ transition: 'margin-left 0.3s ease' }}>
                         <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#0E1B25' }}>
+                        {/*<Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, black, #2C2C2C 40%, #555555 100%)' }}>*/}
                             <ContentWrapper>
                                 {/* 상태에 따라 MainContentPage에서 직접적으로 컴포넌트 렌더링 */}
                                 <MainContentPage selectedSubSubMenu={memoizedSubSubMenu} />

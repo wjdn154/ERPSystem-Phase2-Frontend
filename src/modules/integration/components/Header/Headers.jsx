@@ -47,7 +47,7 @@ const styles = {
     },
     content: {
        padding: '20px'
-    }, height: '2000px', // 스크롤 테스트를 위한 임의의 높이 },
+    }, height: '2000px'
 };
 
 export default Headers;

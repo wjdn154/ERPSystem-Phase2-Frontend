@@ -11,7 +11,7 @@ import {
     TableCell,
     Grid
 } from '@mui/material';
-import {Button, Col, Form, Row, Input, Table as AntTable, Switch, Select} from "antd";
+import {Modal as AntModal, Divider, Button, Col, Form, Row, Input, Table as AntTable, Switch, Select} from "antd";
 const { Option } = Select;
 import {cashMemoColumn} from "../../utils/AccountSubject/CashMemoColumn.jsx";
 import {transferMemosColumn} from "../../utils/AccountSubject/TransferMemosColumn.jsx";
@@ -38,15 +38,16 @@ const SelectedAccountSubjectDetailSection = ({
     deleteRelationCode
 }) => (
     <Paper elevation={3}>
-        <Typography variant="h6" className="paper-header">계정과목 상세 내용</Typography>
+        <Typography variant="h6" sx={{ padding: '20px' }} >계정과목 상세 내용</Typography>
         <Box sx={{ padding: '20px' }}>
             <Form layout="vertical">
                 <Row gutter={16}>
+                    {/*계정과목코드 / 계정과목명*/}
                     <Col span={12}>
                         <Form.Item
-                            label="계정과목코드(명)"
+                            label="계정과목코드 / 계정과목명"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('계정과목코드') : undefined}
-                            style={{ marginBottom: '4px' }}
+                            style={{ marginBottom: '40px' }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Input value={accountSubjectDetail.code} style={{ marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6 !important' }} readOnly />
@@ -54,87 +55,88 @@ const SelectedAccountSubjectDetailSection = ({
                             </div>
                         </Form.Item>
                     </Col>
+                    {/*성격코드 / 성격*/}
                     <Col span={12}>
                         <Form.Item
-                            label="성격코드(명)"
+                            label="성격코드 / 성격"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('성격') : undefined}
-                            style={{ marginBottom: '4px' }}
+                            style={{ marginBottom: '40px' }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Input value={accountSubjectDetail.natureCode} style={{ marginRight: '10px', flex: 1 }} readOnly={!accountSubjectDetail.modificationType}/>
-                                <Input value={accountSubjectDetail.natureName} style={{ flex: 1 }} readOnly={!accountSubjectDetail.modificationType}/>
+                            <div className={'input-wrapper'} style={{ display: 'flex', alignItems: 'center' }}>
+                                <Input className={'input-field'} value={accountSubjectDetail.natureCode} style={{ marginRight: '10px', flex: 1 }} readOnly={!accountSubjectDetail.modificationType}/>
+                                <Input className={'input-field'} value={accountSubjectDetail.natureName} style={{ flex: 1 }} readOnly={!accountSubjectDetail.modificationType}/>
                             </div>
                         </Form.Item>
                     </Col>
                 </Row>
                 <Row gutter={16}>
+                    {/*관계명 / 관계코드*/}
                     <Col span={12}>
                         <Form.Item
-                            label="관계코드(명)"
+                            label="관계명 / 관계코드"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('관계코드') : undefined}
-                            style={{ marginBottom: '4px' }}
+                            style={{ marginBottom: '40px' }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Input value={accountSubjectDetail.parentCode || '없음'} style={{ marginRight: '10px', flex: 1 }} readOnly={!accountSubjectDetail.modificationType} />
-                                <Input value={accountSubjectDetail.parentName || '없음'} style={{ flex: 1 }} readOnly={!accountSubjectDetail.modificationType} />
+                            <div className={'input-wrapper'} style={{display: 'flex', alignItems: 'center'}}>
+                                    <Input className={'input-field'} value={accountSubjectDetail.parentCode || '없음'}
+                                           style={{marginRight: '10px', flex: 1}}
+                                           readOnly={!accountSubjectDetail.modificationType}/>
+                                    <Input className={'input-field'} value={accountSubjectDetail.parentName || '없음'}
+                                           style={{flex: 1}} readOnly={!accountSubjectDetail.modificationType}/>
                             </div>
                         </Form.Item>
                     </Col>
-                    <Modal
-                        open={isRelationCodeModalVisible || false}
-                        onClose={() => handleClose()}
-                        aria-labelledby="select-relation-code-modal"
-                        aria-describedby="select-a-relation-code-from-list"
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
+                    <AntModal
+                        open={isRelationCodeModalVisible}
+                        onCancel={handleClose}
+                        footer={null}
+                        centered
+                        width="40vw"
                     >
-                        <Box sx={{ minWidth: '50vw', minHeight: '40vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
-                            <Typography id="modal-modal-title" variant="h6" component="h2">
-                                관계 코드 선택
-                            </Typography>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            관계 코드 선택
+                        </Typography>
 
-                            {/* antd Table 사용 */}
-                            <AntTable
-                                columns={RelationCodeColumn()}
-                                dataSource={data.accountSubjects}
-                                rowKey="code"
-                                size={'small'}
-                                pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
-                                onRow={(record) => ({
-                                    style: { cursor: 'pointer' },
-                                    onClick: () => {
-                                        selectRelationCode(record);
-                                        handleClose();
-                                    },
-                                })}
-                                style={{ marginTop: 16 }}
-                            />
+                        {/* antd Table 사용 */}
+                        <AntTable
+                            columns={RelationCodeColumn()}
+                            dataSource={data.accountSubjects}
+                            rowKey="code"
+                            size={'small'}
+                            pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
+                            onRow={(record) => ({
+                                style: { cursor: 'pointer' },
+                                onClick: () => {
+                                    selectRelationCode(record);
+                                    handleClose();
+                                },
+                            })}
+                            style={{ marginTop: 16 }}
+                        />
 
-                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button onClick={deleteRelationCode} variant="contained" type="danger" style={{ marginRight: '20px' }} sx={{ mr: 1 }}>
-                                    삭제
-                                </Button>
-                                <Button onClick={handleClose} variant="contained" type="danger" sx={{ mr: 1 }}>
-                                    닫기
-                                </Button>
-                            </Box>
+                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button onClick={deleteRelationCode} variant="contained" type="danger" style={{ marginRight: '20px' }} sx={{ mr: 1 }}>
+                                삭제
+                            </Button>
+                            <Button onClick={handleClose} variant="contained" type="danger" sx={{ mr: 1 }}>
+                                닫기
+                            </Button>
                         </Box>
-                    </Modal>
+                    </AntModal>
+                    {/*영문명*/}
                     <Col span={12}>
-                        <Form.Item label="영문명" style={{ marginBottom: '4px' }}>
+                        <Form.Item label="영문명" style={{ marginBottom: '40px' }}>
                             <Input value={accountSubjectDetail.englishName || ''} onChange={(e) => handleInputChange(e, 'englishName')} readOnly={!accountSubjectDetail.modificationType} />
                         </Form.Item>
                     </Col>
                 </Row>
                 <Row gutter={16}>
+                    {/*계정사용여부*/}
                     <Col span={12}>
                         <Form.Item
                             label="계정사용여부"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('계정사용여부') : undefined}
-                            style={{ marginBottom: '4px' }}
+                            style={{ marginBottom: '40px' }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 {/* 현재 상태를 확인할 수 있는 Input */}
@@ -159,6 +161,7 @@ const SelectedAccountSubjectDetailSection = ({
                             </div>
                         </Form.Item>
                     </Col>
+                    {/*계정수정구분*/}
                     <Col span={12}>
                         <Form.Item
                             label="계정수정구분"
@@ -170,19 +173,22 @@ const SelectedAccountSubjectDetailSection = ({
                     </Col>
                 </Row>
                 <Row gutter={16}>
+                    {/*표준재무제표명 / 표준재무제표코드*/}
                     <Col span={12}>
                         <Form.Item
-                            label="표준재무제표코드(명)"
+                            label="표준재무제표명 / 표준재무제표코드"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('표준재무제표') : undefined}
-                            style={{ marginBottom: '4px' }}
+                            style={{ marginBottom: '40px' }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div className={'input-wrapper'} style={{ display: 'flex', alignItems: 'center' }}>
                                 <Input
+                                    className={'input-field'}
                                     value={accountSubjectDetail.standardFinancialStatementCode}
                                     style={{ marginRight: '10px', flex: 1 }}
                                     readOnly={!accountSubjectDetail.modificationType}
                                 />
                                 <Input
+                                    className={'input-field'}
                                     value={accountSubjectDetail.standardFinancialStatementName}
                                     style={{ marginRight: '10px', flex: 1 }}
                                     readOnly={!accountSubjectDetail.modificationType}
@@ -190,51 +196,48 @@ const SelectedAccountSubjectDetailSection = ({
                             </div>
                         </Form.Item>
                     </Col>
-                    <Modal
+                    <AntModal
                         open={isFinancialStatementModalVisible}
-                        onClose={() => handleClose()}
-                        aria-labelledby="select-financial-statement-modal"
-                        aria-describedby="select-a-financial-statement-from-list"
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
+                        onCancel={handleClose}
+                        footer={null}
+                        centered
+                        width="40vw"
                     >
-                        <Box sx={{ minWidth: '40vw', minHeight: '40vh', bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, overflow: 'auto' }}>
-                            <Typography id="modal-modal-title" variant="h6" component="h2">
-                                표준재무제표 선택
-                            </Typography>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            표준재무제표 선택
+                        </Typography>
 
-                            {/* antd Table 사용 */}
-                            <AntTable
-                                columns={FinancialStatementColumn()}
-                                dataSource={accountSubjectDetail.standardFinancialStatement}
-                                rowKey="code"
-                                size={'small'}
-                                pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
-                                onRow={(record) => ({
-                                    style: { cursor: 'pointer' },
-                                    onClick: () => {
-                                        selectFinancialStatement(record);
-                                        handleClose();
-                                    },
-                                })}
-                                style={{ marginTop: 16 }}
-                            />
 
-                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button onClick={handleClose} variant="contained" type="danger" sx={{ mr: 1 }}>
-                                    닫기
-                                </Button>
-                            </Box>
-                        </Box>
-                    </Modal>
+                        <Divider sx={{ backgroundColor: 'red !important' }}/>
+
+                        <AntTable
+                            columns={FinancialStatementColumn()}
+                            dataSource={accountSubjectDetail.standardFinancialStatement}
+                            rowKey="code"
+                            size={'small'}
+                            pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
+                            onRow={(record) => ({
+                                style: { cursor: 'pointer' },
+                                onClick: () => {
+                                    selectFinancialStatement(record);
+                                    handleClose();
+                                },
+                            })}
+                            style={{ marginTop: 16 }}
+                        />
+
+                        <div style={{ marginTop: 16, textAlign: 'right' }}>
+                            <Button onClick={handleClose} type="danger" style={{ marginRight: 8 }}>
+                                닫기
+                            </Button>
+                        </div>
+                    </AntModal>
+                    {/*외화사용여부*/}
                     <Col span={12}>
                         <Form.Item
                             label="외화사용여부"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('외화사용여부') : undefined}
-                            style={{ marginBottom: '4px' }}
+                            style={{ marginBottom: '40px' }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Input value={accountSubjectDetail.isForeignCurrency ? '여' : '부'} style={{ flex: 1 }} readOnly />
@@ -243,11 +246,12 @@ const SelectedAccountSubjectDetailSection = ({
                     </Col>
                 </Row>
                 <Row gutter={16}>
+                    {/*업무용차여부*/}
                     <Col span={12}>
                         <Form.Item
                             label="업무용차여부"
                             onClick={accountSubjectDetail.modificationType ? () => handlePopupClick('업무용차여부') : undefined}
-                            style={{ marginBottom: '4px' }}
+                            style={{ marginBottom: '40px' }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Input value={accountSubjectDetail.isBusinessCar ? '여' : '부'} style={{ flex: 1 }} readOnly />

@@ -34,10 +34,17 @@ const Sidebar = () => {
         };
     }, [openKeys, lastOpenKeys]);
 
+    // 대분류가 선택될 때 하나의 대분류만 열리도록 설정하되, 중분류는 유지
     const handleOpenChange = (keys) => {
-        setOpenKeys(keys);
+        const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1); // 새로 열린 키 찾기
+        if (latestOpenKey && !latestOpenKey.includes('-')) {
+            // 대분류일 경우, 해당 대분류만 열리도록 설정
+            setOpenKeys([latestOpenKey]);
+        } else {
+            // 중분류일 경우, 열린 상태 유지
+            setOpenKeys(keys);
+        }
     };
-
 
     const handleClick = (menu, subMenu, subSubItem) => {
         // Redux 상태 업데이트
@@ -69,11 +76,7 @@ const Sidebar = () => {
     }));
 
     return (
-        <Sider className="custom-sidebar" ref={sidebarRef}
-            // style={{
-            //     transition: 'width 0.6s ease, min-width 0.6s ease, max-width 0.6s ease',
-            // }}
-        >
+        <Sider className="custom-sidebar" ref={sidebarRef}>
             <Menu
                 mode="inline"
                 defaultSelectedKeys={['1']}
