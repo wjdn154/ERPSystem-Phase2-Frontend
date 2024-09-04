@@ -1,4 +1,4 @@
-export const employeeDataDetailColumn = [
+export const employeeDataDetailColumn = (showDetailModal) => [
     {
         title: <span>성</span>,
         dataIndex: 'firstName',
@@ -42,6 +42,16 @@ export const employeeDataDetailColumn = [
     {
         title: <span>입사일자</span>,
         dataIndex: 'hireDate',
+        width: '9%',
+    },
+    {
+        title: <span>프로필 사진</span>,
+        dataIndex: 'profilePicture',
+        width: '9%',
+    },
+    {
+        title: <span>세대주 여부</span>,
+        dataIndex: 'isHouseholdHead',
         width: '9%',
     },
 ]
