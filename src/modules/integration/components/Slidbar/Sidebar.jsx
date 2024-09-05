@@ -1,202 +1,92 @@
-import React, { useEffect } from 'react';
-import { Box, List, ListItem, ListItemIcon, ListItemText, Collapse, Divider } from '@mui/material';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import React, { useEffect, useRef, useState } from 'react';
+import { Layout, Menu } from 'antd';
+import { useDispatch } from 'react-redux';
+import '../../../../styles/App.css';
+import { menuItems, subMenuItems } from '../../../../config/menuItems.jsx';
+import { setSelectedMenu, setSelectedSubMenu, setSelectedSubSubMenu } from '../../../../store.jsx';
 
-const Sidebar = ({
-                     selectedMenu,
-                     setSelectedMenu,
-                     selectedSubMenu,
-                     setSelectedSubMenu,
-                     selectedSubSubMenu,
-                     setSelectedSubSubMenu,
-                     menuItems,
-                     subMenuItems
-                 }) => {
-    // 상태 관리 함수 및 초기 설정을 App.jsx로부터 받아옴
+const { Sider } = Layout;
 
-    const [open, setOpen] = React.useState({}); // 대분류 메뉴 열림/닫힘 상태
-    const [subOpen, setSubOpen] = React.useState({}); // 중분류 메뉴 열림/닫힘 상태
+const Sidebar = () => {
+    const dispatch = useDispatch();
+    const [openKeys, setOpenKeys] = useState([]);
+    const [lastOpenKeys, setLastOpenKeys] = useState([]);
+    const sidebarRef = useRef(null);
 
     useEffect(() => {
-        // 초기 마운트 시 선택된 메뉴를 기본으로 열림
-        setOpen({ [selectedMenu]: true }); // 대분류 메뉴 열림 상태 설정
-        setSubOpen({ [selectedSubMenu]: true }); // 중분류 메뉴 열림 상태 설정
-    }, [selectedMenu, selectedSubMenu]);
+        const sidebar = sidebarRef.current;
 
-    // 대분류 메뉴 클릭 시 호출되는 함수
-    const handleMenuClick = (menu) => {
-        if (selectedMenu === menu) return;
+        const handleMouseEnter = () => {
+            setOpenKeys(lastOpenKeys);
+        };
 
-        setSelectedMenu(menu);
-        setSelectedSubMenu(''); // 중분류 초기화
-        setSelectedSubSubMenu(''); // 소분류 초기화
+        const handleMouseLeave = () => {
+            setLastOpenKeys(openKeys);
+            setOpenKeys([]);
+        };
 
-        // 선택된 대분류 메뉴만 열림 상태로 설정
-        setOpen({ [menu]: true });
-        setSubOpen({}); // 중분류 메뉴 닫기
-    };
+        sidebar.addEventListener('mouseenter', handleMouseEnter);
+        sidebar.addEventListener('mouseleave', handleMouseLeave);
 
-    // 중분류 메뉴 클릭 시 호출되는 함수
-    const handleSubMenuClick = (subMenu) => {
-        if (selectedSubMenu === subMenu) {
-            setSelectedSubMenu('');
-            setSelectedSubSubMenu('');
-            return;
+        return () => {
+            sidebar.removeEventListener('mouseenter', handleMouseEnter);
+            sidebar.removeEventListener('mouseleave', handleMouseLeave);
+        };
+    }, [openKeys, lastOpenKeys]);
+
+    // 대분류가 선택될 때 하나의 대분류만 열리도록 설정하되, 중분류는 유지
+    const handleOpenChange = (keys) => {
+        const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1); // 새로 열린 키 찾기
+        if (latestOpenKey && !latestOpenKey.includes('-')) {
+            // 대분류일 경우, 해당 대분류만 열리도록 설정
+            setOpenKeys([latestOpenKey]);
+        } else {
+            // 중분류일 경우, 열린 상태 유지
+            setOpenKeys(keys);
         }
-
-        setSelectedSubMenu(subMenu);
-        setSelectedSubSubMenu(''); // 소분류 초기화
-
-        // 선택된 중분류 메뉴만 열림 상태로 설정
-        setSubOpen({ [subMenu]: true });
     };
 
-    // 소분류 메뉴 클릭 시 호출되는 함수
-    const handleSubSubMenuClick = (subSubMenu) => {
-        setSelectedSubSubMenu(subSubMenu);
+    const handleClick = (menu, subMenu, subSubItem) => {
+        // Redux 상태 업데이트
+        dispatch(setSelectedMenu(menu));
+        dispatch(setSelectedSubMenu(subMenu));
+        dispatch(setSelectedSubSubMenu(subSubItem));
     };
+
+    // 메뉴 아이템을 items 속성에 맞게 변환
+    const menuItemsWithSubMenu = menuItems.map((item, index) => ({
+        key: `sub${index + 1}`,
+        icon: item.icon,
+        label: item.text,
+        children: subMenuItems[item.text].map((subItem, subIndex) => ({
+            key: `sub${index + 1}-${subIndex + 1}`,
+            label: subItem.text,
+            children: subItem.items.map((subSubItem, subSubIndex) => ({
+                key: `sub${index + 1}-${subIndex + 1}-${subSubIndex + 1}`,
+                label: (
+                    <div
+                        onClick={() => handleClick(item.text, subItem.text, subSubItem)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        {subSubItem.text}
+                    </div>
+                ),
+            })),
+        })),
+    }));
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
-            {/* 대분류 메뉴 영역 */}
-            <Box sx={{ minWidth: '100px', display: 'flex', flexDirection: 'column', paddingRight: '10px' }}>
-                <List className="mui-scrollbar" sx={{ flexGrow: 1, overflow: 'auto' }}>
-                    {menuItems.map((item, index) => (
-                        <React.Fragment key={index}>
-                            <ListItem
-                                button
-                                onClick={() => handleMenuClick(item.text)}
-                                sx={{
-                                    marginBottom: index === item.length - 1 ? '0px' : '5px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    height: '70px',
-                                    '&:hover': {
-                                        backgroundColor: '#d3daf7',
-                                        color: '#19358c',
-                                        borderRadius: '10px',
-                                        boxShadow: 1,
-                                        transition: 'background-color 0.3s, border-radius 0.3s',
-                                        fill: '#19358c',
-                                    },
-                                    backgroundColor: selectedMenu === item.text ? '#d3daf7' : 'inherit',
-                                    color: selectedMenu === item.text ? '#19358c' : 'inherit',
-                                    borderRadius: selectedMenu === item.text ? '10px' : '0px',
-                                    boxShadow: selectedMenu === item.text ? 1 : 0,
-                                    transition: 'background-color 0.3s, border-radius 0.3s',
-                                }}
-                            >
-                                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                                    <ListItemIcon >
-                                        {React.cloneElement(item.icon, { style: {width: '100%', fill: selectedMenu === item.text ? '#076EA8' : 'inherit' } })}
-                                    </ListItemIcon>
-                                    <ListItemText
-                                        primary={item.text}
-                                        primaryTypographyProps={{
-                                            sx: { fontSize: '0.9rem', fontWeight: '700' }
-                                        }}
-                                    />
-                                </Box>
-                            </ListItem>
-                        </React.Fragment>
-                    ))}
-                </List>
-            </Box>
-
-            {/* 중분류 및 소분류 메뉴 영역 */}
-            {selectedMenu && subMenuItems[selectedMenu] && (
-                <Box className="mui-scrollbar" sx={{ minWidth: '250px', display: 'flex', flexDirection: 'column', overflow: "auto" }}>
-                    <Collapse in={open[selectedMenu]} timeout="auto" unmountOnExit>
-                        <List className="mui-scrollbar" sx={{ overflow: 'auto', padding: '0px'}}>
-                            {subMenuItems[selectedMenu].map((subItem, subIndex) => (
-                                <React.Fragment key={subIndex}>
-                                    {subIndex !== 0 && <Divider sx={{light: false, margin: '0px 20px 0px 10px'}} />}
-                                    <ListItem
-                                        button
-                                        onClick={() => handleSubMenuClick(subItem.text)}
-                                        sx={{
-                                            width: '90%',
-                                            margin: '5px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            backgroundColor: selectedSubMenu === subItem.text ? '#d3daf7' : 'inherit',
-                                            color: selectedSubMenu === subItem.text ? '#19358c' : 'inherit',
-                                            borderRadius: selectedSubMenu === subItem.text ? '10px' : '0px',
-                                            boxShadow: selectedSubMenu === subItem.text ? 1 : 0,
-                                            transition: 'background-color 0.3s, border-radius 0.3s',
-                                            '&:hover': {
-                                                backgroundColor: '#d3daf7',
-                                                color: '#19358c',
-                                                boxShadow: 1,
-                                                borderRadius: '10px',
-                                                transition: 'background-color 0.3s, border-radius 0.3s',
-                                            },
-                                        }}
-                                    >
-                                        <ListItemText
-                                            primary={subItem.text}
-                                            primaryTypographyProps={{
-                                                sx: { fontSize: '0.9rem', fontWeight: '500' }
-                                            }}
-                                        />
-                                        {subItem.items && (
-                                            subOpen[subItem.text] ? <ExpandLess /> : <ExpandMore />
-                                        )}
-                                    </ListItem>
-                                    {subItem.items && (
-                                        <Collapse in={subOpen[subItem.text]} timeout="auto" unmountOnExit>
-                                            <Box sx={{display: 'flex'}}>
-                                                <Divider orientation="vertical" flexItem sx={{ margin: '10px 0px 10px 15px' }} />
-                                                <List component="div" disablePadding sx={{ width: '80%' }}>
-                                                    {subItem.items.map((item, index) => (
-                                                        <ListItem
-                                                            button
-                                                            key={index}
-                                                            onClick={() => handleSubSubMenuClick(item)}
-                                                            sx={{
-                                                                display: 'flex',
-                                                                marginLeft: '5%',
-                                                                alignItems: 'center',
-                                                                marginTop: index === 0 ? '10px' : '0px',
-                                                                marginBottom: index === subItem.items.length - 1 ? '10px' : '5px',
-                                                                backgroundColor: selectedSubSubMenu.text === item.text ? '#d3daf7' : 'inherit',
-                                                                color: selectedSubSubMenu.text === item.text ? '#19358c' : 'inherit',
-                                                                boxShadow: selectedSubSubMenu.text === item.text ? 1 : 0,
-                                                                borderRadius: selectedSubSubMenu.text === item.text ? '10px' : '0px',
-                                                                transition: 'background-color 0.3s, border-radius 0.3s',
-                                                                '&:hover': {
-                                                                    backgroundColor: '#d3daf7',
-                                                                    color: '#19358c',
-                                                                    borderRadius: '10px',
-                                                                    boxShadow: 1,
-                                                                    transition: 'background-color 0.3s, border-radius 0.3s',
-                                                                },
-                                                            }}
-                                                        >
-                                                            <ListItemIcon sx={{ color: '#000', minWidth: '20px' }}>
-                                                                <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
-                                                            </ListItemIcon>
-                                                            <ListItemText
-                                                                primary={item.text}
-                                                                primaryTypographyProps={{
-                                                                    sx: { fontSize: '0.8rem', fontWeight: '400' }
-                                                                }}
-                                                            />
-                                                        </ListItem>
-                                                    ))}
-                                                </List>
-                                            </Box>
-                                        </Collapse>
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </List>
-                    </Collapse>
-                </Box>
-            )}
-        </Box>
+        <Sider className="custom-sidebar" ref={sidebarRef}>
+            <Menu
+                mode="inline"
+                defaultSelectedKeys={['1']}
+                openKeys={openKeys}
+                onOpenChange={handleOpenChange}
+                items={menuItemsWithSubMenu}  // items 속성 사용
+                style={{ height: 'calc(100vh - 64px)', overflowY: 'auto', borderRight: 0 }}
+                theme="dark"
+            />
+        </Sider>
     );
 };
 
