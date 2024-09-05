@@ -4,52 +4,59 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeSettings } from './modules/integration/utils/AppUtil.jsx';
 
 // React 및 MUI 컴포넌트 임포트
-import React from 'react';
+import React, {useMemo} from 'react';
 import { CssBaseline, Box } from '@mui/material';
 
-// 메뉴 아이템 관련 데이터 임포트
-import { menuItems, subMenuItems } from './config/menuItems.jsx';
+// Redux 관련 임포트
+import { useSelector } from 'react-redux';
 
-//components
+// components
 import ContentWrapper from './modules/integration/components/MainContent/ContentWrapper.jsx';
 import Sidebar from './modules/integration/components/Slidbar/Sidebar.jsx';
 import MainContentPage from './modules/integration/pages/MainContentPage.jsx';
-import Header from './modules/integration/components/Header/Header.jsx';
+import Headers from './modules/integration/components/Header/Headers.jsx';
 
-// hooks
-import AppHook from './modules/integration/hooks/AppHook';
+// Antd 컴포넌트 임포트
+import { Layout } from "antd";
+
+const { Sider, Content } = Layout;
+
+// 테마 생성
+const theme = createTheme(themeSettings);
 
 // App 컴포넌트 정의
 const App = () => {
-    const { selectedMenu, setSelectedMenu, selectedSubMenu, setSelectedSubMenu, selectedSubSubMenu, setSelectedSubSubMenu } = AppHook();
-
-    const theme = createTheme(themeSettings);
+    // Redux에서 상태 가져오기
+    const selectedSubSubMenu = useSelector((state) => state.menu.selectedSubSubMenu);
+    const memoizedSubSubMenu = useMemo(() => selectedSubSubMenu, [selectedSubSubMenu]);
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Box sx={{ boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", zIndex: 1000, height: '10vh', position: 'relative' }}>
-                <Header selectedMenu={selectedMenu} selectedSubMenu={selectedSubMenu} selectedSubSubMenu={selectedSubSubMenu} />
-            </Box>
-            <Box sx={{ backgroundColor: '#fff', display: 'flex', width: '100%', height: '90vh' }}>
-                <Sidebar
-                    selectedMenu={selectedMenu} // 현재 선택된 대분류 메뉴 상태
-                    setSelectedMenu={setSelectedMenu} // 대분류 메뉴 선택 상태 업데이트 함수
-                    selectedSubMenu={selectedSubMenu} // 현재 선택된 중분류 메뉴 상태
-                    setSelectedSubMenu={setSelectedSubMenu} // 중분류 메뉴 선택 상태 업데이트 함수
-                    selectedSubSubMenu={selectedSubSubMenu} // 현재 선택된 소분류 메뉴 상태
-                    setSelectedSubSubMenu={setSelectedSubSubMenu} // 소분류 메뉴 선택 상태 업데이트 함수
-                    menuItems={menuItems} // 대분류 메뉴 항목 데이터
-                    subMenuItems={subMenuItems} // 중분류 및 소분류 메뉴 항목 데이터
-                />
-                <Box sx={{ flexGrow: 1, overflowY: 'auto', height: '90vh', backgroundColor: '#f5f5f5' }}>
-                    <ContentWrapper>
-                        <MainContentPage selectedSubSubMenu={selectedSubSubMenu} />
-                    </ContentWrapper>
-                </Box>
-            </Box>
+            <Layout style={{ minHeight: '100vh' }}>
+                {/* 헤더 영역 */}
+                <Headers />
+
+                <Layout>
+                    {/* 사이드바 영역 */}
+                    <Sider className="custom-sidebar">
+                        <Sidebar />
+                    </Sider>
+
+                    {/* 메인 컨텐츠 영역 */}
+                    <Content style={{ transition: 'margin-left 0.3s ease' }}>
+                        <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#0E1B25' }}>
+                        {/*<Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, black, #2C2C2C 40%, #555555 100%)' }}>*/}
+                            <ContentWrapper>
+                                {/* 상태에 따라 MainContentPage에서 직접적으로 컴포넌트 렌더링 */}
+                                <MainContentPage selectedSubSubMenu={memoizedSubSubMenu} />
+                            </ContentWrapper>
+                        </Box>
+                    </Content>
+                </Layout>
+            </Layout>
         </ThemeProvider>
     );
-}
+};
 
 export default App;

@@ -4,7 +4,14 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
-import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API, PRODUCTION_API, USERS_API} from "./apiConstants.jsx";
+import {
+    DEPARTMENT_API,
+    EMPLOYEE_API,
+    FINANCIAL_API,
+    LOGISTICS_API,
+    PRODUCTION_API,
+    USERS_API
+} from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
@@ -12,8 +19,9 @@ import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHisto
 import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
-import WorkcenterManagementPage from "../modules/production/pages/Workcenter/WorkcenterManagementPage.jsx";
+import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
 import ProcessDetailsPage from "../modules/production/pages/ProcessDetails/ProcessDetailsPage.jsx";
+import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
@@ -38,8 +46,8 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '거래처등록', component: null, apiPath: null },
-                { text: '계정과목및적요등록', component: AccountSubjectPage, apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API },
+                { text: '거래처등록', component: 'ClientRegistrationPage', apiPath: false },
+                { text: '계정과목및적요등록', component: 'AccountSubjectPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API },
                 { text: '환경등록', component: null, apiPath: null },
                 { text: '업무용승용차등록', component: null, apiPath: null },
             ]
@@ -115,9 +123,9 @@ export const subMenuItems = {
         {
             text: '기초 정보 관리',
             items: [
-                { text: '사원 관리', component: EmployeeDataPage, apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API },
-                { text: '사용자 관리', component: UsersDataPage, apiPath: USERS_API.USERS_DATA_API },
-                { text: '부서 관리', component: null, apiPath: null },
+                { text: '사원 관리', component: 'EmployeeDataPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API },
+                { text: '사용자 관리', component: 'UsersDataPage', apiPath: USERS_API.USERS_DATA_API },
+                { text: '부서 관리', component: 'DepartmentDataPage', apiPath: DEPARTMENT_API.DEPARTMENT_DATA_API },
                 { text: '발령 관리', component: null, apiPath: null },
                 { text: '성과 평가 관리', component: null, apiPath: null },
                 { text: '퇴사자 관리', component: null, apiPath: null },
@@ -148,7 +156,7 @@ export const subMenuItems = {
             items: [
                 { text: '품목 관리', component: null, apiPath: null },
                 { text: '품목 그룹 관리', component: null, apiPath: null },
-                { text: '창고등록', component: WarehouseListPage, apiPath: LOGISTICS_API.WAREHOUSE_LIST_API },
+                { text: '창고등록', component: 'WarehouseListPage', apiPath: LOGISTICS_API.WAREHOUSE_LIST_API },
             ]
         },
         {
@@ -223,7 +231,7 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '작업장 관리', component: WorkcenterManagementPage, apiPath: PRODUCTION_API.WORKCENTER_API },
+                { text: '작업장 관리', component: WorkcenterPage, apiPath: PRODUCTION_API.WORKCENTER_LIST_API },
                 { text: 'LOT 관리', component: null, apiPath: null },
                 { text: 'Serial No 관리', component: null, apiPath: null },
             ]
@@ -233,8 +241,8 @@ export const subMenuItems = {
             items: [
                 { text: '작업자 관리', component: null, apiPath: null },
                 { text: '자재 정보 관리', component: null, apiPath: null },
-                { text: '설비 정보 관리', component: EquipmentDataPage, apiPath: PRODUCTION_API.EQUIPMENT_DATA_API },
-                { text: '유지보수 이력 관리', component: MaintenanceHistoryPage, apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API },
+                { text: '설비 정보 관리', component: 'EquipmentDataPage', apiPath: PRODUCTION_API.EQUIPMENT_DATA_API },
+                { text: '유지보수 이력 관리', component: 'MaintenanceHistoryPage', apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API },
             ]
         },
         {
