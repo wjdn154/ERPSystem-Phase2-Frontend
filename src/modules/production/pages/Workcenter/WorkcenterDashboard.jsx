@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Row, Col } from "antd";
 import { fetchWorkcenters } from "../../services/Workcenter/WorkcenterApi";
+import {Cell, Pie, PieChart, ResponsiveContainer} from "recharts";
 
 const WorkcenterDashboard = () => {
   const [workcenters, setWorkcenters] = useState([]);
@@ -30,24 +31,46 @@ const WorkcenterDashboard = () => {
     loadWorkcenters();
   }, []);
 
+  const COLORS = ['#0088FE', '#FF8042'];
+
+  const data = [
+    { name: '활성화된 작업장', value: activeRate },
+    { name: '비활성화된 작업장', value: 90 - activeRate },
+  ];
+
   return (
       <div style={{ marginBottom: '16px' }}>
-        <Typography.Title level={4} style={{ marginBottom: '16px' }}>
-          작업장 대시보드
-        </Typography.Title>
         <Row gutter={16}>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
+          <Col xs={12} sm={6}>
+            <Card className={'purple-card'}>
               <Typography.Title level={5}>전체 작업장 수</Typography.Title>
               <Typography.Title level={2} style={{ color: '#1890ff' }}>
                 {workcenters.length}
               </Typography.Title>
             </Card>
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
+          <Col xs={12} sm={6}>
+            <Card className={'blue-card'}>
               <Typography.Title level={5}>활성화율</Typography.Title>
-              <Typography.Title level={2} style={{ color: '#1890ff' }}>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                      data={data}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={60}
+                      fill="#8884d8"
+                      label
+                  >
+                    {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <Typography.Title level={2} style={{ color: '#1890ff', textAlign: 'center' }}>
                 {activeRate.toFixed(2)}%
               </Typography.Title>
             </Card>

@@ -23,9 +23,13 @@
  */
 
 /* 그리드 영역 시작 */
+.MuiGrid-root {
+  color: #CFDFE1 !important;
+}
 .MuiGrid-item {
   padding-left: 10px !important
 }
+
 /* 그리드 영역 끝 */
 
 
@@ -516,3 +520,19 @@ input.ant-input[readonly] {
   color: #CFDFE1 !important;
 }
 /* Ant Typography 영역 끝 */
+
+
+/* Card 영역 */
+.purple-card {
+  background-color: #531DAB !important;
+  color: #FBFAFD !important;
+  border: none !important;
+  border-radius: 10px !important;
+}
+.blue-card {
+  background-color: #096DD9 !important;
+  color: #FBFAFD !important;
+  border: none !important;
+  border-radius: 10px !important;
+}
+/* Card 영역 끝 */
