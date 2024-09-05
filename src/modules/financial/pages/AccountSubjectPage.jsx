@@ -37,7 +37,6 @@ const AccountSubjectPage = ({ initialData }) => {
         activeTabKey, // 탭 상태
     } = accountSubjectHook(initialData);
 
-    console.log(getRowClassName);
     return (
         <Box sx={{ margin: '20px' }}>
             {/* 계정과목 관리 제목과 환영 메시지 */}

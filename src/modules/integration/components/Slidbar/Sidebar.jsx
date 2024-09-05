@@ -1,27 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Layout, Menu } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // URL 이동을 위한 훅
 import '../../../../styles/App.css';
 import { menuItems, subMenuItems } from '../../../../config/menuItems.jsx';
-import { setSelectedMenu, setSelectedSubMenu, setSelectedSubSubMenu } from '../../../../store.jsx';
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
-    const dispatch = useDispatch();
     const [openKeys, setOpenKeys] = useState([]);
-    const [lastOpenKeys, setLastOpenKeys] = useState([]);
     const sidebarRef = useRef(null);
+    const navigate = useNavigate(); // URL 이동을 위한 navigate 훅
 
     useEffect(() => {
         const sidebar = sidebarRef.current;
 
         const handleMouseEnter = () => {
-            setOpenKeys(lastOpenKeys);
+            setOpenKeys(openKeys);
         };
 
         const handleMouseLeave = () => {
-            setLastOpenKeys(openKeys);
             setOpenKeys([]);
         };
 
@@ -32,25 +29,31 @@ const Sidebar = () => {
             sidebar.removeEventListener('mouseenter', handleMouseEnter);
             sidebar.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [openKeys, lastOpenKeys]);
+    }, [openKeys]);
 
-    // 대분류가 선택될 때 하나의 대분류만 열리도록 설정하되, 중분류는 유지
+    // 대분류 및 중분류가 선택될 때, 각 분류에서 하나씩만 열리도록 설정
     const handleOpenChange = (keys) => {
         const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1); // 새로 열린 키 찾기
-        if (latestOpenKey && !latestOpenKey.includes('-')) {
-            // 대분류일 경우, 해당 대분류만 열리도록 설정
-            setOpenKeys([latestOpenKey]);
+        if (latestOpenKey) {
+            const rootMenuLevel = latestOpenKey.split('-').length === 1; // 대분류 판단 ('-'가 없는 경우 대분류)
+
+            if (rootMenuLevel) {
+                // 대분류일 경우, 해당 대분류만 열리도록 설정하고 중분류는 초기화
+                setOpenKeys([latestOpenKey]);
+            } else {
+                // 중분류일 경우, 대분류와 함께 하나의 중분류만 열리도록 유지
+                const parentKey = latestOpenKey.split('-')[0];
+                setOpenKeys([parentKey, latestOpenKey]);
+            }
         } else {
-            // 중분류일 경우, 열린 상태 유지
-            setOpenKeys(keys);
+            setOpenKeys([]); // 아무 것도 선택되지 않으면 모두 닫기
         }
     };
 
-    const handleClick = (menu, subMenu, subSubItem) => {
-        // Redux 상태 업데이트
-        dispatch(setSelectedMenu(menu));
-        dispatch(setSelectedSubMenu(subMenu));
-        dispatch(setSelectedSubSubMenu(subSubItem));
+    const handleClick = (subSubItem) => {
+        if (subSubItem?.url) {
+            navigate(subSubItem.url); // 해당 URL로 이동
+        }
     };
 
     // 메뉴 아이템을 items 속성에 맞게 변환
@@ -65,7 +68,7 @@ const Sidebar = () => {
                 key: `sub${index + 1}-${subIndex + 1}-${subSubIndex + 1}`,
                 label: (
                     <div
-                        onClick={() => handleClick(item.text, subItem.text, subSubItem)}
+                        onClick={() => handleClick(subSubItem)}
                         style={{ cursor: 'pointer' }}
                     >
                         {subSubItem.text}

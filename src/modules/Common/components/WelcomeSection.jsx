@@ -19,9 +19,7 @@ const WelcomeSection = ({
             {/* 설명 부분 */}
             <Box sx={{ color: '#CFDFE1', display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                 <Box>
-                    <Typography variant="body1">
-                        {description}
-                    </Typography>
+                    {description}
                 </Box>
             </Box>
 

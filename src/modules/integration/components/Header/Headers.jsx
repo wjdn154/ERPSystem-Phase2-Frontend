@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Row, Col } from 'antd';
-import Logo from "../../../../assets/favicon/OMZ.svg";
+import LogoWhite from "../../../../assets/favicon/OMZ_white.svg";
 
 const { Header } = Layout;
 
@@ -12,7 +12,7 @@ function Headers() {
             <Row style={styles.row}>
                 <Col span={12} style={styles.col}>
                     <Col span={6} style={styles.col}>
-                        <img src={Logo} alt="로고" style={{width: '80px'}}/>
+                        <img src={LogoWhite} alt="로고" style={{width: '80px'}}/>
                     </Col>
                     <Col span={6} style={styles.col}>
                         searchbar
