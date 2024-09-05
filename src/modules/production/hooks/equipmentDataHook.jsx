@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
+import axios from "axios";
 import {
     fetchEquipmentData,
     fetchEquipmentDataDetail,
@@ -18,10 +19,8 @@ export const equipmentDataHook = (initialData) => {
 
     const equipmentMemoizedData = useMemo(() => data, [data]);
 
-    console.log("hook 호출됨");
     //데이터가 변경될 때마다 컴포넌트를 새로 렌더링
     useEffect(() => {
-        console.log('equipmentdata 변경됨 : ',equipmentDataDetail);
         if (equipmentDataDetail) {
             setShowDetail(true);
         } else {
@@ -50,7 +49,6 @@ export const equipmentDataHook = (initialData) => {
         setSelectedRow(selectedRow);
         setShowDetail(false);   //상세정보 로딩중일때 기존 상세정보 숨기기
 
-        console.log('selected row : ',selectedRow);
         try {
             console.log('selectedRow.id : ',selectedRow.id);
             const detail = await fetchEquipmentDataDetail(selectedRow.id);     //비동기 api 호출
@@ -72,6 +70,24 @@ export const equipmentDataHook = (initialData) => {
         }));
 
     }
+    //등록 버튼 누를 시 값 초기화되는 함수
+    const handleOpenInsertModal=() => {
+        setIsInsertModalVisible(true);
+        setEquipmentDataDetail({  // 모든 필드를 초기화
+            workcenterCode: '',
+            factoryCode: '',
+            equipmentNum: '',
+            equipmentName: '',
+            modelName: '',
+            equipmentType: '',
+            manufacturer: '',
+            purchaseDate: null,
+            installDate: null,
+            operationStatus: '',
+            cost: '',
+            equipmentImg: ''
+        });
+    };
 
     // 저장 버튼 클릭 시 실행되는 함수
     const handleSave = async () => {
@@ -84,6 +100,7 @@ export const equipmentDataHook = (initialData) => {
             const savedData = await fetchEquipmentData();
             setData(savedData);
             window.alert("저장되었습니다.");
+            handleInsertOk();
         } catch (error) {
             console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
         }
@@ -120,12 +137,14 @@ export const equipmentDataHook = (initialData) => {
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
+            const confirmSave = window.confirm("수정하시겠습니까?");
             console.log("수정버튼 클릭시 id : ",equipmentDataDetail.id);
             console.log("수정버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
 
             await updateEquipmentDataDetail(equipmentDataDetail.id, equipmentDataDetail);
             const updatedData = await fetchEquipmentData();
             setData(updatedData);
+            window.alert("수정완료되었습니다.");
         } catch (error) {
             console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
         }
@@ -163,7 +182,8 @@ export const equipmentDataHook = (initialData) => {
         handleInsertOk,
         isInsertModalVisible,
         isUpdateModalVisible,
-        handleInsertCancel
+        handleInsertCancel,
+        handleOpenInsertModal
     };
 
 };

@@ -4,6 +4,7 @@ import {equipmentDataHook} from '../hooks/equipmentDataHook.jsx';
 import EquipmentDataListSection from "../../production/components/EquipmentDataListSection.jsx";
 import {equipmentDataListColumn} from "../utils/EquipmentData/EquipmentDataListColumn.jsx";
 import EquipmentDataDetailSection from "../components/EquipmentDataDetailSection.jsx";
+import EquipmentEnum from "../utils/EquipmentData/EquipmentEnum.jsx";
 
 const EquipmentDataPage = ({initialData}) => {
 
@@ -14,11 +15,9 @@ const EquipmentDataPage = ({initialData}) => {
         showDetail,
         handleSelectedRow,
         handleRowSelection,
-        equipmentDataDetail,
+        equipmentDataDetail = {},
         setEquipmentDataDetail,
         handleInputChange,
-        handleSave,
-        handleUpdate,
         handleDelete,
         showModal,
         handleInsertOk,
@@ -27,15 +26,10 @@ const EquipmentDataPage = ({initialData}) => {
         handleUpdateOk,
         isInsertModalVisible,
         isUpdateModalVisible,
-        handleInsertCancel
+        handleInsertCancel,
+        handleOpenInsertModal
 
     } = equipmentDataHook(initialData);
-
-    console.log('rendered data:',data);
-    console.log('initialData : ',initialData);
-    console.log(data.equipmentDataDetail);
-    console.log(equipmentDataDetail);
-
 
     if(!data || data.length === 0) {
         return <div>데이터가 없습니다.</div>
@@ -59,6 +53,8 @@ const EquipmentDataPage = ({initialData}) => {
                                 handleInsertOk={handleInsertOk}
                                 handleInsertCancel={handleInsertCancel}
                                 isInsertModalVisible={isInsertModalVisible}
+                                handleInputChange={handleInputChange}
+                                handleOpenInsertModal={handleOpenInsertModal}
 
                             />
                         </div>
@@ -76,7 +72,7 @@ const EquipmentDataPage = ({initialData}) => {
                                 handleInputChange={handleInputChange}
                                 setEquipmentDataDetail={setEquipmentDataDetail}
                                 handleDelete={handleDelete}
-                                isUpdateModalVisible={{isUpdateModalVisible}}
+                                isUpdateModalVisible={isUpdateModalVisible}
                                 showModal={showModal}
                                 handleUpdateOk={handleUpdateOk}
                                 handleUpdateCancel={handleUpdateCancel}
