@@ -19,7 +19,7 @@ import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHisto
 import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
-import WorkcenterManagementPage from "../modules/production/pages/Workcenter/WorkcenterManagementPage.jsx";
+import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
 import ProcessDetailsPage from "../modules/production/pages/ProcessDetails/ProcessDetailsPage.jsx";
 import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 
@@ -231,7 +231,7 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '작업장 관리', component: null, apiPath: null },
+                { text: '작업장 관리', component: WorkcenterPage, apiPath: PRODUCTION_API.WORKCENTER_LIST_API },
                 { text: 'LOT 관리', component: null, apiPath: null },
                 { text: 'Serial No 관리', component: null, apiPath: null },
             ]
@@ -248,7 +248,7 @@ export const subMenuItems = {
         {
             text: '공정 경로 관리',
             items: [
-                { text: '공정 세부정보 관리', component: null, apiPath: null },
+                { text: "공정세부정보 관리", component: ProcessDetailsPage, apiPath: PRODUCTION_API.PROCESS_LIST_API },
                 { text: 'Routing 관리', component: null, apiPath: null },
             ]
         },
