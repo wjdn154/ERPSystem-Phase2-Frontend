@@ -1,5 +1,5 @@
 import axios from "axios";
-import {Department_API, USERS_API} from "../../../config/apiConstants.jsx";
+import {DEPARTMENT_API} from "../../../config/apiConstants.jsx";
 
 // 부서 기본 호출 함수
 export const fetchDepartmentData = async () => {

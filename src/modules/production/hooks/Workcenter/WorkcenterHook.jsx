@@ -1,110 +1,183 @@
 import { useState, useEffect } from 'react';
 import {
     fetchWorkcenters,
-    fetchWorkcenterDetails,
-    createWorkcenter,
+    fetchWorkcenter,
     updateWorkcenter,
-    deleteWorkcenter
-} from '../../services/Workcenter/WorkcenterApi'; 
+    deleteWorkcenter,
+    createWorkcenter,
+} from '../../services/Workcenter/WorkcenterApi.jsx';
+import { useSearch } from '../../hooks/useSearch.jsx';
 
-export const useWorkcenter = () => {
-    const [workcenters, setWorkcenters] = useState([]); // 작업장 목록 상태
-    const [selectedWorkcenter, setSelectedWorkcenter] = useState(null); // 선택된 작업장 상태
-    const [loading, setLoading] = useState(false); // 로딩 상태
-    const [error, setError] = useState(null); // 에러 상태
+import { Modal } from "antd";
 
-    // 작업장 목록을 가져오는 함수
-    const loadWorkcenters = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await fetchWorkcenters();
-            setWorkcenters(data);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+export const useWorkcenter = (initialData) => {
+    const [data, setData] = useState(initialData || []);
+    const [workcenter, setWorkcenter] = useState(null);
+    const [selectedRow, setSelectedRow] = useState(null);
+    const [isWorkcenterModalVisible, setIsWorkcenterModalVisible] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [activeRate, setActiveRate] = useState(null);
 
-    // 특정 작업장을 선택하고 상세 정보를 가져오는 함수
-    const selectWorkcenter = async (code) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await fetchWorkcenterDetails(code);
-            setSelectedWorkcenter(data);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // useSearch 훅을 사용하여 검색 상태 관리
+    const searchFields = ['code', 'name', 'description']; // Workcenter에서 검색할 필드 지정
+    const {
+        searchData,
+        isSearchActive,
+        handleSearch,
+        setIsSearchActive,
+        setSearchData,
+    } = useSearch(data, searchFields);
 
-    // 작업장을 생성하는 함수
-    const addWorkcenter = async (newWorkcenter) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const createdWorkcenter = await createWorkcenter(newWorkcenter);
-            setWorkcenters(prevWorkcenters => [...prevWorkcenters, createdWorkcenter]);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 작업장을 수정하는 함수
-    const updateSelectedWorkcenter = async (code, updatedWorkcenter) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const updated = await updateWorkcenter(code, updatedWorkcenter);
-            setWorkcenters(prevWorkcenters =>
-                prevWorkcenters.map(wc => (wc.code === code ? updated : wc))
-            );
-            if (selectedWorkcenter && selectedWorkcenter.code === code) {
-                setSelectedWorkcenter(updated);
-            }
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 작업장을 삭제하는 함수
-    const removeWorkcenter = async (code) => {
-        setLoading(true);
-        setError(null);
-        try {
-            await deleteWorkcenter(id);
-            setWorkcenters(prevWorkcenters => prevWorkcenters.filter(wc => wc.code !== code));
-            if (selectedWorkcenter && selectedWorkcenter.code === code) {
-                setSelectedWorkcenter(null);
-            }
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 컴포넌트가 마운트될 때 작업장 목록을 로드
+    // 초기 데이터 로딩
     useEffect(() => {
+        const loadWorkcenters = async () => {
+            try {
+                if (!initialData || initialData.length === 0) {
+                    const fetchedData = await fetchWorkcenters();
+                    setData(fetchedData);
+                }
+            } catch (error) {
+                console.error("데이터 로드 중 오류 발생:", error);
+            }
+        };
+
         loadWorkcenters();
-    }, []);
+    }, [initialData]);
+
+    // 특정 작업장 삭제 로직
+    const handleDeleteWorkcenter = async (code) => {
+        try {
+            await deleteWorkcenter(code);
+
+            Modal.success({
+                content: '삭제가 완료되었습니다.',
+            });
+
+            // 선택된 작업장이 삭제된 경우, 상세 보기 초기화
+            if (workcenter && workcenter.code === code) {
+                setWorkcenter(null);
+            }
+
+            // 리스트 새로고침
+            const updatedWorkcenters = await fetchWorkcenters();
+            setData(updatedWorkcenters);
+
+        } catch (error) {
+            Modal.error({
+                content: error.message.includes('사용 중이므로 삭제할 수 없습니다')
+                    ? '해당 작업장은 현재 사용 중이므로 삭제할 수 없습니다.'
+                    : '삭제 중 오류가 발생했습니다. 다시 시도해주세요.',
+            });
+        }
+    };
+
+    // 행 선택 핸들러 설정
+    const handleRowSelection = {
+        type: 'radio',
+        onSelect: (record) => {
+            handleSelectedRow(record); // 선택된 행의 데이터를 설정하는 함수 호출
+        },
+    };
+
+    // 행 선택 시 상세정보 설정
+    const handleSelectedRow = async (selectedRow) => {
+        setSelectedRow(selectedRow);
+        setIsEditing(false);
+
+        try {
+            const detail = await fetchWorkcenter(selectedRow.code);
+            setWorkcenter(detail);
+            setIsWorkcenterModalVisible(true); // 모달 표시
+        } catch (error) {
+            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+        }
+    };
+
+    // Input 수정
+    const handleInputChange = (e, key) => {
+        let value = e.target.value;
+        if (key === 'isActive') {
+            value = value.toLowerCase() === 'y';
+        }
+
+        setWorkcenter({
+            ...workcenter,
+            [key]: value,
+        });
+    };
+
+    // handleSave
+    const handleSave = async () => {
+        try {
+            const confirmSave = window.confirm("저장하시겠습니까?");
+            if (!confirmSave) return;
+
+            if (isEditing) {
+                await createWorkcenter(workcenter);
+            } else {
+                await updateWorkcenter(workcenter.code, workcenter);
+            }
+
+            // 데이터 저장 후 리스트 새로고침
+            const updatedData = await fetchWorkcenters();
+            setData(updatedData);
+
+
+            // 리스트 새로고침 후 활성화율 재계산
+            const activeCount = updatedData.filter((wc) => wc.isActive).length;
+            const totalCount = updatedData.length;
+            const activeRate = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
+            const newActiveRate = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
+            if (newActiveRate !== activeRate) {
+                setActiveRate(newActiveRate);
+            }
+            console.log("사용률 새로고침:", newActiveRate); // 로그 추가
+
+            handleClose();
+        } catch (error) {
+            console.error("작업장 저장 중 오류 발생:", error);
+        }
+    };
+
+    // handleClose
+    const handleClose = () => {
+        setIsWorkcenterModalVisible(false);
+    };
+
+    // 새 작업장 추가 핸들러
+    const handleAddWorkcenter = () => {
+        setWorkcenter({
+            id: '',
+            code: '',
+            name: '',
+            workcenterType: '',
+            description: '',
+            isActive: 'false',
+            factoryCode: '',
+            processCode: '',
+            equipmentList: [],
+            workerAssignments: []
+        });
+        setIsEditing(true);
+        setIsWorkcenterModalVisible(true);
+    };
 
     return {
-        workcenters,
-        selectedWorkcenter,
-        loading,
-        error,
-        loadWorkcenters,
-        selectWorkcenter,
-        addWorkcenter,
-        updateSelectedWorkcenter,
-        removeWorkcenter
+        data,
+        workcenter,
+        setWorkcenter,
+        isWorkcenterModalVisible,
+        handleDeleteWorkcenter,
+        handleSelectedRow,
+        handleInputChange,
+        handleSave,
+        handleClose,
+        handleAddWorkcenter,
+        handleSearch, // useSearch 훅에서 반환된 handleSearch
+        searchData,
+        isSearchActive,
+        setIsSearchActive,
+        setSearchData,
+        setActiveRate,
     };
 };

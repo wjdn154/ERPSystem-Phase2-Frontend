@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { FINANCIAL_API } from '../../../config/apiConstants.jsx';
-import { accountSubjectHook } from '../hooks/AccountSubjectHook.jsx';
 
 // 계정과목 기본 정보 호출 함수
 export const fetchAccountSubject = async () => {
