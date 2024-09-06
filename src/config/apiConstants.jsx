@@ -28,11 +28,13 @@ export const USERS_API = {
 }
 
 // 물류관리
+// 물류관리
 export const LOGISTICS_API = {
-    WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse` // 창고 목록 조회 API
-};
+    WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse`, // 창고 목록 조회 API
+    WAREHOUSE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/${id}`, // 창고 상세 조회 API
+    WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics//warehouse/updateWarehouse/${id}`
+};// 생산관리
 
-// 생산관리
 export const PRODUCTION_API = {
     EQUIPMENT_DATA_API:`${API_BASE_URL}/api/production/equipmentDatas`,    //설비정보 목록 조회 API
     EQUIPMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/production/equipmentData/${id}`,   //설비정보 상세 조회 API
