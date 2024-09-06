@@ -4,6 +4,7 @@ import {equipmentDataHook} from '../hooks/equipmentDataHook.jsx';
 import EquipmentDataListSection from "../../production/components/EquipmentDataListSection.jsx";
 import {equipmentDataListColumn} from "../utils/EquipmentData/EquipmentDataListColumn.jsx";
 import EquipmentDataDetailSection from "../components/EquipmentDataDetailSection.jsx";
+import EquipmentEnum from "../utils/EquipmentData/EquipmentEnum.jsx";
 
 const EquipmentDataPage = ({initialData}) => {
 
@@ -14,11 +15,25 @@ const EquipmentDataPage = ({initialData}) => {
         showDetail,
         handleSelectedRow,
         handleRowSelection,
-        equipmentDataDetail,
-        setEquipmentDataDetail
+        equipmentDataDetail = {},
+        setEquipmentDataDetail,
+        handleInputChange,
+        handleDelete,
+        showModal,
+        handleInsertOk,
+        handleUpdateCancel,
+        insertEquipmentModal,
+        handleUpdateOk,
+        isInsertModalVisible,
+        isUpdateModalVisible,
+        handleInsertCancel,
+        handleOpenInsertModal
 
     } = equipmentDataHook(initialData);
-    console.log('rendered data:',data);
+
+    if(!data || data.length === 0) {
+        return <div>데이터가 없습니다.</div>
+    }
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -30,39 +45,42 @@ const EquipmentDataPage = ({initialData}) => {
                             <EquipmentDataListSection
                                 columns={equipmentDataListColumn}
                                 data={data}
-                                handleRowSelection={{handleRowSelection}}
-                                handleSelectedRow={{handleSelectedRow}}
+                                equipmentDataDetail={equipmentDataDetail}
+                                setEquipmentDataDetail={setEquipmentDataDetail}
+                                handleRowSelection={handleRowSelection}
+                                handleSelectedRow={handleSelectedRow}
+                                insertEquipmentModal={insertEquipmentModal}
+                                handleInsertOk={handleInsertOk}
+                                handleInsertCancel={handleInsertCancel}
+                                isInsertModalVisible={isInsertModalVisible}
+                                handleInputChange={handleInputChange}
+                                handleOpenInsertModal={handleOpenInsertModal}
+
                             />
                         </div>
                     </Grow>
                 </Grid>
             </Grid>
-            {/* 설비정보 상세 영역 */}
-            {/*<Grid item xs={12}>*/}
-            {/*    <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}  >*/}
-            {/*        <div>*/}
-            {/*            {equipmentDataDetail && (*/}
-            {/*                <EquipmentDataDetailSection*/}
-            {/*                    data={data}*/}
-            {/*                    equipmentDataDetail={equipmentDataDetail}*/}
-            {/*                    handlePopupClick={handlePopupClick}*/}
-            {/*                    isFinancialStatementModalVisible={isFinancialStatementModalVisible}*/}
-            {/*                    isRelationCodeModalVisible={isRelationCodeModalVisible}*/}
-            {/*                    handleClose={handleClose}*/}
-            {/*                    selectFinancialStatement={selectFinancialStatement}*/}
-            {/*                    handleInputChange={handleInputChange}*/}
-            {/*                    handleInputChange2={handleInputChange2}*/}
-            {/*                    handleDeleteMemo={handleDeleteMemo}*/}
-            {/*                    handleAddNewMemo={handleAddNewMemo}*/}
-            {/*                    setEquipmentDataDetail={setEquipmentDataDetail}*/}
-            {/*                    selectRelationCode={selectRelationCode}*/}
-            {/*                    handleSave={handleSave}*/}
-            {/*                    deleteRelationCode={deleteRelationCode}*/}
-            {/*                />*/}
-            {/*            )}*/}
-            {/*        </div>*/}
-            {/*    </Grow>*/}
-            {/*</Grid>*/}
+
+            <Grid item xs={12} sx={{ marginTop: 3 }}>
+                {equipmentDataDetail && (
+                    <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
+                        <div>
+                            <EquipmentDataDetailSection
+                                data={data}
+                                equipmentDataDetail={equipmentDataDetail}
+                                handleInputChange={handleInputChange}
+                                setEquipmentDataDetail={setEquipmentDataDetail}
+                                handleDelete={handleDelete}
+                                isUpdateModalVisible={isUpdateModalVisible}
+                                showModal={showModal}
+                                handleUpdateOk={handleUpdateOk}
+                                handleUpdateCancel={handleUpdateCancel}
+                            />
+                        </div>
+                    </Grow>
+                )}
+            </Grid>
         </Box>
     )
 }
