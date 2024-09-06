@@ -34,6 +34,8 @@ export const DEPARTMENT_API = {
 export const LOGISTICS_API = {
     PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/product-list`, // 품목 목록 조회 API
     PRODUCT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/product-detail/${id}`, // 품목 상세 조회 API
+    PRODUCT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/update-product/${id}`,
+    PRODUCT_CREATE_API: `${API_BASE_URL}/api/logistics/save-product`,
     WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse` // 창고 목록 조회 API
 };
 
