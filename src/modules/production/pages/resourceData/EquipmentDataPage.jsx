@@ -5,7 +5,7 @@ import EquipmentDataListSection from "../../components/resourceData/EquipmentDat
 import {equipmentDataListColumn} from "../../utils/resourceData/EquipmentDataListColumn.jsx";
 import EquipmentDataDetailSection from "../../components/resourceData/EquipmentDataDetailSection.jsx";
 import WelcomeSection from "../../../Common/components/WelcomeSection.jsx";
-import {tabItems} from "../../../financial/utils/AccountSubject/AccountSubjectUtil.jsx";
+import {equipmentTabItems} from "../../utils/resourceData/EquipmentDataUtil.jsx";
 
 
 const EquipmentDataPage = ({initialData}) => {
@@ -31,7 +31,7 @@ const EquipmentDataPage = ({initialData}) => {
         handleInsertCancel,
         handleOpenInsertModal,
         handleCostInput,
-
+        activeTabKey
 
     } = equipmentDataHook(initialData);
 
@@ -56,13 +56,14 @@ const EquipmentDataPage = ({initialData}) => {
                                     <span style={{ color: '#00C1D8' }}> 조회, 등록, 수정, 삭제</span>하는 기능을 제공하는 페이지
                                 </Typography>
                             )}
-                            //tabItems={tabItems()}
-                            //activeTabKey={activeTabKey}
+                            //tabItems={equipmentTabItems()}
+                            activeTabKey={activeTabKey}
                             //handleTabChange={handleTabChange}
                         />
                     </Grid>
                 </Grid>
                 {/* 설비정보 리스트 영역 */}
+            {activeTabKey === '1' && (
             <Grid container spacing={2}
                   justifyContent="center"  // 수평 중앙 정렬
                   alignItems="center"      // 수직 중앙 정렬
@@ -89,6 +90,7 @@ const EquipmentDataPage = ({initialData}) => {
                     </Grow>
                 </Grid>
             </Grid>
+            )}
             <Grid container spacing={2} sx={{ marginTop: 3 }}
                   justifyContent="center"  // 수평 중앙 정렬
                   alignItems="center"      // 수직 중앙 정렬
