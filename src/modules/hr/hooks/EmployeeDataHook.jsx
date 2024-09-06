@@ -2,7 +2,6 @@ import {useEffect, useMemo, useState} from "react";
 import{
     fetchEmployeeData,
     fetchEmployeeDataDetail,
-
 } from "../services/EmployeeDataApi.jsx"
 
 
@@ -12,7 +11,7 @@ export const employeeDataHook = (initialData) => {
     const [selectedRow, setSelectedRow] = useState(null);
     const [employeeDataDetail, setEmployeeDataDetail] = useState(initialData.employeeDataDetail);
 
-    const employeeMemoizedData = useMemo(() => data, [data])
+    const employeeMemoizedData = useMemo(() => data, [data]);
 
     useEffect(() => {
         if (employeeDataDetail) {

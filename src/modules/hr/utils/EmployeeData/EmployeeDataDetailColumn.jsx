@@ -1,7 +1,57 @@
-export const employeeDataDetailColumn = [
+export const employeeDataDetailColumn = (showDetailModal) => [
     {
-        title: <span>사원번호</span>, // 컬럼 제목
-        dataIndex: 'employeeNumber', // 데이터 인덱스: 이 필드는 데이터 객체의 'employeeNumber' 속성과 연결됩니다.
-        width: '9%', // 컬럼 너비 설정
+        title: <span>성</span>,
+        dataIndex: 'firstName',
+        width: '9%',
+    },
+    {
+        title: <span>이름</span>,
+        dataIndex: 'lastName',
+        width: '9%',
+    },
+    {
+        title: <span>생년월일</span>,
+        dataIndex: 'dateOfBirth',
+        width: '9%',
+    },
+    {
+        title: <span>부서코드</span>,
+        dataIndex: 'departmentCode',
+        width: '9%',
+    },
+    {
+        title: <span>직위</span>,
+        dataIndex: 'positionName',
+        width: '9%',
+    },
+    {
+        title: <span>직책</span>,
+        dataIndex: 'jobTitleName',
+        width: '9%',
+    },
+    {
+        title: <span>휴대폰 번호</span>,
+        dataIndex: 'phoneNumber',
+        width: '9%',
+    },
+    {
+        title: <span>이메일</span>,
+        dataIndex: 'email',
+        width: '9%',
+    },
+    {
+        title: <span>입사일자</span>,
+        dataIndex: 'hireDate',
+        width: '9%',
+    },
+    {
+        title: <span>프로필 사진</span>,
+        dataIndex: 'profilePicture',
+        width: '9%',
+    },
+    {
+        title: <span>세대주 여부</span>,
+        dataIndex: 'isHouseholdHead',
+        width: '9%',
     },
 ]

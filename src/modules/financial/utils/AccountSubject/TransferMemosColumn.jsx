@@ -38,7 +38,7 @@ export const transferMemosColumn = (
     if (accountSubjectDetail.modificationType) {
         columns.push({
             title:
-                <Button type="primary" onClick={() => handleAddNewMemo('transferMemos')}>
+                <Button style={{ height: '30px' }} type="primary" onClick={() => handleAddNewMemo('transferMemos')}>
                     생성
                 </Button>, // '생성' 버튼 컬럼
             dataIndex: 'action', // 'action' 필드를 위한 데이터 인덱싱 (실제 데이터와는 무관)
@@ -46,6 +46,7 @@ export const transferMemosColumn = (
             width: '20%', // 컬럼의 너비 설정
             render: (_, record) => (
                 <Button
+                    style={{ height: '30px' }}
                     type="danger"
                     onClick={() => handleDeleteMemo('transferMemos', record.code, setAccountSubjectDetail, accountSubjectDetail)} // '삭제' 버튼 클릭 시 처리 로직
                 >
