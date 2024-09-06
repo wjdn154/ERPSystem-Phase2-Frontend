@@ -51,7 +51,7 @@ const AppContent = () => {
                 </Sider>
 
                 <Content style={{ transition: 'margin-left 0.3s ease' }}>
-                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#0E1B25' }}>
+                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
                         <ContentWrapper>
                             <Routes>
                                 {/* 동적으로 라우트들을 렌더링 */}

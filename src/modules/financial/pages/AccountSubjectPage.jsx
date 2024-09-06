@@ -91,7 +91,7 @@ const AccountSubjectPage = ({ initialData }) => {
                         </Grow>
                     </Grid>
                     {/* 계정과목 리스트 영역 */}
-                    <Grid item xs={12} md={3} sx={{ minWidth: '400px' }}>
+                    <Grid item xs={12} md={3} sx={{ minWidth: '600px' }}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <AccountSubjectListSection

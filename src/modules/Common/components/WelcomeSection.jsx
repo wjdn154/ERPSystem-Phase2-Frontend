@@ -12,12 +12,12 @@ const WelcomeSection = ({
     return (
         <div style={{ padding: '20px' }}>
             {/* 제목 부분 */}
-            <Typography sx={{ color: '#CFDFE1' }} variant="h4" component="h1">
+            <Typography sx={{ color: '#000' }} variant="h4" component="h1">
                 {title}
             </Typography>
 
             {/* 설명 부분 */}
-            <Box sx={{ color: '#CFDFE1', display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Box sx={{ color: '#000', display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                 <Box>
                     {description}
                 </Box>
