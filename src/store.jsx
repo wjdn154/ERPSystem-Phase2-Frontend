@@ -1,11 +1,10 @@
-// store.js
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 
 // 초기 상태 설정
 const initialState = {
     selectedMenu: '그룹웨어',
     selectedSubMenu: '기초정보관리',
-    selectedSubSubMenu: { text: '회사정보수정', component: null, apiPath: null },
+    selectedSubSubMenu: { text: '회사정보수정', component: null, apiPath: null, url: '/groupware/basic-info/company-edit' },
 };
 
 // Redux 슬라이스 생성
@@ -20,7 +19,8 @@ const menuSlice = createSlice({
             state.selectedSubMenu = action.payload;
         },
         setSelectedSubSubMenu: (state, action) => {
-            state.selectedSubSubMenu = action.payload;
+            // 새로운 객체로 selectedSubSubMenu 설정 (불변성 유지)
+            state.selectedSubSubMenu = { ...action.payload };
         },
     },
 });
@@ -36,6 +36,7 @@ const store = configureStore({
 export const {
     setSelectedMenu,
     setSelectedSubMenu,
-    setSelectedSubSubMenu
+    setSelectedSubSubMenu,
+    selectedSubSubMenu
 } = menuSlice.actions;
 export default store;
