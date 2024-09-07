@@ -40,6 +40,7 @@ const WarehouseRegistrationPage = ({initialData}) => {
 
             {/* 창고 목록 섹션 */}
             <WarehouseListSection
+                data={data}
                 initialData={initialData}
                 onRowClick={handleRowClick}  // 창고 클릭 시 모달 열기
             />

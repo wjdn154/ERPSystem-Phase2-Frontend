@@ -156,8 +156,7 @@ export const subMenuItems = {
             items: [
                 { text: '품목 관리', component: null, apiPath: null },
                 { text: '품목 그룹 관리', component: null, apiPath: null },
-                { text: '창고등록', component: WarehouseRegistrationPage, apiPath: LOGISTICS_API.WAREHOUSE_LIST_API },
-                { text: '창고등록', component: 'WarehouseListPage', apiPath: LOGISTICS_API.WAREHOUSE_LIST_API },
+                { text: '창고등록', component: 'WarehouseRegistrationPage', apiPath: LOGISTICS_API.WAREHOUSE_LIST_API },
             ]
         },
         {
