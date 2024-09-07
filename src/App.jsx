@@ -1,60 +1,83 @@
-// 스타일 및 테마 임포트
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeSettings } from './modules/integration/utils/AppUtil.jsx';
-
-// React 및 MUI 컴포넌트 임포트
-import React, {useMemo} from 'react';
+import React, { useEffect } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-
-// Redux 관련 임포트
-import { useSelector } from 'react-redux';
-
-// components
+import { useSelector, useDispatch } from 'react-redux';
+import { setSelectedSubSubMenu } from './store'; // Redux 액션
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import ContentWrapper from './modules/integration/components/MainContent/ContentWrapper.jsx';
 import Sidebar from './modules/integration/components/Slidbar/Sidebar.jsx';
 import MainContentPage from './modules/integration/pages/MainContentPage.jsx';
 import Headers from './modules/integration/components/Header/Headers.jsx';
-
-// Antd 컴포넌트 임포트
+import { subMenuItems } from './config/menuItems.jsx';
 import { Layout } from "antd";
 
 const { Sider, Content } = Layout;
-
-// 테마 생성
 const theme = createTheme(themeSettings);
 
-// App 컴포넌트 정의
-const App = () => {
-    // Redux에서 상태 가져오기
+const AppContent = () => {
     const selectedSubSubMenu = useSelector((state) => state.menu.selectedSubSubMenu);
-    const memoizedSubSubMenu = useMemo(() => selectedSubSubMenu, [selectedSubSubMenu]);
 
+    // 모든 URL을 라우팅 설정에서 처리하기 위한 동적 컴포넌트
+    const renderRoutes = () => {
+        const routes = [];
+
+        // 모든 메뉴와 서브메뉴 항목을 순회하면서 동적 라우트를 설정
+        for (const mainMenu in subMenuItems) {
+            subMenuItems[mainMenu].forEach((subMenu) => {
+                subMenu.items.forEach((subSubItem) => {
+                    routes.push(
+                        <Route
+                            key={subSubItem.url}
+                            path={subSubItem.url}
+                            element={<MainContentPage selectedSubSubMenu={subSubItem} />}
+                        />
+                    );
+                });
+            });
+        }
+
+        return routes;
+    };
+
+    return (
+        <Layout style={{ minHeight: '100vh' }}>
+            <Headers />
+
+            <Layout>
+                <Sider className="custom-sidebar">
+                    <Sidebar />
+                </Sider>
+
+                <Content style={{ transition: 'margin-left 0.3s ease' }}>
+                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
+                        <ContentWrapper>
+                            <Routes>
+                                {/* 동적으로 라우트들을 렌더링 */}
+                                {renderRoutes()}
+
+                                {/* 기본 경로로 이동할 때 */}
+                                <Route
+                                    path="/"
+                                    element={<MainContentPage selectedSubSubMenu={selectedSubSubMenu} />}
+                                />
+                            </Routes>
+                        </ContentWrapper>
+                    </Box>
+                </Content>
+            </Layout>
+        </Layout>
+    );
+};
+
+const App = () => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Layout style={{ minHeight: '100vh' }}>
-                {/* 헤더 영역 */}
-                <Headers />
-
-                <Layout>
-                    {/* 사이드바 영역 */}
-                    <Sider className="custom-sidebar">
-                        <Sidebar />
-                    </Sider>
-
-                    {/* 메인 컨텐츠 영역 */}
-                    <Content style={{ transition: 'margin-left 0.3s ease' }}>
-                        <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#0E1B25' }}>
-                        {/*<Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, black, #2C2C2C 40%, #555555 100%)' }}>*/}
-                            <ContentWrapper>
-                                {/* 상태에 따라 MainContentPage에서 직접적으로 컴포넌트 렌더링 */}
-                                <MainContentPage selectedSubSubMenu={memoizedSubSubMenu} />
-                            </ContentWrapper>
-                        </Box>
-                    </Content>
-                </Layout>
-            </Layout>
+            <Router>
+                <AppContent />
+            </Router>
         </ThemeProvider>
     );
 };

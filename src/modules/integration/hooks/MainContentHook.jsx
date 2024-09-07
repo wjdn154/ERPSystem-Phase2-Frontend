@@ -1,51 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
-import { subMenuItems } from "../../../config/menuItems.jsx";
-import { Typography } from "@mui/material";
+import lodash from "lodash";  // lodash 사용
 
 const MainContentHook = (selectedSubSubMenu) => {
     const [initialData, setInitialData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        let isMounted = true; // 컴포넌트 마운트 상태 확인
+    const prevSubSubMenuRef = useRef();  // 이전 값을 저장
 
+    const handleDataFetch = () => {
+        // 이전 값과 같은지 체크
+        if (lodash.isEqual(prevSubSubMenuRef.current, selectedSubSubMenu)) return;
 
-        const fetchData = () => {
-            if (selectedSubSubMenu && selectedSubSubMenu.apiPath) {
-                setLoading(true);
+        prevSubSubMenuRef.current = selectedSubSubMenu;  // 이전 값 업데이트
 
-                axios.post(selectedSubSubMenu.apiPath)
-                    .then(response => {
-                        if (isMounted) {
-                            setInitialData(response.data);
-                            setError(null);
-                        }
-                    })
-                    .catch(err => {
-                        if (isMounted) {
-                            setError('데이터 로딩 중 오류가 발생했습니다.');
-                            setInitialData(null);
-                        }
-                    })
-                    .finally(() => {
-                        if (isMounted) {
-                            setLoading(false);
-                        }
-                    });
-            }
-        };
+        // 로딩 상태 설정
+        setLoading(true);
 
-        fetchData();
+        if (selectedSubSubMenu.apiPath) {
+            axios
+                .post(selectedSubSubMenu.apiPath)
+                .then((response) => {
+                    setInitialData(response.data);
+                    setError(null);
+                })
+                .catch((err) => {
+                    setError("데이터 로딩 중 오류가 발생했습니다.");
+                    setInitialData(null);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+    };
 
-        // 클린업 함수로 컴포넌트 언마운트 시 isMounted 플래그를 false로 설정
-        return () => {
-            isMounted = false;
-        };
-    }, [selectedSubSubMenu]);
+    // 상태가 변경되면 강제로 데이터를 가져옴
+    handleDataFetch();
 
-  return { initialData, error, loading };
+    return { initialData, error, loading };
 };
 
 export default MainContentHook;
