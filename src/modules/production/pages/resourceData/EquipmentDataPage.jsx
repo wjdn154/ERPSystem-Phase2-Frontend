@@ -110,7 +110,6 @@ const EquipmentDataPage = ({initialData}) => {
                                     handleUpdateOk={handleUpdateOk}
                                     handleUpdateCancel={handleUpdateCancel}
                                     handleCostInput={handleCostInput}
-                                    handleCostInput={handleCostInput}
                                 />
                             </div>
                         </Grow>
