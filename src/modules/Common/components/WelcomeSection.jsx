@@ -18,7 +18,7 @@ const WelcomeSection = ({
 
             {/* 설명 부분 */}
             <Box sx={{ color: '#000', display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Box>
+                <Box className="welcome-section-description">
                     {description}
                 </Box>
             </Box>

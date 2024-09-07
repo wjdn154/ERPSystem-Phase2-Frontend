@@ -17,7 +17,7 @@ const AccountSubjectStructureSection = ({ data }) => {
     }
     return (
         <Grid item xs={12}>
-            <Paper elevation={3} sx={{ padding: '20px', height: '100%' }}>
+            <Paper elevation={3} sx={{ minWidth: '30vw', padding: '20px', height: '100%' }}>
                 <Typography variant="h6" sx={{ marginBottom: '20px' }}>계정과목 체계</Typography>
                 <MuiTable size="small" sx={{ borderCollapse: 'collapse' }}>
                     <TableHead>
