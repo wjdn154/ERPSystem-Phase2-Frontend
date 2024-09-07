@@ -6,7 +6,7 @@ import { Button, Input, Select, Space } from 'antd';
 import SearchBar from './SearchBar.jsx'; // 검색바 컴포넌트 임포트
 import SettingsIcon from '@mui/icons-material/Settings'; // 설정 아이콘 임포트
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'; // 네비게이션 아이콘 임포트
-import Logo from '../../../../assets/favicon/OMZ.svg'; // 로고 이미지 파일 임포트
+import Logo from '../../../../assets/favicon/OMZ_white.svg'; // 로고 이미지 파일 임포트
 
 // Header 컴포넌트 정의, 메뉴 선택 상태를 props로 받음
 function Header({ selectedMenu, selectedSubMenu, selectedSubSubMenu }) {
