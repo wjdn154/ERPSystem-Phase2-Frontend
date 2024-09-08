@@ -1,51 +1,60 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Cookies from 'js-cookie';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import {Box, TextField} from "@mui/material";
+import {Button, Typography} from "antd";
+import { jwtDecode } from "jwt-decode";
+import {COMMON_API} from "../../../config/apiConstants.jsx";
+import {useDispatch} from "react-redux";
+import {setAuth} from "../../../store.jsx";
 
 const LoginPage = () => {
-    const [username, setUsername] = useState('');
+    const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const handleLogin = (e) => {
-        e.preventDefault();
+    const handleLogin = async () => {
+        try {
+            const response = await axios.post(COMMON_API.LOGIN_API, { userName, password });
+            const token = response.data;
 
-        if (username === '1' && password === '1') {
-            // 쿠키에 로그인 상태 저장 (1일 동안 유지)
-            Cookies.set('username', username, { expires: 1, path: '/' });
-
-            // 로그인 후 메인 페이지로 리디렉션
+            console.log("로그인 성공", jwtDecode(token));
+            Cookies.set('jwt', token, { expires: 1 }); // 1일 동안 JWT 저장
+            dispatch(setAuth(token));
             navigate('/');
-        } else {
-            alert('로그인 정보가 올바르지 않습니다.');
+        } catch (error) {
+            alert("로그인 실패");
+            console.error("로그인 실패", error);
         }
     };
 
     return (
+
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
-            <Typography variant="h4" gutterBottom>Login</Typography>
+            <Typography variant="h4" >Login</Typography>
             <form onSubmit={handleLogin}>
                 <Box mb={2}>
                     <TextField
-                        label="Username"
+                        label="아이디"
+                        value={userName}
                         variant="outlined"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) => setUserName(e.target.value)}
                         fullWidth
                     />
                 </Box>
                 <Box mb={2}>
                     <TextField
-                        label="Password"
+                        label="비밀번호"
                         type="password"
-                        variant="outlined"
                         value={password}
+                        variant="outlined"
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
                     />
                 </Box>
-                <Button type="submit" variant="contained" color="primary" fullWidth>Login</Button>
+                <Button onClick={handleLogin} type="primary">로그인</Button>
             </form>
         </Box>
     );

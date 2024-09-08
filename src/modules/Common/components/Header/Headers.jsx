@@ -3,24 +3,15 @@ import { Layout, Row, Col } from 'antd';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie'; // 쿠키 관리 라이브러리
 import LogoWhite from "../../../../assets/favicon/OMZ.svg";
+import {useDispatch, useSelector} from "react-redux";
+import {logout} from "../../../../store.jsx";
 
 const { Header } = Layout;
 
 function Headers() {
     const navigate = useNavigate();
-    const [username, setUsername] = useState(null); // 쿠키에서 가져온 사용자 이름을 저장하는 상태
-
-    // 컴포넌트가 로드될 때 쿠키에서 사용자 정보를 읽어옴
-    useEffect(() => {
-        const storedUsername = Cookies.get('username'); // 쿠키에서 사용자 이름 가져오기
-        setUsername(storedUsername); // 사용자 이름 상태 설정
-    }, []); // 컴포넌트가 로드될 때 한 번 실행
-
-    useEffect(() => {
-        // 로그인이 되었을 때 상태가 업데이트되면 헤더도 다시 렌더링
-        const storedUsername = Cookies.get('username');
-        setUsername(storedUsername); // 쿠키에서 다시 읽어옴
-    }, [Cookies.get('username')]); // 쿠키 값이 변할 때마다 실행
+    const dispatch = useDispatch();
+    const userNickName = useSelector(state => state.auth.userNickName);
 
     // 로고 클릭 시 특정 페이지로 이동
     const handleLogoClick = () => {
@@ -29,10 +20,9 @@ function Headers() {
 
     // 로그아웃 처리
     const handleLogout = () => {
-        Cookies.remove('username'); // 쿠키에서 사용자 이름 삭제
-        setUsername(null); // 상태 즉시 업데이트
-        navigate('/login'); // 로그인 페이지로 리디렉션
-        window.location.reload(); // 강제 새로고침하여 상태 반영
+        Cookies.remove('jwt'); // JWT 토큰 삭제
+        dispatch(logout());
+        navigate('/login');
     };
 
     return (
@@ -47,9 +37,9 @@ function Headers() {
                     </Col>
                 </Col>
                 <Col span={12} style={styles.col}>
-                    {username ? ( // 사용자가 로그인된 경우
+                    {userNickName ? ( // 사용자가 로그인된 경우
                         <div style={styles.userSection}>
-                            <span style={styles.username}>{username}</span> {/* 사용자 이름 표시 */}
+                            <span style={styles.userNickName}>{userNickName}</span> {/* 사용자 이름 표시 */}
                             <button onClick={handleLogout} style={styles.logoutButton}>로그아웃</button> {/* 로그아웃 버튼 */}
                         </div>
                     ) : (
@@ -89,7 +79,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
     },
-    username: {
+    userNickName: {
         marginRight: '20px',
         fontWeight: 'bold',
     },

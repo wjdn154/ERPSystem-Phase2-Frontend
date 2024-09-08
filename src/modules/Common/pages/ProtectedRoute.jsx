@@ -1,13 +1,26 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import { jwtDecode } from "jwt-decode";
 
-const ProtectedRoute = ({ isLoggedIn, children }) => {
-    // 로그인이 안되어 있으면 로그인 페이지로 리디렉션
-    if (!isLoggedIn) {
+const ProtectedRoute = ({ children }) => {
+    const token = Cookies.get('jwt');
+
+    if (!token) {
         return <Navigate to="/login" replace />;
     }
 
-    return children; // 로그인된 상태라면 컴포넌트 렌더링
+    try {
+        const decoded = jwtDecode(token);
+        if (decoded.exp * 1000 < Date.now()) {
+            Cookies.remove('jwt');
+            return <Navigate to="/login" replace />;
+        }
+    } catch (e) {
+        Cookies.remove('jwt');
+        return <Navigate to="/login" replace />;
+    }
+
+    return children;
 };
 
 export default ProtectedRoute;
