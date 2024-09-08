@@ -36,7 +36,7 @@ const EquipmentDataListSection = ({columns,
 
     return (
         <Paper elevation={3} sx={{height: '100%', p: 2}}>
-            <Typography variant="h6" marginBottom={'20px'}>유지보수 이력 목록</Typography>
+            <Typography variant="h6" marginBottom={'20px'}>설비 정보 목록</Typography>
             <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
                 <Button onClick={handleOpenInsertModal} type="primary">등록</Button>
             </div>
@@ -57,7 +57,7 @@ const EquipmentDataListSection = ({columns,
 
 
             <Modal
-                title="유지보수 정보 등록"
+                title="설비 상세 정보 등록"
                 open={isInsertModalVisible}
                 onOk={handleInsertOk}
                 onCancel={handleInsertCancel}
@@ -85,6 +85,8 @@ const EquipmentDataListSection = ({columns,
                     <Input value={maintenanceDataDetail?.equipmentNum || ''} style={{marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'equipmentNum')}
                            ref={equipmentNumRef}/>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center'}}>
                     <Input value={"설비 명"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
@@ -92,8 +94,6 @@ const EquipmentDataListSection = ({columns,
                            style={{marginRight: '30px', marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'equipmentName')}
                            ref={equipmentNameRef}/>
-                </div>
-                <div style={{display: 'flex', alignItems: 'center'}}>
                     <Input value={"모델 명"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
