@@ -1,12 +1,12 @@
 import React, {useMemo} from "react";
 import {Box, Grid, Grow, Typography} from "@mui/material";
-import {equipmentDataHook} from '../../hooks/resourceData/equipmentDataHook.jsx';
-import EquipmentDataListSection from "../../components/resourceData/EquipmentDataListSection.jsx";
 import {MaintenanceHistoryListColumn} from "../../utils/resourceData/MaintenanceHistoryListColumn.jsx";
-import EquipmentDataDetailSection from "../../components/resourceData/EquipmentDataDetailSection.jsx";
+import MaintenanceHistoryListSection from "../../components/resourceData/MaintenanceHistoryListSection.jsx"
 import WelcomeSection from "../../../Common/components/WelcomeSection.jsx";
 import {maintenanceTabItems} from "../../utils/resourceData/EquipmentDataUtil.jsx";
 import {maintenanceHistoryHook} from "../../hooks/resourceData/maintenanceHistoryHook.jsx";
+import MaintenanceHistoryDetailSection from "../../components/resourceData/MaintenanceHistoryDetailSection.jsx";
+import EquipmentDataDetailSection from "../../components/resourceData/MaintenanceHistoryDetailSection.jsx";
 
 
 const MaintenanceHistoryPage = ({initialData}) => {
@@ -25,7 +25,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
         showModal,
         handleInsertOk,
         handleUpdateCancel,
-        insertEquipmentModal,
+        insertMaintenanceModal,
         handleUpdateOk,
         isInsertModalVisible,
         isUpdateModalVisible,
@@ -72,21 +72,21 @@ const MaintenanceHistoryPage = ({initialData}) => {
                     <Grid item xs={11}>
                         <Grow in={true} timeout={200}>
                             <div>
-                                {/*<EquipmentDataListSection*/}
-                                {/*    columns={MaintenanceHistoryListColumn}*/}
-                                {/*    data={data}*/}
-                                {/*    maintenanceDataDetail={maintenanceDataDetail}*/}
-                                {/*    setMaintenanceDataDetail={setMaintenanceDataDetail}*/}
-                                {/*    handleRowSelection={handleRowSelection}*/}
-                                {/*    handleSelectedRow={handleSelectedRow}*/}
-                                {/*    insertMaintenanceModal={insertMaintenanceModal}*/}
-                                {/*    handleInsertOk={handleInsertOk}*/}
-                                {/*    handleInsertCancel={handleInsertCancel}*/}
-                                {/*    isInsertModalVisible={isInsertModalVisible}*/}
-                                {/*    handleInputChange={handleInputChange}*/}
-                                {/*    handleOpenInsertModal={handleOpenInsertModal}*/}
+                                <MaintenanceHistoryListSection
+                                    columns={MaintenanceHistoryListColumn}
+                                    data={data}
+                                    maintenanceDataDetail={maintenanceDataDetail}
+                                    setMaintenanceDataDetail={setMaintenanceDataDetail}
+                                    handleRowSelection={handleRowSelection}
+                                    handleSelectedRow={handleSelectedRow}
+                                    insertMaintenanceModal={insertMaintenanceModal}
+                                    handleInsertOk={handleInsertOk}
+                                    handleInsertCancel={handleInsertCancel}
+                                    isInsertModalVisible={isInsertModalVisible}
+                                    handleInputChange={handleInputChange}
+                                    handleOpenInsertModal={handleOpenInsertModal}
 
-                                {/*/>*/}
+                                />
                             </div>
                         </Grow>
                     </Grid>
@@ -100,18 +100,18 @@ const MaintenanceHistoryPage = ({initialData}) => {
                     {maintenanceDataDetail && (
                         <Grow in={showDetail} timeout={200} key={maintenanceDataDetail.id}>
                             <div>
-                                {/*<EquipmentDataDetailSection*/}
-                                {/*    data={data}*/}
-                                {/*    maintenanceDataDetail={maintenanceDataDetail}*/}
-                                {/*    handleInputChange={handleInputChange}*/}
-                                {/*    setMaintenanceDataDetail={setMaintenanceDataDetail}*/}
-                                {/*    handleDelete={handleDelete}*/}
-                                {/*    isUpdateModalVisible={isUpdateModalVisible}*/}
-                                {/*    showModal={showModal}*/}
-                                {/*    handleUpdateOk={handleUpdateOk}*/}
-                                {/*    handleUpdateCancel={handleUpdateCancel}*/}
-                                {/*    handleCostInput={handleCostInput}*/}
-                                {/*/>*/}
+                                <MaintenanceHistoryDetailSection
+                                    data={data}
+                                    maintenanceDataDetail={maintenanceDataDetail}
+                                    handleInputChange={handleInputChange}
+                                    setMaintenanceDataDetail={setMaintenanceDataDetail}
+                                    handleDelete={handleDelete}
+                                    isUpdateModalVisible={isUpdateModalVisible}
+                                    showModal={showModal}
+                                    handleUpdateOk={handleUpdateOk}
+                                    handleUpdateCancel={handleUpdateCancel}
+                                    handleCostInput={handleCostInput}
+                                />
                             </div>
                         </Grow>
                     )}

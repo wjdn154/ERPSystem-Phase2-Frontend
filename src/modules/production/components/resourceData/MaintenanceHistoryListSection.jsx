@@ -6,12 +6,10 @@ import {tabItems} from "../../../financial/utils/AccountSubject/AccountSubjectUt
 const {Option} = Select;
 
 
-const EquipmentDataListSection = ({columns,
+const MaintenanceHistoryListSection = ({columns,
                                       data,
                                       handleRowSelection,
                                       handleSelectedRow,
-                                      handleSave,
-                                      insertEquipmentModal,
                                       handleInsertOk,
                                       handleInsertCancel,
                                       isInsertModalVisible,
@@ -27,12 +25,10 @@ const EquipmentDataListSection = ({columns,
     const factoryCodeRef = useRef(null);
     const equipmentNumRef = useRef(null);
     const equipmentNameRef = useRef(null);
-    const modelNameRef = useRef(null);
-    const manufacturerRef = useRef(null);
-    const equipmentTypeRef = useRef(null);
-    const installDateRef = useRef(null);
-    const purchaseDateRef = useRef(null);
-    const equipmentImgRef = useRef(null);
+    const maintenanceManagerRef = useRef(null);
+    const maintenanceCostRef = useRef(null);
+    const titleRef = useRef(null);
+    const maintenanceDetailRef = useRef(null);
 
     return (
         <Paper elevation={3} sx={{height: '100%', p: 2}}>
@@ -61,7 +57,7 @@ const EquipmentDataListSection = ({columns,
                 open={isInsertModalVisible}
                 onOk={handleInsertOk}
                 onCancel={handleInsertCancel}
-                width={700} // 너비를 700px로 설정
+                width={800} // 너비를 800px로 설정
             >
 
                 <div style={{display: 'flex', alignItems: 'center'}}>
@@ -69,7 +65,7 @@ const EquipmentDataListSection = ({columns,
                            readOnly/>
                     <Input value={maintenanceDataDetail?.workcenterCode || ''} style={{marginRight: '30px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'workcenterCode')}
-                           //Ant Design의 Input 컴포넌트 내부의 input DOM에 접근하려면 ref를 통해 실제 DOM 요소에 접근해야 함
+                        //Ant Design의 Input 컴포넌트 내부의 input DOM에 접근하려면 ref를 통해 실제 DOM 요소에 접근해야 함
                            ref={workcenterCodeRef}/>
                     <Input value={"설치된 공장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
@@ -80,100 +76,89 @@ const EquipmentDataListSection = ({columns,
                 </div>
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <Input value={"설비 번호"}
-                           style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}}
+                           style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <Input value={maintenanceDataDetail?.equipmentNum || ''} style={{marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'equipmentNum')}
                            ref={equipmentNumRef}/>
-                    <Input value={"설비 명"}
-                           style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                           readOnly/>
-                    <Input value={maintenanceDataDetail?.equipmentName || ''}
-                           style={{marginRight: '30px', marginTop: '20px', flex: 1}}
-                           onChange={(e) => handleInputChange(e, 'equipmentName')}
-                           ref={equipmentNameRef}/>
-                </div>
-                <div style={{display: 'flex', alignItems: 'center'}}>
-                    <Input value={"모델 명"}
-                           style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                           readOnly/>
-                    <Input value={maintenanceDataDetail?.modelName || ''} style={{marginTop: '20px', flex: 1}}
-                           onChange={(e) => handleInputChange(e, 'modelName')}
-                           ref={modelNameRef}/>
                 </div>
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <Input value={"유형"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <Select
-                        value={maintenanceDataDetail?.equipmentType || ''}
-                        onChange={(value) => handleInputChange({target: {value}}, 'equipmentType')}
+                        value={maintenanceDataDetail?.maintenanceType || ''}
+                        onChange={(value) => handleInputChange({target: {value}}, 'maintenanceType')}
                         style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
                     >
-                        <Option value={"ASSEMBLY"}>조립 설비</Option>
-                        <Option value={"MACHINING"}>가공 설비</Option>
-                        <Option value={"INSPECTION"}>검사 설비</Option>
-                        <Option value={"PACKAGING"}>포장 설비</Option>
+                        <Option value={"EMERGENCY_REPAIR"}>긴급 수리</Option>
+                        <Option value={"REGULAR_INSPECTION"}>정기점검</Option>
+                        <Option value={"FAILURE_REPAIR"}>고장 수리</Option>
                     </Select>
-                    <Input value={"제조사"}
+                    <Input value={"관리 담당자"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
-                    <Input value={maintenanceDataDetail?.manufacturer || ''} style={{marginTop: '20px', flex: 1}}
-                           onChange={(e) => handleInputChange(e, 'manufacturer')}
-                           ref={manufacturerRef}/>
+                    <Input value={maintenanceDataDetail?.maintenanceManager || ''} style={{marginTop: '20px', flex: 1}}
+                           onChange={(e) => handleInputChange(e, 'maintenanceManager')}
+                           ref={maintenanceManagerRef}/>
                 </div>
                 <div style={{display: 'flex', alignItems: 'center'}}>
-                    <Input value={"구매 날짜"}
+                    <Input value={"진행 상태"}
+                           style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
+                           readOnly/>
+                    <Select
+                        value={maintenanceDataDetail?.maintenanceStatus}
+                        onChange={(value) => handleInputChange({target: {value}}, 'maintenanceStatus')}
+                        style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
+                    >
+                        <Option value={true}>완료</Option>
+                        <Option value={false}>작업 중</Option>
+                    </Select>
+                    <Input value={"유지보수 비용"}
+                           style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
+                           readOnly/>
+                    <Input value={maintenanceDataDetail?.maintenanceCost || ''} style={{marginTop: '20px', flex: 1}}
+                           onChange={(e) => handleInputChange(e, 'maintenanceCost')}
+                           onKeyPress={handleCostInput}/>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <Input value={"유지보수 일자"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <DatePicker
-                        value={maintenanceDataDetail?.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
+                        value={maintenanceDataDetail?.maintenanceDate ? moment(maintenanceDataDetail.maintenanceDate, 'YYYY-MM-DD') : null}
                         style={{marginRight: '30px', marginTop: '20px', flex: 1}}
-                        onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'purchaseDate')}
+                        onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'maintenanceDate')}
                     />
-                    <Input value={"설치날짜"}
+                    <Input value={"다음 유지보수 예정일"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <DatePicker
-                        value={maintenanceDataDetail?.installDate ? moment(equipmentDataDetail.installDate, 'YYYY-MM-DD') : null}
-                        onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'installDate')}
+                        value={maintenanceDataDetail?.nextScheduleDate ? moment(maintenanceDataDetail.nextScheduleDate, 'YYYY-MM-DD') : null}
+                        onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'nextScheduleDate')}
                         style={{width: '100%', marginTop: '20px', flex: 1}}
                     />
                 </div>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
-                        <Input value={"가동 상태"}
-                               style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                               readOnly/>
-                        <Select
-                            value={maintenanceDataDetail?.operationStatus || ''}
-                            onChange={(value) => handleInputChange({target: {value}}, 'operationStatus')}
-                            style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
-                        >
-                            <Option value={"BEFORE_OPERATION"}>가동 전</Option>
-                            <Option value={"OPERATING"}>가동 중</Option>
-                            <Option value={"MAINTENANCE"}>유지보수 중</Option>
-                            <Option value={"FAILURE"}>고장</Option>
-                            <Option value={"REPAIRING"}>수리 중</Option>
-                        </Select>
-                        <Input value={"구매 비용"}
-                               style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                               readOnly/>
-                        <Input value={maintenanceDataDetail?.cost || ''} style={{marginTop: '20px', flex: 1}}
-                               onChange={(e) => handleInputChange(e, 'cost')}
-                               ref={(input) => workcenterCodeRef.current = input?.input}
-                               onKeyPress={handleCostInput}/>
-                    </div>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
-                        <Input value={"설비 이미지"}
-                               style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}}
-                               readOnly/>
-                        <Input value={maintenanceDataDetail?.equipmentImg || ''} style={{marginTop: '20px', flex: 1}}
-                               onChange={(e) => handleInputChange(e, 'equipmentImg')}
-                               ref={equipmentImgRef}/>
-                    </div>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <Input value={"제목"}
+                           style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}}
+                           readOnly/>
+                    <Input value={maintenanceDataDetail?.title || ''} style={{marginTop: '20px', flex: 1}}
+                           onChange={(e) => handleInputChange(e, 'title')}
+                           ref={titleRef}/>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <Input value={"내용"}
+                           style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}}
+                           readOnly/>
+                    <Input value={maintenanceDataDetail?.maintenanceDetail || ''}
+                              style={{marginTop: '20px', flex: 1}}
+                        onChange={(e) => handleInputChange(e, 'maintenanceDetail')}
+                        ref={maintenanceDetailRef}/>
+                </div>
             </Modal>
         </Paper>
-)
+    )
 }
 
-export default EquipmentDataListSection;
+export default MaintenanceHistoryListSection;

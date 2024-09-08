@@ -214,11 +214,6 @@ export const equipmentDataHook = (initialData) => {
             setTimeout(() => factoryCodeRef.current.focus(), 0);
             return;
         }
-        if (!equipmentDataDetail.equipmentNum) {
-            alert("설비 번호를 입력하세요.");
-            setTimeout(() => equipmentNumRef.current.focus(), 0);
-            return;
-        }
         if (!equipmentDataDetail.equipmentName) {
             alert("설비 명을 입력하세요.");
             setTimeout(() => equipmentNameRef.current.focus(), 0);
@@ -237,11 +232,6 @@ export const equipmentDataHook = (initialData) => {
         if (!equipmentDataDetail.cost) {
             alert("비용을 입력하세요.");
             setTimeout(() => costRef.current.focus(), 0);
-            return;
-        }
-        if (equipmentDataDetail?.equipmentNum !== equipmentDataDetail?.originalEquipmentNum) {
-            alert("설비번호가 일치하지 않습니다.");
-            setTimeout(() => equipmentNumRef.current.focus(), 0);
             return;
         }
 

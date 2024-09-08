@@ -91,7 +91,7 @@ const EquipmentDataDetailSection = ({
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"설비 번호"} style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.equipmentNum} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e, 'equipmentNum')}/>
+                <Input value={equipmentDataDetail.equipmentNum} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e, 'equipmentNum')} readOnly/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"설비 명"}

@@ -20,7 +20,7 @@ export const
         title: <span>설비번호</span>,  // 컬럼 제목
         dataIndex: 'equipmentNum',  // 데이터 인덱스: 이 필드는 데이터 객체의 'equipmentNum' 속성과 연결됩니다.
         key:'equipmentNum',
-        width: '20%',  // 컬럼 너비 설정
+        width: '18%',  // 컬럼 너비 설정
     },
     {
         title: <span>설비 명</span>,  // 컬럼 제목
@@ -47,7 +47,7 @@ export const
         title: <span>가동 상태</span>,  // 컬럼 제목
         dataIndex: 'operationStatus',  // 데이터 인덱스: 이 필드는 데이터 객체의 'operationStatus' 속성과 연결됩니다.
         key:'operationStatus',
-        width: '15%',  // 컬럼 너비 설정
+        width: '13%',  // 컬럼 너비 설정
         render: (text) => {
             return operationStatusMap[text] || text;  // 한글로 변환 후 표시
         }
@@ -56,12 +56,12 @@ export const
         title: <span>공장 이름</span>,  // 컬럼 제목
         dataIndex: 'factoryName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'factoryName' 속성과 연결됩니다.
         key:'factoryName',
-        width: '10%',  // 컬럼 너비 설정
+        width: '13%',  // 컬럼 너비 설정
     },
     {
         title: <span>작업장 이름</span>,  // 컬럼 제목
         dataIndex: 'workcenterName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'workcenterName' 속성과 연결됩니다.
         key:'workcenterName',
-        width: '12%',  // 컬럼 너비 설정
+        width: '14%',  // 컬럼 너비 설정
     },
 ];
