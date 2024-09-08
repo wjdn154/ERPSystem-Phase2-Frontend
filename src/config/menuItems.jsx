@@ -14,8 +14,8 @@ import {
 } from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
-import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
-import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
+import EquipmentDataPage from "../modules/production/pages/resourceData/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../modules/production/pages/resourceData/MaintenanceHistoryPage.jsx";
 import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";

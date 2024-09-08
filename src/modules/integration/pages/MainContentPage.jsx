@@ -4,8 +4,8 @@ import MainContentHook from '../hooks/MainContentHook.jsx';
 import AntdSkeleton from "../components/MainContent/AntdSkeleton.jsx";
 
 import AccountSubjectPage from "../../financial/pages/AccountSubjectPage.jsx";
-import EquipmentDataPage from "../../production/pages/EquipmentDataPage.jsx";
-import MaintenanceHistoryPage from "../../production/pages/MaintenanceHistoryPage.jsx";
+import EquipmentDataPage from "../../production/pages/resourceData/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../../production/pages/resourceData/MaintenanceHistoryPage.jsx";
 import WarehouseListPage from "../../logistics/pages/WarehouseListPage.jsx";
 import ClientRegistrationPage from "../../financial/pages/ClientRegistrationPage.jsx";
 import EmployeeDataPage from "../../hr/pages/EmployeeDataPage.jsx";
