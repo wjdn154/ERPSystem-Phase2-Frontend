@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState, useRef} from "react";
 import axios from "axios";
 import {
     fetchEquipmentData,
@@ -6,7 +6,7 @@ import {
     updateEquipmentDataDetail,
     saveEquipmentDataDetail,
     deleteEquipmentDataDetail
-} from "../services/EquipmentDataApi.jsx";
+} from "../../services/resourceData/EquipmentDataApi.jsx";
 
 export const equipmentDataHook = (initialData) => {
 
@@ -16,6 +16,17 @@ export const equipmentDataHook = (initialData) => {
     const [equipmentDataDetail, setEquipmentDataDetail] = useState(null);   //상세정보
     const [isInsertModalVisible, setIsInsertModalVisible] = useState(false); //삭제 모달 상태
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
+    const [activeTabKey, setActiveTabKey] = useState('1'); // tabs state
+    const workcenterCodeRef = useRef(null);
+    const factoryCodeRef = useRef(null);
+    const equipmentNumRef = useRef(null);
+    const equipmentNameRef = useRef(null);
+    const modelNameRef = useRef(null);
+    const manufacturerRef = useRef(null);
+    const equipmentTypeRef = useRef(null);
+    const installDateRef = useRef(null);
+    const purchaseDateRef = useRef(null);
+    const equipmentImgRef = useRef(null);
 
     const equipmentMemoizedData = useMemo(() => data, [data]);
 
@@ -53,7 +64,11 @@ export const equipmentDataHook = (initialData) => {
             console.log('selectedRow.id : ',selectedRow.id);
             const detail = await fetchEquipmentDataDetail(selectedRow.id);     //비동기 api 호출
             console.log('fetch detail : ',detail);
-            setEquipmentDataDetail(detail);      //상세정보 설정
+            // 원래 설비 번호를 따로 저장 (originalEquipmentNum)
+            setEquipmentDataDetail({
+                ...detail,
+                originalEquipmentNum: detail.equipmentNum  // 원래 설비번호 저장
+            });
 
         } catch (error) {
             console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
@@ -98,11 +113,20 @@ export const equipmentDataHook = (initialData) => {
             console.log("저장버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
             await saveEquipmentDataDetail(equipmentDataDetail);
             const savedData = await fetchEquipmentData();
-            setData(savedData);
             window.alert("저장되었습니다.");
-            handleInsertOk();
+            setIsInsertModalVisible(false);
+            setData(savedData);
         } catch (error) {
             console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
+        }
+    };
+
+    // 비용 입력 시 숫자만 허용
+    const handleCostInput = (e) => {
+        const regex = /^[0-9\b]+$/; // 숫자와 백스페이스만 허용
+        if (!regex.test(e.key)) {
+            window.alert("비용 입력시 숫자만 입력하세요");
+            setTimeout(() => costRef.current.focus(), 0);
         }
     };
 
@@ -115,7 +139,62 @@ export const equipmentDataHook = (initialData) => {
         setIsInsertModalVisible(false);
     }
     const handleInsertOk = async () => {
-        setIsInsertModalVisible(false);
+        if (!equipmentDataDetail.workcenterCode) {
+            alert("작업장 코드를 입력하세요.");
+            setTimeout(() => workcenterCodeRef.current?.focus(), 0); // 경고창 닫힌 후 해당 input으로 포커스 이동
+            return;
+        }
+        if (!equipmentDataDetail.factoryCode) {
+            alert("공장 코드를 입력하세요.");
+            setTimeout(() => factoryCodeRef.current?.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.equipmentNum) {
+            alert("설비 번호를 입력하세요.");
+            setTimeout(() => equipmentNumRef.current?.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.equipmentName) {
+            alert("설비 명을 입력하세요.");
+            setTimeout(() => equipmentNameRef.current?.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.modelName) {
+            alert("모델 명을 입력하세요.");
+            setTimeout(() => modelNameRef.current?.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.equipmentType) {
+            alert("설비 유형을 입력하세요.");
+            return;
+        }
+        if (!equipmentDataDetail.manufacturer) {
+            alert("제조사를 입력하세요.");
+            setTimeout(() => manufacturerRef.current?.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.purchaseDate) {
+            alert("구매 날짜를 입력하세요.");
+            return;
+        }if (!equipmentDataDetail.installDate) {
+            alert("설치 날짜를 입력하세요.");
+            return;
+        }
+        if (!equipmentDataDetail.operationStatus) {
+            alert("가동 상태를 입력하세요.");
+            return;
+        }
+        if (!equipmentDataDetail.cost) {
+            alert("비용을 입력하세요.");
+            setTimeout(() => costRef.current?.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.equipmentImg) {
+            alert("설비 이미지를 입력하세요.");
+            setTimeout(() => equipmentImgRef.current?.focus(), 0);
+            return;
+        }
+
         await handleSave();
     }
 
@@ -125,7 +204,38 @@ export const equipmentDataHook = (initialData) => {
     };
 
     const handleUpdateOk = async () => {
-        setIsUpdateModalVisible(false);
+        if (!equipmentDataDetail.workcenterCode) {
+            alert("작업장 코드를 입력하세요.");
+            setTimeout(() => workcenterCodeRef.current.focus(), 0); // 경고창 닫힌 후 해당 input으로 포커스 이동
+            return;
+        }
+        if (!equipmentDataDetail.factoryCode) {
+            alert("공장 코드를 입력하세요.");
+            setTimeout(() => factoryCodeRef.current.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.equipmentName) {
+            alert("설비 명을 입력하세요.");
+            setTimeout(() => equipmentNameRef.current.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.modelName) {
+            alert("모델 명을 입력하세요.");
+            setTimeout(() => modelNameRef.current.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.manufacturer) {
+            alert("제조사를 입력하세요.");
+            setTimeout(() => manufacturerRef.current.focus(), 0);
+            return;
+        }
+        if (!equipmentDataDetail.cost) {
+            alert("비용을 입력하세요.");
+            setTimeout(() => costRef.current.focus(), 0);
+            return;
+        }
+
+
         await handleUpdate();
         // 여기서 수정 작업을 진행하거나 저장할 수 있습니다.
     };
@@ -145,6 +255,7 @@ export const equipmentDataHook = (initialData) => {
             const updatedData = await fetchEquipmentData();
             setData(updatedData);
             window.alert("수정완료되었습니다.");
+            setIsUpdateModalVisible(false);
         } catch (error) {
             console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
         }
@@ -157,6 +268,7 @@ export const equipmentDataHook = (initialData) => {
             await deleteEquipmentDataDetail(equipmentDataDetail.id);
             const deletedData = await fetchEquipmentData();
             window.alert('삭제 완료되었습니다.');
+            setData(deletedData);
         }catch (error){
             console.error("API에서 데이터를 삭제하는 중 오류 발생:", error);
         }
@@ -183,7 +295,9 @@ export const equipmentDataHook = (initialData) => {
         isInsertModalVisible,
         isUpdateModalVisible,
         handleInsertCancel,
-        handleOpenInsertModal
+        handleOpenInsertModal,
+        handleCostInput,
+        activeTabKey
     };
 
 };
