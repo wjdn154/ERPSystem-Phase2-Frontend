@@ -15,8 +15,8 @@ const EquipmentDataListSection = ({columns,
                                       handleInsertOk,
                                       handleInsertCancel,
                                       isInsertModalVisible,
-                                      maintenanceDataDetail,
-                                      setMaintenanceDataDetail,
+                                      equipmentDataDetail,
+                                      setEquipmentDataDetail,
                                       handleInputChange,
                                       handleOpenInsertModal,
                                       handleCostInput
@@ -67,13 +67,13 @@ const EquipmentDataListSection = ({columns,
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <Input value={"설치된 작업장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
-                    <Input value={maintenanceDataDetail?.workcenterCode || ''} style={{marginRight: '30px', flex: 1}}
+                    <Input value={equipmentDataDetail?.workcenterCode || ''} style={{marginRight: '30px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'workcenterCode')}
                            //Ant Design의 Input 컴포넌트 내부의 input DOM에 접근하려면 ref를 통해 실제 DOM 요소에 접근해야 함
                            ref={workcenterCodeRef}/>
                     <Input value={"설치된 공장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
-                    <Input value={maintenanceDataDetail?.factoryCode || ''} style={{flex: 1}}
+                    <Input value={equipmentDataDetail?.factoryCode || ''} style={{flex: 1}}
                            onChange={(e) => handleInputChange(e, 'factoryCode')}
                            ref={factoryCodeRef}/>
 
@@ -82,7 +82,7 @@ const EquipmentDataListSection = ({columns,
                     <Input value={"설비 번호"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}}
                            readOnly/>
-                    <Input value={maintenanceDataDetail?.equipmentNum || ''} style={{marginTop: '20px', flex: 1}}
+                    <Input value={equipmentDataDetail?.equipmentNum || ''} style={{marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'equipmentNum')}
                            ref={equipmentNumRef}/>
                 </div>
@@ -90,14 +90,14 @@ const EquipmentDataListSection = ({columns,
                     <Input value={"설비 명"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
-                    <Input value={maintenanceDataDetail?.equipmentName || ''}
+                    <Input value={equipmentDataDetail?.equipmentName || ''}
                            style={{marginRight: '30px', marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'equipmentName')}
                            ref={equipmentNameRef}/>
                     <Input value={"모델 명"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
-                    <Input value={maintenanceDataDetail?.modelName || ''} style={{marginTop: '20px', flex: 1}}
+                    <Input value={equipmentDataDetail?.modelName || ''} style={{marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'modelName')}
                            ref={modelNameRef}/>
                 </div>
@@ -106,7 +106,7 @@ const EquipmentDataListSection = ({columns,
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <Select
-                        value={maintenanceDataDetail?.equipmentType || ''}
+                        value={equipmentDataDetail?.equipmentType || ''}
                         onChange={(value) => handleInputChange({target: {value}}, 'equipmentType')}
                         style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
                     >
@@ -118,7 +118,7 @@ const EquipmentDataListSection = ({columns,
                     <Input value={"제조사"}
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
-                    <Input value={maintenanceDataDetail?.manufacturer || ''} style={{marginTop: '20px', flex: 1}}
+                    <Input value={equipmentDataDetail?.manufacturer || ''} style={{marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'manufacturer')}
                            ref={manufacturerRef}/>
                 </div>
@@ -127,7 +127,7 @@ const EquipmentDataListSection = ({columns,
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <DatePicker
-                        value={maintenanceDataDetail?.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
+                        value={equipmentDataDetail?.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
                         style={{marginRight: '30px', marginTop: '20px', flex: 1}}
                         onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'purchaseDate')}
                     />
@@ -135,7 +135,7 @@ const EquipmentDataListSection = ({columns,
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <DatePicker
-                        value={maintenanceDataDetail?.installDate ? moment(equipmentDataDetail.installDate, 'YYYY-MM-DD') : null}
+                        value={equipmentDataDetail?.installDate ? moment(equipmentDataDetail.installDate, 'YYYY-MM-DD') : null}
                         onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'installDate')}
                         style={{width: '100%', marginTop: '20px', flex: 1}}
                     />
@@ -145,7 +145,7 @@ const EquipmentDataListSection = ({columns,
                                style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                                readOnly/>
                         <Select
-                            value={maintenanceDataDetail?.operationStatus || ''}
+                            value={equipmentDataDetail?.operationStatus || ''}
                             onChange={(value) => handleInputChange({target: {value}}, 'operationStatus')}
                             style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
                         >
@@ -158,7 +158,7 @@ const EquipmentDataListSection = ({columns,
                         <Input value={"구매 비용"}
                                style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                                readOnly/>
-                        <Input value={maintenanceDataDetail?.cost || ''} style={{marginTop: '20px', flex: 1}}
+                        <Input value={equipmentDataDetail?.cost || ''} style={{marginTop: '20px', flex: 1}}
                                onChange={(e) => handleInputChange(e, 'cost')}
                                ref={(input) => workcenterCodeRef.current = input?.input}
                                onKeyPress={handleCostInput}/>
@@ -167,7 +167,7 @@ const EquipmentDataListSection = ({columns,
                         <Input value={"설비 이미지"}
                                style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}}
                                readOnly/>
-                        <Input value={maintenanceDataDetail?.equipmentImg || ''} style={{marginTop: '20px', flex: 1}}
+                        <Input value={equipmentDataDetail?.equipmentImg || ''} style={{marginTop: '20px', flex: 1}}
                                onChange={(e) => handleInputChange(e, 'equipmentImg')}
                                ref={equipmentImgRef}/>
                     </div>

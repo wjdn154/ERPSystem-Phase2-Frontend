@@ -195,11 +195,11 @@ export const maintenanceHistoryHook = (initialData) => {
             return;
         }
         // 설비번호 존재 확인
-        if (!response.ok) {
-            const errorMessage = await response.text(); // 백엔드에서 보낸 에러 메시지를 읽음
-            alert(errorMessage); // 에러 메시지를 alert 창으로 표시
-            return;
-        }
+        // if (!response.ok) {
+        //     const errorMessage = await response.text(); // 백엔드에서 보낸 에러 메시지를 읽음
+        //     alert(errorMessage); // 에러 메시지를 alert 창으로 표시
+        //     return;
+        // }
 
 
         await handleSave();
