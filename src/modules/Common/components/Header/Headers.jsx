@@ -11,7 +11,7 @@ const { Header } = Layout;
 function Headers() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const userNickName = useSelector(state => state.auth.userNickName);
+    const userNickname = useSelector(state => state.auth.userNickname);
 
     // 로고 클릭 시 특정 페이지로 이동
     const handleLogoClick = () => {
@@ -37,9 +37,9 @@ function Headers() {
                     </Col>
                 </Col>
                 <Col span={12} style={styles.col}>
-                    {userNickName ? ( // 사용자가 로그인된 경우
+                    {userNickname ? ( // 사용자가 로그인된 경우
                         <div style={styles.userSection}>
-                            <span style={styles.userNickName}>{userNickName}</span> {/* 사용자 이름 표시 */}
+                            <span style={styles.userNickname}>{userNickname}</span> {/* 사용자 이름 표시 */}
                             <button onClick={handleLogout} style={styles.logoutButton}>로그아웃</button> {/* 로그아웃 버튼 */}
                         </div>
                     ) : (
@@ -79,7 +79,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
     },
-    userNickName: {
+    userNickname: {
         marginRight: '20px',
         fontWeight: 'bold',
     },

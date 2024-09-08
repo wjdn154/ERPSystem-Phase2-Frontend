@@ -27,7 +27,7 @@ const menuSlice = createSlice({
 // 초기 상태 설정 (인증 관련)
 const initialAuthState = {
     token: null,
-    userNickName: null,
+    userNickname: null,
 };
 
 // 인증 관련 슬라이스 생성
@@ -39,11 +39,11 @@ export const authSlice = createSlice({
             state.token = action.payload;  // JWT 토큰 설정
             const decodedToken = jwtDecode(action.payload);  // 토큰 디코드하여 사용자 정보 추출
             console.log("디코드된 토큰", decodedToken);
-            state.userNickName = decodedToken.userNickName;  // 디코드된 토큰에서 사용자 이름 설정
+            state.userNickname = decodedToken.userNickname;  // 디코드된 토큰에서 사용자 이름 설정
         },
         logout: (state) => {
             state.token = null;  // 로그아웃 시 토큰 제거
-            state.userNickName = null;  // 로그아웃 시 사용자 이름 제거
+            state.userNickname = null;  // 로그아웃 시 사용자 이름 제거
         },
     },
 });
