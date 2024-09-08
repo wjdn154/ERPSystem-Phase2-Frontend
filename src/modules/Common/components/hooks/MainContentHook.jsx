@@ -23,7 +23,6 @@ const MainContentHook = (selectedSubSubMenu) => {
                 .post(selectedSubSubMenu.apiPath)
                 .then((response) => {
                     setInitialData(response.data);
-                    console.log(response.data);
                     setError(null);
                 })
                 .catch((err) => {

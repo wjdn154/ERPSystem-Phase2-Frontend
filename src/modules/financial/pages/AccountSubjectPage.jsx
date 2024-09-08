@@ -63,7 +63,7 @@ const AccountSubjectPage = ({ initialData }) => {
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     {/* 계정과목 리스트 영역 */}
-                    <Grid item xs={12} md={5} sx={{ minWidth: '600px' }}>
+                    <Grid item xs={12} md={5} sx={{ minWidth: '600px !important', maxWidth: '800px !important' }}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <AccountSubjectListSection
@@ -77,7 +77,7 @@ const AccountSubjectPage = ({ initialData }) => {
                         </Grow>
                     </Grid>
                     {/* 계정과목 상세 영역 */}
-                    <Grid item xs={12} md={6} sx={{ minWidth: '500px' }}>
+                    <Grid item xs={12} md={6} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
                         <Grow in={showDetail} timeout={200} key={accountSubjectDetail?.code}>
                             <div>
                                 {accountSubjectDetail && (

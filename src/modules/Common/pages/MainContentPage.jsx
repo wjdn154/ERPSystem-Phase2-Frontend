@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, Box } from '@mui/material';
-import MainContentHook from '../hooks/MainContentHook.jsx';
+import MainContentHook from '../components/hooks/MainContentHook.jsx';
 import AntdSkeleton from "../components/MainContent/AntdSkeleton.jsx";
 
 import AccountSubjectPage from "../../financial/pages/AccountSubjectPage.jsx";

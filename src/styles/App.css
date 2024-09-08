@@ -115,7 +115,7 @@
 /* Form 영역 시작 */
 
 input.ant-input[readonly] {
-  background-color: #f6f6f6 !important;
+  background-color: #FAFAFA !important;
   pointer-events: none;
 }
 
