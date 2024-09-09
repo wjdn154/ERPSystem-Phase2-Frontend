@@ -21,7 +21,6 @@ const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
 
 const AppContent = () => {
-
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -53,47 +52,55 @@ const AppContent = () => {
     };
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Headers />
+        <Routes>
+            {/* 로그인 페이지는 전체화면으로 렌더링 */}
+            <Route path="/login" element={<LoginPage />} />
 
-            <Layout>
-                <Sider className="custom-sidebar">
-                    <Sidebar />
-                </Sider>
+            {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
+            <Route
+                path="/*"
+                element={
+                    <Layout style={{ minHeight: '100vh' }}>
+                        <Headers />
+                        <Layout>
+                            <Sider className="custom-sidebar">
+                                <Sidebar />
+                            </Sider>
 
-                <Content style={{ transition: 'margin-left 0.3s ease' }}>
-                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
-                        <ContentWrapper>
-                            <Routes>
-                                <Route path="/login" element={<LoginPage />} />
+                            <Content style={{ transition: 'margin-left 0.3s ease' }}>
+                                <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
+                                    <ContentWrapper>
+                                        <Routes>
+                                            <Route
+                                                path="/"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <MainContentPage />
+                                                    </ProtectedRoute>
+                                                }
+                                            />
 
-                                <Route
-                                    path="/"
-                                    element={
-                                        <ProtectedRoute>
-                                            <MainContentPage />
-                                        </ProtectedRoute>
-                                    }
-                                />
-
-                                {/* 동적으로 라우트들을 렌더링 */}
-                                {renderRoutes().map((route) => (
-                                    <Route
-                                        key={route.key}
-                                        path={route.props.path}
-                                        element={
-                                            <ProtectedRoute>
-                                                {route.props.element}
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                ))}
-                            </Routes>
-                        </ContentWrapper>
-                    </Box>
-                </Content>
-            </Layout>
-        </Layout>
+                                            {/* 동적으로 라우트들을 렌더링 */}
+                                            {renderRoutes().map((route) => (
+                                                <Route
+                                                    key={route.key}
+                                                    path={route.props.path}
+                                                    element={
+                                                        <ProtectedRoute>
+                                                            {route.props.element}
+                                                        </ProtectedRoute>
+                                                    }
+                                                />
+                                            ))}
+                                        </Routes>
+                                    </ContentWrapper>
+                                </Box>
+                            </Content>
+                        </Layout>
+                    </Layout>
+                }
+            />
+        </Routes>
     );
 };
 
