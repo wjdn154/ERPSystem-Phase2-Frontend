@@ -18,17 +18,7 @@ import error from "eslint-plugin-react/lib/util/error.js";
 export const fetchProductList = async () => {
     try {
         const response = await axios.get('/api/product/list');
-        return response.data.map((product) => ({
-            code: product.code,
-            name: product.name,
-            productGroupName: product.productGroupName,
-            standard: product.standard,
-            unit: product.unit,
-            purchasePrice: product.purchasePrice,
-            salesPrice: product.salesPrice,
-            productType: product.productType,
-            productionRoutingName: product.productionRoutingName,
-        }));
+        return response.data;
     } catch (error) {
         console.error('Error fetching product list:', error);
         throw error;

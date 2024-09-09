@@ -26,7 +26,7 @@ const NewProductModal = ({ open, onClose, onSave, isSaving, groupList, routingLi
     const handleProductGroupChange = (value) => {
         setNewProductDetail({
             ...newProductDetail,
-            productGroupId: Number(value),  // ID(Long) 값 저장
+            productGroupId: value ? Number(value) : "",  // ID(Long) 값 저장
         });
     };
 
@@ -34,7 +34,7 @@ const NewProductModal = ({ open, onClose, onSave, isSaving, groupList, routingLi
     const handleProductionRoutingChange = (value) => {
         setNewProductDetail({
             ...newProductDetail,
-            productionRoutingId: Number(value),  // ID(Long) 값 저장
+            productionRoutingId: value ? Number(value) : "",  // ID(Long) 값 저장
         });
     };
 
@@ -71,6 +71,10 @@ const NewProductModal = ({ open, onClose, onSave, isSaving, groupList, routingLi
                 <NewProductDetailSection
                     productDetail={newProductDetail}  // 기본값 빈 객체 보장
                     handleInputChange={handleInputChange}
+                    handleProductGroupChange={handleProductGroupChange}
+                    handleProductionRoutingChange={handleProductionRoutingChange}
+                    groupList={groupList}  // 그룹 데이터 전달
+                    routingList={routingList}  // 라우팅 데이터 전달
                 />
             </Modal>
         </div>

@@ -24,8 +24,8 @@ const NewProductDetailSection = ({ productDetail, handleInputChange }) => {
                 <Grid item xs={6}>
                     <TextField
                         label="품목 그룹명"
-                        value={productDetail.productGroupName || ""}  // 기본값으로 빈 문자열 설정
-                        onChange={(e) => handleInputChange("productGroupName", e.target.value)}
+                        value={productDetail.productGroupId || ""}  // 기본값으로 빈 문자열 설정
+                        onChange={(e) => handleInputChange("productGroupId", Number(e.target.value))}
                         fullWidth
                     />
                 </Grid>
@@ -49,7 +49,7 @@ const NewProductDetailSection = ({ productDetail, handleInputChange }) => {
                     <TextField
                         label="입고 단가"
                         value={productDetail.purchasePrice || ""}  // 기본값으로 빈 문자열 설정
-                        onChange={(e) => handleInputChange("purchasePrice", e.target.value)}
+                        onChange={(e) => handleInputChange("purchasePrice", parseFloat(e.target.value))}
                         fullWidth
                     />
                 </Grid>
@@ -57,7 +57,7 @@ const NewProductDetailSection = ({ productDetail, handleInputChange }) => {
                     <TextField
                         label="출고 단가"
                         value={productDetail.salesPrice || ""}  // 기본값으로 빈 문자열 설정
-                        onChange={(e) => handleInputChange("salesPrice", e.target.value)}
+                        onChange={(e) => handleInputChange("salesPrice", parseFloat(e.target.value))}
                         fullWidth
                     />
                 </Grid>
@@ -72,8 +72,8 @@ const NewProductDetailSection = ({ productDetail, handleInputChange }) => {
                 <Grid item xs={6}>
                     <TextField
                         label="생산 라우팅"
-                        value={productDetail.productionRoutingName || ""}  // 기본값으로 빈 문자열 설정
-                        onChange={(e) => handleInputChange("productionRoutingName", e.target.value)}
+                        value={productDetail.productionRoutingId || null}  // 기본값으로 빈 문자열 설정
+                        onChange={(e) => handleInputChange("productionRoutingId", Number(e.target.value))}
                         fullWidth
                     />
                 </Grid>

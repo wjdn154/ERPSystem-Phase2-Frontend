@@ -9,15 +9,19 @@ import { saveProductDetail, updateProductDetail } from "../services/ProductApi.j
 
 const ProductPage = ({ initialData }) => {
     const memoizedData = useMemo(() => initialData, [initialData]);
+
+    // 데이터를 관리하는 상태 (useState로 정의)
+    const [data, setData] = useState(memoizedData);
+
     const {
-        data,
         productDetail,
-        setData,
         setProductDetail,
         handleRowSelection,
+        handleInputChange,
         handleSelectedRow,
         updateProductDetail,
         isSaving,
+        showDetail,
     } = productHook(initialData);
 
     const [isModalVisible, setIsModalVisible] = useState(false);  // 상세 정보 모달 상태
@@ -34,6 +38,7 @@ const ProductPage = ({ initialData }) => {
     };
 
     const handleOpenAddModal = () => {
+        setIsModalVisible(false);
         setIsAddModalVisible(true);
     };
 
@@ -52,7 +57,7 @@ const ProductPage = ({ initialData }) => {
     const handleSaveProductDetail = (updatedProductDetail) => {
         console.log("저장된 데이터:", updatedProductDetail);
         updateProductDetail(updatedProductDetail.id, updatedProductDetail);
-        setIsModalVisible(false);  // 저장 후 상세 정보 모달 닫기
+        handleCloseModal();  // 저장 후 상세 정보 모달 닫기
     };
 
     // 새로운 품목 등록 함수
@@ -60,8 +65,9 @@ const ProductPage = ({ initialData }) => {
         try {
             console.log(newProductDetail);
             const savedProduct = await saveProductDetail(newProductDetail);  // 새로운 품목 등록 함수 호출
+            console.log("savedProduct" + savedProduct)
             setData((prevData) => [...prevData, savedProduct]);  // 새로 등록된 품목을 리스트에 추가
-            setIsAddModalVisible(false);  // 신규 등록 모달 닫기
+            handleCloseModal();  // 신규 등록 모달 닫기
         } catch (error) {
             console.error('Error saving new product:', error);
         }
