@@ -1,8 +1,9 @@
 import React from 'react';
 import {Box, Grid, Paper, Typography} from '@mui/material';
 import {Table as AntTable} from "antd";
+import {accountSubjectColumn} from "../../utils/AccountSubject/AccountSubjectColumn.jsx";
 
-const AccountSubjectListSection = ({ columns, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
+const AccountSubjectListSection = ({ accountSubjectColumn, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
     if (!data) {
         return null;
     }
@@ -12,9 +13,9 @@ const AccountSubjectListSection = ({ columns, data, handleRowSelection, handleSe
             <Typography variant="h6" sx={{ padding: '20px' }} >계정과목 목록</Typography>
             <AntTable
                 style={{ padding: '20px' }}
-                columns={columns}
+                columns={accountSubjectColumn}
                 dataSource={data.accountSubjects}
-                pagination={{ pageSize: 15, position: ['bottomRight'], showSizeChanger: false }}
+                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                 rowSelection={handleRowSelection}
                 size="small"
                 rowKey="id"

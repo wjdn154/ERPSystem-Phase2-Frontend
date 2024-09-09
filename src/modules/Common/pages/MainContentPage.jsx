@@ -1,15 +1,18 @@
 import React from 'react';
 import { Typography, Box } from '@mui/material';
-import MainContentHook from '../hooks/MainContentHook.jsx';
+import MainContentHook from '../components/hooks/MainContentHook.jsx';
 import AntdSkeleton from "../components/MainContent/AntdSkeleton.jsx";
 
-// 필요한 컴포넌트를 모두 임포트하여 객체로 묶음
 import AccountSubjectPage from "../../financial/pages/AccountSubjectPage.jsx";
-import EquipmentDataPage from "../../production/pages/EquipmentDataPage.jsx";
-import MaintenanceHistoryPage from "../../production/pages/MaintenanceHistoryPage.jsx";
+import EquipmentDataPage from "../../production/pages/resourceData/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../../production/pages/resourceData/MaintenanceHistoryPage.jsx";
 import WarehouseListPage from "../../logistics/pages/WarehouseListPage.jsx";
 import ClientRegistrationPage from "../../financial/pages/ClientRegistrationPage.jsx";
 import ProductPage from "../../logistics/pages/ProductPage.jsx";
+import EmployeeDataPage from "../../hr/pages/EmployeeDataPage.jsx";
+import UsersDataPage from "../../hr/pages/UsersDataPage.jsx";
+import DepartmentDataPage from "../../hr/pages/DepartmentDataPage.jsx";
+import WorkcenterPage from "../../production/pages/Workcenter/WorkcenterPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
@@ -18,7 +21,11 @@ const componentsMap = {
     MaintenanceHistoryPage,
     WarehouseListPage,
     ClientRegistrationPage,
-    ProductPage
+    ProductPage,
+    EmployeeDataPage,
+    UsersDataPage,
+    DepartmentDataPage,
+    WorkcenterPage
     // 필요한 경우 다른 컴포넌트도 여기에 추가
 };
 
@@ -35,6 +42,10 @@ function MainContentPage({ selectedSubSubMenu }) {
 
         // 컴포넌트 이름을 통해 실제 컴포넌트를 가져옴
         const ComponentToRender = componentsMap[selectedSubSubMenu.component];
+
+        if (!selectedSubSubMenu.apiPath) {
+            return ComponentToRender ? <ComponentToRender /> : <Typography color="error">컴포넌트를 찾을 수 없습니다.</Typography>;
+        }
 
         if (loading) return <AntdSkeleton variant="rectangular" style={{ height: '90vh' }} />;
         // return <AntdSkeleton variant="rectangular" style={{ height: '90vh' }} />;
