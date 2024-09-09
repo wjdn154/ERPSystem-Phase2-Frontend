@@ -14,7 +14,8 @@ const EquipmentDataDetailSection = ({
                                         showModal,
                                         handleUpdateOk,
                                         handleUpdateCancel,
-                                        isUpdateModalVisible
+                                        isUpdateModalVisible,
+                                        handleCostInput
                                     }) => (
     <Paper elevation={3} sx={{p: 2}}>
         <Typography variant="h6" marginBottom={'20px'}>설비 상세 정보</Typography>
@@ -30,7 +31,7 @@ const EquipmentDataDetailSection = ({
                                 <Input value={equipmentDataDetail.factoryName} style={{flex: 1}} onChange={(e) => handleInputChange(e, 'factoryName')} readOnly/>
                             </div>
                             <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"설비 번호"} style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}} readOnly/>
+                                <Input value={"설비 번호"} style={{marginRight: '10px', marginTop: '20px', flex: 0.29, backgroundColor: '#f6a6a6'}} readOnly/>
                                 <Input value={equipmentDataDetail.equipmentNum} style={{marginTop: '20px', flex: 1, backgroundColor:'#F5F5F5'}} onChange={(e) => handleInputChange(e, 'equipmentNum')} readOnly/>
                             </div>
                             <div style={{display: 'flex', alignItems: 'center'}}>
@@ -89,8 +90,8 @@ const EquipmentDataDetailSection = ({
                        onChange={(e) => handleInputChange(e, 'factoryCode')}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"설비 번호"} style={{marginRight: '10px', marginTop: '20px', flex: 0.27, backgroundColor: '#f6a6a6'}} readOnly/>
-                <Input value={equipmentDataDetail.equipmentNum} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e, 'equipmentNum')}/>
+                <Input value={"설비 번호"} style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}} readOnly/>
+                <Input value={equipmentDataDetail.equipmentNum} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e, 'equipmentNum')} readOnly/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"설비 명"}
@@ -101,7 +102,7 @@ const EquipmentDataDetailSection = ({
                 <Input value={equipmentDataDetail.modelName} style={{marginTop: '20px', flex: 1}} onChange={(e) => handleInputChange(e, 'modelName')}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"유형"} style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
+                <Input value={"설비 유형"} style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
                     <Select value={equipmentDataDetail.equipmentType} onChange={(value) => handleInputChange({target: {value}}, 'equipmentType')}
                         style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
                     >
@@ -116,17 +117,17 @@ const EquipmentDataDetailSection = ({
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"구매 날짜"} style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
                 <DatePicker
-                    value={equipmentDataDetail.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
+                    value={equipmentDataDetail?.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
                     style={{ marginRight: '30px', marginTop: '20px', flex: 1 }}
                     onChange={(date, dateString) => handleInputChange({ target: { value: dateString } }, 'purchaseDate')}
                 />
                 <Input value={"설치날짜"}
                        style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
                 <DatePicker
-                    value={equipmentDataDetail.installDate ? moment(equipmentDataDetail.installDate, 'YYYY-MM-DD') : null}
+                    value={equipmentDataDetail?.installDate ? moment(equipmentDataDetail.installDate, 'YYYY-MM-DD') : null}
                     onChange={(date, dateString) => handleInputChange({ target: { value: dateString } }, 'installDate')}
-                    style={{ width: '100%',marginTop: '20px', flex: 1}} // Input 필드와 동일한 너비로 설정
-                />
+                    style={{ width: '100%',marginTop: '20px', flex: 1}}
+                    />
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"가동 상태"}
@@ -145,7 +146,8 @@ const EquipmentDataDetailSection = ({
                 <Input value={"구매 비용"}
                        style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
                 <Input value={equipmentDataDetail.cost} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'cost')}/>
+                       onChange={(e) => handleInputChange(e, 'cost')}
+                       onKeyPress={handleCostInput}/>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <Input value={"설비 이미지"}

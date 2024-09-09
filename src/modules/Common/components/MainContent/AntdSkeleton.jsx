@@ -16,7 +16,6 @@ function AntdSkeleton() {
             style={{
                 width: '100%', // 카드의 너비 설정
                 height: '30%', // 카드의 높이 설정
-                backgroundColor: '#0E1B25',
                 padding: '24px', // 카드 내의 여백 설정
             }}
         />
@@ -30,7 +29,6 @@ function AntdSkeleton() {
             style={{
                 width: '100%', // 카드의 너비 설정
                 height: '30%', // 카드의 높이 설정
-                backgroundColor: '#0E1B25',
                 padding: '24px', // 카드 내의 여백 설정
             }}
         />
@@ -44,7 +42,6 @@ function AntdSkeleton() {
                 style={{
                     width: '100%', // 카드의 너비 설정
                     height: '30%', // 카드의 높이 설정
-                    backgroundColor: '#0E1B25',
                     padding: '24px', // 카드 내의 여백 설정
                 }}
             />
