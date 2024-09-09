@@ -38,7 +38,7 @@ export const cashMemoColumn = (
     if (accountSubjectDetail.modificationType) {
         columns.push({
             title:
-                <Button type="primary" onClick={() => handleAddNewMemo('cashMemos')}>
+                <Button style={{ height: '30px' }} type="primary" onClick={() => handleAddNewMemo('cashMemos')}>
                     생성
                 </Button>,
             dataIndex: 'code', // 각 행에서 'code' 데이터 필드를 참조
@@ -46,6 +46,7 @@ export const cashMemoColumn = (
             width: '20%', // 컬럼 너비를 20%로 설정
             render: (_, record) => (
                 <Button
+                    style={{ height: '30px' }}
                     type="danger"
                     onClick={() => handleDeleteMemo('cashMemos', record.code, setAccountSubjectDetail, accountSubjectDetail)} // 삭제 버튼 클릭 시 핸들러 호출
                 >

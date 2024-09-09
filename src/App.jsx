@@ -1,55 +1,111 @@
-// 스타일 및 테마 임포트
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { themeSettings } from './modules/integration/utils/AppUtil.jsx';
-
-// React 및 MUI 컴포넌트 임포트
-import React from 'react';
+import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
+import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie'; // 쿠키 사용
+import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
+import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
+import MainContentPage from './modules/Common/pages/MainContentPage.jsx';
+import Headers from './modules/Common/components/Header/Headers.jsx';
+import { subMenuItems } from './config/menuItems.jsx';
+import { Layout } from "antd";
+import LoginPage from "./modules/Common/pages/LoginPage.jsx";
+import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
+import { jwtDecode } from "jwt-decode";
+import {setAuth} from "./store.jsx";
+import {useDispatch} from "react-redux";
 
-// 메뉴 아이템 관련 데이터 임포트
-import { menuItems, subMenuItems } from './config/menuItems.jsx';
+const { Sider, Content } = Layout;
+const theme = createTheme(themeSettings);
 
-//components
-import ContentWrapper from './modules/integration/components/MainContent/ContentWrapper.jsx';
-import Sidebar from './modules/integration/components/Slidbar/Sidebar.jsx';
-import MainContentPage from './modules/integration/pages/MainContentPage.jsx';
-import Header from './modules/integration/components/Header/Header.jsx';
+const AppContent = () => {
 
-// hooks
-import AppHook from './modules/integration/hooks/AppHook';
+    const dispatch = useDispatch();
 
-// App 컴포넌트 정의
+    useEffect(() => {
+        const token = Cookies.get('jwt');
+        if (token) {
+            dispatch(setAuth(token));  // 쿠키에 있는 토큰으로 Redux 상태 초기화
+        }
+    }, []);
+
+    const renderRoutes = () => {
+        const routes = [];
+
+        // 모든 메뉴와 서브메뉴 항목을 순회하면서 동적 라우트를 설정
+        for (const mainMenu in subMenuItems) {
+            subMenuItems[mainMenu].forEach((subMenu) => {
+                subMenu.items.forEach((subSubItem) => {
+                    routes.push(
+                        <Route
+                            key={subSubItem.url}
+                            path={subSubItem.url}
+                            element={<MainContentPage selectedSubSubMenu={subSubItem} />}
+                        />
+                    );
+                });
+            });
+        }
+
+        return routes;
+    };
+
+    return (
+        <Layout style={{ minHeight: '100vh' }}>
+            <Headers />
+
+            <Layout>
+                <Sider className="custom-sidebar">
+                    <Sidebar />
+                </Sider>
+
+                <Content style={{ transition: 'margin-left 0.3s ease' }}>
+                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
+                        <ContentWrapper>
+                            <Routes>
+                                <Route path="/login" element={<LoginPage />} />
+
+                                <Route
+                                    path="/"
+                                    element={
+                                        <ProtectedRoute>
+                                            <MainContentPage />
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                {/* 동적으로 라우트들을 렌더링 */}
+                                {renderRoutes().map((route) => (
+                                    <Route
+                                        key={route.key}
+                                        path={route.props.path}
+                                        element={
+                                            <ProtectedRoute>
+                                                {route.props.element}
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                ))}
+                            </Routes>
+                        </ContentWrapper>
+                    </Box>
+                </Content>
+            </Layout>
+        </Layout>
+    );
+};
+
 const App = () => {
-    const { selectedMenu, setSelectedMenu, selectedSubMenu, setSelectedSubMenu, selectedSubSubMenu, setSelectedSubSubMenu } = AppHook();
-
-    const theme = createTheme(themeSettings);
-
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Box sx={{ boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", zIndex: 1000, height: '10vh', position: 'relative' }}>
-                <Header selectedMenu={selectedMenu} selectedSubMenu={selectedSubMenu} selectedSubSubMenu={selectedSubSubMenu} />
-            </Box>
-            <Box sx={{ backgroundColor: '#fff', display: 'flex', width: '100%', height: '90vh' }}>
-                <Sidebar
-                    selectedMenu={selectedMenu} // 현재 선택된 대분류 메뉴 상태
-                    setSelectedMenu={setSelectedMenu} // 대분류 메뉴 선택 상태 업데이트 함수
-                    selectedSubMenu={selectedSubMenu} // 현재 선택된 중분류 메뉴 상태
-                    setSelectedSubMenu={setSelectedSubMenu} // 중분류 메뉴 선택 상태 업데이트 함수
-                    selectedSubSubMenu={selectedSubSubMenu} // 현재 선택된 소분류 메뉴 상태
-                    setSelectedSubSubMenu={setSelectedSubSubMenu} // 소분류 메뉴 선택 상태 업데이트 함수
-                    menuItems={menuItems} // 대분류 메뉴 항목 데이터
-                    subMenuItems={subMenuItems} // 중분류 및 소분류 메뉴 항목 데이터
-                />
-                <Box sx={{ flexGrow: 1, overflowY: 'auto', height: '90vh', backgroundColor: '#f5f5f5' }}>
-                    <ContentWrapper>
-                        <MainContentPage selectedSubSubMenu={selectedSubSubMenu} />
-                    </ContentWrapper>
-                </Box>
-            </Box>
+            <Router>
+                <AppContent />
+            </Router>
         </ThemeProvider>
     );
-}
+};
 
 export default App;

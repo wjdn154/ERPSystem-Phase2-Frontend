@@ -16,6 +16,8 @@ export const accountSubjectHook = (initialData) => {
     const [accountSubjectDetail, setAccountSubjectDetail] = useState(initialData.accountSubjectDetail);
     const [isFinancialStatementModalVisible, setIsFinancialStatementModalVisible] = useState(false);
     const [isRelationCodeModalVisible, setIsRelationCodeModalVisible] = useState(false);
+    const [isNatureModalVisible, setIsNatureModalVisible] = useState(false);
+    const [activeTabKey, setActiveTabKey] = useState('1'); // tabs state
 
     const memoizedData = useMemo(() => data, [data]);
 
@@ -120,16 +122,19 @@ export const accountSubjectHook = (initialData) => {
     const handlePopupClick = (field) => {
         if (field === "표준재무제표") showModal(field);
         if (field === "관계코드") showModal(field);
+        if (field === "성격") showModal(field);
     };
 
     const showModal = (field) => {
         if (field === "표준재무제표") setIsFinancialStatementModalVisible(true);
         if (field === "관계코드") setIsRelationCodeModalVisible(true);
+        if (field === "성격") setIsNatureModalVisible(true);
     }
 
     const handleClose = (e) => {
         setIsFinancialStatementModalVisible(false);
         setIsRelationCodeModalVisible(false);
+        setIsNatureModalVisible(false);
     };
 
     const selectFinancialStatement = (item) => {
@@ -141,6 +146,18 @@ export const accountSubjectHook = (initialData) => {
             };
         });
     };
+
+    // 성격코드 선택 시 실행되는 함수
+    const selectNature = (item) => {
+        setAccountSubjectDetail(prevState => {
+            return {
+                ...prevState,
+                natureCode: item.code,
+                natureName: item.name
+            };
+        });
+    };
+
 
     // 관계코드 선택 시 실행되는 함수
     const selectRelationCode = (item) => {
@@ -179,6 +196,9 @@ export const accountSubjectHook = (initialData) => {
             console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
         }
     }
+    const handleTabChange = (key) => {
+        setActiveTabKey(key);
+    };
 
     return {
         data,
@@ -193,12 +213,16 @@ export const accountSubjectHook = (initialData) => {
         handlePopupClick,
         isFinancialStatementModalVisible,
         isRelationCodeModalVisible,
+        isNatureModalVisible,
         showModal,
         handleClose,
         selectFinancialStatement,
         selectRelationCode,
+        selectNature,
         handleSave,
         showDetail,
         deleteRelationCode,
+        handleTabChange,
+        activeTabKey,
     };
 };
