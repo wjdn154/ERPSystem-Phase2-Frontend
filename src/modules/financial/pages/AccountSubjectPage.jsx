@@ -47,9 +47,9 @@ const AccountSubjectPage = ({ initialData }) => {
                         description={(
                             <Typography>
                                 계정과목 및 적요 등록 페이지는 재무 관리 시스템에서{' '}
-                                <span style={{ color: '#00C1D8' }}>계정과목과 적요</span>
-                                (거래의 내역이나 설명)를 <span style={{ color: '#00C1D8' }}>관리하고 등록</span>하는 중요한 기능을 제공하는 페이지임.
-                                <br />
+                                <span>계정과목과 적요</span>
+                                (거래의 내역이나 설명)를 <span>관리하고 등록</span>하는 중요한 기능을 제공하는 페이지임.
+                                <br/>
                                 이 페이지는 기업의 재무 데이터를 정확하게 기록하고 관리하는 데 필수적인 역할을 함.
                             </Typography>
                         )}
@@ -62,8 +62,22 @@ const AccountSubjectPage = ({ initialData }) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    {/* 계정과목 리스트 영역 */}
+                    <Grid item xs={12} md={5} sx={{ minWidth: '600px !important', maxWidth: '800px !important' }}>
+                        <Grow in={true} timeout={200}>
+                            <div>
+                                <AccountSubjectListSection
+                                    accountSubjectColumn={accountSubjectColumn}
+                                    data={data}
+                                    handleRowSelection={handleRowSelection}
+                                    handleSelectedRow={handleSelectedRow}
+                                    rowClassName={getRowClassName}
+                                />
+                            </div>
+                        </Grow>
+                    </Grid>
                     {/* 계정과목 상세 영역 */}
-                    <Grid item xs={12} md={4} sx={{ minWidth: '500px' }}>
+                    <Grid item xs={12} md={6} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
                         <Grow in={showDetail} timeout={200} key={accountSubjectDetail?.code}>
                             <div>
                                 {accountSubjectDetail && (
@@ -87,20 +101,6 @@ const AccountSubjectPage = ({ initialData }) => {
                                         deleteRelationCode={deleteRelationCode}
                                     />
                                 )}
-                            </div>
-                        </Grow>
-                    </Grid>
-                    {/* 계정과목 리스트 영역 */}
-                    <Grid item xs={12} md={3} sx={{ minWidth: '600px' }}>
-                        <Grow in={true} timeout={200}>
-                            <div>
-                                <AccountSubjectListSection
-                                    columns={accountSubjectColumn}
-                                    data={data}
-                                    handleRowSelection={handleRowSelection}
-                                    handleSelectedRow={handleSelectedRow}
-                                    rowClassName={getRowClassName}
-                                />
                             </div>
                         </Grow>
                     </Grid>
