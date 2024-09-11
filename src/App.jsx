@@ -1,60 +1,116 @@
-// 스타일 및 테마 임포트
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { themeSettings } from './modules/integration/utils/AppUtil.jsx';
-
-// React 및 MUI 컴포넌트 임포트
-import React, {useMemo} from 'react';
+import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
+import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-
-// Redux 관련 임포트
-import { useSelector } from 'react-redux';
-
-// components
-import ContentWrapper from './modules/integration/components/MainContent/ContentWrapper.jsx';
-import Sidebar from './modules/integration/components/Slidbar/Sidebar.jsx';
-import MainContentPage from './modules/integration/pages/MainContentPage.jsx';
-import Headers from './modules/integration/components/Header/Headers.jsx';
-
-// Antd 컴포넌트 임포트
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie'; // 쿠키 사용
+import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
+import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
+import MainContentPage from './modules/Common/pages/MainContentPage.jsx';
+import Headers from './modules/Common/components/Header/Headers.jsx';
+import { subMenuItems } from './config/menuItems.jsx';
 import { Layout } from "antd";
+import LoginPage from "./modules/Common/pages/LoginPage.jsx";
+import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
+import { jwtDecode } from "jwt-decode";
+import {setAuth} from "./store.jsx";
+import {useDispatch} from "react-redux";
 
 const { Sider, Content } = Layout;
-
-// 테마 생성
 const theme = createTheme(themeSettings);
 
-// App 컴포넌트 정의
-const App = () => {
-    // Redux에서 상태 가져오기
-    const selectedSubSubMenu = useSelector((state) => state.menu.selectedSubSubMenu);
-    const memoizedSubSubMenu = useMemo(() => selectedSubSubMenu, [selectedSubSubMenu]);
+const AppContent = () => {
+    const dispatch = useDispatch();
 
+    useEffect(() => {
+        const token = Cookies.get('jwt');
+        if (token) {
+            dispatch(setAuth(token));  // 쿠키에 있는 토큰으로 Redux 상태 초기화
+        }
+    }, []);
+
+    const renderRoutes = () => {
+        const routes = [];
+
+        // 모든 메뉴와 서브메뉴 항목을 순회하면서 동적 라우트를 설정
+        for (const mainMenu in subMenuItems) {
+            subMenuItems[mainMenu].forEach((subMenu) => {
+                subMenu.items.forEach((subSubItem) => {
+                    routes.push(
+                        <Route
+                            key={subSubItem.url}
+                            path={subSubItem.url}
+                            element={<MainContentPage selectedSubSubMenu={subSubItem} />}
+                        />
+                    );
+                });
+            });
+        }
+
+        return routes;
+    };
+
+    return (
+        <Routes>
+            {/* 로그인 페이지는 전체화면으로 렌더링 */}
+            <Route path="/login" element={<LoginPage />} />
+
+            {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
+            <Route
+                path="/*"
+                element={
+                    <Layout style={{ minHeight: '100vh' }}>
+                        <Headers />
+                        <Layout>
+                            <Sider className="custom-sidebar">
+                                <Sidebar />
+                            </Sider>
+
+                            <Content style={{ transition: 'margin-left 0.3s ease' }}>
+                                <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
+                                    <ContentWrapper>
+                                        <Routes>
+                                            <Route
+                                                path="/"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <MainContentPage />
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+
+                                            {/* 동적으로 라우트들을 렌더링 */}
+                                            {renderRoutes().map((route) => (
+                                                <Route
+                                                    key={route.key}
+                                                    path={route.props.path}
+                                                    element={
+                                                        <ProtectedRoute>
+                                                            {route.props.element}
+                                                        </ProtectedRoute>
+                                                    }
+                                                />
+                                            ))}
+                                        </Routes>
+                                    </ContentWrapper>
+                                </Box>
+                            </Content>
+                        </Layout>
+                    </Layout>
+                }
+            />
+        </Routes>
+    );
+};
+
+const App = () => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Layout style={{ minHeight: '100vh' }}>
-                {/* 헤더 영역 */}
-                <Headers />
-
-                <Layout>
-                    {/* 사이드바 영역 */}
-                    <Sider className="custom-sidebar">
-                        <Sidebar />
-                    </Sider>
-
-                    {/* 메인 컨텐츠 영역 */}
-                    <Content style={{ transition: 'margin-left 0.3s ease' }}>
-                        <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#0E1B25' }}>
-                        {/*<Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, black, #2C2C2C 40%, #555555 100%)' }}>*/}
-                            <ContentWrapper>
-                                {/* 상태에 따라 MainContentPage에서 직접적으로 컴포넌트 렌더링 */}
-                                <MainContentPage selectedSubSubMenu={memoizedSubSubMenu} />
-                            </ContentWrapper>
-                        </Box>
-                    </Content>
-                </Layout>
-            </Layout>
+            <Router>
+                <AppContent />
+            </Router>
         </ThemeProvider>
     );
 };
