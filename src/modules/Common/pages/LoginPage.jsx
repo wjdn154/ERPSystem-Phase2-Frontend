@@ -15,13 +15,14 @@ import background3 from "../../../assets/img/background3.png";
 const LoginPage = () => {
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [companyId, setCompanyId] = useState('2');
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(COMMON_API.LOGIN_API, { userName, password });
+            const response = await axios.post(COMMON_API.LOGIN_API, { companyId, userName, password });
             const token = response.data;
 
             console.log("로그인 성공", jwtDecode(token));
@@ -39,7 +40,7 @@ const LoginPage = () => {
             {/* 왼쪽 부분 */}
             <Grid item xs={12} md={4} style={{ backgroundImage: 'url(' + background3 + ')', backgroundSize: 'cover', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Box p={6} >
-                    <Typography sx={{ fontSize: '35px' }}>Think Global, Act Local ERP 솔루션<br/>
+                    <Typography sx={{ fontSize: '30px' }}>Think Global, Act Local ERP 솔루션<br/>
                         지역사회를 위한 지속 가능한 성장
                     </Typography>
                     <Typography>
