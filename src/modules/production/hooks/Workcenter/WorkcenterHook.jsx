@@ -11,12 +11,19 @@ import { useSearch } from '../../hooks/useSearch.jsx';
 import { Modal } from "antd";
 
 export const useWorkcenter = (initialData) => {
+    const [activeTabKey, setActiveTabKey] = useState('1');
     const [data, setData] = useState(initialData || []);
     const [workcenter, setWorkcenter] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
     const [isWorkcenterModalVisible, setIsWorkcenterModalVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [activeRate, setActiveRate] = useState(null);
+
+
+    const handleTabChange = (key) => {
+        setActiveTabKey(key);
+    };
+
 
     // useSearch 훅을 사용하여 검색 상태 관리
     const searchFields = ['code', 'name', 'description']; // Workcenter에서 검색할 필드 지정
@@ -179,5 +186,7 @@ export const useWorkcenter = (initialData) => {
         setIsSearchActive,
         setSearchData,
         setActiveRate,
+        handleTabChange,
+        activeTabKey,
     };
 };

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Row, Col } from "antd";
 import { fetchWorkcenters } from "../../services/Workcenter/WorkcenterApi";
+import {Cell, Pie, PieChart, ResponsiveContainer} from "recharts";
+import {Grid} from "@mui/material";
 
 const WorkcenterDashboard = () => {
   const [workcenters, setWorkcenters] = useState([]);
@@ -30,26 +32,54 @@ const WorkcenterDashboard = () => {
     loadWorkcenters();
   }, []);
 
+  const COLORS = ['#cacaca', '#fff']; // 노란 연두 계열 '#eedb99', '#9ce578'
+
+  const data = [
+    { name: '활성화된 작업장', value: activeRate },
+    { name: '비활성화된 작업장', value: 90 - activeRate },
+  ];
+
   return (
       <div style={{ marginBottom: '16px' }}>
-        <Typography.Title level={4} style={{ marginBottom: '16px' }}>
-          작업장 대시보드
-        </Typography.Title>
-        <Row gutter={16}>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Typography.Title level={5}>전체 작업장 수</Typography.Title>
+        <Row gutter={12}>
+          <Col xs={12} sm={6}>
+            <Card className={'purple-card'} style={{height: 150}} >
+              <Typography style={{ fontSize:'25px', fontWeight: 700 }}>전체 작업장 수</Typography>
               <Typography.Title level={2} style={{ color: '#1890ff' }}>
                 {workcenters.length}
               </Typography.Title>
             </Card>
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Typography.Title level={5}>활성화율</Typography.Title>
-              <Typography.Title level={2} style={{ color: '#1890ff' }}>
-                {activeRate.toFixed(2)}%
-              </Typography.Title>
+          <Col xs={12} sm={6}>
+            <Card className={'blue-card'} style={{height: 150}} >
+              <Row gutter={12}>
+                <Col xs={12} sm={12}>
+                  <Typography style={{ fontSize:'25px', fontWeight: 700 }}>활성화율</Typography>
+                  <Typography.Title level={2} style={{ color: '#1890ff' }}>
+                    {activeRate.toFixed(2)}%
+                  </Typography.Title>
+                </Col>
+                <Col xs={12} sm={12} style={{paddingRight: '50px', height: 160}}>
+                  {/*<ResponsiveContainer>*/}
+                  {/*  <PieChart>*/}
+                  {/*    <Pie*/}
+                  {/*        data={data}*/}
+                  {/*        dataKey="value"*/}
+                  {/*        nameKey="name"*/}
+                  {/*        cx="50%"*/}
+                  {/*        cy="50%"*/}
+                  {/*        outerRadius={50}*/}
+                  {/*        fill="#8884d8"*/}
+                  {/*        label*/}
+                  {/*    >*/}
+                  {/*      {data.map((entry, index) => (*/}
+                  {/*          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />*/}
+                  {/*      ))}*/}
+                  {/*    </Pie>*/}
+                  {/*  </PieChart>*/}
+                  {/*</ResponsiveContainer>*/}
+                </Col>
+              </Row>
             </Card>
           </Col>
           {/*

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {PRODUCTION_API} from "../../../config/apiConstants.jsx";
+import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 
 //설비정보 기본 호출 함수
 export const fetchEquipmentData = async () => {
