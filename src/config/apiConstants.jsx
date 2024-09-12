@@ -18,6 +18,9 @@ axios.interceptors.request.use((config) => {
 // 공통
 export const COMMON_API = {
     LOGIN_API: `${API_BASE_URL}/api/hr/auth/login`, // 로그인 API
+    COMPANY_LIST_API: `${API_BASE_URL}/api/financial/company/`, // 회사 목록 조회 API
+    COMPANY_SEARCH_API: `${API_BASE_URL}/api/financial/company/search`, // 회사 검색 API
+    REGISTER_API: `${API_BASE_URL}/api/hr/auth/register`, // 회원가입 API
 };
 
 // 재무회계
