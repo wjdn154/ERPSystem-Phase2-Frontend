@@ -1,6 +1,6 @@
 import React, {useMemo} from "react";
 import {Box, Grid, Grow, Typography} from "@mui/material";
-import {equipmentDataHook} from '../../hooks/resourceData/equipmentDataHook.jsx';
+import {equipmentDataHook} from '../../hooks/resourceData/EquipmentDataHook.jsx';
 import EquipmentDataListSection from "../../components/resourceData/EquipmentDataListSection.jsx";
 import {equipmentDataListColumn} from "../../utils/resourceData/EquipmentDataListColumn.jsx";
 import EquipmentDataDetailSection from "../../components/resourceData/EquipmentDataDetailSection.jsx";

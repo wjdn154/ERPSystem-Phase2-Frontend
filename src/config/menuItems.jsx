@@ -15,7 +15,6 @@ import {
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/resourceData/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/resourceData/MaintenanceHistoryPage.jsx";
-import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
 import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
@@ -238,7 +237,7 @@ export const subMenuItems = {
         {
             text: '자원관리',
             items: [
-                { text: '작업자 관리', component: null, apiPath: null, url: '/production/resource-management/worker-management' },
+                { text: '작업자 관리', component: 'WorkerPage', apiPath: PRODUCTION_API.WORKER_LIST_API, url: '/production/resource-management/worker-management' },
                 { text: '자재 정보 관리', component: null, apiPath: null, url: '/production/resource-management/material-management' },
                 { text: '설비 정보 관리', component: 'EquipmentDataPage', apiPath: PRODUCTION_API.EQUIPMENT_DATA_API, url: '/production/resource-management/equipment-management' },
                 { text: '유지보수 이력 관리', component: 'MaintenanceHistoryPage', apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API, url: '/production/resource-management/maintenance-history' },

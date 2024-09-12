@@ -41,7 +41,7 @@ export const
             key:'maintenanceStatus',
             width: '14%',  // 컬럼 너비 설정
             render: (text) => {
-                return text === true ? '완료' : '작업 중';
+                return text === true ? '완료' : '작업중';
             }
         },
         {
