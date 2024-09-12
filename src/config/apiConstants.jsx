@@ -80,7 +80,7 @@ export const PRODUCTION_API = {
     UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}/`, // 작업장 수정 API
     DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete?code=${code}/`, // 작업장 삭제 API
 
-    PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails`, // 생산공정 목록 조회 API
+    PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails/`, // 생산공정 목록 조회 API
     PROCESS_DETAILS_API: (code) => `${API_BASE_URL}/api/production/processDetails/details/${code}/`, // 생산공정 세부정보 조회 API
     PROCESS_SEARCH_API: (name) => `${API_BASE_URL}/api/production/processDetails/search?name=${name}/`, // 생산공정 이름검색 API
     SAVE_PROCESS_API: `${API_BASE_URL}/api/production/processDetails/create/`, // 새 생산공정 저장 API
@@ -92,4 +92,19 @@ export const PRODUCTION_API = {
     UPDATE_WORKER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/worker/updateWorker/${id}`, //작업자 상세 수정 API
     WORKER_ATTENDANCE_ASSIGNMENT_LIST_API: (id) => `${API_BASE_URL}/api/production/worker/attendance/${id}` //작업자 근태,작업배치 목록 조회 API
 
+    // BOM
+
+    // Routing
+
+    // 생산계획
+
+    // 작업지시
+
+    // 생산실적
+
+    // 품질관리
+
+    // 외주/계약관리
+
+    // 기타 메뉴구조도순으로 정렬
 };

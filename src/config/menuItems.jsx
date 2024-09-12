@@ -227,10 +227,10 @@ export const subMenuItems = {
     ],
     '생산관리': [
         {
-            text: '기초정보관리',
+            text: '기초정보 관리',
             items: [
                 { text: '작업장 관리', component: 'WorkcenterPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter' },
-                { text: "공정세부정보 관리", component: ProcessDetailsPage, apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/basic-data/process-management/details' },
+                { text: "공정세부정보 관리", component: 'ProcessDetailsPage', apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/basic-data/process-management/details' },
                 { text: 'Routing 관리', component: null, apiPath: null, url: '/production/basic-data/process-management/routing' },
                 { text: 'BOM 관리', component: null, apiPath: null, url: '/production/basic-data/bom' },
             ]
@@ -276,12 +276,11 @@ export const subMenuItems = {
         {
             text: '품질 관리',
             items: [
-                { text: '불량군 관리', component: null, apiPath: null, url: '/production/performance-management/defect-group' },
-                { text: '불량 유형 관리', component: null, apiPath: null, url: '/production/performance-management/defect-type' },
-                { text: '품질 검사 관리', component: null, apiPath: null, url: '/production/performance-management/quality-inspection' },
-                { text: 'LOT 관리', component: null, apiPath: null, url: '/production/performance-management/lot-management' },
-                { text: 'Serial No 관리', component: null, apiPath: null, url: '/production/performance-management/serial-management' },
-                { text: '생산품 입고 처리', component: null, apiPath: null, url: '/production/performance-management/goods-receipt' },
+                { text: '불량군/유형 관리', component: null, apiPath: null, url: '/production/quality-control/defect-group-type' },
+                { text: '품질 검사 관리', component: null, apiPath: null, url: '/production/quality-control/quality-inspection' },
+                { text: 'LOT 관리', component: null, apiPath: null, url: '/production/quality-control/lot-management' },
+                { text: 'Serial No. 관리', component: null, apiPath: null, url: '/production/quality-control/serial-management' },
+                { text: '생산품 입고 처리', component: null, apiPath: null, url: '/production/quality-control/goods-receipt' },
             ]
         },
         {
