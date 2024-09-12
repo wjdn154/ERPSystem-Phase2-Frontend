@@ -78,13 +78,13 @@ const MaintenanceHistoryDetailSection = ({
                             </div>
                             <div style={{display: 'flex', alignItems: 'center'}}>
                                 <Input value={"제목"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}} readOnly/>
+                                       style={{marginRight: '10px', marginTop: '20px', flex: 0.29, backgroundColor: '#f6a6a6'}} readOnly/>
                                 <Input value={maintenanceDataDetail.title} style={{marginTop: '20px', flex: 1}}
                                        onChange={(e) => handleInputChange(e, 'title')} readOnly/>
                             </div>
                             <div style={{display: 'flex', alignItems: 'center'}}>
                                 <Input value={"내용"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}} readOnly/>
+                                       style={{marginRight: '10px', marginTop: '20px', flex: 0.29, backgroundColor: '#f6a6a6'}} readOnly/>
                                 <Input value={maintenanceDataDetail.maintenanceDetail}
                                        style={{marginTop: '20px', flex: 1}}
                                        onChange={(e) => handleInputChange(e, 'maintenanceDetail')} readOnly/>
@@ -151,11 +151,10 @@ const MaintenanceHistoryDetailSection = ({
                        readOnly/>
                 <Select
                     value={maintenanceDataDetail?.maintenanceStatus}
-                    onChange={(value) => handleInputChange({target: {value}}, 'maintenanceStatus')}
+                    onChange={(value) => handleInputChange({target: {value:value}}, 'maintenanceStatus')}
                     style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
                 >
                     <Option value={true}>완료</Option>
-
                     <Option value={false}>작업 중</Option>
                 </Select>
                 <Input value={"유지보수 비용"}
