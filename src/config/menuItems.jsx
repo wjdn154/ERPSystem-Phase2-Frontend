@@ -15,7 +15,6 @@ import {
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/resourceData/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/resourceData/MaintenanceHistoryPage.jsx";
-import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
 import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
