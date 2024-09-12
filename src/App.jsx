@@ -16,6 +16,7 @@ import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠�
 import { jwtDecode } from "jwt-decode";
 import {setAuth} from "./store.jsx";
 import {useDispatch} from "react-redux";
+import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
@@ -55,6 +56,7 @@ const AppContent = () => {
         <Routes>
             {/* 로그인 페이지는 전체화면으로 렌더링 */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
             {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
             <Route
