@@ -1,27 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { Box, TextField, Typography, Grid, Paper, Link, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
-import { Button, Alert } from "antd";  // Ant Design의 Alert 컴포넌트 가져오기
+import { Box, TextField, Typography, Grid, Paper, Link, CircularProgress } from "@mui/material";
+import {Alert, Button} from "antd";
 import { COMMON_API } from "../../../config/apiConstants.jsx";
-import { useDispatch } from "react-redux";
-import { setAuth } from "../../../store.jsx";
 import background from "../../../assets/img/background3.png";
-import CompanyRegisterSection from "../../financial/components/Company/CompanyReigterSection.jsx";
 import DebounceSelect from '../components/DebounceSelect'; // DebounceSelect 컴포넌트 import
 
-const LoginPage = () => {
+const Register = () => {
+    const [error, setError] = useState('');  // 에러 메시지를 저장할 상태
+
+    // 하나의 state로 관리
     const [formData, setFormData] = useState({
         userName: '',
         password: '',
+        userNickname: '',
         companyId: null,
     });
     const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [error, setError] = useState('');  // 에러 메시지를 저장할 상태
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     // 초기값 API 호출
     const fetchInitialCompanyOptions = async () => {
@@ -51,39 +49,39 @@ const LoginPage = () => {
         }
     };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    // 입력 필드의 변화에 따른 상태 업데이트
+    // 입력값 업데이트 함수
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevFormData) => ({
             ...prevFormData,
-            [name]: value
+            [name]: value,
         }));
     };
 
-    // 회사 선택 시 상태 업데이트
+    // 회사 선택 시 업데이트
     const handleCompanyChange = (newValue) => {
+        setError(null);
+        console.log(error);
         setFormData((prevFormData) => ({
             ...prevFormData,
             companyId: newValue,
         }));
     };
 
-    const handleLogin = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
-        setError('');  // 로그인 시도 시 에러 메시지 초기화
+        setLoading(true);
         try {
-            const response = await axios.post(COMMON_API.LOGIN_API, formData);
+            console.log(formData);
+            const response = await axios.post(COMMON_API.REGISTER_API, formData);
             const token = response.data;
             Cookies.set('jwt', token, { expires: 1 });
-            dispatch(setAuth(token));
             navigate('/');
         } catch (error) {
-            setError('로그인 실패. 사용자 정보를 확인하세요.');  // 에러 메시지 설정
-            console.error("로그인 실패", error);
+            setError('회원가입 실패. 사용자 정보를 확인하세요.');
+            console.error("회원가입 실패", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -91,7 +89,7 @@ const LoginPage = () => {
         <Grid container style={{ height: '100vh' }}>
             {/* 왼쪽 부분 */}
             <Grid item xs={12} md={4} style={{ backgroundImage: 'url(' + background + ')', backgroundSize: 'cover', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Box p={6} >
+                <Box p={6}>
                     <Typography sx={{ fontSize: '30px' }}>Think Global, Act Local ERP 솔루션<br />
                         지역사회를 위한 지속 가능한 성장
                     </Typography>
@@ -113,23 +111,21 @@ const LoginPage = () => {
                             borderRadius: '8px',
                         }}
                     >
-                        <Typography variant="h4" gutterBottom>로그인</Typography>
+                        <Typography variant="h4" gutterBottom>회원가입</Typography>
                         <Typography variant="body2" gutterBottom color="textSecondary">
-                            이메일과 비밀번호를 입력해주세요.
+                            필요한 정보를 입력해주세요.
                         </Typography>
-
                         {/* 에러가 있을 경우 Alert 표시 */}
                         {error && (
                             <Alert
-                                message="로그인 실패"
+                                message="회원가입 실패"
                                 description={error}
                                 type="error"
                                 showIcon
                                 style={{ marginBottom: '20px' }}
                             />
                         )}
-
-                        <form onSubmit={handleLogin} style={{ marginTop: '20px' }}>
+                        <form onSubmit={handleRegister} style={{ marginTop: '20px' }}>
                             <Box mb={2}>
                                 {loading ? (
                                     <CircularProgress />
@@ -139,27 +135,26 @@ const LoginPage = () => {
                                         placeholder="회사 선택"
                                         fetchInitialOptions={fetchInitialCompanyOptions}  // 초기값 호출 API
                                         fetchSearchOptions={fetchSearchCompanyOptions}    // 검색 API
-                                        onChange={handleCompanyChange}  // 회사 선택 시 상태 업데이트
-                                        style={{ width: '100%', height: '56px', marginBottom: '20px' }}
+                                        onChange={handleCompanyChange}
+                                        style={{ width: '100%', height: '56px' }}
                                     />
                                 )}
                             </Box>
-
-                            {/* 회사 추가 Dialog */}
-                            <Dialog open={open} onClose={handleClose}>
-                                <DialogTitle>새로운 회사 추가</DialogTitle>
-                                <DialogContent>
-                                    <CompanyRegisterSection />
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleClose} color="primary">취소</Button>
-                                </DialogActions>
-                            </Dialog>
-
+                            <Box mb={2}>
+                                <TextField
+                                    label="닉네임"
+                                    name="userNickname"
+                                    value={formData.userNickname}
+                                    variant="outlined"
+                                    onChange={handleInputChange}
+                                    fullWidth
+                                    required
+                                />
+                            </Box>
                             <Box mb={2}>
                                 <TextField
                                     label="Email"
-                                    name="userName"  // name 속성을 이용해 상태를 업데이트
+                                    name="userName"
                                     value={formData.userName}
                                     variant="outlined"
                                     onChange={handleInputChange}
@@ -168,22 +163,9 @@ const LoginPage = () => {
                                 />
                             </Box>
                             <Box mb={2}>
-                                <Link href="#" variant="body2" sx={{
-                                    display: 'flex',
-                                    width: '100%',
-                                    justifyContent: 'flex-end',
-                                    color: 'gray',
-                                    textDecoration: 'none',
-                                    transition: 'color 0.3s ease',
-                                    '&:hover': {
-                                        color: '#000',
-                                        textDecoration: 'none'
-                                    }}}>
-                                    암호를 잊으셨나요?
-                                </Link>
                                 <TextField
                                     label="비밀번호"
-                                    name="password"  // name 속성을 이용해 상태를 업데이트
+                                    name="password"
                                     type="password"
                                     value={formData.password}
                                     variant="outlined"
@@ -194,10 +176,10 @@ const LoginPage = () => {
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Typography variant="body2" mt={2}>
-                                    계정이 없으신가요? <Link href="/register">회원가입</Link>
+                                    계정이 있으신가요? <Link href="/login">로그인</Link>
                                 </Typography>
                                 <Button htmlType="submit" type="primary" style={{ width: '100px', height: '45px', fontSize: '1rem' }} >
-                                    로그인
+                                    회원가입
                                 </Button>
                             </Box>
                         </form>
@@ -208,4 +190,4 @@ const LoginPage = () => {
     );
 };
 
-export default LoginPage;
+export default Register;
