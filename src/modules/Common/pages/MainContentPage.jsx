@@ -13,6 +13,7 @@ import UsersDataPage from "../../hr/pages/UsersDataPage.jsx";
 import DepartmentDataPage from "../../hr/pages/DepartmentDataPage.jsx";
 import WorkcenterPage from "../../production/pages/Workcenter/WorkcenterPage.jsx";
 import WorkerPage from "../../production/pages/resourceData/WorkerPage.jsx";
+import ProcessDetailsPage from "../../production/pages/ProcessDetails/ProcessDetailsPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
@@ -24,6 +25,7 @@ const componentsMap = {
     UsersDataPage,
     DepartmentDataPage,
     WorkcenterPage,
+    ProcessDetailsPage,
     WorkerPage
     // 필요한 경우 다른 컴포넌트도 여기에 추가
 };

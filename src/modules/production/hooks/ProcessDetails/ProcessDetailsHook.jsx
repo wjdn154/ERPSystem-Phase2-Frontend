@@ -25,11 +25,13 @@ export const useProcessDetails = (initialData) => {
     useEffect(() => {
         const loadProcessDetails = async () => {
             try {
-                console.log("초기 데이터 로드 시도"); // 로그 추가
+                console.log("초기 데이터 로드 시도");
                 if (!initialData || initialData.length === 0) {
                     const fetchedData = await fetchProcessDetails();
-                    console.log("로드된 데이터:", fetchedData); // 로그 추가
+                    console.log("로드된 데이터:", fetchedData);
                     setData(fetchedData);
+                } else {
+                    console.log("이미 제공된 initialData:", initialData);
                 }
             } catch (error) {
                 console.error("데이터 로드 중 오류 발생:", error);

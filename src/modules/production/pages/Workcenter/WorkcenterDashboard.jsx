@@ -9,7 +9,6 @@ const WorkcenterDashboard = () => {
   const [activeRate, setActiveRate] = useState(0);
 
   useEffect(() => {
-    console.log("WorkcenterDashboard 컴포넌트 시작");
 
     const loadWorkcenters = async () => {
       try {
