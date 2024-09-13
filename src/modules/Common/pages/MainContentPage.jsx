@@ -55,7 +55,7 @@ function MainContentPage({ selectedSubSubMenu }) {
             return ComponentToRender ? <ComponentToRender /> :
                 <Result
                     status="warning"
-                    title="컴포넌트를 찾을 수 없습니다."
+                    title="API 경로를 찾을 수 없습니다."
                     extra={
                         <Button type="primary" key="console">
                             Go Console
