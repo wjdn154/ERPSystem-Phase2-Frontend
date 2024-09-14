@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Box, TextField, Typography, Grid, Paper, Link, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
-import {Button, Alert, notification} from "antd";  // Ant Design의 Alert 및 notification 컴포넌트 가져오기
+import {Button, Alert, notification} from "antd";
 import { COMMON_API } from "../../../config/apiConstants.jsx";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../../../config/redux/authSlice.jsx";
+import { setAuth } from "../utils/redux/authSlice.jsx";
 import background from "../../../assets/img/background3.png";
 import CompanyRegisterSection from "../../financial/components/Company/CompanyReigterSection.jsx";
 import DebounceSelect from '../components/DebounceSelect';
+import {useNotificationContext} from "../utils/NotificationContext.jsx";
 
-const LoginPage = ({handleLoginNotification}) => {
-    const [api, contextHolder] = notification.useNotification();
+const LoginPage = () => {
+    const notify = useNotificationContext();
+    const location = useLocation();
+
     const [formData, setFormData] = useState({
         userName: '',
         password: '',
@@ -24,14 +27,12 @@ const LoginPage = ({handleLoginNotification}) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    // 로그인 성공 시 알림을 표시하는 함수
-    const handleRegisterNotification = () => {
-        api.info({
-            message: '로그인 성공',
-            description: '환영합니다! 메인 페이지로 이동했습니다.',
-            placement: 'top',
-        });
-    };
+    useEffect(() => {
+        // 회원가입 후 넘어온 경우 알림 표시
+        if (location.state?.registered) {
+            notify('success', '회원가입 완료', '성공적으로 회원가입 되었습니다. 이제 로그인하세요!', 'top');
+        }
+    }, [location.state, notify]);
 
     // 초기값 API 호출
     const fetchInitialCompanyOptions = async () => {
@@ -90,8 +91,7 @@ const LoginPage = ({handleLoginNotification}) => {
             const token = response.data;
             Cookies.set('jwt', token, { expires: 1 });
             dispatch(setAuth(token));
-            handleLoginNotification();  // 로그인 성공 시 콜백 호출
-            navigate('/');
+            navigate('/', { state: { login: true } });
         } catch (error) {
             setError('로그인 실패. 사용자 정보를 확인하세요.');
             console.error("로그인 실패", error);
@@ -180,7 +180,22 @@ const LoginPage = ({handleLoginNotification}) => {
                                     />
                                 </Box>
                                 <Box mb={2}>
-                                    <Link href="#" variant="body2" sx={{
+                                    <Link href="#" onClick={() => {
+                                        notification.error({
+                                            message: '미구현 기능',
+                                            description: (
+                                                <>
+                                                이 기능은 현재 준비 중입니다.<br />
+                                                추가 정보나 업데이트는{' '}
+                                                <a href="https://github.com/wjdn154/ERPSystem" target="_blank" rel="noopener noreferrer">
+                                                    여기를 클릭
+                                                </a>
+                                                에서 확인하실 수 있습니다.
+                                            </>
+                                            ),
+                                            placement: 'top',
+                                        });
+                                    }} variant="body2" sx={{
                                         display: 'flex',
                                         width: '100%',
                                         justifyContent: 'flex-end',
