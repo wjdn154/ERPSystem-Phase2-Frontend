@@ -129,6 +129,12 @@ input.ant-input[readonly] {
   cursor: pointer !important;
 }
 
+.ant-select-arrow  > span > svg{
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 5px;
+}
+
 .ant-select-selector, .ant-select {
 }
 
