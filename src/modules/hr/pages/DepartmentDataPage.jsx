@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import {departmentDataHook} from "../hooks/DepartmentDataHook.jsx"
 import DepartmentDataListSection from "../components/Department/DepartmentDataListSection.jsx"
+import DepartmentDataDetailSectoin from "../components/Department/DepartmentDataDetailSectoin.jsx";
 import {departmentDataListColumn} from "../utils/DepartmentData/DepartmentDataListColumn.jsx"
 
 const DepartmentDataPage = ({initialData}) => {

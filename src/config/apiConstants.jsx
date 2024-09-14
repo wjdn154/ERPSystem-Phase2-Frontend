@@ -49,6 +49,7 @@ export const USERS_API = {
 // 인사관리 - 부서
 export const DEPARTMENT_API = {
     DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/all`,
+    DEPARTMENT_DATA_DETAIL_API:  (id) =>  `${API_BASE_URL}/api/hr/department/${id}`,
 }
 // 물류관리
 export const LOGISTICS_API = {

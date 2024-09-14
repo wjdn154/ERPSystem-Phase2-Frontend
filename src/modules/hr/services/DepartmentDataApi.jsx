@@ -12,4 +12,12 @@ export const fetchDepartmentData = async () => {
     }
 }
 
-export const fetchDepartmentDataDetail = async (id) => {}
+export const fetchDepartmentDataDetail = async (id) => {
+    try{
+        const response = await axios.get(DEPARTMENT_API.DEPARTMENT_DATA_DETAIL_API);
+        return response.data;
+    } catch(error){
+        console.error("부서 상세정보를 가져오는 중 오류 발생 : " + error)
+        throw error;
+    }
+}

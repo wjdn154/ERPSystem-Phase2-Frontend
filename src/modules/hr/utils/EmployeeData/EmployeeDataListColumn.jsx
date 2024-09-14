@@ -21,7 +21,7 @@ export const employeeDataListColumn= (showDetailModal)  => [
         dataIndex: 'fullName', // 데이터 인덱스는 생략 가능
         key: 'fullName',
         width: '10%', // 컬럼 너비 설정
-        render: (text, record) => `${record.firstName}${record.lastName}`, // 성과 이름을 합침
+        render: (text, record) => `${record.lastName}${record.firstName}`, // 성과 이름을 합침
     },
     // {
     //     title: <span>성</span>, // 컬럼 제목
