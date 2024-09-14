@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
 import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
 import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
 import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
@@ -13,22 +13,33 @@ import { subMenuItems } from './config/menuItems.jsx';
 import { Layout } from "antd";
 import LoginPage from "./modules/Common/pages/LoginPage.jsx";
 import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
-import { jwtDecode } from "jwt-decode";
-import {setAuth} from "./store.jsx";
-import {useDispatch} from "react-redux";
+import { setAuth } from "./config/redux/authSlice.jsx";
+import { useDispatch } from "react-redux";
+import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
+import { notification } from 'antd'; // Ant Design notification 사용
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
 
 const AppContent = () => {
     const dispatch = useDispatch();
+    const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
         const token = Cookies.get('jwt');
         if (token) {
             dispatch(setAuth(token));  // 쿠키에 있는 토큰으로 Redux 상태 초기화
         }
-    }, []);
+    }, [dispatch]);
+
+    // 로그인 성공 시 알림을 표시하는 함수
+    const handleLoginNotification = () => {
+        api.info({
+            message: '로그인 성공',
+            description: '환영합니다! 메인 페이지로 이동했습니다.',
+            placement: 'top',
+        });
+    };
 
     const renderRoutes = () => {
         const routes = [];
@@ -52,55 +63,59 @@ const AppContent = () => {
     };
 
     return (
-        <Routes>
-            {/* 로그인 페이지는 전체화면으로 렌더링 */}
-            <Route path="/login" element={<LoginPage />} />
+        <>
+            {contextHolder}
+            <Routes>
+                {/* 로그인 페이지는 전체화면으로 렌더링 */}
+                <Route path="/login" element={<LoginPage handleLoginNotification={handleLoginNotification} />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-            {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
-            <Route
-                path="/*"
-                element={
-                    <Layout style={{ minHeight: '100vh' }}>
-                        <Headers />
-                        <Layout>
-                            <Sider className="custom-sidebar">
-                                <Sidebar />
-                            </Sider>
+                {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
+                <Route
+                    path="/*"
+                    element={
+                        <Layout style={{ minHeight: '100vh' }}>
+                            <Headers />
+                            <Layout>
+                                <Sider className="custom-sidebar">
+                                    <Sidebar />
+                                </Sider>
 
-                            <Content style={{ transition: 'margin-left 0.3s ease' }}>
-                                <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
-                                    <ContentWrapper>
-                                        <Routes>
-                                            <Route
-                                                path="/"
-                                                element={
-                                                    <ProtectedRoute>
-                                                        <MainContentPage />
-                                                    </ProtectedRoute>
-                                                }
-                                            />
-
-                                            {/* 동적으로 라우트들을 렌더링 */}
-                                            {renderRoutes().map((route) => (
+                                <Content style={{ transition: 'margin-left 0.3s ease' }}>
+                                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
+                                        <ContentWrapper>
+                                            <Routes>
                                                 <Route
-                                                    key={route.key}
-                                                    path={route.props.path}
+                                                    path="/"
                                                     element={
                                                         <ProtectedRoute>
-                                                            {route.props.element}
+                                                            <MainContentPage />
                                                         </ProtectedRoute>
                                                     }
                                                 />
-                                            ))}
-                                        </Routes>
-                                    </ContentWrapper>
-                                </Box>
-                            </Content>
+
+                                                {/* 동적으로 라우트들을 렌더링 */}
+                                                {renderRoutes().map((route) => (
+                                                    <Route
+                                                        key={route.key}
+                                                        path={route.props.path}
+                                                        element={
+                                                            <ProtectedRoute>
+                                                                {route.props.element}
+                                                            </ProtectedRoute>
+                                                        }
+                                                    />
+                                                ))}
+                                            </Routes>
+                                        </ContentWrapper>
+                                    </Box>
+                                </Content>
+                            </Layout>
                         </Layout>
-                    </Layout>
-                }
-            />
-        </Routes>
+                    }
+                />
+            </Routes>
+        </>
     );
 };
 
