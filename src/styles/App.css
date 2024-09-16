@@ -115,7 +115,7 @@
 /* Form 영역 시작 */
 
 input.ant-input[readonly] {
-  background-color: #f6f6f6 !important;
+  background-color: #FAFAFA !important;
   pointer-events: none;
 }
 
@@ -127,6 +127,12 @@ input.ant-input[readonly] {
 .input-wrapper:hover {
   /* 포인터 커서 유지 */
   cursor: pointer !important;
+}
+
+.ant-select-arrow  > span > svg{
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 5px;
 }
 
 .ant-select-selector, .ant-select {
@@ -236,6 +242,7 @@ input.ant-input[readonly] {
 /* 버튼 영역 시작  */
 .ant-btn-primary {
   outline: none !important;
+  background-color: #3F87F5 !important;
 }
 .ant-btn-primary > span {
 }

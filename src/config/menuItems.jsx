@@ -13,10 +13,8 @@ import {
     USERS_API
 } from "./apiConstants.jsx";
 import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
-import MainContentPage from "../modules/integration/pages/MainContentPage.jsx";
-import EquipmentDataPage from "../modules/production/pages/EquipmentDataPage.jsx";
-import MaintenanceHistoryPage from "../modules/production/pages/MaintenanceHistoryPage.jsx";
-import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx";
+import EquipmentDataPage from "../modules/production/pages/resourceData/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../modules/production/pages/resourceData/MaintenanceHistoryPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
 import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
@@ -37,7 +35,6 @@ export const subMenuItems = {
     '그룹웨어': [
         {
             text: '기초정보관리',
-            url: '/groupware/basic-info',
             items: [
                 { text: '회사정보수정', component: null, apiPath: null, url: '/groupware/basic-info/company-edit' },
             ]
@@ -46,7 +43,6 @@ export const subMenuItems = {
     '재무회계': [
         {
             text: '기초정보관리',
-            url: '/finance/basic-info',
             items: [
                 { text: '거래처등록', component: 'ClientRegistrationPage', apiPath: null, url: '/finance/basic-info/client-registration' },
                 { text: '계정과목및적요등록', component: 'AccountSubjectPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/finance/basic-info/account-subject' },
@@ -56,7 +52,6 @@ export const subMenuItems = {
         },
         {
             text: '전표입력',
-            url: '/finance/voucher-input',
             items: [
                 { text: '일반전표입력', component: null, apiPath: null, url: '/finance/voucher-input/general' },
                 { text: '매입매출전표입력', component: null, apiPath: null, url: '/finance/voucher-input/sales-purchase' },
@@ -65,7 +60,6 @@ export const subMenuItems = {
         },
         {
             text: '장부관리',
-            url: '/finance/ledger-management',
             items: [
                 { text: '거래처원장', component: null, apiPath: null, url: '/finance/ledger-management/client-ledger' },
                 { text: '거래처별계정과목별원장', component: null, apiPath: null, url: '/finance/ledger-management/client-account-ledger' },
@@ -81,7 +75,6 @@ export const subMenuItems = {
         },
         {
             text: '결산/재무제표',
-            url: '/finance/financial-statements',
             items: [
                 { text: '결산자료입력', component: null, apiPath: null, url: '/finance/financial-statements/closing-data' },
                 { text: '합계잔액시산표', component: null, apiPath: null, url: '/finance/financial-statements/trial-balance' },
@@ -96,7 +89,6 @@ export const subMenuItems = {
         },
         {
             text: '전기분재무제표',
-            url: '/finance/previous-financial-statements',
             items: [
                 { text: '전기분재무상태표', component: null, apiPath: null, url: '/finance/previous-financial-statements/financial-position' },
                 { text: '전기분손익계산서', component: null, apiPath: null, url: '/finance/previous-financial-statements/income-statement' },
@@ -108,7 +100,6 @@ export const subMenuItems = {
         },
         {
             text: '고정자산및감가상각',
-            url: '/finance/fixed-assets',
             items: [
                 { text: '고정자산등록', component: null, apiPath: null, url: '/finance/fixed-assets/register' },
                 { text: '미상각분감가상각비', component: null, apiPath: null, url: '/finance/fixed-assets/undepreciated' },
@@ -118,7 +109,6 @@ export const subMenuItems = {
         },
         {
             text: '자금관리',
-            url: '/finance/funds',
             items: [
                 { text: '받을어음현황', component: null, apiPath: null, url: '/finance/funds/bills-receivable' },
                 { text: '지급어음현황', component: null, apiPath: null, url: '/finance/funds/bills-payable' },
@@ -130,7 +120,6 @@ export const subMenuItems = {
     '인사관리': [
         {
             text: '기초 정보 관리',
-            url: '/hr/basic-info',
             items: [
                 { text: '사원 관리', component: 'EmployeeDataPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management' },
                 { text: '사용자 관리', component: 'UsersDataPage', apiPath: USERS_API.USERS_DATA_API, url: '/hr/basic-info/user-management' },
@@ -142,7 +131,6 @@ export const subMenuItems = {
         },
         {
             text: '출결 관리',
-            url: '/hr/attendance',
             items: [
                 { text: '근태 관리', component: null, apiPath: null, url: '/hr/attendance/time-management' },
                 { text: '휴가 관리', component: null, apiPath: null, url: '/hr/attendance/leave-management' },
@@ -151,7 +139,6 @@ export const subMenuItems = {
         },
         {
             text: '채용 관리',
-            url: '/hr/recruitment',
             items: [
                 { text: '채용 공고 관리', component: null, apiPath: null, url: '/hr/recruitment/job-postings' },
                 { text: '지원자 관리', component: null, apiPath: null, url: '/hr/recruitment/applicant-management' },
@@ -164,7 +151,6 @@ export const subMenuItems = {
     '물류관리': [
         {
             text: '기초정보관리',
-            url: '/logistics/basic-info',
             items: [
                 { text: '품목 관리', component: null, apiPath: null, url: '/logistics/basic-info/item-management' },
                 { text: '품목 그룹 관리', component: null, apiPath: null, url: '/logistics/basic-info/item-group-management' },
@@ -173,7 +159,6 @@ export const subMenuItems = {
         },
         {
             text: '영업 관리',
-            url: '/logistics/sales',
             items: [
                 { text: '견적서', component: null, apiPath: null, url: '/logistics/sales/quotation' },
                 { text: '주문서', component: null, apiPath: null, url: '/logistics/sales/order' },
@@ -184,7 +169,6 @@ export const subMenuItems = {
         },
         {
             text: '구매 관리',
-            url: '/logistics/purchase',
             items: [
                 { text: '발주 요청', component: null, apiPath: null, url: '/logistics/purchase/purchase-request' },
                 { text: '발주 계획', component: null, apiPath: null, url: '/logistics/purchase/purchase-plan' },
@@ -196,7 +180,6 @@ export const subMenuItems = {
         },
         {
             text: '반품 관리',
-            url: '/logistics/returns',
             items: [
                 { text: '반품 접수', component: null, apiPath: null, url: '/logistics/returns/returns-reception' },
                 { text: '반품 현황', component: null, apiPath: null, url: '/logistics/returns/returns-status' },
@@ -204,7 +187,6 @@ export const subMenuItems = {
         },
         {
             text: '출하지시서',
-            url: '/logistics/shipping-orders',
             items: [
                 { text: '출하지시서조회', component: null, apiPath: null, url: '/logistics/shipping-orders/view' },
                 { text: '출하지시서입력', component: null, apiPath: null, url: '/logistics/shipping-orders/input' },
@@ -212,7 +194,6 @@ export const subMenuItems = {
         },
         {
             text: '출하',
-            url: '/logistics/shipment',
             items: [
                 { text: '출하조회', component: null, apiPath: null, url: '/logistics/shipment/view' },
                 { text: '출하입력', component: null, apiPath: null, url: '/logistics/shipment/input' },
@@ -221,7 +202,6 @@ export const subMenuItems = {
         },
         {
             text: '입고관리',
-            url: '/logistics/inbound-management',
             items: [
                 { text: '입고예정', component: null, apiPath: null, url: '/logistics/inbound-management/expected' },
                 { text: '입고처리', component: null, apiPath: null, url: '/logistics/inbound-management/processing' },
@@ -229,7 +209,6 @@ export const subMenuItems = {
         },
         {
             text: '출고관리',
-            url: '/logistics/outbound-management',
             items: [
                 { text: '출고예정', component: null, apiPath: null, url: '/logistics/outbound-management/expected' },
                 { text: '출고예정현황', component: null, apiPath: null, url: '/logistics/outbound-management/expected-status' },
@@ -238,7 +217,6 @@ export const subMenuItems = {
         },
         {
             text: '재고조정',
-            url: '/logistics/inventory-adjustment',
             items: [
                 { text: '재고조정진행단계', component: null, apiPath: null, url: '/logistics/inventory-adjustment/steps' },
                 { text: '재고실사조회', component: null, apiPath: null, url: '/logistics/inventory-adjustment/inspection-view' },
@@ -249,66 +227,64 @@ export const subMenuItems = {
     ],
     '생산관리': [
         {
-            text: '기초정보관리',
-            url: '/production/basic-info',
+            text: '기초정보 관리',
             items: [
-                { text: '작업장 관리', component: 'WorkcenterPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-info/workcenter-management' },
-                { text: 'LOT 관리', component: null, apiPath: null, url: '/production/basic-info/lot-management' },
-                { text: 'Serial No 관리', component: null, apiPath: null, url: '/production/basic-info/serial-management' },
+                { text: '작업장 관리', component: 'WorkcenterPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter' },
+                { text: "공정세부정보 관리", component: 'ProcessDetailsPage', apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/basic-data/process-management/details' },
+                { text: 'Routing 관리', component: null, apiPath: null, url: '/production/basic-data/process-management/routing' },
+                { text: 'BOM 관리', component: null, apiPath: null, url: '/production/basic-data/bom' },
             ]
         },
         {
-            text: '자원관리',
-            url: '/production/resource-management',
+            text: '자원 관리',
             items: [
-                { text: '작업자 관리', component: null, apiPath: null, url: '/production/resource-management/worker-management' },
+                { text: '작업자 관리', component: 'WorkerPage', apiPath: PRODUCTION_API.WORKER_LIST_API, url: '/production/resource-management/worker-management' },
                 { text: '자재 정보 관리', component: null, apiPath: null, url: '/production/resource-management/material-management' },
                 { text: '설비 정보 관리', component: 'EquipmentDataPage', apiPath: PRODUCTION_API.EQUIPMENT_DATA_API, url: '/production/resource-management/equipment-management' },
                 { text: '유지보수 이력 관리', component: 'MaintenanceHistoryPage', apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API, url: '/production/resource-management/maintenance-history' },
+                { text: '폐기물 관리', component: null, apiPath: null, url: '/production/resource-management/waste-management' },
             ]
         },
         {
-            text: '공정 경로 관리',
-            url: '/production/process-management',
+            text: '생산 운영 및 계획',
             items: [
-                { text: "공정세부정보 관리", component: ProcessDetailsPage, apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/process-management/details' },
-                { text: 'Routing 관리', component: null, apiPath: null, url: '/production/process-management/routing' },
+                { text: '생산 의뢰 관리', component: null, apiPath: null, url: '/production/common-scheduling/request' },
+                { text: '주생산계획 관리', component: null, apiPath: null, url: '/production/planning/mps' },
+                // { text: '가용생산능력 계획 관리', component: null, apiPath: null, url: '/production/planning/crp' },
+                { text: '실자재 투입 현황 관리', component: null, apiPath: null, url: '/production/planning/material-input-status' },
+                { text: '자재소요량 계획 관리', component: null, apiPath: null, url: '/production/planning/mrp' },
+                { text: '주문 생산 계획 관리', component: null, apiPath: null, url: '/production/strategy/plan-of-mto' },
+                { text: '재고 생산 계획 관리', component: null, apiPath: null, url: '/production/strategy/plan-of-mts' },
             ]
         },
         {
-            text: '자재 소요 관리',
-            url: '/production/material-requirement',
+            text: '작업 지시 관리',
             items: [
-                { text: 'BOM 관리', component: null, apiPath: null, url: '/production/material-requirement/bom' },
-                { text: '자재소요량 계획 관리', component: null, apiPath: null, url: '/production/material-requirement/material-plan' },
-                { text: '실자재 투입 현황 관리', component: null, apiPath: null, url: '/production/material-requirement/material-input-status' },
-            ]
-        },
-        {
-            text: '생산 계획 관리',
-            url: '/production/production-planning',
-            items: [
-                { text: '생산 의뢰 관리', component: null, apiPath: null, url: '/production/production-planning/request' },
-                { text: '주문 생산 계획 관리', component: null, apiPath: null, url: '/production/production-planning/order' },
-                { text: '재고 생산 계획 관리', component: null, apiPath: null, url: '/production/production-planning/inventory' },
-                { text: '작업 지시 관리', component: null, apiPath: null, url: '/production/production-planning/work-order' },
+                { text: '교대 유형 관리', component: null, apiPath: null, url: '/production/common-scheduling/shift-type' },
+                { text: '작업 지시 관리', component: null, apiPath: null, url: '/production/common-scheduling/production-order' },
+                { text: '작업배정이력 관리', component: null, apiPath: null, url: '/production/common-scheduling/worker-assignment' },
             ]
         },
         {
             text: '생산 실적 관리',
-            url: '/production/performance-management',
             items: [
                 { text: '작업 실적 관리', component: null, apiPath: null, url: '/production/performance-management/work-performance' },
-                { text: '불량군 관리', component: null, apiPath: null, url: '/production/performance-management/defect-group' },
-                { text: '불량 유형 관리', component: null, apiPath: null, url: '/production/performance-management/defect-type' },
-                { text: '품질 검사 관리', component: null, apiPath: null, url: '/production/performance-management/quality-inspection' },
-                { text: '생산품 입고 처리', component: null, apiPath: null, url: '/production/performance-management/product-receiving' },
-                { text: '생산 일/월보 처리', component: null, apiPath: null, url: '/production/performance-management/daily-monthly-report' },
+                { text: '생산 일보 등록', component: null, apiPath: null, url: '/production/performance-management/daily-report' },
+                { text: '생산 월보 등록', component: null, apiPath: null, url: '/production/performance-management/monthly-report' },
+            ]
+        },
+        {
+            text: '품질 관리',
+            items: [
+                { text: '불량군/유형 관리', component: null, apiPath: null, url: '/production/quality-control/defect-group-type' },
+                { text: '품질 검사 관리', component: null, apiPath: null, url: '/production/quality-control/quality-inspection' },
+                { text: 'LOT 관리', component: null, apiPath: null, url: '/production/quality-control/lot-management' },
+                { text: 'Serial No. 관리', component: null, apiPath: null, url: '/production/quality-control/serial-management' },
+                { text: '생산품 입고 처리', component: null, apiPath: null, url: '/production/quality-control/goods-receipt' },
             ]
         },
         {
             text: '외주/계약 관리',
-            url: '/production/outsourcing-management',
             items: [
                 { text: '외주 단가 관리', component: null, apiPath: null, url: '/production/outsourcing-management/price' },
                 { text: '외주 발주 관리', component: null, apiPath: null, url: '/production/outsourcing-management/order' },

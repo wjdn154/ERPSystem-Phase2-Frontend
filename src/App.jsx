@@ -1,25 +1,47 @@
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { themeSettings } from './modules/integration/utils/AppUtil.jsx';
-import React, { useEffect } from 'react';
+import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
+import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
-import { setSelectedSubSubMenu } from './store'; // Redux 액션
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import ContentWrapper from './modules/integration/components/MainContent/ContentWrapper.jsx';
-import Sidebar from './modules/integration/components/Slidbar/Sidebar.jsx';
-import MainContentPage from './modules/integration/pages/MainContentPage.jsx';
-import Headers from './modules/integration/components/Header/Headers.jsx';
+import {BrowserRouter as Router, Routes, Route, useNavigate, useLocation} from 'react-router-dom';
+import Cookies from 'js-cookie'; // 쿠키 사용
+import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
+import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
+import MainContentPage from './modules/Common/pages/MainContentPage.jsx';
+import Headers from './modules/Common/components/Header/Headers.jsx';
 import { subMenuItems } from './config/menuItems.jsx';
 import { Layout } from "antd";
+import LoginPage from "./modules/Common/pages/LoginPage.jsx";
+import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
+import { setAuth } from "./modules/Common/utils/redux/authSlice.jsx";
+import { useDispatch } from "react-redux";
+import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
+import { notification } from 'antd';
+import {NotificationProvider, useNotificationContext} from "./modules/Common/utils/NotificationContext.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
 
 const AppContent = () => {
-    const selectedSubSubMenu = useSelector((state) => state.menu.selectedSubSubMenu);
+    const notify = useNotificationContext();
+    const location = useLocation();
 
-    // 모든 URL을 라우팅 설정에서 처리하기 위한 동적 컴포넌트
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const token = Cookies.get('jwt');
+        if (token) {
+            dispatch(setAuth(token));  // 쿠키에 있는 토큰으로 Redux 상태 초기화
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (location.state?.login) {
+            notify('success', '로그인 성공', '환영합니다! 메인 페이지로 이동했습니다.', 'top');
+        }
+    }, [location.state, notify]);
+
+
     const renderRoutes = () => {
         const routes = [];
 
@@ -42,43 +64,71 @@ const AppContent = () => {
     };
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Headers />
+        <>
+            <Routes>
+                {/* 로그인 페이지는 전체화면으로 렌더링 */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-            <Layout>
-                <Sider className="custom-sidebar">
-                    <Sidebar />
-                </Sider>
+                {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
+                <Route
+                    path="/*"
+                    element={
+                        <Layout style={{ minHeight: '100vh' }}>
+                            <Headers />
+                            <Layout>
+                                <Sider className="custom-sidebar">
+                                    <Sidebar />
+                                </Sider>
 
-                <Content style={{ transition: 'margin-left 0.3s ease' }}>
-                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
-                        <ContentWrapper>
-                            <Routes>
-                                {/* 동적으로 라우트들을 렌더링 */}
-                                {renderRoutes()}
+                                <Content style={{ transition: 'margin-left 0.3s ease' }}>
+                                    <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
+                                        <ContentWrapper>
+                                            <Routes>
+                                                <Route
+                                                    path="/"
+                                                    element={
+                                                        <ProtectedRoute>
+                                                            <MainContentPage />
+                                                        </ProtectedRoute>
+                                                    }
+                                                />
 
-                                {/* 기본 경로로 이동할 때 */}
-                                <Route
-                                    path="/"
-                                    element={<MainContentPage selectedSubSubMenu={selectedSubSubMenu} />}
-                                />
-                            </Routes>
-                        </ContentWrapper>
-                    </Box>
-                </Content>
-            </Layout>
-        </Layout>
+                                                {/* 동적으로 라우트들을 렌더링 */}
+                                                {renderRoutes().map((route) => (
+                                                    <Route
+                                                        key={route.key}
+                                                        path={route.props.path}
+                                                        element={
+                                                            <ProtectedRoute>
+                                                                {route.props.element}
+                                                            </ProtectedRoute>
+                                                        }
+                                                    />
+                                                ))}
+                                            </Routes>
+                                        </ContentWrapper>
+                                    </Box>
+                                </Content>
+                            </Layout>
+                        </Layout>
+                    }
+                />
+            </Routes>
+        </>
     );
 };
 
 const App = () => {
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Router>
-                <AppContent />
-            </Router>
-        </ThemeProvider>
+        <NotificationProvider>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <Router>
+                    <AppContent />
+                </Router>
+            </ThemeProvider>
+        </NotificationProvider>
     );
 };
 
