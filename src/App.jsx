@@ -62,6 +62,7 @@ const AppContent = () => {
 
         return routes;
     };
+    console.log('젠킨스 테스트');
 
     return (
         <>
