@@ -62,7 +62,7 @@ const AppContent = () => {
 
         return routes;
     };
-    console.log('젠킨스 테스트2');
+    console.log('젠킨스 테스트3');
 
     return (
         <>
