@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 
 
 // const API_BASE_URL = "http://localhost:8080";
+// 테스트
 const API_BASE_URL = "https://omz.kro.kr";
 
 
