@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
 import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-import {BrowserRouter as Router, Routes, Route, useNavigate, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate} from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
 import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
 import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
@@ -25,6 +25,7 @@ const theme = createTheme(themeSettings);
 const AppContent = () => {
     const notify = useNotificationContext();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
 
@@ -38,6 +39,7 @@ const AppContent = () => {
     useEffect(() => {
         if (location.state?.login) {
             notify('success', '로그인 성공', '환영합니다! 메인 페이지로 이동했습니다.', 'top');
+            navigate('/', {replace: true, state: {}});
         }
     }, [location.state, notify]);
 
@@ -62,7 +64,6 @@ const AppContent = () => {
 
         return routes;
     };
-    console.log('젠킨스 테스트 2024.09.19 00:06');
 
     return (
         <>
@@ -107,6 +108,15 @@ const AppContent = () => {
                                                         }
                                                     />
                                                 ))}
+                                                {/* 정의되지 않은 경로는 JWT 토큰이 유효한지에 따라 메인 페이지 또는 로그인 페이지로 리다이렉트 */}
+                                                <Route
+                                                    path="*"
+                                                    element={
+                                                        Cookies.get('jwt')
+                                                            ? <Navigate to="/" replace /> // JWT 토큰이 있으면 메인 페이지로 리다이렉트
+                                                            : <Navigate to="/login" replace /> // JWT 토큰이 없으면 로그인 페이지로 리다이렉트
+                                                    }
+                                                />
                                             </Routes>
                                         </ContentWrapper>
                                     </Box>
