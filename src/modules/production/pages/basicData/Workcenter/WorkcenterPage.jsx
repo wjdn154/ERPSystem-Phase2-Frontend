@@ -1,15 +1,21 @@
 import React from 'react';
 import { Row, Col, Button, Modal, Typography } from 'antd';
-import SearchBar from '../../components/SearchBar.jsx';
-import WorkcenterListSection from '../../components/Workcenter/WorkcenterListSection.jsx';
-import SelectedWorkcenterSection from '../../components/Workcenter/SelectedWorkcenterSection.jsx';
-import { useWorkcenter } from '../../hooks/Workcenter/WorkcenterHook.jsx';
-import { workcenterColumns } from '../../utils/Workcenter/WorkcenterColumn.jsx';
-import { getRowClassName } from '../../utils/Workcenter/WorkcenterUtil.jsx';
-import { filterDataByTerm } from '../../utils/filterDataByTerm.jsx'
+import SearchBar from '../../../utils/common/SearchBar.jsx';
+import WorkcenterListSection from '../../../components/basicData/Workcenter/WorkcenterListSection.jsx';
+import SelectedWorkcenterSection from '../../../components/basicData/Workcenter/SelectedWorkcenterSection.jsx';
+import FactorySelectSection from '../../../components/basicData/Workcenter/FactorySelectSection.jsx'; // 여기서 .jsx.jsx 수정
+import { useWorkcenter } from '../../../hooks/basicData/Workcenter/WorkcenterHook.jsx';
+import { workcenterColumns } from '../../../utils/basicData/Workcenter/WorkcenterColumn.jsx';
+import { getRowClassName } from '../../../utils/basicData/Workcenter/WorkcenterUtil.jsx';
+import { filterDataByTerm } from '../../../utils/common/filterDataByTerm.jsx';
 import WorkcenterDashboard from "./WorkcenterDashboard.jsx";
-import {Box, Grid} from "@mui/material";
-import WelcomeSection from "../../../Common/components/WelcomeSection.jsx";
+import { Box, Grid } from "@mui/material";
+import WelcomeSection from "../../../../Common/components/WelcomeSection.jsx";
+import WorkerAssignmentPage from "./WorkerAssignmentPage.jsx";
+import { tabItems } from "../../../utils/basicData/Workcenter/WorkcenterUtil.jsx";
+
+const { Text } = Typography;
+
 const WorkcenterPage = ({ initialData }) => {
     const {
         data,
@@ -54,13 +60,13 @@ const WorkcenterPage = ({ initialData }) => {
             {activeTabKey === '1' && (
                 <Grid>
                     {/* 사용중 작업장 대시보드 */}
-                    <div style={{marginBottom: '16px'}}>
-                        <WorkcenterDashboard/>
+                    <div style={{ marginBottom: '16px' }}>
+                        <WorkcenterDashboard />
                     </div>
                     {/* 검색 바 */}
-                    <Row gutter={16} style={{marginBottom: '16px'}}>
+                    <Row gutter={16} style={{ marginBottom: '16px' }}>
                         <Col span={8}>
-                            <SearchBar onSearch={handleSearch}/>
+                            <SearchBar onSearch={handleSearch} />
                         </Col>
                     </Row>
 
@@ -68,7 +74,7 @@ const WorkcenterPage = ({ initialData }) => {
                     {isSearchActive && (
                         <>
                             {searchData && searchData.length > 0 ? (
-                                <Row gutter={16} style={{marginBottom: '16px'}}>
+                                <Row gutter={16} style={{ marginBottom: '16px' }}>
                                     <Col span={24}>
                                         <WorkcenterListSection
                                             columns={workcenterColumns}
@@ -85,7 +91,7 @@ const WorkcenterPage = ({ initialData }) => {
                     )}
 
                     {/* 기본 데이터 목록 */}
-                    <Row gutter={16} style={{marginTop: isSearchActive && searchData && searchData.length > 0 ? '16px' : '0'}}>
+                    <Row gutter={16} style={{ marginTop: isSearchActive && searchData && searchData.length > 0 ? '16px' : '0' }}>
                         <Col span={24}>
                             <WorkcenterListSection
                                 columns={workcenterColumns}
@@ -97,7 +103,7 @@ const WorkcenterPage = ({ initialData }) => {
                     </Row>
 
                     {/* 작업장 추가 버튼 */}
-                    <Button type="primary" onClick={handleAddWorkcenter} style={{marginTop: '16px'}}>
+                    <Button type="primary" onClick={handleAddWorkcenter} style={{ marginTop: '16px' }}>
                         등록
                     </Button>
 
@@ -117,35 +123,26 @@ const WorkcenterPage = ({ initialData }) => {
                             />
                         </Modal>
                     )}
-
                 </Grid>
             )}
             {activeTabKey === '2' && (
                 <Grid>
-                    {/* 작업장별 오늘의 작업자 배정 명단 */}
-                    <div style={{marginBottom: '16px'}}>
-                        {/* WorkerAssignmentPerWorkcenterList */}
-                    </div>
                     {/* 공장 선택 */}
-                    {/* 표에서 작업장, 작업자, 작업지시, 일자, 교대유형 검색 */}
-                    {/* 검색 결과 목록 또는 경고 메시지 */}
-                    {/* 일자, 작업장, 교대유형, 작업지시별 명단표 */}
+                    <div style={{ marginTop: '16px' }}>
+                        <FactorySelectSection />
+                    </div>
+
+                    {/* 작업장별 오늘의 작업자 배정 명단 */}
+                    <div style={{ marginBottom: '16px' }}>
+                        <WorkerAssignmentPage />
+                    </div>
 
                     {/* 출력 버튼 */}
-                    <Button type="primary" onClick={handleAddWorkcenter} style={{marginTop: '16px'}}>출력</Button>
-
+                    <Button type="primary" onClick={handleAddWorkcenter} style={{ marginTop: '16px' }}>출력</Button>
                 </Grid>
             )}
-
-
-
-</Box>
-
-);
+        </Box>
+    );
 };
-
-import {tabItems} from "../../utils/Workcenter/WorkcenterUtil.jsx";
-
-const { Text } = Typography;
 
 export default WorkcenterPage;

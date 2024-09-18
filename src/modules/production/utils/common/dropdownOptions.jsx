@@ -1,7 +1,7 @@
 // 활성 상태 드롭다운 옵션
 import {Select} from "antd";
 
-export const isActiveOptions = [
+export const isTrueOptions = [
     { value: true, label: 'Y' },
     { value: false, label: 'N' },
 ];

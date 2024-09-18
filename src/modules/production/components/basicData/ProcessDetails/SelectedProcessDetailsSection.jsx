@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Space, Modal, Form, Input } from 'antd';
+import { Button, Space, Modal, Form, Input, Select } from 'antd';
+import { ActionButtons, showDeleteConfirm} from "../../../utils/common/commonActions.jsx";
+import { isTrueOptions } from "../../../utils/common/dropdownOptions.jsx";
 
 const { confirm } = Modal;
 
@@ -10,22 +12,12 @@ const SelectedProcessDetailsSection = ({
                                            handleDeleteProcessDetail,
                                        }) => {
 
-    // 삭제 확인 다이얼로그 함수
-    const showDeleteConfirm = () => {
-        confirm({
-            title: '삭제하시겠습니까?',
-            content: '이 작업은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?',
-            okText: '예',
-            okType: 'danger',
-            cancelText: '아니오',
-            onOk() {
-                console.log("삭제 확인 버튼이 눌렸습니다."); // 확인 로그 추가
-                handleDeleteProcessDetail(processDetail.code);
-            },
-            onCancel() {
-                console.log('취소됨');
-            },
-        });
+    // 삭제 확인 다이얼로그 호출
+    const handleDelete = () => {
+        showDeleteConfirm(
+            '이 작업은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?',
+            () => handleDeleteProcessDetail(processDetail.code)
+        );
     };
 
     if (!processDetail) {
@@ -35,10 +27,7 @@ const SelectedProcessDetailsSection = ({
     return (
         <div style={{ padding: '20px', position: 'relative' }}>
             {/* 공정 상세 정보를 표시하는 Form */}
-            <Form
-                layout="vertical"
-                initialValues={processDetail}
-            >
+            <Form layout="vertical" initialValues={processDetail}>
                 <Form.Item label="공정 코드">
                     <Input
                         value={processDetail.code}
@@ -52,9 +41,10 @@ const SelectedProcessDetailsSection = ({
                     />
                 </Form.Item>
                 <Form.Item label="외주여부">
-                    <Input
+                    <Select
                         value={processDetail.isOutsourced ? 'Y' : 'N'}
-                        onChange={(e) => handleInputChange(e, 'isOutsourced')}
+                        options={isTrueOptions}  // 공통 드롭다운 옵션 사용
+                        onChange={(value) => handleInputChange({ target: { value } }, 'isUsed')}
                     />
                 </Form.Item>
                 <Form.Item label="소요시간">
@@ -76,28 +66,20 @@ const SelectedProcessDetailsSection = ({
                     />
                 </Form.Item>
                 <Form.Item label="사용여부">
-                    <Input
-                        value={processDetail.isUsed ? 'Y' : 'N'}
-                        onChange={(e) => handleInputChange(e, 'isUsed')}
+                    <Select
+                        value={processDetail.isUsed}  // true 또는 false로 설정
+                        options={isTrueOptions}  // 공통 드롭다운 옵션 사용 (value: true/false)
+                        onChange={(value) => handleInputChange({ target: { value } }, 'isUsed')}
                     />
                 </Form.Item>
 
             </Form>
 
-            {/* 저장 및 삭제 버튼 */}
-            <Space style={{ position: 'absolute', right: 0, bottom: 0 }}>
-                <Button type="primary" onClick={handleSave} style={{ marginTop: '16px' }}>
-                    저장
-                </Button>
-                <Button
-                    type="primary"
-                    danger
-                    onClick={showDeleteConfirm}
-                    style={{ marginTop: '16px' }}
-                >
-                    삭제
-                </Button>
-            </Space>
+            {/* 공통 ActionButtons 컴포넌트 사용 */}
+            <ActionButtons
+                onSave={handleSave}
+                onDelete={handleDelete}
+            />
         </div>
 
     );

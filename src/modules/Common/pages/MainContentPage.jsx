@@ -11,9 +11,9 @@ import ClientRegistrationPage from "../../financial/pages/ClientRegistrationPage
 import EmployeeDataPage from "../../hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../../hr/pages/UsersDataPage.jsx";
 import DepartmentDataPage from "../../hr/pages/DepartmentDataPage.jsx";
-import WorkcenterPage from "../../production/pages/Workcenter/WorkcenterPage.jsx";
+import WorkcenterPage from "../../production/pages/basicData/Workcenter/WorkcenterPage.jsx";
 import WorkerPage from "../../production/pages/resourceData/WorkerPage.jsx";
-import ProcessDetailsPage from "../../production/pages/ProcessDetails/ProcessDetailsPage.jsx";
+import ProcessDetailsPage from "../../production/pages/basicData/ProcessDetails/ProcessDetailsPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
