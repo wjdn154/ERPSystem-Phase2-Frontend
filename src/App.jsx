@@ -62,7 +62,7 @@ const AppContent = () => {
 
         return routes;
     };
-    console.log('젠킨스 테스트 2024.09.19 00:05');
+    console.log('젠킨스 테스트 2024.09.19 00:06');
 
     return (
         <>
