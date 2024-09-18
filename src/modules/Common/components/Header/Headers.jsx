@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie'; // 쿠키 관리 라이브러리
 import LogoWhite from "../../../../assets/favicon/OMZ.svg";
 import {useDispatch, useSelector} from "react-redux";
-import {logout} from "../../../../config/redux/authSlice.jsx";
+import {logout} from "../../utils/redux/authSlice.jsx";
 
 
 const { Header } = Layout;

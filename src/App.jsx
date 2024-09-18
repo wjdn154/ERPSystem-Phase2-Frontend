@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
 import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route, useNavigate, useLocation} from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
 import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
 import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
@@ -13,17 +13,20 @@ import { subMenuItems } from './config/menuItems.jsx';
 import { Layout } from "antd";
 import LoginPage from "./modules/Common/pages/LoginPage.jsx";
 import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
-import { setAuth } from "./config/redux/authSlice.jsx";
+import { setAuth } from "./modules/Common/utils/redux/authSlice.jsx";
 import { useDispatch } from "react-redux";
 import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
-import { notification } from 'antd'; // Ant Design notification 사용
+import { notification } from 'antd';
+import {NotificationProvider, useNotificationContext} from "./modules/Common/utils/NotificationContext.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
 
 const AppContent = () => {
+    const notify = useNotificationContext();
+    const location = useLocation();
+
     const dispatch = useDispatch();
-    const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
         const token = Cookies.get('jwt');
@@ -32,14 +35,12 @@ const AppContent = () => {
         }
     }, [dispatch]);
 
-    // 로그인 성공 시 알림을 표시하는 함수
-    const handleLoginNotification = () => {
-        api.info({
-            message: '로그인 성공',
-            description: '환영합니다! 메인 페이지로 이동했습니다.',
-            placement: 'top',
-        });
-    };
+    useEffect(() => {
+        if (location.state?.login) {
+            notify('success', '로그인 성공', '환영합니다! 메인 페이지로 이동했습니다.', 'top');
+        }
+    }, [location.state, notify]);
+
 
     const renderRoutes = () => {
         const routes = [];
@@ -61,13 +62,13 @@ const AppContent = () => {
 
         return routes;
     };
+    console.log('젠킨스 테스트 2024.09.19 00:06');
 
     return (
         <>
-            {contextHolder}
             <Routes>
                 {/* 로그인 페이지는 전체화면으로 렌더링 */}
-                <Route path="/login" element={<LoginPage handleLoginNotification={handleLoginNotification} />} />
+                <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
                 {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
@@ -121,12 +122,14 @@ const AppContent = () => {
 
 const App = () => {
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Router>
-                <AppContent />
-            </Router>
-        </ThemeProvider>
+        <NotificationProvider>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <Router>
+                    <AppContent />
+                </Router>
+            </ThemeProvider>
+        </NotificationProvider>
     );
 };
 

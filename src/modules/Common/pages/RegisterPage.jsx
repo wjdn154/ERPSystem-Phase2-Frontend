@@ -72,11 +72,8 @@ const Register = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            console.log(formData);
             const response = await axios.post(COMMON_API.REGISTER_API, formData);
-            const token = response.data;
-            Cookies.set('jwt', token, { expires: 1 });
-            navigate('/');
+            navigate('/login', { state: { registered: true} });
         } catch (error) {
             setError('회원가입 실패. 사용자 정보를 확인하세요.');
             console.error("회원가입 실패", error);
