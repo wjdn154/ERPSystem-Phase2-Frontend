@@ -43,7 +43,7 @@ export const subMenuItems = {
             text: '기초정보관리',
             items: [
                 { text: '회사정보수정', component: null, apiPath: null, url: '/integration/basic-info/company-edit' },
-                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: USERS_API.USERS_DATA_API, url: '/integration/basic-info/user-management' },
+                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/integration/basic-info/user-management' },
             ]
         }
     ],
