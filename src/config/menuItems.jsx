@@ -19,6 +19,7 @@ import WarehouseListPage from "../modules/logistics/pages/WarehouseListPage.jsx"
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
 import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
+import ProductPage from "../modules/logistics/pages/ProductPage.jsx"
 import ProcessDetailsPage from "../modules/production/pages/ProcessDetails/ProcessDetailsPage.jsx";
 import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 
@@ -153,7 +154,7 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '품목 관리', component: null, apiPath: null, url: '/logistics/basic-info/item-management' },
+                { text: '품목 관리', component: 'ProductPage', apiPath: null, url: '/logistics/basic-info/item-management' },
                 { text: '품목 그룹 관리', component: null, apiPath: null, url: '/logistics/basic-info/item-group-management' },
                 { text: '창고등록', component: 'WarehouseListPage', apiPath: LOGISTICS_API.WAREHOUSE_LIST_API, url: '/logistics/basic-info/warehouse-registration' },
             ]
