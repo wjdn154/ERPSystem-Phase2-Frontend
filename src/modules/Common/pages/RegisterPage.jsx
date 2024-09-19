@@ -6,10 +6,13 @@ import { Box, TextField, Typography, Grid, Paper, Link, CircularProgress } from 
 import {Alert, Button} from "antd";
 import { COMMON_API } from "../../../config/apiConstants.jsx";
 import background from "../../../assets/img/background3.png";
-import DebounceSelect from '../components/DebounceSelect'; // DebounceSelect 컴포넌트 import
+import DebounceSelect from '../components/DebounceSelect';
+import {useNotificationContext} from "../utils/NotificationContext.jsx"; // DebounceSelect 컴포넌트 import
 
 const Register = () => {
-    const [error, setError] = useState('');  // 에러 메시지를 저장할 상태
+    const notify = useNotificationContext();
+    const [registerError, setRegisterError] = useState('');  // 에러 메시지를 저장할 상태
+    const navigate = useNavigate();
 
     // 하나의 state로 관리
     const [formData, setFormData] = useState({
@@ -18,8 +21,13 @@ const Register = () => {
         userNickname: '',
         companyId: null,
     });
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(registerError) {
+            notify('error', '로그인 실패', registerError, 'top');
+            setRegisterError('');
+        }
+    }, [registerError]);
 
     // 초기값 API 호출
     const fetchInitialCompanyOptions = async () => {
@@ -60,8 +68,6 @@ const Register = () => {
 
     // 회사 선택 시 업데이트
     const handleCompanyChange = (newValue) => {
-        setError(null);
-        console.log(error);
         setFormData((prevFormData) => ({
             ...prevFormData,
             companyId: newValue,
@@ -70,15 +76,12 @@ const Register = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        setLoading(true);
+
         try {
             const response = await axios.post(COMMON_API.REGISTER_API, formData);
             navigate('/login', { state: { registered: true} });
         } catch (error) {
-            setError('회원가입 실패. 사용자 정보를 확인하세요.');
-            console.error("회원가입 실패", error);
-        } finally {
-            setLoading(false);
+            setRegisterError(error.response.data);
         }
     };
 
@@ -112,30 +115,17 @@ const Register = () => {
                         <Typography variant="body2" gutterBottom color="textSecondary">
                             필요한 정보를 입력해주세요.
                         </Typography>
-                        {/* 에러가 있을 경우 Alert 표시 */}
-                        {error && (
-                            <Alert
-                                message="회원가입 실패"
-                                description={error}
-                                type="error"
-                                showIcon
-                                style={{ marginBottom: '20px' }}
-                            />
-                        )}
+
                         <form onSubmit={handleRegister} style={{ marginTop: '20px' }}>
                             <Box mb={2}>
-                                {loading ? (
-                                    <CircularProgress />
-                                ) : (
-                                    <DebounceSelect
-                                        value={formData.companyId}
-                                        placeholder="회사 선택"
-                                        fetchInitialOptions={fetchInitialCompanyOptions}  // 초기값 호출 API
-                                        fetchSearchOptions={fetchSearchCompanyOptions}    // 검색 API
-                                        onChange={handleCompanyChange}
-                                        style={{ width: '100%', height: '56px' }}
-                                    />
-                                )}
+                                <DebounceSelect
+                                    value={formData.companyId}
+                                    placeholder="회사 선택"
+                                    fetchInitialOptions={fetchInitialCompanyOptions}  // 초기값 호출 API
+                                    fetchSearchOptions={fetchSearchCompanyOptions}    // 검색 API
+                                    onChange={handleCompanyChange}
+                                    style={{ width: '100%', height: '56px' }}
+                                />
                             </Box>
                             <Box mb={2}>
                                 <TextField
