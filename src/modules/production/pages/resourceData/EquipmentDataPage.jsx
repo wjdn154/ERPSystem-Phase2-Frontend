@@ -5,7 +5,7 @@ import EquipmentDataListSection from "../../components/resourceData/EquipmentDat
 import {equipmentDataListColumn} from "../../utils/resourceData/EquipmentDataListColumn.jsx";
 import EquipmentDataDetailSection from "../../components/resourceData/EquipmentDataDetailSection.jsx";
 import WelcomeSection from "../../../Common/components/WelcomeSection.jsx";
-import {equipmentTabItems} from "../../utils/resourceData/EquipmentDataUtil.jsx";
+import {equipmentTabItems} from "../../utils/resourceData/ResourceDataUtil.jsx";
 
 
 const EquipmentDataPage = ({initialData}) => {

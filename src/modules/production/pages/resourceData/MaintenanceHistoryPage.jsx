@@ -3,7 +3,7 @@ import {Box, Grid, Grow, Typography} from "@mui/material";
 import {MaintenanceHistoryListColumn} from "../../utils/resourceData/MaintenanceHistoryListColumn.jsx";
 import MaintenanceHistoryListSection from "../../components/resourceData/MaintenanceHistoryListSection.jsx"
 import WelcomeSection from "../../../Common/components/WelcomeSection.jsx";
-import {maintenanceTabItems} from "../../utils/resourceData/EquipmentDataUtil.jsx";
+import {maintenanceTabItems} from "../../utils/resourceData/ResourceDataUtil.jsx";
 import {maintenanceHistoryHook} from "../../hooks/resourceData/MaintenanceHistoryHook.jsx";
 import MaintenanceHistoryDetailSection from "../../components/resourceData/MaintenanceHistoryDetailSection.jsx";
 import EquipmentDataDetailSection from "../../components/resourceData/MaintenanceHistoryDetailSection.jsx";

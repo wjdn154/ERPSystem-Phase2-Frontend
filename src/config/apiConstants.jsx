@@ -62,6 +62,7 @@ export const LOGISTICS_API = {
 };
 // 생산관리
 export const PRODUCTION_API = {
+    // 자원
     EQUIPMENT_DATA_API: `${API_BASE_URL}/api/production/equipmentDatas`,    //설비정보 목록 조회 API
     EQUIPMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/production/equipmentData/${id}`,   //설비정보 상세 조회 API
     SAVE_EQUIPMENT_DATA_API: `${API_BASE_URL}/api/production/equipmentData/createEquipment`,         //설비정보 등록 API
@@ -74,6 +75,19 @@ export const PRODUCTION_API = {
     UPDATE_MAINTENANCE_HISTORY_API: (id) => `${API_BASE_URL}/api/production/maintenanceHistory/updateMaintenance/${id}`, //유지보수 이력 수정 API
     DELETE_MAINTENANCE_HISTORY_API:(id) => `${API_BASE_URL}/api/production/maintenanceHistory/deleteMaintenance/${id}`,  //유지보수 이력 삭제 API
 
+    WORKER_LIST_API: `${API_BASE_URL}/api/production/workers`,    //작업자 목록 조회 API
+    WORKER_DETAIL_API:(id) => `${API_BASE_URL}/api/production/worker/${id}`,  //작업자 상세 조회 API
+    UPDATE_WORKER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/worker/updateWorker/${id}`, //작업자 상세 수정 API
+    WORKER_ATTENDANCE_ASSIGNMENT_LIST_API: (id) => `${API_BASE_URL}/api/production/worker/attendance/${id}`, //작업자 근태,작업배치 목록 조회 API
+
+    MATERIAL_LIST_API: `${API_BASE_URL}/api/production/materials`,    //자재 목록 조회 API
+    CREATE_MATERIAL_API: `${API_BASE_URL}/api/production/material/createMaterial`,     //자재 등록 API
+    UPDATE_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/material/updateMaterial/${id}`,    //자재 수정 API
+    DELETE_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/material/deleteMaterial/${id}`,    //자재 삭제 API
+    HAZARDOUS_MATERIAL_LIST_API:(id) => `${API_BASE_URL}/api/production/hazardousMaterial/${id}`,   //해당 자재의 유해물질 목록 조회 API
+    PRODUCT_MATERIAL_LIST_API:(id) => `${API_BASE_URL}/api/production/productMaterial/${id}`,      //해당 자재의 품목 목록 조회 API
+
+    // 기초정보
     WORKCENTER_LIST_API: `${API_BASE_URL}/api/production/workcenters/`, // 작업장 목록 조회 API
     WORKCENTER_DETAILS_API: (code) => `${API_BASE_URL}/api/production/workcenters/details/${code}/`, // 작업장 세부정보 조회 API
     WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search?name=${name}/`, // 작업장 이름검색 API
@@ -86,12 +100,9 @@ export const PRODUCTION_API = {
     PROCESS_SEARCH_API: (name) => `${API_BASE_URL}/api/production/processDetails/search?name=${name}/`, // 생산공정 이름검색 API
     SAVE_PROCESS_API: `${API_BASE_URL}/api/production/processDetails/create/`, // 새 생산공정 저장 API
     UPDATE_PROCESS_API: (code) => `${API_BASE_URL}/api/production/processDetails/update/${code}/`, // 생산공정 수정 API
-    DELETE_PROCESS_API: (code) =>`${API_BASE_URL}/api/production/processDetails/delete?code=${code}/`, // 생산공정 삭제 API
+    DELETE_PROCESS_API: (code) =>`${API_BASE_URL}/api/production/processDetails/delete?code=${code}/` // 생산공정 삭제 API
 
-    WORKER_LIST_API: `${API_BASE_URL}/api/production/workers`,    //작업자 목록 조회 API
-    WORKER_DETAIL_API:(id) => `${API_BASE_URL}/api/production/worker/${id}`,  //작업자 상세 조회 API
-    UPDATE_WORKER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/worker/updateWorker/${id}`, //작업자 상세 수정 API
-    WORKER_ATTENDANCE_ASSIGNMENT_LIST_API: (id) => `${API_BASE_URL}/api/production/worker/attendance/${id}` //작업자 근태,작업배치 목록 조회 API
+
 
     // BOM
 

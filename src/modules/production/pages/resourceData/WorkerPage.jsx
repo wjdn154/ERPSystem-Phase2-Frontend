@@ -4,7 +4,7 @@ import {workerHook} from '../../hooks/resourceData/WorkerHook.jsx';
 import WorkerListSection from "../../components/resourceData/WorkerListSection.jsx";
 import {workerListColumn} from "../../utils/resourceData/WorkerListColumn.jsx"
 import WelcomeSection from "../../../Common/components/WelcomeSection.jsx";
-import {workerTabItems} from "../../utils/resourceData/WorkerUtil.jsx";
+import {workerTabItems} from "../../utils/resourceData/ResourceDataUtil.jsx";
 import WorkerAttendanceListSection from "../../components/resourceData/WorkerAttendanceListSection.jsx";
 import {workerAttendanceListColumn} from "../../utils/resourceData/WorkerAttendanceListColumn.jsx"
 
