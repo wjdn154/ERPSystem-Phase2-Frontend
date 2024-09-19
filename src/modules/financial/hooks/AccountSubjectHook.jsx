@@ -6,6 +6,9 @@ import {
 } from '../services/AccountSubjectApi.jsx';
 import {RelationCodeColumn} from "../utils/AccountSubject/RelationCodeColumn.jsx";
 import {FinancialStatementColumn} from "../utils/AccountSubject/FinancialStatementColumn.jsx";
+import {Modal, notification} from "antd";
+
+const { confirm } = Modal;
 
 // 계정과목 관련 커스텀 훅
 export const accountSubjectHook = (initialData) => {
@@ -183,19 +186,45 @@ export const accountSubjectHook = (initialData) => {
     };
 
     // 저장 버튼 클릭 시 실행되는 함수
-    const handleSave = async () => {
-        try {
-            const confirmSave = window.confirm("정말로 저장하시겠습니까?");
+    const handleSave = () => {
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            async onOk() {
+                try {
+                    await updateAccountSubjectDetail(accountSubjectDetail.code, accountSubjectDetail);
+                    const updatedData = await fetchAccountSubject();
+                    setData(updatedData);
 
-            if (!confirmSave) return;
+                    // 성공 알림 표시
+                    notification.success({
+                        message: '저장 성공',
+                        description: '변경 사항이 성공적으로 저장되었습니다.',
+                        placement: 'bottomLeft',
+                    });
+                } catch (error) {
+                    console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
 
-            await updateAccountSubjectDetail(accountSubjectDetail.code, accountSubjectDetail);
-            const updatedData = await fetchAccountSubject();
-            setData(updatedData);
-        } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
-        }
-    }
+                    // 실패 알림 표시
+                    notification.error({
+                        message: '저장 실패',
+                        description: '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
+                        placement: 'top',
+                    });
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '저장이 취소',
+                    description: '저장이 취소되었습니다.',
+                    placement: 'bottomLeft',
+                });
+            },
+        });
+    };
+
     const handleTabChange = (key) => {
         setActiveTabKey(key);
     };

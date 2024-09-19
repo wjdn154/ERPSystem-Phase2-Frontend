@@ -129,6 +129,12 @@ input.ant-input[readonly] {
   cursor: pointer !important;
 }
 
+.ant-select-arrow  > span > svg{
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 5px;
+}
+
 .ant-select-selector, .ant-select {
 }
 
@@ -236,6 +242,7 @@ input.ant-input[readonly] {
 /* 버튼 영역 시작  */
 .ant-btn-primary {
   outline: none !important;
+  background-color: #3F87F5 !important;
 }
 .ant-btn-primary > span {
 }

@@ -41,7 +41,7 @@ export const transferMemosColumn = (
                 <Button style={{ height: '30px' }} type="primary" onClick={() => handleAddNewMemo('transferMemos')}>
                     생성
                 </Button>, // '생성' 버튼 컬럼
-            dataIndex: 'action', // 'action' 필드를 위한 데이터 인덱싱 (실제 데이터와는 무관)
+            dataIndex: 'action',
             align: 'center', // 셀 내용을 가운데 정렬
             width: '20%', // 컬럼의 너비 설정
             render: (_, record) => (
