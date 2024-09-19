@@ -18,6 +18,13 @@ const MainContentHook = (selectedSubSubMenu) => {
         // 로딩 상태 설정
         setLoading(true);
 
+        if(selectedSubSubMenu.apiPath === undefined) {
+            setInitialData(null);
+            setError(null);
+            setLoading(false);
+            return;
+        }
+
         if (selectedSubSubMenu.apiPath) {
             axios
                 .post(selectedSubSubMenu.apiPath)
