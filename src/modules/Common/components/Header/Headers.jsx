@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Row, Col } from 'antd';
+import React from 'react';
+import { Layout, Row, Col, Avatar, Dropdown, Button } from 'antd';
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie'; // 쿠키 관리 라이브러리
+import Cookies from 'js-cookie';
 import LogoWhite from "../../../../assets/favicon/OMZ.svg";
-import {useDispatch, useSelector} from "react-redux";
-import {logout} from "../../../../config/redux/authSlice.jsx";
-
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../utils/redux/authSlice.jsx";
+import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons';
 
 const { Header } = Layout;
 
@@ -14,9 +14,9 @@ function Headers() {
     const dispatch = useDispatch();
     const userNickname = useSelector(state => state.auth.userNickname);
 
-    // 로고 클릭 시 특정 페이지로 이동
+    // 로고 클릭 시
     const handleLogoClick = () => {
-        navigate('/groupware/basic-info/company-edit');
+        navigate('/groupware');
     };
 
     // 로그아웃 처리
@@ -26,25 +26,41 @@ function Headers() {
         navigate('/login');
     };
 
+    // 사용자 메뉴 아이템
+    const userMenuItems = [
+        {
+            key: 'profile',
+            label: '프로필',
+            icon: <UserOutlined />,
+        },
+        {
+            type: 'divider',
+        },
+        {
+            key: 'logout',
+            label: '로그아웃',
+            icon: <LogoutOutlined />,
+            onClick: handleLogout,
+        }
+    ];
+
     return (
         <Header style={styles.header}>
-            <Row style={styles.row}>
-                <Col span={12} style={styles.col}>
-                    <Col span={6} style={styles.col}>
-                        <img onClick={handleLogoClick} src={LogoWhite} alt="로고" style={styles.img} />
-                    </Col>
-                    <Col span={6} style={styles.col}>
-                        searchbar
-                    </Col>
-                </Col>
-                <Col span={12} style={styles.col}>
-                    {userNickname ? ( // 사용자가 로그인된 경우
-                        <div style={styles.userSection}>
-                            <span style={styles.userNickname}>{userNickname}</span> {/* 사용자 이름 표시 */}
-                            <button onClick={handleLogout} style={styles.logoutButton}>로그아웃</button> {/* 로그아웃 버튼 */}
-                        </div>
+            <Row justify="space-between" align="middle" style={styles.row}>
+                <img onClick={handleLogoClick} src={LogoWhite} alt="로고" style={styles.img} />
+                <Col>
+                    {userNickname ? (
+                        <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
+                            <div style={styles.userSection}>
+                                <Avatar style={styles.avatar} icon={<UserOutlined />} />
+                                <span style={styles.userNickname}>{userNickname}</span>
+                                <DownOutlined style={styles.downIcon} />
+                            </div>
+                        </Dropdown>
                     ) : (
-                        <div>로그인 필요</div> // 로그인되지 않은 경우
+                        <Button type="primary" onClick={() => navigate('/login')}>
+                            로그인
+                        </Button>
                     )}
                 </Col>
             </Row>
@@ -57,20 +73,16 @@ const styles = {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        color: '#000',
-        padding: '0 20px',
+        backgroundColor: '#fff',
+        padding: '0 24px',
+        height: '64px',
         display: 'flex',
         alignItems: 'center',
-        height: '64px',
-        backgroundColor: '#fff',
-        boxShadow: 'rgba(0, 0, 0, 0.15) 0px 1px 4px -1px',
+        boxShadow: 'rgba(0, 0, 0, 0.1) 0px 1px 4px',
     },
     row: {
         width: '100%',
-    },
-    col: {
-        display: 'flex',
-        alignItems: 'center',
+        color: '#000',
     },
     img: {
         width: '80px',
@@ -79,18 +91,19 @@ const styles = {
     userSection: {
         display: 'flex',
         alignItems: 'center',
+        cursor: 'pointer',
     },
     userNickname: {
-        marginRight: '20px',
+        marginLeft: '10px',
+        marginRight: '10px',
         fontWeight: 'bold',
+        color: '#000',
     },
-    logoutButton: {
-        padding: '5px 10px',
-        backgroundColor: '#f5222d',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
+    downIcon: {
+        color: '#000',
+    },
+    avatar: {
+        backgroundColor: '#1890ff',
     },
 };
 

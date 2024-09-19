@@ -10,7 +10,7 @@ function AntdSkeleton() {
             active
             paragraph={{
                 rows: 3, // 3개의 가로줄을 생성
-                width: ['100%', '90%', '80%'], // 각각의 가로줄 너비를 다르게 설정
+                width: ['80%', '60%', '40%'], // 각각의 가로줄 너비를 다르게 설정
             }}
             title={{ width: '60%' }} // 제목 스켈레톤의 너비를 설정
             style={{
@@ -23,7 +23,7 @@ function AntdSkeleton() {
             active
             paragraph={{
                 rows: 4, // 3개의 가로줄을 생성
-                width: ['100%', '90%', '80%', '70%'], // 각각의 가로줄 너비를 다르게 설정
+                width: ['80%', '50%', '30%', '20%'], // 각각의 가로줄 너비를 다르게 설정
             }}
             title={{ width: '60%' }} // 제목 스켈레톤의 너비를 설정
             style={{
@@ -36,7 +36,7 @@ function AntdSkeleton() {
                 active
                 paragraph={{
                     rows: 3, // 3개의 가로줄을 생성
-                    width: ['100%', '90%', '80%'], // 각각의 가로줄 너비를 다르게 설정
+                    width: ['80%', '60%', '40%'], // 각각의 가로줄 너비를 다르게 설정
                 }}
                 title={{ width: '60%' }} // 제목 스켈레톤의 너비를 설정
                 style={{
