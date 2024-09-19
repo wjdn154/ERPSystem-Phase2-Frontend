@@ -16,7 +16,7 @@ function Headers() {
 
     // 로고 클릭 시
     const handleLogoClick = () => {
-        navigate('/groupware');
+        navigate('/integration');
     };
 
     // 로그아웃 처리

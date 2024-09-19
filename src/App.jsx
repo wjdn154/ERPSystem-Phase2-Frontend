@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
 import { notification } from 'antd';
 import {NotificationProvider, useNotificationContext} from "./modules/Common/utils/NotificationContext.jsx";
+import {jwtDecode} from "jwt-decode";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
@@ -39,7 +40,7 @@ const AppContent = () => {
     useEffect(() => {
         if (location.state?.login) {
             notify('success', '로그인 성공', '환영합니다! 메인 페이지로 이동했습니다.', 'top');
-            navigate('/groupware', {replace: true, state: {}});
+            navigate('/integration', {replace: true, state: {}});
         }
     }, [location.state, notify]);
 
@@ -64,6 +65,7 @@ const AppContent = () => {
 
         return routes;
     };
+
 
     return (
         <>
@@ -91,7 +93,7 @@ const AppContent = () => {
                                                     path="/"
                                                     element={
                                                         <ProtectedRoute>
-                                                            <Navigate to="/groupware" replace />
+                                                            <Navigate to="/integration" replace />
                                                         </ProtectedRoute>
                                                     }
                                                 />
@@ -113,7 +115,7 @@ const AppContent = () => {
                                                     path="*"
                                                     element={
                                                         Cookies.get('jwt')
-                                                            ? <Navigate to="/groupware" replace /> // JWT 토큰이 있으면 메인 페이지로 리다이렉트
+                                                            ? <Navigate to="/integration" replace /> // JWT 토큰이 있으면 메인 페이지로 리다이렉트
                                                             : <Navigate to="/login" replace /> // JWT 토큰이 없으면 로그인 페이지로 리다이렉트
                                                     }
                                                 />
