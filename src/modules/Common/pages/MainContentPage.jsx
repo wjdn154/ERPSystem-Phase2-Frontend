@@ -1,9 +1,11 @@
-import React from 'react';
-import {Typography, Box, Link} from '@mui/material';
-import {Button, Result} from "antd";
+import React, { Component } from 'react';
+import {Result, Button, Typography} from 'antd';
+import { Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import MainContentHook from '../components/hooks/MainContentHook.jsx';
 import AntdSkeleton from "../components/MainContent/AntdSkeleton.jsx";
 
+// 필요한 페이지 컴포넌트들
 import AccountSubjectPage from "../../financial/pages/AccountSubjectPage.jsx";
 import EquipmentDataPage from "../../production/pages/resourceData/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../../production/pages/resourceData/MaintenanceHistoryPage.jsx";
@@ -13,6 +15,12 @@ import UsersDataPage from "../../hr/pages/UsersDataPage.jsx";
 import DepartmentDataPage from "../../hr/pages/DepartmentDataPage.jsx";
 import WorkcenterPage from "../../production/pages/Workcenter/WorkcenterPage.jsx";
 import WorkerPage from "../../production/pages/resourceData/WorkerPage.jsx";
+import CustomErrorPage from "../components/CustomErrorPage.jsx";
+import GroupwareDashboardPage from "../../Groupware/pages/GroupwareDashboardPage.jsx";
+import FinanceDashboardPage from "../../financial/pages/FinanceDashboardPage.jsx";
+import ProductionDashboardPage from "../../production/pages/ProductionDashboardPage.jsx";
+import HRDashboardPage from "../../hr/pages/HRDashboardPage.jsx";
+import LogisticsDashboardPage from "../../logistics/pages/LogisticsDashboardPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
@@ -24,53 +32,71 @@ const componentsMap = {
     UsersDataPage,
     DepartmentDataPage,
     WorkcenterPage,
-    WorkerPage
-    // 필요한 경우 다른 컴포넌트도 여기에 추가
+    WorkerPage,
+    GroupwareDashboardPage,
+    FinanceDashboardPage,
+    ProductionDashboardPage,
+    HRDashboardPage,
+    LogisticsDashboardPage
 };
 
-// MainContentPage 컴포넌트는 선택된 서브메뉴에 따라 관련 데이터를 표시
+// MainContentPage 컴포넌트
 function MainContentPage({ selectedSubSubMenu }) {
-    // MainContentHook 훅을 사용하여 데이터, 로딩 상태 및 오류 관리
     const { initialData, error, loading } = MainContentHook(selectedSubSubMenu);
 
-    // renderContent 함수는 데이터 로딩 상태에 따라 적절한 UI를 렌더링
     const renderContent = () => {
+        // 서브메뉴가 선택되지 않았거나, 컴포넌트가 없을 경우
         if (!selectedSubSubMenu || !selectedSubSubMenu.component) {
-            return <Result
-                status="error"
-                title="컴포넌트를 찾을 수 없습니다."
-                style={{ width: '100%', height: '90vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-                extra={
-                    <Button type="primary" key="console">
-                        돌아가기
-                    </Button>
-                }
-            />;
+            return (
+                <CustomErrorPage
+                    errorCode="404"
+                    errorMessage="해당 메뉴에 연결된 컴포넌트를 찾을 수 없습니다."
+                />
+            );
         }
 
         // 컴포넌트 이름을 통해 실제 컴포넌트를 가져옴
         const ComponentToRender = componentsMap[selectedSubSubMenu.component];
 
+        // API 경로가 없을 경우
         if (!selectedSubSubMenu.apiPath) {
-            return ComponentToRender ? <ComponentToRender /> :
-                <Result
-                    status="warning"
-                    title="API 경로를 찾을 수 없습니다."
-                    extra={
-                        <Button type="primary" key="console">
-                            Go Console
-                        </Button>
-                    }
-                />;
+            return (
+                <CustomErrorPage
+                    errorCode="WARNING"
+                    errorMessage="데이터를 가져올 API 경로가 정의되어 있지 않습니다."
+                />
+            );
         }
 
-        if (loading) return <AntdSkeleton variant="rectangular" style={{ height: '90vh' }} />;
-        if (error) return <Typography color="error">{error}</Typography>;
+        // 로딩 상태일 경우
+        if (loading) {
+            return <AntdSkeleton variant="rectangular" style={{ height: '90vh' }} />;
+        }
 
-        return ComponentToRender ? <ComponentToRender initialData={initialData} /> : <Typography color="error">컴포넌트를 찾을 수 없습니다.</Typography>;
+        // 오류가 발생했을 경우
+        if (error) {
+            return (
+                <CustomErrorPage
+                    errorCode="ERROR"
+                    errorMessage="데이터 로딩에 실패했습니다."
+                />
+            );
+        }
+
+        // 컴포넌트가 렌더링 가능한 경우
+        return ComponentToRender ? (
+            <ComponentToRender initialData={initialData} />
+        ) : (
+            <CustomErrorPage
+                errorCode="500"
+                errorMessage="해당 페이지의 컴포넌트를 찾을 수 없습니다."
+            />
+        );
     };
 
-    return <Box>{renderContent()}</Box>;
+    return (
+        <Box>{renderContent()}</Box>
+    );
 }
 
 export default MainContentPage;
