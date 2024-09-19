@@ -14,9 +14,9 @@ function Headers() {
     const dispatch = useDispatch();
     const userNickname = useSelector(state => state.auth.userNickname);
 
-    // 로고 클릭 시 특정 페이지로 이동
+    // 로고 클릭 시
     const handleLogoClick = () => {
-        navigate('/groupware/basic-info/company-edit');
+        navigate('/groupware');
     };
 
     // 로그아웃 처리

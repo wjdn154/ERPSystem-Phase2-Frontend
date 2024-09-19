@@ -39,7 +39,7 @@ const AppContent = () => {
     useEffect(() => {
         if (location.state?.login) {
             notify('success', '로그인 성공', '환영합니다! 메인 페이지로 이동했습니다.', 'top');
-            navigate('/', {replace: true, state: {}});
+            navigate('/groupware', {replace: true, state: {}});
         }
     }, [location.state, notify]);
 
@@ -91,7 +91,7 @@ const AppContent = () => {
                                                     path="/"
                                                     element={
                                                         <ProtectedRoute>
-                                                            <MainContentPage />
+                                                            <Navigate to="/groupware" replace />
                                                         </ProtectedRoute>
                                                     }
                                                 />
@@ -113,7 +113,7 @@ const AppContent = () => {
                                                     path="*"
                                                     element={
                                                         Cookies.get('jwt')
-                                                            ? <Navigate to="/" replace /> // JWT 토큰이 있으면 메인 페이지로 리다이렉트
+                                                            ? <Navigate to="/groupware" replace /> // JWT 토큰이 있으면 메인 페이지로 리다이렉트
                                                             : <Navigate to="/login" replace /> // JWT 토큰이 없으면 로그인 페이지로 리다이렉트
                                                     }
                                                 />
