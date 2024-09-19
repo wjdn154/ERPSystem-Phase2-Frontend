@@ -110,15 +110,13 @@ const AccountSubjectPage = ({ initialData }) => {
             {/* activeTabKey가 2일 때 새로운 레이아웃을 보여줌 */}
             {activeTabKey === '2' && (
                 /* 계정과목 체계 영역 */
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={2}>
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <AccountSubjectStructureSection data={data} />
                             </div>
                         </Grow>
-                    </Grid>
-                    <Grid item xs={12} md={10}>
                     </Grid>
                 </Grid>
             )}

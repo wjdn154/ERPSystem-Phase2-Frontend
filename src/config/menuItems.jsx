@@ -23,16 +23,22 @@ import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
-    { text: '그룹웨어', icon: <FeaturedPlayListIcon />, url: '/groupware' },
-    { text: '재무회계', icon: <AttachMoneyIcon />, url: '/finance' },
-    { text: '인사관리', icon: <GroupsIcon />, url: '/hr' },
-    { text: '물류관리', icon: <LocalShippingIcon />, url: '/logistics' },
-    { text: '생산관리', icon: <PrecisionManufacturingIcon />, url: '/production' },
+    { text: '그룹웨어', icon: <FeaturedPlayListIcon /> },
+    { text: '재무회계', icon: <AttachMoneyIcon /> },
+    { text: '인사관리', icon: <GroupsIcon /> },
+    { text: '물류관리', icon: <LocalShippingIcon /> },
+    { text: '생산관리', icon: <PrecisionManufacturingIcon /> },
 ];
 
 // 서브 메뉴 아이템 객체를 정의, 메인 메뉴별로 다양한 서브 메뉴 항목들을 배열로 관리
 export const subMenuItems = {
     '그룹웨어': [
+        {
+            text: '대시보드',
+            items: [
+                { text: '대시보드', component: 'GroupwareDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/groupware' },
+            ]
+        },
         {
             text: '기초정보관리',
             items: [
@@ -41,6 +47,12 @@ export const subMenuItems = {
         }
     ],
     '재무회계': [
+        {
+            text: '대시보드',
+            items: [
+                { text: '대시보드', component: 'FinanceDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/finance' },
+            ]
+        },
         {
             text: '기초정보관리',
             items: [
@@ -119,6 +131,12 @@ export const subMenuItems = {
     ],
     '인사관리': [
         {
+            text: '대시보드',
+            items: [
+                { text: '대시보드', component: 'HRDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/hr' },
+            ]
+        },
+        {
             text: '기초 정보 관리',
             items: [
                 { text: '사원 관리', component: 'EmployeeDataPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management' },
@@ -149,6 +167,12 @@ export const subMenuItems = {
         }
     ],
     '물류관리': [
+        {
+            text: '대시보드',
+            items: [
+                { text: '대시보드', component: 'LogisticsDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/logistics' },
+            ]
+        },
         {
             text: '기초정보관리',
             items: [
@@ -226,6 +250,12 @@ export const subMenuItems = {
         }
     ],
     '생산관리': [
+        {
+            text: '대시보드',
+            items: [
+                { text: '대시보드', component: 'ProductionDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/production' },
+            ]
+        },
         {
             text: '기초정보 관리',
             items: [

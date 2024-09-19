@@ -96,7 +96,7 @@ const LoginPage = () => {
             // Redux 상태 업데이트
             dispatch(setAuth(token));
             // 로그인 성공 시 메인 페이지로 이동
-            navigate('/', { state: { login: true } });
+            navigate('/groupware', { state: { login: true } });
         } catch (error) {
             // 에러 메시지 설정
             setLoginError(error.response.data);
