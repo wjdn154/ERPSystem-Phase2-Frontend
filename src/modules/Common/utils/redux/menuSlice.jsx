@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 
 // 초기 상태 설정 (메뉴 관련)
 const initialMenuState = {
-    selectedMenu: '그룹웨어',
+    selectedMenu: '통합관리',
     selectedSubMenu: '기초정보관리',
-    selectedSubSubMenu: { text: '회사정보수정', component: null, apiPath: null, url: '/groupware/basic-info/company-edit' },
+    selectedSubSubMenu: { text: '대시보드', component: 'IntegrationDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/integration' },
 };
 
 // 메뉴 관련 슬라이스 생성
