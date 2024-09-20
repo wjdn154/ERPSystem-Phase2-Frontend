@@ -6,7 +6,7 @@ import { Box, TextField, Typography, Grid, Paper, Link, Dialog, DialogTitle, Dia
 import {Button, Alert, notification} from "antd";
 import { COMMON_API } from "../../../config/apiConstants.jsx";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../utils/redux/authSlice.jsx";
+import {logout, setAuth} from "../utils/redux/authSlice.jsx";
 import background from "../../../assets/img/background3.png";
 import CompanyRegisterSection from "../../financial/components/Company/CompanyReigterSection.jsx";
 import DebounceSelect from '../components/DebounceSelect';
