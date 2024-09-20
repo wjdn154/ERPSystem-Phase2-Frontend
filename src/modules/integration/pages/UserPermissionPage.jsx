@@ -4,15 +4,49 @@ import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../Common/components/WelcomeSection.jsx';
 import { Table } from 'antd';
 import { tabItems } from '../utils/UserPermission/UserPermissonUtil.jsx';
-import { USERS_API } from "../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, USERS_API} from "../../../config/apiConstants.jsx";
 import axios from "axios";
 import {SearchOutlined} from "@ant-design/icons";
+import {setAuth} from "../../Common/utils/redux/authSlice.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 
 const UserPermissionPage = ({ initialData }) => {
+    console.log(initialData);
+
+    const isAdmin = useSelector(state => state.auth.isAdmin);
+    const isAdminPermission = useSelector(state => state.auth.permission);
+    const dispatch = useDispatch();
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [selectedUser, setSelectedUser] = useState(null);
+    const [employee, setEmployee] = useState({});
+    const [adminEmployee, setAdminEmployee] = useState({});
     const [permissions, setPermissions] = useState({});
-    const [isAdmin, setIsAdmin] = useState(false);
+
+    // 필터링 함수: NO_ACCESS가 아닌 값만 반환
+    const filteredPermissions = Object.entries(initialData)
+        .filter(([key, value]) => key !== 'id' && value !== 'NO_ACCESS' && value !== null)
+        .map(([key, value]) => ({
+            key,
+            label: key,
+            value,
+        }));
+
+    const personalPermissionColumns = [
+        {
+            title: '권한명',
+            dataIndex: 'label',
+            key: 'label',
+            align: 'center',
+        },
+        {
+            title: '상태',
+            dataIndex: 'value',
+            key: 'value',
+            align: 'center',
+        },
+    ];
 
 
     const handleUserClick = (user) => {
@@ -20,14 +54,62 @@ const UserPermissionPage = ({ initialData }) => {
         fetchUserPermissions(user.email);
     };
 
+    const fetchAdminEmployee = async () => {
+        try {
+            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_ADMIN_PERMISSION_API(jwtDecode(Cookies.get('jwt')).companyId));
+            const data = response.data;
+            setAdminEmployee(data);
+            console.log(data);
+        } catch (error) {
+            console.error('관리자 직원 정보를 가져오지 못했습니다. :', error);
+        }
+    };
+
+    const fetchEmployee = async () => {
+        try {
+            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
+            const data = response.data;
+            setEmployee(data);
+        } catch (error) {
+            console.error('직원 목록을 가져오지 못했습니다. :', error);
+        }
+    };
+
     const fetchUserPermissions = async (username) => {
         try {
             const response = await axios.post(USERS_API.USERS_PERMISSION_API(username));
             const data = response.data;
-            setPermissions(data); // API로부터 받은 데이터를 직접 사용
-            setIsAdmin(data.adminPermission === 'ADMIN');
+            setPermissions(data);
         } catch (error) {
             console.error('사용자 권한을 가져오지 못했습니다. :', error);
+        }
+    };
+
+    const updateUserPermissions = async () => {
+        try {
+            const requestBody = {
+                username: selectedUser.email,
+                permissionDTO : permissions,
+            };
+
+            const response = await axios.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
+            const permission = response.data;
+            const token = Cookies.get('jwt');
+
+            dispatch(setAuth({ token, permission }));
+
+            notification.success({
+                message: '성공',
+                description: '권한이 성공적으로 저장되었습니다.',
+                placement: 'bottomLeft',
+            });
+
+        } catch (error) {
+            notification.error({
+                message: '실패',
+                description: error.response ? error.response.data : error.message,
+                placement: 'bottomLeft',
+            });
         }
     };
 
@@ -43,14 +125,27 @@ const UserPermissionPage = ({ initialData }) => {
         }));
     };
 
-    const handleSavePermissions = () => {
-        notification.success({
-            message: '성공',
-            description: '권한이 성공적으로 저장되었습니다.',
-        });
+    // 탭 변경 함수
+    const handleTabChange = (key) => {
+        // 2번 탭으로 이동하려 할 때 관리자 권한을 체크
+        if (key === '2') {
+            if (!isAdmin && isAdminPermission.adminPermission !== "ADMIN") {
+                notification.error({
+                    message: '권한 오류',
+                    description: '해당 페이지에 접근할 권한이 없습니다.',
+                    placement: 'top',
+                });
+                return; // 권한이 없으면 탭 변경을 막음
+            }
+            fetchAdminEmployee();
+            fetchEmployee();
+        }
+        // 권한이 있으면 탭을 변경
+        setActiveTabKey(key);
     };
 
     const permissionData = [
+        { key: 'adminPermission', label: '관리자 권한', value: permissions.adminPermission },
         { key: 'clientRegistrationPermission', label: '거래처 등록 권한', value: permissions.clientRegistrationPermission },
         { key: 'accountSubjectPermission', label: '계정과목 및 적요 등록 권한', value: permissions.accountSubjectPermission },
         { key: 'generalVoucherPermission', label: '일반전표 입력 권한', value: permissions.generalVoucherPermission },
@@ -243,22 +338,26 @@ const UserPermissionPage = ({ initialData }) => {
         {
             title: '사용자',
             align: 'center',
-            width: '10%',
+            width: '15%',
             render: (_, record) => (
-                <Checkbox
-                    checked={permissions[record.key] === 'GENERAL'}
-                    onChange={(e) => handlePermissionChange(record.key, e.target.checked ? 'GENERAL' : 'NO_ACCESS')}
-                />
+                record.key === 'adminPermission' ? null : (  // adminPermission이면 아예 안보이게 처리
+                    <Checkbox
+                        checked={permissions[record.key] === 'GENERAL'}
+                        onChange={(e) => handlePermissionChange(record.key, e.target.checked ? 'GENERAL' : 'NO_ACCESS')}
+                        disabled={(selectedUser.email === jwtDecode(Cookies.get('jwt')).sub) && isAdmin || selectedUser.email === adminEmployee}  // 사용자가 자신이면 수정 불가
+                    />
+                )
             ),
         },
         {
             title: '관리자',
             align: 'center',
-            width: '10%',
+            width: '15%',
             render: (_, record) => (
                 <Checkbox
-                    checked={permissions[record.key] === 'APPROVAL'}
-                    onChange={(e) => handlePermissionChange(record.key, e.target.checked ? 'APPROVAL' : 'NO_ACCESS')}
+                    checked={permissions[record.key] === 'ADMIN'}
+                    onChange={(e) => handlePermissionChange(record.key, e.target.checked ? 'ADMIN' : 'NO_ACCESS')}
+                    disabled={(selectedUser.email === jwtDecode(Cookies.get('jwt')).sub) && isAdmin || (record.key === 'adminPermission' && !isAdmin) || selectedUser.email === adminEmployee}  // 자신이거나 isAdmin이 false면 수정 불가
                 />
             ),
         },
@@ -270,25 +369,50 @@ const UserPermissionPage = ({ initialData }) => {
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
                         title="사용자 권한 관리"
-                        description="이 페이지는 사용자의 권한을 관리하고 설정하는 페이지입니다."
+                        description={(
+                            <Typography>
+                                이 페이지는 <span>ERP 시스템의 사용자 권한을 관리</span>하고 설정하는 페이지임.<br/>
+                                관리자는 사용자별로 적합한 권한을 부여하여, 각 사용자가 자신의 직무에 맞는 기능만을 사용할 수 있도록 제어할 수 있음.<br/>
+                                이를 통해 <span>업무 효율성을 극대화</span>하고, 기업 내 시스템의 보안성을 강화할 수 있음.
+                            </Typography>
+                        )}
                         tabItems={tabItems()}
                         activeTabKey={activeTabKey}
-                        handleTabChange={setActiveTabKey}
+                        handleTabChange={handleTabChange}
                     />
                 </Grid>
             </Grid>
-
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                        <Grow in={true} timeout={300}>
+                            <Paper elevation={3}>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>사용자 권한</Typography>
+                                <Table
+                                    style={{ padding: '20px' }}
+                                    columns={personalPermissionColumns}
+                                    dataSource={filteredPermissions}
+                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                    size={'small'}
+                                    rowKey="key"
+                                />
+                            </Paper>
+                        </Grow>
+                    </Grid>
+                </Grid>
+            )}
+
+            {activeTabKey === '2' && (
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     {/* 회원 목록 테이블 */}
-                    <Grow in={true} timeout={300}>
-                        <Grid item xs={12} md={5} sx={{ minWidth: '400px !important', maxWidth: '600px !important' }}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
+                    <Grid item xs={12} md={5} sx={{ minWidth: '600px !important', maxWidth: '800px !important' }}>
+                        <Grow in={true} timeout={300}>
+                            <Paper elevation={3}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>회원 목록</Typography>
                                 <Table
                                     style={{ padding: '20px' }}
                                     columns={userColumns}
-                                    dataSource={initialData}
+                                    dataSource={Array.isArray(employee) ? employee : []}
                                     pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                     rowSelection={handleRowSelection}
                                     size={'small'}
@@ -299,14 +423,14 @@ const UserPermissionPage = ({ initialData }) => {
                                     })}
                                 />
                             </Paper>
-                        </Grid>
-                    </Grow>
+                        </Grow>
+                    </Grid>
 
                     {/* 권한 부여 또는 본인 권한 조회 */}
-                    <Grow in={!!selectedUser} timeout={300}>
-                        <Grid item xs={12} md={7} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={6} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                        <Grow in={!!selectedUser} timeout={300}>
                             {selectedUser ? (
-                                <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Paper elevation={3} >
                                     <Typography variant="h6" sx={{ padding: '20px' }}>
                                         {`${selectedUser.lastName}${selectedUser.firstName} 님의 권한 관리`}
                                     </Typography>
@@ -321,21 +445,17 @@ const UserPermissionPage = ({ initialData }) => {
                                         rowKey="key"
                                     />
 
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{ mt: 2 }}
-                                        onClick={handleSavePermissions}
-                                    >
-                                        권한 저장
-                                    </Button>
+                                    <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
+                                        <Button onClick={updateUserPermissions} type="primary" style={{ marginBottom: '20px' }} >
+                                            저장
+                                        </Button>
+                                    </Box>
                                 </Paper>
                             ) : (
                                 <></>
                             )}
-
-                        </Grid>
-                    </Grow>
+                        </Grow>
+                    </Grid>
                 </Grid>
             )}
         </Box>

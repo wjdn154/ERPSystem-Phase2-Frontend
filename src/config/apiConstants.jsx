@@ -2,8 +2,8 @@ import axios from "axios";
 import Cookies from 'js-cookie';
 
 
-// const API_BASE_URL = "http://localhost:8080";
-const API_BASE_URL = "https://omz.kro.kr";
+const API_BASE_URL = "http://localhost:8080";
+// const API_BASE_URL = "https://omz.kro.kr";
 
 
 axios.interceptors.request.use((config) => {
@@ -37,6 +37,7 @@ export const FINANCIAL_API = {
 // 인사관리 - 사원
 export const EMPLOYEE_API = {
     EMPLOYEE_DATA_API: `${API_BASE_URL}/api/hr/employee/all`, // 사원 목록 조회 API
+    EMPLOYEE_ADMIN_PERMISSION_API:(companyId) => `${API_BASE_URL}/api/hr/employee/permission/admin/${companyId}`, // 관리자 권한 직원 조회
     EMPLOYEE_DATA_DETAIL_API:(id) =>`${API_BASE_URL}/api/hr/employee/${id}`, // 사원 상세 조회 API
     SAVE_EMPLOYEE_DATA_API: `${API_BASE_URL}/api/hr/employee/createEmployee`, // 사원 등록 API
     UPDATE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/hr/employee/updateEmployee/${id}`, // 사원 수정 API
@@ -45,6 +46,7 @@ export const EMPLOYEE_API = {
 // 인사관리 - 사용자
 export const USERS_API = {
     USERS_PERMISSION_API: (username) => `${API_BASE_URL}/api/hr/users/permission/${username}`, // 사용자 권한 조회 API
+    UPDATE_USERS_PERMISSION_API: `${API_BASE_URL}/api/hr/users/permission/update`,
     USERS_DATA_API: `${API_BASE_URL}/api/hr/users/all`,
     USERS_DATA_DETAIL_API: (id) => `${API_BASE_URL}/api/hr/users/${id}`,
     SAVE_USERS_DATA_API: `${API_BASE_URL}/api/hr/users/create`,
