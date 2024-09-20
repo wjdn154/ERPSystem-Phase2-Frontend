@@ -5,8 +5,8 @@ import {
     updateWorkcenter,
     deleteWorkcenter,
     createWorkcenter,
-} from '../../services/Workcenter/WorkcenterApi.jsx';
-import { useSearch } from '../../hooks/useSearch.jsx';
+} from '../../../services/basicData/Workcenter/WorkcenterApi.jsx';
+import { useSearch } from '../../../utils/common/useSearch.jsx';
 
 import { Modal } from "antd";
 
@@ -105,6 +105,11 @@ export const useWorkcenter = (initialData) => {
         let value = e.target.value;
         if (key === 'isActive') {
             value = value.toLowerCase() === 'y';
+        } else if (value.toLowerCase() === 'n') {
+            value = false;
+        } else {
+            // 유효하지 않은 값이 입력된 경우, false로 처리 && 경고 표시
+            value = false; // TODO
         }
 
         setWorkcenter({
@@ -142,7 +147,7 @@ export const useWorkcenter = (initialData) => {
 
             handleClose();
         } catch (error) {
-            console.error("작업장 저장 중 오류 발생:", error);
+            console.error("작업장 저장 중 오류 발생:", error); // TODO 에러페이지 반환
         }
     };
 

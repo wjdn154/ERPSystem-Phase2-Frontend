@@ -6,8 +6,8 @@ import {
     deleteProcessDetail,
     createProcessDetail,
     searchProcessDetails,
-} from '../../services/ProcessDetails/ProcessDetailsApi.jsx';
-import { filterProcessDetails  } from '../../utils/ProcessDetails/ProcessDetailsUtil.jsx';
+} from '../../../services/basicData/ProcessDetails/ProcessDetailsApi.jsx';
+import { filterProcessDetails  } from '../../../utils/basicData/ProcessDetails/ProcessDetailsUtil.jsx';
 
 import {Modal} from "antd";
 
@@ -25,11 +25,13 @@ export const useProcessDetails = (initialData) => {
     useEffect(() => {
         const loadProcessDetails = async () => {
             try {
-                console.log("초기 데이터 로드 시도"); // 로그 추가
+                console.log("초기 데이터 로드 시도");
                 if (!initialData || initialData.length === 0) {
                     const fetchedData = await fetchProcessDetails();
-                    console.log("로드된 데이터:", fetchedData); // 로그 추가
+                    console.log("로드된 데이터:", fetchedData);
                     setData(fetchedData);
+                } else {
+                    console.log("이미 제공된 initialData:", initialData);
                 }
             } catch (error) {
                 console.error("데이터 로드 중 오류 발생:", error);
@@ -108,16 +110,21 @@ export const useProcessDetails = (initialData) => {
     // Input 수정
     const handleInputChange = (e, key) => {
         let value = e.target.value;  // let을 사용하여 값 재할당 가능하도록 변경
-        if (key === 'isOutsourced' || key === 'isUsed') {
-            if (value.toLowerCase() === 'y') {
-                value = true;
-            } else if (value.toLowerCase() === 'n') {
-                value = false;
+
+        // 숫자 double 등 타입 처리해야 하는 필드 유효성 검사
+        if (key === 'duration' || key === 'cost' || key === 'defectRate') {
+            if (isNaN(value)) {
+                console.error("숫자를 입력해주세요.")
+                return;
             } else {
-                // 유효하지 않은 값이 입력된 경우, 기본적으로 false로 처리하거나 경고를 표시할 수 있음
-                value = false;
+                value = parseFloat(value);
             }
         }
+
+        if (key === 'isOutsourced' || key === 'isUsed') {
+            value = value === 'Y' ? true : false;
+        }
+
 
         setProcessDetail({
             ...processDetail,
@@ -142,7 +149,7 @@ export const useProcessDetails = (initialData) => {
             setData(updatedData);
             handleClose();
         } catch (error) {
-            console.error("공정 저장 중 오류 발생:", error);
+            console.error("공정 저장 중 오류 발생:", error); // TODO 에러페이지 반환
         }
     }
 

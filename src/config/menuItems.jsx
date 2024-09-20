@@ -17,8 +17,8 @@ import EquipmentDataPage from "../modules/production/pages/resourceData/Equipmen
 import MaintenanceHistoryPage from "../modules/production/pages/resourceData/MaintenanceHistoryPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
-import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
-import ProcessDetailsPage from "../modules/production/pages/ProcessDetails/ProcessDetailsPage.jsx";
+import WorkcenterPage from "../modules/production/pages/basicData/Workcenter/WorkcenterPage.jsx";
+import ProcessDetailsPage from "../modules/production/pages/basicData/ProcessDetails/ProcessDetailsPage.jsx";
 import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PRODUCTION_API } from '../../../../config/apiConstants.jsx';
+import { PRODUCTION_API } from '../../../../../config/apiConstants.jsx';
 
 // 작업장 목록 조회 함수
 export const fetchWorkcenters = async () => {
