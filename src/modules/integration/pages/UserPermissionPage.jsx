@@ -12,18 +12,17 @@ import {useDispatch, useSelector} from "react-redux";
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
 
-const UserPermissionPage = ({ initialData }) => {
+const UserPermissionPage = () => {
 
     const { token, isAdmin, permission, companyId } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
-    const isAdminPermission = permission;
-    const [myPermissions, setMyPermissions] = useState(initialData);
+    const [myPermissions, setMyPermissions] = useState(permission);
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [selectedUser, setSelectedUser] = useState(null);
     const [employee, setEmployee] = useState({});
     const [adminEmployee, setAdminEmployee] = useState({});
-    const [permissions, setPermissions] = useState({});
+    const [permissions, setPermissions] = useState(permission);
 
     const permissionData = [
         { key: 'adminPermission', label: '관리자 권한', value: permissions.adminPermission },
@@ -302,7 +301,7 @@ const UserPermissionPage = ({ initialData }) => {
     const handleTabChange = (key) => {
         // 2번 탭으로 이동하려 할 때 관리자 권한을 체크
         if (key === '2') {
-            if (!isAdmin && isAdminPermission.adminPermission !== "ADMIN") {
+            if (!isAdmin && myPermissions.adminPermission !== "ADMIN") {
                 notification.error({
                     message: '권한 오류',
                     description: '해당 페이지에 접근할 권한이 없습니다.',
