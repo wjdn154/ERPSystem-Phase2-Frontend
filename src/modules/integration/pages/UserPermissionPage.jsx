@@ -416,6 +416,9 @@ const UserPermissionPage = () => {
                                     pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                     size={'small'}
                                     rowKey="key"
+                                    locale={{
+                                        emptyText: '데이터가 없습니다.',
+                                    }}
                                 />
                             </Paper>
                         </Grow>
@@ -442,6 +445,9 @@ const UserPermissionPage = () => {
                                         onClick: () => handleUserClick(record),
                                         style: { cursor: 'pointer' },
                                     })}
+                                    locale={{
+                                        emptyText: '데이터가 없습니다.',
+                                    }}
                                 />
                             </Paper>
                         </Grow>
@@ -464,6 +470,9 @@ const UserPermissionPage = () => {
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         size={'small'}
                                         rowKey="key"
+                                        locale={{
+                                            emptyText: '데이터가 없습니다.',
+                                        }}
                                     />
 
                                     <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
