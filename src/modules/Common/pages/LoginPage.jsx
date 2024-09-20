@@ -15,7 +15,6 @@ import {useNotificationContext} from "../utils/NotificationContext.jsx";
 const LoginPage = () => {
     const notify = useNotificationContext();
     const location = useLocation();
-    const [loginError, setLoginError] = useState('');
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -33,12 +32,6 @@ const LoginPage = () => {
         }
     }, [location.state, notify]);
 
-    useEffect(() => {
-        if(loginError) {
-            notify('error', '로그인 실패', loginError, 'top');
-            setLoginError('');
-        }
-    }, [loginError]);
 
     // 초기값 API 호출
     const fetchInitialCompanyOptions = async () => {
@@ -89,18 +82,16 @@ const LoginPage = () => {
         e.preventDefault();
         try {
             const response = await axios.post(COMMON_API.LOGIN_API, formData);
-            // response.data.token에서 토큰 추출
-            const token = response.data.token;
+            // 서버로부터 토큰과 권한 정보를 받아옴
+            const { token, permission, isAdmin } = response.data;
             // JWT 토큰을 쿠키에 저장 (만료 기간 1일)
             Cookies.set('jwt', token, { expires: 1 });
-            // Redux 상태 업데이트
-            dispatch(setAuth(token));
+            // Redux 상태 업데이트 (JWT 토큰 및 권한 정보 저장)
+            dispatch(setAuth({ token, permission, isAdmin }));
             // 로그인 성공 시 메인 페이지로 이동
             navigate('/integration', { state: { login: true } });
         } catch (error) {
-            // 에러 메시지 설정
-            setLoginError(error.response.data);
-            console.error("로그인 실패", error);
+            notify('error', '로그인 실패', error.response.data, 'top');
         }
     };
 

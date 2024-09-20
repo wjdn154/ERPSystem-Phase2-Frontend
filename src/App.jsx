@@ -12,13 +12,13 @@ import Headers from './modules/Common/components/Header/Headers.jsx';
 import { subMenuItems } from './config/menuItems.jsx';
 import { Layout } from "antd";
 import LoginPage from "./modules/Common/pages/LoginPage.jsx";
-import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
 import { setAuth } from "./modules/Common/utils/redux/authSlice.jsx";
 import { useDispatch } from "react-redux";
 import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
 import { notification } from 'antd';
 import {NotificationProvider, useNotificationContext} from "./modules/Common/utils/NotificationContext.jsx";
 import {jwtDecode} from "jwt-decode";
+import ProtectedRoute from "./config/ProtectedRoute.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
@@ -29,13 +29,6 @@ const AppContent = () => {
     const navigate = useNavigate();
 
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        const token = Cookies.get('jwt');
-        if (token) {
-            dispatch(setAuth(token));  // 쿠키에 있는 토큰으로 Redux 상태 초기화
-        }
-    }, [dispatch]);
 
     useEffect(() => {
         if (location.state?.login) {

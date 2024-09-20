@@ -1,10 +1,13 @@
-import React, { Component } from 'react';
-import { Box, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Box, Button, Typography } from "@mui/material";
+import { useNavigate, useLocation } from 'react-router-dom';
 
-// 커스텀 에러 페이지 디자인
-function CustomErrorPage({ errorCode, errorMessage }) {
+const UnauthorizedPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // 전달된 state에서 requiredPermission, userPermission 추출
+    const { permissionLevel, userPermission } = location.state || { permissionLevel: '알 수 없음', userPermission: '알 수 없음' };
 
     return (
         <Box
@@ -13,26 +16,28 @@ function CustomErrorPage({ errorCode, errorMessage }) {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 'calc(100vh - 128px)',  // 헤더
+                height: '100vh',
+                width: '100vw',
                 marginRight: '140px',            // 사이드바
                 backgroundColor: '#fafafa',
                 textAlign: 'center',
                 padding: '20px',
             }}
         >
-            {/* 에러 코드 */}
-            <Typography variant="h1" sx={{ fontWeight: 'bold', marginBottom: '16px', color: '#FF6F61', fontSize: '120px' }}>
-                {errorCode}
+            {/* 에러 코드 및 권한 정보 출력 */}
+            <Typography variant="h1" sx={{ fontWeight: 'bold', marginBottom: '16px', color: '#FF6F61', fontSize: '100px' }}>
+                권한이 없습니다
             </Typography>
 
             {/* 에러 메시지 */}
             <Typography variant="h5" sx={{ marginBottom: '24px', color: '#333', fontSize: '22px' }}>
-                {errorMessage}
+                이 페이지에 접근할 권한이 없습니다. 관리자에게 문의하세요.<br/>
             </Typography>
 
             {/* 추가 메시지 */}
             <Typography sx={{ marginBottom: '40px', color: '#555', fontSize: '18px' }}>
-                페이지를 새로고침하거나, 메인 페이지로 돌아가 주세요.
+                필요한 권한: {permissionLevel}<br/>
+                현재 권한: {userPermission}
             </Typography>
 
             {/* 버튼 섹션 */}
@@ -70,6 +75,6 @@ function CustomErrorPage({ errorCode, errorMessage }) {
             </Box>
         </Box>
     );
-}
+};
 
-export default CustomErrorPage;
+export default UnauthorizedPage;

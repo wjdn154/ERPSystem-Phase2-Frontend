@@ -1,9 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
 const initialAuthState = {
     token: null,
     userNickname: null,
+    isAdmin: false,
+    permission: {},
+    companyId: null,
 };
 
 const authSlice = createSlice({
@@ -11,17 +16,41 @@ const authSlice = createSlice({
     initialState: initialAuthState,
     reducers: {
         setAuth: (state, action) => {
-            state.token = action.payload;
-            const decodedToken = jwtDecode(action.payload);
-            state.userNickname = decodedToken.userNickname;
+            const { token, permission, isAdmin } = action.payload;
+
+            state.permission = permission;
+            state.isAdmin = isAdmin;
+
+            if (token && typeof token === 'string') {
+                state.token = token;
+
+                try {
+                    const decodedToken = jwtDecode(token);
+                    state.userNickname = decodedToken.userNickname;
+                    state.companyId = decodedToken.companyId;
+                } catch (error) {
+                    console.error('유효하지 않은 토큰:', error);
+                    state.token = null;
+                    state.userNickname = null;
+                    state.companyId = null;
+                }
+            }
         },
         logout: (state) => {
             state.token = null;
             state.userNickname = null;
+            state.isAdmin = false;
+            state.permission = null;
+            state.companyId = null;
         },
     },
 });
 
-// 액션을 내보내기 (setAuth, logout)
+const persistConfig = {
+    key: 'auth',
+    storage,
+    whitelist: ['token', 'userNickname', 'isAdmin', 'permission', 'companyId'],
+};
+
 export const { setAuth, logout } = authSlice.actions;
-export default authSlice.reducer;
+export default persistReducer(persistConfig, authSlice.reducer);
