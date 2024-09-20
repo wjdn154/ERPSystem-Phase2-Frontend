@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore } from 'redux-persist';
-import menuReducer from './modules/Common/utils/redux/menuSlice';
-import authReducer from './modules/Common/utils/redux/authSlice';
-import notificationReducer from './modules/Common/utils/redux/notificationSlice';
+import menuReducer from './config/redux/menuSlice';
+import authReducer from './config/redux/authSlice';
+import notificationReducer from './config/redux/notificationSlice';
 
 const store = configureStore({
     reducer: {

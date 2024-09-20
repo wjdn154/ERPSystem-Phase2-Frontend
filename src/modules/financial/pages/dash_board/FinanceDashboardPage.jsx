@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {Box, Grid, Typography} from '@mui/material';
-import WelcomeSection from '../../common/components/WelcomeSection.jsx';
-import { tabItems } from '../utils/dash_board/DashBoardUtil.jsx';
+import WelcomeSection from '../../../common/components/WelcomeSection.jsx';
+import { tabItems } from './DashBoardUtil.jsx';
 
-const LogisticsDashboardPage = ({ initialData }) => {
+const FinanceDashboardPage = ({ initialData }) => {
     const [activeTabKey, setActiveTabKey] = useState('1');
 
     const handleTabChange = (key) => {
@@ -15,10 +15,10 @@ const LogisticsDashboardPage = ({ initialData }) => {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <WelcomeSection
-                        title="물류관리 대시보드"
+                        title="재무회계 대시보드"
                         description={(
                             <Typography>
-                                물류관리 대시보드는 상품의 이동 및 창고 관리 등을 포함하여 전체적인 물류 프로세스를 관리합니다.
+                                재무회계 대시보드는 기업의 재무 상태와 회계 정보를 관리하는 페이지입니다. 재무 보고 및 분석이 가능합니다.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -31,7 +31,7 @@ const LogisticsDashboardPage = ({ initialData }) => {
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12}>
-                        <Typography>물류관리 기본 콘텐츠입니다.</Typography>
+                        <Typography>재무회계 기본 콘텐츠입니다.</Typography>
                     </Grid>
                 </Grid>
             )}
@@ -39,7 +39,7 @@ const LogisticsDashboardPage = ({ initialData }) => {
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12}>
-                        <Typography>다른 물류관리 탭의 콘텐츠입니다.</Typography>
+                        <Typography>다른 재무회계 탭의 콘텐츠입니다.</Typography>
                     </Grid>
                 </Grid>
             )}
@@ -47,4 +47,4 @@ const LogisticsDashboardPage = ({ initialData }) => {
     );
 };
 
-export default LogisticsDashboardPage;
+export default FinanceDashboardPage;
