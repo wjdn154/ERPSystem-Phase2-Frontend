@@ -1,11 +1,11 @@
 import React from 'react';
 import { Row, Col, Button, Modal, Typography } from 'antd';
-import SearchBar from '../../components/ProcessDetails/SearchBar.jsx';
-import ProcessDetailsListSection from '../../components/ProcessDetails/ProcessDetailsListSection.jsx';
-import SelectedProcessDetailsSection from '../../components/ProcessDetails/SelectedProcessDetailsSection.jsx';
-import { useProcessDetails } from '../../hooks/ProcessDetails/ProcessDetailsHook.jsx';
-import { processDetailsColumn } from '../../utils/ProcessDetails/ProcessDetailsColumn.jsx';
-import { getRowClassName, filterProcessDetails } from '../../utils/ProcessDetails/ProcessDetailsUtil.jsx';
+import SearchBar from '../../../components/basicData/ProcessDetails/SearchBar.jsx';
+import ProcessDetailsListSection from '../../../components/basicData/ProcessDetails/ProcessDetailsListSection.jsx';
+import SelectedProcessDetailsSection from '../../../components/basicData/ProcessDetails/SelectedProcessDetailsSection.jsx';
+import { useProcessDetails } from '../../../hooks/basicData/ProcessDetails/ProcessDetailsHook.jsx';
+import { processDetailsColumn } from '../../../utils/basicData/ProcessDetails/ProcessDetailsColumn.jsx';
+import { getRowClassName, filterProcessDetails } from '../../../utils/basicData/ProcessDetails/ProcessDetailsUtil.jsx';
 
 const { Text } = Typography;
 

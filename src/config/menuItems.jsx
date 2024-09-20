@@ -17,8 +17,8 @@ import EquipmentDataPage from "../modules/production/pages/resourceData/Equipmen
 import MaintenanceHistoryPage from "../modules/production/pages/resourceData/MaintenanceHistoryPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
-import WorkcenterPage from "../modules/production/pages/Workcenter/WorkcenterPage.jsx";
-import ProcessDetailsPage from "../modules/production/pages/ProcessDetails/ProcessDetailsPage.jsx";
+import WorkcenterPage from "../modules/production/pages/basicData/Workcenter/WorkcenterPage.jsx";
+import ProcessDetailsPage from "../modules/production/pages/basicData/ProcessDetails/ProcessDetailsPage.jsx";
 import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";

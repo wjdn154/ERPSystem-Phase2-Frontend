@@ -13,7 +13,8 @@ import ClientRegistrationPage from "../../financial/pages/ClientRegistrationPage
 import EmployeeDataPage from "../../hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../../hr/pages/UsersDataPage.jsx";
 import DepartmentDataPage from "../../hr/pages/DepartmentDataPage.jsx";
-import WorkcenterPage from "../../production/pages/Workcenter/WorkcenterPage.jsx";
+import WorkcenterPage from "../../production/pages/basicData/Workcenter/WorkcenterPage.jsx";
+import ProcessDetailsPage from "../../production/pages/basicData/ProcessDetails/ProcessDetailsPage.jsx";
 import WorkerPage from "../../production/pages/resourceData/WorkerPage.jsx";
 import CustomErrorPage from "../components/CustomErrorPage.jsx";
 import IntegrationDashboardPage from "../../integration/pages/IntegrationDashboardPage.jsx";
@@ -36,6 +37,7 @@ const componentsMap = {
     UsersDataPage,
     DepartmentDataPage,
     WorkcenterPage,
+    ProcessDetailsPage,
     WorkerPage,
     IntegrationDashboardPage,
     FinanceDashboardPage,

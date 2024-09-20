@@ -4,6 +4,7 @@ import { Table, Button, Space, Modal } from 'antd';
 const { confirm } = Modal;
 
 const ProcessDetailsListSection = ({ columns, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
+
     if (!data) {
         return null;
     }

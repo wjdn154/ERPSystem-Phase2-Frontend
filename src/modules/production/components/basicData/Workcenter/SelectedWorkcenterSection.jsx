@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Select } from 'antd';
-import { ActionButtons, showDeleteConfirm } from '../../utils/commonActions';  // 공통 버튼 및 다이얼로그
-import { isActiveOptions, workcenterTypeOptions } from '../../utils/dropdownOptions';  // 공통 드롭다운 옵션
+import { ActionButtons, showDeleteConfirm } from '../../../utils/common/commonActions.jsx';  // 공통 버튼 및 다이얼로그
+import { isTrueOptions, workcenterTypeOptions } from '../../../utils/common/dropdownOptions.jsx';  // 공통 드롭다운 옵션
 
 const SelectedWorkcenterSection = ({
                                      workcenter,
@@ -26,7 +26,6 @@ const SelectedWorkcenterSection = ({
       <div style={{ padding: '20px', position: 'relative' }}>
         <Form layout="vertical" initialValues={workcenter}>
 
-          {/* 작업장 코드 */}
           <Form.Item label="작업장 코드">
             <Input
                 value={workcenter.code}
@@ -35,7 +34,6 @@ const SelectedWorkcenterSection = ({
             />
           </Form.Item>
 
-          {/* 작업장명 */}
           <Form.Item label="작업장명">
             <Input
                 value={workcenter.name}
@@ -43,7 +41,6 @@ const SelectedWorkcenterSection = ({
             />
           </Form.Item>
 
-          {/* 작업장 유형 (공통 Enum 드롭다운 사용) */}
           <Form.Item label="작업장 유형">
             <Select
                 value={workcenter.workcenterType}
@@ -56,7 +53,7 @@ const SelectedWorkcenterSection = ({
           <Form.Item label="활성 상태">
             <Select
                 value={workcenter.isActive ? 'Y' : 'N'}
-                options={isActiveOptions}  // 공통 드롭다운 옵션 사용
+                options={isTrueOptions}  // 공통 드롭다운 옵션 사용
                 onChange={(value) => handleInputChange({ target: { value } }, 'isActive')}
             />
           </Form.Item>
