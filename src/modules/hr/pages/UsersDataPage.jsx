@@ -1,8 +1,8 @@
 import React, {useMemo} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import {usersDataHook} from "../hooks/UsersDataHook.jsx";
-import UsersDataListSection from "../components/Users/UsersDataListSection.jsx";
-import {usersDataListColumn} from "../utils/UsersData/UsersDataListColumn.jsx";
+import UsersDataListSection from "../components/users/UsersDataListSection.jsx";
+import {usersDataListColumn} from "../utils/users_data/UsersDataListColumn.jsx";
 //import UsersDataDetailSection from "../components/Users/UsersDataDetailSection.jsx";
 //import {getRowClassName} from "../utils/UsersData/UsersDataListColumn.jsx";
 

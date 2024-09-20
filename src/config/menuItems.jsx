@@ -12,13 +12,13 @@ import {
     PRODUCTION_API,
     USERS_API
 } from "./apiConstants.jsx";
-import AccountSubjectPage from "../modules/financial/pages/AccountSubjectPage.jsx";
-import EquipmentDataPage from "../modules/production/pages/resourceData/EquipmentDataPage.jsx";
-import MaintenanceHistoryPage from "../modules/production/pages/resourceData/MaintenanceHistoryPage.jsx";
+import AccountSubjectPage from "../modules/financial/pages/account_subject/AccountSubjectPage.jsx";
+import EquipmentDataPage from "../modules/production/pages/resource_data/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../modules/production/pages/resource_data/MaintenanceHistoryPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../modules/hr/pages/UsersDataPage.jsx";
-import WorkcenterPage from "../modules/production/pages/basicData/Workcenter/WorkcenterPage.jsx";
-import ProcessDetailsPage from "../modules/production/pages/basicData/ProcessDetails/ProcessDetailsPage.jsx";
+import WorkcenterPage from "../modules/production/pages/basic_data/Workcenter/WorkcenterPage.jsx";
+import ProcessDetailsPage from "../modules/production/pages/basic_data/ProcessDetails/ProcessDetailsPage.jsx";
 import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";

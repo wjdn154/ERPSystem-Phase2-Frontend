@@ -250,9 +250,9 @@ import { Grid, Grow, Box } from '@mui/material';
 import axios from 'axios';
 import { EMPLOYEE_API } from '../../../config/apiConstants.jsx';
 import { employeeDataHook } from '../hooks/EmployeeDataHook';
-import EmployeeDataListSection from '../components/Employee/EmployeeDataListSection.jsx';
-import { employeeDataListColumn } from '../utils/EmployeeData/EmployeeDataListColumn.jsx';
-import EmployeeDetailModal from '../components/Employee/EmployeeDetailModal';
+import EmployeeDataListSection from '../components/employee/EmployeeDataListSection.jsx';
+import { employeeDataListColumn } from '../utils/employee_data/EmployeeDataListColumn.jsx';
+import EmployeeDetailModal from '../components/employee/EmployeeDetailModal';
 
 const EmployeeDataPage = ({ initialData }) => {
     const [isDetailModalVisible, setIsDetailModalVisible] = useState(false); // 상세 모달 표시 상태

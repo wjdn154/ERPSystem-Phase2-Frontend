@@ -1,25 +1,25 @@
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
+import { themeSettings } from './config/AppUtil.jsx';
 import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
-import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
-import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
-import MainContentPage from './modules/Common/pages/MainContentPage.jsx';
-import Headers from './modules/Common/components/Header/Headers.jsx';
+import ContentWrapper from './modules/common/pages/main_content/ContentWrapper.jsx';
+import Sidebar from './modules/common/components/Sidebar.jsx';
+import MainContentPage from './modules/common/pages/main_content/MainContentPage.jsx';
+import Headers from './modules/common/components/Headers.jsx';
 import { Layout } from "antd";
-import LoginPage from "./modules/Common/pages/LoginPage.jsx";
+import LoginPage from "./modules/common/pages/login/LoginPage.jsx";
 import ProtectedRoute from "./config/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
-import { setAuth } from "./modules/Common/utils/redux/authSlice.jsx";
+import { setAuth } from "./config/redux/authSlice.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import { subMenuItems } from './config/menuItems.jsx';
-import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
+import RegisterPage from "./modules/common/pages/register/RegisterPage.jsx";
 import { notification } from 'antd';
-import { NotificationProvider, useNotificationContext } from "./modules/Common/utils/NotificationContext.jsx";
+import { NotificationProvider, useNotificationContext } from "./config/NotificationContext.jsx";
 import { jwtDecode } from "jwt-decode";
-import UnauthorizedPage from "./modules/Common/pages/UnauthorizedPage.jsx";
+import UnauthorizedPage from "./modules/common/pages/unauthorized/UnauthorizedPage.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
