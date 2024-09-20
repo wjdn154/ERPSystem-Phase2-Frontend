@@ -13,136 +13,17 @@ import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
 
 const UserPermissionPage = ({ initialData }) => {
-    console.log(initialData);
 
-    const isAdmin = useSelector(state => state.auth.isAdmin);
-    const isAdminPermission = useSelector(state => state.auth.permission);
+    const { token, isAdmin, permission, companyId } = useSelector((state) => state.auth);
+
     const dispatch = useDispatch();
+    const isAdminPermission = permission;
+    const [myPermissions, setMyPermissions] = useState(initialData);
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [selectedUser, setSelectedUser] = useState(null);
     const [employee, setEmployee] = useState({});
     const [adminEmployee, setAdminEmployee] = useState({});
     const [permissions, setPermissions] = useState({});
-
-    // 필터링 함수: NO_ACCESS가 아닌 값만 반환
-    const filteredPermissions = Object.entries(initialData)
-        .filter(([key, value]) => key !== 'id' && value !== 'NO_ACCESS' && value !== null)
-        .map(([key, value]) => ({
-            key,
-            label: key,
-            value,
-        }));
-
-    const personalPermissionColumns = [
-        {
-            title: '권한명',
-            dataIndex: 'label',
-            key: 'label',
-            align: 'center',
-        },
-        {
-            title: '상태',
-            dataIndex: 'value',
-            key: 'value',
-            align: 'center',
-        },
-    ];
-
-
-    const handleUserClick = (user) => {
-        setSelectedUser(user);
-        fetchUserPermissions(user.email);
-    };
-
-    const fetchAdminEmployee = async () => {
-        try {
-            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_ADMIN_PERMISSION_API(jwtDecode(Cookies.get('jwt')).companyId));
-            const data = response.data;
-            setAdminEmployee(data);
-            console.log(data);
-        } catch (error) {
-            console.error('관리자 직원 정보를 가져오지 못했습니다. :', error);
-        }
-    };
-
-    const fetchEmployee = async () => {
-        try {
-            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
-            const data = response.data;
-            setEmployee(data);
-        } catch (error) {
-            console.error('직원 목록을 가져오지 못했습니다. :', error);
-        }
-    };
-
-    const fetchUserPermissions = async (username) => {
-        try {
-            const response = await axios.post(USERS_API.USERS_PERMISSION_API(username));
-            const data = response.data;
-            setPermissions(data);
-        } catch (error) {
-            console.error('사용자 권한을 가져오지 못했습니다. :', error);
-        }
-    };
-
-    const updateUserPermissions = async () => {
-        try {
-            const requestBody = {
-                username: selectedUser.email,
-                permissionDTO : permissions,
-            };
-
-            const response = await axios.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
-            const permission = response.data;
-            const token = Cookies.get('jwt');
-
-            dispatch(setAuth({ token, permission }));
-
-            notification.success({
-                message: '성공',
-                description: '권한이 성공적으로 저장되었습니다.',
-                placement: 'bottomLeft',
-            });
-
-        } catch (error) {
-            notification.error({
-                message: '실패',
-                description: error.response ? error.response.data : error.message,
-                placement: 'bottomLeft',
-            });
-        }
-    };
-
-    const handleRowSelection = {
-        type: 'radio',
-        selectedRowKeys: selectedUser ? [selectedUser.id] : [],
-    };
-
-    const handlePermissionChange = (permissionKey, value) => {
-        setPermissions((prevPermissions) => ({
-            ...prevPermissions,
-            [permissionKey]: value,
-        }));
-    };
-
-    // 탭 변경 함수
-    const handleTabChange = (key) => {
-        // 2번 탭으로 이동하려 할 때 관리자 권한을 체크
-        if (key === '2') {
-            if (!isAdmin && isAdminPermission.adminPermission !== "ADMIN") {
-                notification.error({
-                    message: '권한 오류',
-                    description: '해당 페이지에 접근할 권한이 없습니다.',
-                    placement: 'top',
-                });
-                return; // 권한이 없으면 탭 변경을 막음
-            }
-            fetchAdminEmployee();
-            fetchEmployee();
-        }
-        // 권한이 있으면 탭을 변경
-        setActiveTabKey(key);
-    };
 
     const permissionData = [
         { key: 'adminPermission', label: '관리자 권한', value: permissions.adminPermission },
@@ -274,26 +155,167 @@ const UserPermissionPage = ({ initialData }) => {
             width: '20%',
             render: (text, record) => {
                 let color;
+                let value;
                 switch (record.departmentName) {
                     case '재무부':
                         color = 'red';
+                        value = '재무';
                         break;
                     case '인사부':
                         color = 'green';
+                        value = '인사';
                         break;
                     case '생산부':
                         color = 'blue';
+                        value = '생산';
                         break;
                     case '물류부':
                         color = 'orange';
+                        value = '물류';
                         break;
                     default:
                         color = 'gray'; // 기본 색상
                 }
-                return <Tag style={{ marginLeft: '5px' }} color={color}>{record.departmentName}</Tag>;
+                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
             }
         },
     ];
+
+    // 필터링 함수: NO_ACCESS가 아닌 값만 반환
+    const filteredPermissions = permissionData
+        .filter(({ key }) => myPermissions[key] && myPermissions[key] !== 'NO_ACCESS' && myPermissions[key] !== null)
+        .map(({ key, label }) => ({
+            key,
+            label,  // permissionData에서 이미 한글로 된 label 사용
+            value: myPermissions[key],  // myPermissions에서 권한 값 가져오기
+        }));
+
+    const personalPermissionColumns = [
+        {
+            title: '권한명',
+            dataIndex: 'label',
+            key: 'label',
+            align: 'center',
+        },
+        {
+            title: '상태',
+            dataIndex: 'value',
+            key: 'value',
+            align: 'center',
+            render: (text, record) => {
+                let color;
+                let value;
+                switch (text) {
+                    case 'ADMIN':
+                        color = 'blue';
+                        value = '관리자';
+                        break;
+                    case 'GENERAL':
+                        color = 'green';
+                        value = '사용자';
+                        break;
+                    default:
+                        color = 'gray';
+                }
+                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+            }
+        },
+    ];
+
+
+    const handleUserClick = (user) => {
+        setSelectedUser(user);
+        fetchUserPermissions(user.email);
+    };
+
+    const fetchAdminEmployee = async () => {
+        try {
+            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_ADMIN_PERMISSION_API(companyId));
+            const data = response.data;
+            setAdminEmployee(data);
+        } catch (error) {
+            console.error('관리자 직원 정보를 가져오지 못했습니다. :', error);
+        }
+    };
+
+    const fetchEmployee = async () => {
+        try {
+            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
+            const data = response.data;
+            setEmployee(data);
+        } catch (error) {
+            console.error('직원 목록을 가져오지 못했습니다. :', error);
+        }
+    };
+
+    const fetchUserPermissions = async (username) => {
+        try {
+            const response = await axios.post(USERS_API.USERS_PERMISSION_API(username));
+            const data = response.data;
+            setPermissions(data);
+        } catch (error) {
+            console.error('사용자 권한을 가져오지 못했습니다. :', error);
+        }
+    };
+
+    const updateUserPermissions = async () => {
+        try {
+            const requestBody = {
+                username: selectedUser.email,
+                permissionDTO : permissions,
+            };
+
+            const response = await axios.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
+            const permission = response.data;
+
+            dispatch(setAuth({ token, permission }));
+            setMyPermissions(permission);
+
+            notification.success({
+                message: '성공',
+                description: '권한이 성공적으로 저장되었습니다.',
+                placement: 'bottomLeft',
+            });
+
+        } catch (error) {
+            notification.error({
+                message: '실패',
+                description: error.response ? error.response.data : error.message,
+                placement: 'bottomLeft',
+            });
+        }
+    };
+
+    const handleRowSelection = {
+        type: 'radio',
+        selectedRowKeys: selectedUser ? [selectedUser.id] : [],
+    };
+
+    const handlePermissionChange = (permissionKey, value) => {
+        setPermissions((prevPermissions) => ({
+            ...prevPermissions,
+            [permissionKey]: value,
+        }));
+    };
+
+    // 탭 변경 함수
+    const handleTabChange = (key) => {
+        // 2번 탭으로 이동하려 할 때 관리자 권한을 체크
+        if (key === '2') {
+            if (!isAdmin && isAdminPermission.adminPermission !== "ADMIN") {
+                notification.error({
+                    message: '권한 오류',
+                    description: '해당 페이지에 접근할 권한이 없습니다.',
+                    placement: 'top',
+                });
+                return; // 권한이 없으면 탭 변경을 막음
+            }
+            fetchAdminEmployee();
+            fetchEmployee();
+        }
+        // 권한이 있으면 탭을 변경
+        setActiveTabKey(key);
+    };
 
     const permissionColumns = [
         {
@@ -344,7 +366,7 @@ const UserPermissionPage = ({ initialData }) => {
                     <Checkbox
                         checked={permissions[record.key] === 'GENERAL'}
                         onChange={(e) => handlePermissionChange(record.key, e.target.checked ? 'GENERAL' : 'NO_ACCESS')}
-                        disabled={(selectedUser.email === jwtDecode(Cookies.get('jwt')).sub) && isAdmin || selectedUser.email === adminEmployee}  // 사용자가 자신이면 수정 불가
+                        disabled={(selectedUser.email === jwtDecode(token).sub) && isAdmin || selectedUser.email === adminEmployee}  // 사용자가 자신이면 수정 불가
                     />
                 )
             ),
@@ -357,7 +379,7 @@ const UserPermissionPage = ({ initialData }) => {
                 <Checkbox
                     checked={permissions[record.key] === 'ADMIN'}
                     onChange={(e) => handlePermissionChange(record.key, e.target.checked ? 'ADMIN' : 'NO_ACCESS')}
-                    disabled={(selectedUser.email === jwtDecode(Cookies.get('jwt')).sub) && isAdmin || (record.key === 'adminPermission' && !isAdmin) || selectedUser.email === adminEmployee}  // 자신이거나 isAdmin이 false면 수정 불가
+                    disabled={(selectedUser.email === jwtDecode(token).sub) && isAdmin || (record.key === 'adminPermission' && !isAdmin) || selectedUser.email === adminEmployee}  // 자신이거나 isAdmin이 false면 수정 불가
                 />
             ),
         },
@@ -387,7 +409,7 @@ const UserPermissionPage = ({ initialData }) => {
                     <Grid item xs={12} md={6}>
                         <Grow in={true} timeout={300}>
                             <Paper elevation={3}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>사용자 권한</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>내 권한</Typography>
                                 <Table
                                     style={{ padding: '20px' }}
                                     columns={personalPermissionColumns}
