@@ -23,7 +23,7 @@ import DepartmentDataPage from "../modules/hr/pages/DepartmentDataPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
-    { text: '그룹웨어', icon: <FeaturedPlayListIcon /> },
+    { text: '통합관리', icon: <FeaturedPlayListIcon /> },
     { text: '재무회계', icon: <AttachMoneyIcon /> },
     { text: '인사관리', icon: <GroupsIcon /> },
     { text: '물류관리', icon: <LocalShippingIcon /> },
@@ -32,17 +32,18 @@ export const menuItems = [
 
 // 서브 메뉴 아이템 객체를 정의, 메인 메뉴별로 다양한 서브 메뉴 항목들을 배열로 관리
 export const subMenuItems = {
-    '그룹웨어': [
+    '통합관리': [
         {
             text: '대시보드',
             items: [
-                { text: '대시보드', component: 'GroupwareDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/groupware' },
+                { text: '대시보드', component: 'IntegrationDashboardPage', apiPath: undefined, url: '/integration' },
             ]
         },
         {
             text: '기초정보관리',
             items: [
-                { text: '회사정보수정', component: null, apiPath: null, url: '/groupware/basic-info/company-edit' },
+                { text: '회사정보수정', component: null, apiPath: null, url: '/integration/basic-info/company-edit' },
+                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/integration/basic-info/user-management' },
             ]
         }
     ],
@@ -50,7 +51,7 @@ export const subMenuItems = {
         {
             text: '대시보드',
             items: [
-                { text: '대시보드', component: 'FinanceDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/finance' },
+                { text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/finance' },
             ]
         },
         {
@@ -63,12 +64,14 @@ export const subMenuItems = {
             ]
         },
         {
-            text: '전표입력',
+            text: '전표관리',
             items: [
-                { text: '일반전표입력', component: null, apiPath: null, url: '/finance/voucher-input/general' },
-                { text: '매입매출전표입력', component: null, apiPath: null, url: '/finance/voucher-input/sales-purchase' },
-                { text: '전자세금계산서발행', component: null, apiPath: null, url: '/finance/voucher-input/electronic-tax' },
-            ]
+                { text: '미결전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry' },
+                { text: '미결전표승인', component: null, apiPath: null, url: '/finance/voucher-management/pending-approval' },
+                { text: '전표조회', component: null, apiPath: null, url: '/finance/voucher-management/search' },
+                { text: '매입매출전표입력', component: null, apiPath: null, url: '/finance/voucher-management/sales-purchase', },
+                { text: '전자세금계산서발행', component: null, apiPath: null, url: '/finance/voucher-management/electronic-tax', },
+            ],
         },
         {
             text: '장부관리',
@@ -133,7 +136,7 @@ export const subMenuItems = {
         {
             text: '대시보드',
             items: [
-                { text: '대시보드', component: 'HRDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/hr' },
+                { text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr' },
             ]
         },
         {
@@ -170,7 +173,7 @@ export const subMenuItems = {
         {
             text: '대시보드',
             items: [
-                { text: '대시보드', component: 'LogisticsDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/logistics' },
+                { text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics' },
             ]
         },
         {
@@ -253,7 +256,7 @@ export const subMenuItems = {
         {
             text: '대시보드',
             items: [
-                { text: '대시보드', component: 'ProductionDashboardPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/production' },
+                { text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production' },
             ]
         },
         {

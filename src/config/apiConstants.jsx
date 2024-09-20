@@ -44,6 +44,7 @@ export const EMPLOYEE_API = {
 };
 // 인사관리 - 사용자
 export const USERS_API = {
+    USERS_PERMISSION_API: (username) => `${API_BASE_URL}/api/hr/users/permission/${username}`, // 사용자 권한 조회 API
     USERS_DATA_API: `${API_BASE_URL}/api/hr/users/all`,
     USERS_DATA_DETAIL_API: (id) => `${API_BASE_URL}/api/hr/users/${id}`,
     SAVE_USERS_DATA_API: `${API_BASE_URL}/api/hr/users/create`,

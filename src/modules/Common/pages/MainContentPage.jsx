@@ -17,11 +17,13 @@ import WorkcenterPage from "../../production/pages/basicData/Workcenter/Workcent
 import ProcessDetailsPage from "../../production/pages/basicData/ProcessDetails/ProcessDetailsPage.jsx";
 import WorkerPage from "../../production/pages/resourceData/WorkerPage.jsx";
 import CustomErrorPage from "../components/CustomErrorPage.jsx";
-import GroupwareDashboardPage from "../../Groupware/pages/GroupwareDashboardPage.jsx";
+import IntegrationDashboardPage from "../../integration/pages/IntegrationDashboardPage.jsx";
 import FinanceDashboardPage from "../../financial/pages/FinanceDashboardPage.jsx";
 import ProductionDashboardPage from "../../production/pages/ProductionDashboardPage.jsx";
 import HRDashboardPage from "../../hr/pages/HRDashboardPage.jsx";
 import LogisticsDashboardPage from "../../logistics/pages/LogisticsDashboardPage.jsx";
+import PendingVoucherInputPage from "../../financial/pages/PendingVoucherInputPage.jsx";
+import UserPermissionPage from "../../integration/pages/UserPermissionPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
@@ -35,12 +37,13 @@ const componentsMap = {
     WorkcenterPage,
     ProcessDetailsPage,
     WorkerPage,
-    GroupwareDashboardPage,
+    IntegrationDashboardPage,
     FinanceDashboardPage,
     ProductionDashboardPage,
     HRDashboardPage,
-    LogisticsDashboardPage
-    // 필요한 경우 다른 컴포넌트도 여기에 추가
+    LogisticsDashboardPage,
+    PendingVoucherInputPage,
+    UserPermissionPage,
 };
 
 // MainContentPage 컴포넌트
@@ -62,7 +65,7 @@ function MainContentPage({ selectedSubSubMenu }) {
         const ComponentToRender = componentsMap[selectedSubSubMenu.component];
 
         // API 경로가 없을 경우
-        if (!selectedSubSubMenu.apiPath) {
+        if (selectedSubSubMenu.apiPath === null) {
             return (
                 <CustomErrorPage
                     errorCode="WARNING"

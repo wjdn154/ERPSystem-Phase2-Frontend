@@ -32,9 +32,9 @@ export const accountSubjectColumn = [
         align: 'center',
         render: (text, record) => (
             record.modificationType === false ? (
-                <Tag color="red">불가</Tag>
+                <Tag style={{ marginLeft: '5px' }} color="red">불가</Tag>
             ) : (
-                <Tag color="green">가능</Tag>
+                <Tag style={{ marginLeft: '5px' }} color="green">가능</Tag>
             )
         ),
     },
