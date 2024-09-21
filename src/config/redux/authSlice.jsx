@@ -18,8 +18,9 @@ const authSlice = createSlice({
         setAuth: (state, action) => {
             const { token, permission, isAdmin } = action.payload;
 
-            state.permission = permission;
-            state.isAdmin = isAdmin;
+            if (permission !== undefined) state.permission = permission;
+            if (isAdmin !== undefined) state.isAdmin = isAdmin;
+
 
             if (token && typeof token === 'string') {
                 state.token = token;

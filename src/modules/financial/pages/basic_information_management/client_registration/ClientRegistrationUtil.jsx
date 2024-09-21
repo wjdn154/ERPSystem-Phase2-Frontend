@@ -14,15 +14,6 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '거래처 상세 정보',
-            children: (
-                <Typography>
-                    선택된 거래처의 상세 정보를 확인하고 수정할 수 있는 부분으로, 주소, 결제 조건, 담당자 등의 정보를 포함하고 있음.
-                </Typography>
-            ),
-        },
-        {
-            key: '3',
             label: '거래처 등록',
             children: (
                 <Typography>

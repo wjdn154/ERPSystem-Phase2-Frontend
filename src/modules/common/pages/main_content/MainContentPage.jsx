@@ -6,10 +6,10 @@ import MainContentHook from './MainContentHook.jsx';
 import AntdSkeleton from "./AntdSkeleton.jsx";
 
 // 필요한 페이지 컴포넌트들
-import AccountSubjectPage from "../../../financial/pages/account_subject/AccountSubjectPage.jsx";
+import AccountSubjectPage from "../../../financial/pages/basic_information_management/account_subject/AccountSubjectPage.jsx";
 import EquipmentDataPage from "../../../production/pages/resource_data/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../../../production/pages/resource_data/MaintenanceHistoryPage.jsx";
-import ClientRegistrationPage from "../../../financial/pages/client_registration/ClientRegistrationPage.jsx";
+import ClientRegistrationPage from "../../../financial/pages/basic_information_management/client_registration/ClientRegistrationPage.jsx";
 import EmployeeDataPage from "../../../hr/pages/EmployeeDataPage.jsx";
 import UsersDataPage from "../../../hr/pages/UsersDataPage.jsx";
 import DepartmentDataPage from "../../../hr/pages/DepartmentDataPage.jsx";
@@ -18,14 +18,18 @@ import ProcessDetailsPage from "../../../production/pages/basic_data/ProcessDeta
 import WorkerPage from "../../../production/pages/resource_data/WorkerPage.jsx";
 import CustomErrorPage from "../custom_error/CustomErrorPage.jsx";
 import IntegrationDashboardPage from "../../../integration/pages/DashBoard/IntegrationDashboardPage.jsx";
-import FinanceDashboardPage from "../../../financial/pages/dash_board/FinanceDashboardPage.jsx";
+import FinanceDashboardPage from "../../../financial/pages/dash_board/dash_board/FinanceDashboardPage.jsx";
 import ProductionDashboardPage from "../../../production/pages/ProductionDashboardPage.jsx";
 import HRDashboardPage from "../../../hr/pages/HRDashboardPage.jsx";
 import LogisticsDashboardPage from "../../../logistics/pages/LogisticsDashboardPage.jsx";
-import PendingVoucherInputPage from "../../../financial/pages/pending_voucher_input/PendingVoucherInputPage.jsx";
+import PendingVoucherInputPage from "../../../financial/pages/voucher_entry/pending_voucher_input/PendingVoucherInputPage.jsx";
 import UserPermissionPage from "../../../integration/pages/UserPermission/UserPermissionPage.jsx";
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
+import SystemEnvironmentSettingsPage
+    from "../../../financial/pages/basic_information_management/system_environment_settings/SystemEnvironmentSettingsPage.jsx";
+import PendingVoucherApprovalPage
+    from "../../../financial/pages/voucher_entry/pending_voucher_approval/PendingVoucherApprovalPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
@@ -46,6 +50,8 @@ const componentsMap = {
     LogisticsDashboardPage,
     PendingVoucherInputPage,
     UserPermissionPage,
+    SystemEnvironmentSettingsPage,
+    PendingVoucherApprovalPage,
 };
 
 // MainContentPage 컴포넌트

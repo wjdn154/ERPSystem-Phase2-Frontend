@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Box, Grid, Typography, TextField, MenuItem, FormControl, InputLabel, Select, Button } from '@mui/material';
 import { notification, DatePicker } from 'antd';
-import WelcomeSection from '../../../common/components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../common/components/WelcomeSection.jsx';
 import { tabItems } from "./PendingVoucherInputUtil.jsx";
 
 const PendingVoucherInputPage = ({ }) => {

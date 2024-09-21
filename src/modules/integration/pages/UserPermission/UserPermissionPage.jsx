@@ -31,6 +31,12 @@ const UserPermissionPage = ( ) => {
     const handleUserClick = (user) => {
         setSelectedUser(user);
         fetchUserPermissions(user.email);
+        console.log(isAdmin);
+        console.log(selectedUser.email);
+        console.log(jwtDecode(token).sub);
+        console.log(adminEmployee);
+        console.log(permissions);
+        console.log(selectedUser);
     };
 
     const fetchAdminEmployee = async () => {
@@ -130,7 +136,7 @@ const UserPermissionPage = ( ) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} sx={{ minWidth: '600px !important', maxWidth: '800px !important' }}>
                         <Grow in={true} timeout={300}>
                             <Paper elevation={3}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>내 권한</Typography>
@@ -141,9 +147,6 @@ const UserPermissionPage = ( ) => {
                                     pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                     size={'small'}
                                     rowKey="key"
-                                    locale={{
-                                        emptyText: '데이터가 없습니다.',
-                                    }}
                                 />
                             </Paper>
                         </Grow>
@@ -172,9 +175,6 @@ const UserPermissionPage = ( ) => {
                                         onClick: () => handleUserClick(record),
                                         style: { cursor: 'pointer' },
                                     })}
-                                    locale={{
-                                        emptyText: '데이터가 없습니다.',
-                                    }}
                                 />
                             </Paper>
                         </Grow>
@@ -194,9 +194,6 @@ const UserPermissionPage = ( ) => {
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         size={'small'}
                                         rowKey="key"
-                                        locale={{
-                                            emptyText: '데이터가 없습니다.',
-                                        }}
                                     />
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginRight: '20px' }}>
                                         <Button onClick={updateUserPermissions} type="primary" style={{ marginBottom: '20px' }}>

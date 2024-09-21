@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Box, Grid, Typography} from '@mui/material';
-import WelcomeSection from '../../../common/components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../common/components/WelcomeSection.jsx';
 import { tabItems } from './DashBoardUtil.jsx';
 
 const FinanceDashboardPage = ({ initialData }) => {
