@@ -1,24 +1,19 @@
 import axios from "axios";
 import Cookies from 'js-cookie';
 
+export const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? "https://omz.kro.kr" // 운영 환경
+    : "http://localhost:8080"; // 개발 환경
 
-// const API_BASE_URL = "http://localhost:8080";
-const API_BASE_URL = "https://omz.kro.kr";
 
+// export const API_BASE_URL = "http://localhost:8080";
+// export const API_BASE_URL = "https://omz.kro.kr";
 
-axios.interceptors.request.use((config) => {
-    const token = Cookies.get('jwt');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
 
 // 공통
 export const COMMON_API = {
     LOGIN_API: `${API_BASE_URL}/api/hr/auth/login`, // 로그인 API
+    REFRESH_TOKEN_API: `${API_BASE_URL}/api/hr/auth/refresh-token`, // 토큰 갱신 API
     COMPANY_LIST_API: `${API_BASE_URL}/api/financial/company/`, // 회사 목록 조회 API
     COMPANY_SEARCH_API: `${API_BASE_URL}/api/financial/company/search`, // 회사 검색 API
     REGISTER_API: `${API_BASE_URL}/api/hr/auth/register`, // 회원가입 API

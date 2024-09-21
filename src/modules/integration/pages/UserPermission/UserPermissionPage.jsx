@@ -10,6 +10,7 @@ import { setAuth } from "../../../../config/redux/authSlice.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+import apiClient from "../../../../config/apiClient.jsx";
 
 const UserPermissionPage = () => {
 
@@ -34,7 +35,7 @@ const UserPermissionPage = () => {
 
     const fetchAdminEmployee = async () => {
         try {
-            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_ADMIN_PERMISSION_API(companyId));
+            const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_ADMIN_PERMISSION_API(companyId));
             const data = response.data;
             setAdminEmployee(data);
         } catch (error) {
@@ -44,7 +45,7 @@ const UserPermissionPage = () => {
 
     const fetchEmployee = async () => {
         try {
-            const response = await axios.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
+            const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
             const data = response.data;
             setEmployee(data);
         } catch (error) {
@@ -54,7 +55,7 @@ const UserPermissionPage = () => {
 
     const fetchUserPermissions = async (username) => {
         try {
-            const response = await axios.post(USERS_API.USERS_PERMISSION_API(username));
+            const response = await apiClient.post(USERS_API.USERS_PERMISSION_API(username));
             const data = response.data;
             setPermissions(data);
         } catch (error) {
@@ -69,7 +70,7 @@ const UserPermissionPage = () => {
                 permissionDTO: permissions,
             };
 
-            const response = await axios.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
+            const response = await apiClient.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
             const permission = response.data;
 
             dispatch(setAuth({ token, permission }));

@@ -1,10 +1,11 @@
 import axios from "axios";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import apiClient from "../../../../config/apiClient.jsx";
 
 //유지보수 리스트 호출 함수
 export const fetchMaintenanceHistoryList = async () => {
     try {
-        const response = await axios.post(PRODUCTION_API.MAINTENANCE_HISTORY_API);
+        const response = await apiClient.post(PRODUCTION_API.MAINTENANCE_HISTORY_API);
         return response.data;
     }catch (error){
         console.error("유지보수 이력 정보를 가져오는 중 오류 발생 : " + error);
@@ -15,7 +16,7 @@ export const fetchMaintenanceHistoryList = async () => {
 //유지보수 정보 상세 호출 함수
 export const fetchMaintenanceHistoryDetail = async (id) => {
     try {
-        const response = await axios.post(PRODUCTION_API.MAINTENANCE_HISTORY_DETAIL_API(id));
+        const response = await apiClient.post(PRODUCTION_API.MAINTENANCE_HISTORY_DETAIL_API(id));
         return response.data;
     } catch (error){
         console.error("유지보수 이력 상세 정보를 가져오는 중 오류 발생 : " + error);
@@ -26,7 +27,7 @@ export const fetchMaintenanceHistoryDetail = async (id) => {
 //유지보수 정보 등록 함수
 export const saveMaintenanceHistoryDetail = async (maintenanceHistoryDetail) => {
     try {
-        await axios.post(PRODUCTION_API.SAVE_MAINTENANCE_HISTORY_API, maintenanceHistoryDetail);
+        await apiClient.post(PRODUCTION_API.SAVE_MAINTENANCE_HISTORY_API, maintenanceHistoryDetail);
     }catch (error){
         if (error.response) {
             // 서버 응답 오류 처리
@@ -47,7 +48,7 @@ export const updateMaintenanceHistoryDetail = async (id , maintenanceHistoryDeta
     console.log('api 정보 : ',id,maintenanceHistoryDetail);
     try {
         // axios 요청의 결과를 response에 저장
-        const response = await axios.put(
+        const response = await apiClient.put(
             PRODUCTION_API.UPDATE_MAINTENANCE_HISTORY_API(id),
             maintenanceHistoryDetail
         );
@@ -71,7 +72,7 @@ export const updateMaintenanceHistoryDetail = async (id , maintenanceHistoryDeta
 //유지보수 이력 정보 삭제 함수
 export const deleteMaintenanceHistoryDetail = async (id) => {
     try {
-        await axios.delete(PRODUCTION_API.DELETE_MAINTENANCE_HISTORY_API(id));
+        await apiClient.delete(PRODUCTION_API.DELETE_MAINTENANCE_HISTORY_API(id));
     }catch (error){
         console.error("유지보수 이력 정보를 삭제하는 중 오류 발생 : " + error);
         throw error;
