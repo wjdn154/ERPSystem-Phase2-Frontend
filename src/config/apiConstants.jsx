@@ -5,11 +5,6 @@ export const API_BASE_URL = process.env.NODE_ENV === 'production'
     ? "https://omz.kro.kr" // 운영 환경
     : "http://localhost:8080"; // 개발 환경
 
-
-// export const API_BASE_URL = "http://localhost:8080";
-// export const API_BASE_URL = "https://omz.kro.kr";
-
-
 // 공통
 export const COMMON_API = {
     LOGIN_API: `${API_BASE_URL}/api/hr/auth/login`, // 로그인 API

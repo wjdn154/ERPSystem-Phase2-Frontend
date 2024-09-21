@@ -30,7 +30,7 @@ apiClient.interceptors.response.use(
         if (error.response && error.response.status === 403 && !originalRequest._retry) {
             originalRequest._retry = true; // 리프레시 시도 중인지 플래그 설정
 
-            console.error('액세스 토큰 만료. 리프레시 토큰으로 재시도')
+            console.log('액세스 토큰 만료. 리프레시 토큰으로 재시도')
             const refreshToken = Cookies.get('refreshToken'); // 리프레시 토큰 가져오기
 
             if (!refreshToken) {
