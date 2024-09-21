@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Select, message } from "antd";
 import { CircularProgress } from "@mui/material";
 import axios from 'axios';
+import apiClient from "../../../../../config/apiClient.jsx";
 
 const { Option } = Select;
 
@@ -13,7 +14,7 @@ const FactorySelectSection = ({ onFactoryChange }) => {
     useEffect(() => {
         const fetchFactories = async () => {
             try {
-                const response = await axios.post('/api/production/workcenters/factories/');
+                const response = await apiClient.post('/api/production/workcenters/factories/');
                 setFactoryList(response.data);  // 서버에서 받은 데이터로 공장 목록 업데이트
                 setLoading(false);  // 로딩 종료
             } catch (error) {

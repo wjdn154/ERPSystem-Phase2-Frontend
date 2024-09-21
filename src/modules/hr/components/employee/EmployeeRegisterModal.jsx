@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
 import axios from 'axios';
 import { EMPLOYEE_API } from '../../../../config/apiConstants.jsx';
+import apiClient from "../../../../config/apiClient.jsx";
 
 const EmployeeRegisterModal = ({ visible, onCancel, newEmployee, setNewEmployee, setData }) => {
 
@@ -15,7 +16,7 @@ const EmployeeRegisterModal = ({ visible, onCancel, newEmployee, setNewEmployee,
     const handleRegisterEmployee = async () => {
         try {
             // 신규 사원 데이터를 API로 전송
-            await axios.post(EMPLOYEE_API.SAVE_EMPLOYEE_DATA_API, newEmployee);
+            await apiClient.post(EMPLOYEE_API.SAVE_EMPLOYEE_DATA_API, newEmployee);
 
             // 성공 메시지
             message.success('사원이 성공적으로 등록되었습니다.');
@@ -24,7 +25,7 @@ const EmployeeRegisterModal = ({ visible, onCancel, newEmployee, setNewEmployee,
             setNewEmployee({ name: '', age: '', department: '' });
 
             // 서버에서 업데이트된 사원 리스트를 가져와 상태 갱신
-            const updatedData = await axios.get(EMPLOYEE_API.EMPLOYEE_DATA_API);
+            const updatedData = await apiClient.get(EMPLOYEE_API.EMPLOYEE_DATA_API);
             setData(updatedData.data); // 상태 업데이트
 
             // 모달 닫기

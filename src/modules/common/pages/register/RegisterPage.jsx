@@ -7,7 +7,8 @@ import {Alert, Button} from "antd";
 import { COMMON_API } from "../../../../config/apiConstants.jsx";
 import background from "../../../../assets/img/background3.png";
 import DebounceSelect from '../../components/DebounceSelect.jsx';
-import {useNotificationContext} from "../../../../config/NotificationContext.jsx"; // DebounceSelect 컴포넌트 import
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
+import apiClient from "../../../../config/apiClient.jsx"; // DebounceSelect 컴포넌트 import
 
 const Register = () => {
     const notify = useNotificationContext();
@@ -32,7 +33,7 @@ const Register = () => {
     // 초기값 API 호출
     const fetchInitialCompanyOptions = async () => {
         try {
-            const response = await axios.post(COMMON_API.COMPANY_LIST_API);  // 초기값 API
+            const response = await apiClient.post(COMMON_API.COMPANY_LIST_API);  // 초기값 API
             return response.data.map((company) => ({
                 label: company.name,
                 value: company.id
@@ -46,7 +47,7 @@ const Register = () => {
     // 검색 API 호출
     const fetchSearchCompanyOptions = async (searchText) => {
         try {
-            const response = await axios.post(COMMON_API.COMPANY_SEARCH_API, { searchText });  // 검색 API
+            const response = await apiClient.post(COMMON_API.COMPANY_SEARCH_API, { searchText });  // 검색 API
             return response.data.map((company) => ({
                 label: company.name,
                 value: company.id
@@ -78,7 +79,7 @@ const Register = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(COMMON_API.REGISTER_API, formData);
+            const response = await apiClient.post(COMMON_API.REGISTER_API, formData);
             navigate('/login', { state: { registered: true} });
         } catch (error) {
             setRegisterError(error.response.data);

@@ -4,6 +4,7 @@ import { workerAssignmentColumns } from '../../../utils/basic_data/workcenter/Wo
 import { DatePicker, Button } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
+import apiClient from "../../../../../config/apiClient.jsx";
 
 const { RangePicker } = DatePicker;
 
@@ -21,7 +22,7 @@ const WorkerAssignmentPage = () => {
     // API 호출 함수
     const fetchWorkerAssignments = (startDate, endDate) => {
         setLoading(true);  // 로딩 상태 설정
-        axios.post('/api/production/workerAssignment/daily', {
+        apiClient.post('/api/production/workerAssignment/daily', {
             date: startDate.format('YYYY-MM-DD'),  // 시작 날짜
             includeShiftType: false,  // 교대유형 포함 여부
             shiftTypeId: null           // 교대유형 ID (필요 시 설정)

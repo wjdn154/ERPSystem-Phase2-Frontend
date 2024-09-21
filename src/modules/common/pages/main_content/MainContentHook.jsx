@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
-import lodash from "lodash";  // lodash 사용
+import lodash from "lodash";
+import apiClient from "../../../../config/apiClient.jsx";  // lodash 사용
 
 const MainContentHook = (selectedSubSubMenu) => {
     const [initialData, setInitialData] = useState(null);
@@ -26,7 +27,7 @@ const MainContentHook = (selectedSubSubMenu) => {
         }
 
         if (selectedSubSubMenu.apiPath) {
-            axios
+            apiClient
                 .post(selectedSubSubMenu.apiPath)
                 .then((response) => {
                     setInitialData(response.data);

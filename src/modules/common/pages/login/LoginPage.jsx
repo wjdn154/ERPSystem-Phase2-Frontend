@@ -11,6 +11,7 @@ import background from "../../../../assets/img/background3.png";
 import CompanyRegisterSection from "../../../financial/pages/company/CompanyReigterSection.jsx";
 import DebounceSelect from '../../components/DebounceSelect.jsx';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
+import apiClient from "../../../../config/apiClient.jsx";
 
 const LoginPage = () => {
     const notify = useNotificationContext();
@@ -36,7 +37,7 @@ const LoginPage = () => {
     // 초기값 API 호출
     const fetchInitialCompanyOptions = async () => {
         try {
-            const response = await axios.post(COMMON_API.COMPANY_LIST_API);
+            const response = await apiClient.post(COMMON_API.COMPANY_LIST_API);
             return response.data.map((company) => ({
                 label: company.name,
                 value: company.id
@@ -50,7 +51,7 @@ const LoginPage = () => {
     // 검색 API 호출
     const fetchSearchCompanyOptions = async (searchText) => {
         try {
-            const response = await axios.post(COMMON_API.COMPANY_SEARCH_API, { searchText });
+            const response = await apiClient.post(COMMON_API.COMPANY_SEARCH_API, { searchText });
             return response.data.map((company) => ({
                 label: company.name,
                 value: company.id
@@ -81,11 +82,12 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(COMMON_API.LOGIN_API, formData);
+            const response = await apiClient.post(COMMON_API.LOGIN_API, formData);
             // 서버로부터 토큰과 권한 정보를 받아옴
             const { token, permission, isAdmin } = response.data;
             // JWT 토큰을 쿠키에 저장 (만료 기간 1일)
             Cookies.set('jwt', token, { expires: 1 });
+            Cookies.set('refreshToken', token, { expires: 7 });
             // Redux 상태 업데이트 (JWT 토큰 및 권한 정보 저장)
             dispatch(setAuth({ token, permission, isAdmin }));
             // 로그인 성공 시 메인 페이지로 이동
