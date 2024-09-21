@@ -187,7 +187,7 @@ export const userColumns = [
 ];
 
 // 개인 권한 테이블 컬럼 설정
-export const personalPermissionColumns = (myPermissions, setPermissions, selectedUser, isAdmin, adminEmployee, token) => [
+export const personalPermissionColumns = () => [
     {
         title: '권한명',
         dataIndex: 'label',

@@ -12,7 +12,7 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import apiClient from "../../../../config/apiClient.jsx";
 
-const UserPermissionPage = () => {
+const UserPermissionPage = ( ) => {
 
     const { token, isAdmin, permission, companyId } = useSelector((state) => state.auth);
 
@@ -74,7 +74,8 @@ const UserPermissionPage = () => {
             const permission = response.data;
 
             dispatch(setAuth({ token, permission }));
-            setMyPermissions(permission);
+            setPermissions(permission);
+            if (selectedUser.email === jwtDecode(token).sub) setMyPermissions(permission);
 
             notification.success({
                 message: '성공',
@@ -135,7 +136,7 @@ const UserPermissionPage = () => {
                                 <Typography variant="h6" sx={{ padding: '20px' }}>내 권한</Typography>
                                 <Table
                                     style={{ padding: '20px' }}
-                                    columns={personalPermissionColumns(myPermissions, setPermissions, selectedUser, isAdmin, adminEmployee, token)}
+                                    columns={personalPermissionColumns()}
                                     dataSource={filteredPermissions}
                                     pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                     size={'small'}
