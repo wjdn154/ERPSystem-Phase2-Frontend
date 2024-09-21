@@ -8,7 +8,7 @@ import { COMMON_API } from "../../../../config/apiConstants.jsx";
 import { useDispatch } from "react-redux";
 import {logout, setAuth} from "../../../../config/redux/authSlice.jsx";
 import background from "../../../../assets/img/background3.png";
-import CompanyRegisterSection from "../../../financial/pages/company/CompanyReigterSection.jsx";
+import CompanyRegisterSection from "../../../financial/pages/basic_information_management/company/CompanyReigterSection.jsx";
 import DebounceSelect from '../../components/DebounceSelect.jsx';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";

@@ -12,7 +12,7 @@ import {
     PRODUCTION_API,
     USERS_API
 } from "./apiConstants.jsx";
-import AccountSubjectPage from "../modules/financial/pages/account_subject/AccountSubjectPage.jsx";
+import AccountSubjectPage from "../modules/financial/pages/basic_information_management/account_subject/AccountSubjectPage.jsx";
 import EquipmentDataPage from "../modules/production/pages/resource_data/EquipmentDataPage.jsx";
 import MaintenanceHistoryPage from "../modules/production/pages/resource_data/MaintenanceHistoryPage.jsx";
 import EmployeeDataPage from "../modules/hr/pages/EmployeeDataPage.jsx";
@@ -61,18 +61,17 @@ export const subMenuItems = {
             items: [
                 { text: '거래처등록', component: 'ClientRegistrationPage', apiPath: undefined, url: '/finance/basic-info/client-registration', requiredPermission: 'clientRegistrationPermission', permissionLevel: 'GENERAL' },  // 거래처등록 권한
                 { text: '계정과목및적요등록', component: 'AccountSubjectPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/finance/basic-info/account-subject', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL' },  // 계정과목 및 적요 등록 권한
-                { text: '환경등록', component: null, apiPath: undefined, url: '/finance/basic-info/environment', requiredPermission: 'environmentPermission', permissionLevel: 'GENERAL' },  // 환경등록 권한
-                { text: '업무용승용차등록', component: null, apiPath: undefined, url: '/finance/basic-info/company-car', requiredPermission: 'companyCarPermission', permissionLevel: 'GENERAL' },  // 업무용승용차등록 권한
+                { text: '환경등록', component: 'SystemEnvironmentSettingsPage', apiPath: undefined, url: '/finance/basic-info/environment', requiredPermission: 'environmentPermission', permissionLevel: 'GENERAL' },  // 환경등록 권한
             ]
         },
         {
             text: '전표관리',
             items: [
                 { text: '미결전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 일반전표입력 권한
-                { text: '미결전표승인', component: null, apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
-                { text: '전표조회', component: null, apiPath: undefined, url: '/finance/voucher-management/search', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 일반전표입력 권한
-                { text: '매입매출전표입력', component: null, apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
-                { text: '전자세금계산서발행', component: null, apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한
+                { text: '미결전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '전표조회', component: 'VoucherInquiryPage', apiPath: undefined, url: '/finance/voucher-management/search', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 일반전표입력 권한
+                { text: '매입매출전표입력', component: 'PurchaseSalesVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
+                { text: '전자세금계산서발행', component: 'EInvoiceIssuancePage', apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한
             ]
         },
         {

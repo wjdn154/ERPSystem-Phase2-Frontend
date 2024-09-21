@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Grid,Paper,Typography}  from "@mui/material";
 import {Button, Table as AntTable, Modal, Input, Select, DatePicker} from "antd";
 import moment from "moment";
-import {tabItems} from "../../../financial/pages/account_subject/AccountSubjectUtil.jsx";
+import {tabItems} from "../../../financial/pages/basic_information_management/account_subject/AccountSubjectUtil.jsx";
 const {Option} = Select;
 
 

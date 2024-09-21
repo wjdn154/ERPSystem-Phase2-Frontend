@@ -37,7 +37,6 @@ export const getPermissionData = (permissions) => [
     { key: 'generalVoucherPermission', label: '일반전표 입력 권한', value: permissions.generalVoucherPermission },
     { key: 'taxInvoicePermission', label: '세금계산서(계산서) 현황 권한', value: permissions.taxInvoicePermission },
     { key: 'environmentPermission', label: '환경 등록 권한', value: permissions.environmentPermission },
-    { key: 'companyCarPermission', label: '업무용 승용차 등록 권한', value: permissions.companyCarPermission },
     { key: 'salesPurchaseVoucherPermission', label: '매입매출 전표 입력 권한', value: permissions.salesPurchaseVoucherPermission },
     { key: 'electronicTaxPermission', label: '전자세금계산서 발행 권한', value: permissions.electronicTaxPermission },
     { key: 'clientLedgerPermission', label: '거래처 원장 권한', value: permissions.clientLedgerPermission },
@@ -278,8 +277,9 @@ export const permissionColumns = (permissions, setPermissions, selectedUser, isA
                         [record.key]: e.target.checked ? 'GENERAL' : 'NO_ACCESS',
                     }))}
                     disabled={
-                        (selectedUser.email === jwtDecode(token).sub) && isAdmin // 본인이 선택된 경우, isAdmin인 경우에는 권한을 수정할 수 없음
-                        || selectedUser.email === adminEmployee // 관리자 계정(adminEmployee)의 권한은 다른 사용자가 수정할 수 없음
+                        (isAdmin && selectedUser.email === jwtDecode(token).sub)
+                        || (!isAdmin && selectedUser.email === adminEmployee)
+                        || (!isAdmin && (selectedUser.email !== jwtDecode(token).sub) && permissions['adminPermission'] === 'ADMIN')
                     }
                 />
             )
@@ -297,9 +297,10 @@ export const permissionColumns = (permissions, setPermissions, selectedUser, isA
                     [record.key]: e.target.checked ? 'ADMIN' : 'NO_ACCESS',
                 }))}
                 disabled={
-                    (selectedUser.email === jwtDecode(token).sub) && isAdmin  // 본인이 선택된 경우, isAdmin인 경우, 관리자 권한을 수정할 수 없음
-                    || (record.key === 'adminPermission' && !isAdmin) // isAdmin이 아닌 사용자는 관리자 권한을 수정할 수 없음
-                    || selectedUser.email === adminEmployee // 관리자 계정(adminEmployee)의 권한은 다른 사용자가 수정할 수 없음
+                    (isAdmin && selectedUser.email === jwtDecode(token).sub)
+                    || (!isAdmin && record.key === 'adminPermission')
+                    || (!isAdmin && (selectedUser.email !== jwtDecode(token).sub) && permissions['adminPermission'] === 'ADMIN')
+                    || (!isAdmin && selectedUser.email === adminEmployee)
                 }
             />
         ),

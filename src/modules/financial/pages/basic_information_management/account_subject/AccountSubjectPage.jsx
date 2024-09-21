@@ -3,7 +3,7 @@ import {Box, Grid, Grow, Typography} from '@mui/material';
 import AccountSubjectStructureSection from './AccountSubjectStructureSection.jsx';
 import AccountSubjectListSection from './AccountSubjectListSection.jsx';
 import SelectedAccountSubjectDetailSection from './SelectedAccountSubjectDetailSection.jsx';
-import WelcomeSection from '../../../common/components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../common/components/WelcomeSection.jsx';
 import { accountSubjectHook } from './AccountSubjectHook.jsx';
 import { accountSubjectColumn } from './AccountSubjectColumn.jsx';
 import { getRowClassName } from './AccountSubjectUtil.jsx';
