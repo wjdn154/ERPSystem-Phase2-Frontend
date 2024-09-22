@@ -56,37 +56,38 @@ export const LOGISTICS_API = {
 // 생산관리
 export const PRODUCTION_API = {
     // 기초정보
-    WORKCENTER_LIST_API: `${API_BASE_URL}/api/production/workcenters/`, // 작업장 목록 조회 API
-    WORKCENTER_DETAILS_API: (code) => `${API_BASE_URL}/api/production/workcenters/details/${code}/`, // 작업장 세부정보 조회 API
-    WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search?name=${name}/`, // 작업장 이름검색 API
-    SAVE_WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters/create`, // 새 작업장 저장 API
-    UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}/`, // 작업장 수정 API
-    DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete?code=${code}/`, // 작업장 삭제 API
-    PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails`, // 생산공정 목록 조회 API
+    WORKCENTER_LIST_API: `${API_BASE_URL}/api/production/workcenters`, // 작업장 목록 조회 API
+    WORKCENTER_DETAILS_API: (code) => `${API_BASE_URL}/api/production/workcenters/details/${code}`, // 작업장 세부정보 조회 API
+    WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search?name=${name}`, // 작업장 이름검색 API
+    SAVE_WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters/new`, // 새 작업장 저장 API
+    UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}`, // 작업장 수정 API
+    DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete?code=${code}`, // 작업장 삭제 API
+    SEARCH_FACTORIES_API: `${API_BASE_URL}/api/production/workcenters/factories`,
 
+    PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails`, // 생산공정 목록 조회 API
     PROCESS_DETAILS_API: (code) => `${API_BASE_URL}/api/production/processDetails/details/${code}`, // 생산공정 세부정보 조회 API
     PROCESS_SEARCH_API: (name) => `${API_BASE_URL}/api/production/processDetails/search?name=${name}`, // 생산공정 이름검색 API
     SAVE_PROCESS_API: `${API_BASE_URL}/api/production/processDetails/new`, // 새 생산공정 저장 API
     UPDATE_PROCESS_API: (code) => `${API_BASE_URL}/api/production/processDetails/update/${code}`, // 생산공정 수정 API
     DELETE_PROCESS_API: (code) =>`${API_BASE_URL}/api/production/processDetails/delete?code=${code}`, // 생산공정 삭제 API
-    S_BOM_LIST_API: `${API_BASE_URL}/api/production/standardBoms`, // 표준 자재명세서 목록 조회 API
 
+    ROUTING_LIST_API: `${API_BASE_URL}/api/production/processRouting`, // 전체 processRouting 목록 조회 API
+    ROUTING_DETAIL_API: (id) => `${API_BASE_URL}/api/production/processRouting/${id}`, // 특정 processRouting 조회 API
+    ROUTING_CREATE_API: `${API_BASE_URL}/api/production/processRouting/new`, // processRouting 생성 API
+    ROUTING_UPDATE_API: (id) => `${API_BASE_URL}/api/production/processRouting/update/${id}`, // processRouting 수정 API
+    ROUTING_DELETE_API: (id) => `${API_BASE_URL}/api/production/processRouting/delete/${id}`, // processRouting 삭제 API
+    ROUTING_SEARCH_PROCESS_DETAILS_API: `${API_BASE_URL}/api/production/processRouting/searchProcessDetails`, // 생산공정 검색 API
+    ROUTING_SEARCH_PRODUCTS_API: `${API_BASE_URL}/api/production/processRouting/searchProducts`, // 제품 검색 API
+    ROUTING_PREVIEW_PROCESS_DETAILS_API: (id) => `${API_BASE_URL}/api/production/processRouting/previewProcessDetails/${id}`, // 공정 상세조회 API
+    ROUTING_PREVIEW_PRODUCT_API: (id) => `${API_BASE_URL}/api/production/processRouting/previewProduct/${id}`, // 제품 상세조회 API
+
+    S_BOM_LIST_API: `${API_BASE_URL}/api/production/standardBoms`, // 표준 자재명세서 목록 조회 API
     S_BOM_DETAIL_API: (id) => `${API_BASE_URL}/api/production/standardBoms/${id}`, // 특정 표준 자재명세서 조회 API
     S_BOM_CREATE_API: `${API_BASE_URL}/api/production/standardBoms/new`, // 표준 자재명세서 생성 API
     S_BOM_UPDATE_API: (id) => `${API_BASE_URL}/api/production/standardBoms/update/${id}`, // 표준 자재명세서 업데이트 API
     S_BOM_DELETE_API: (id) => `${API_BASE_URL}/api/production/standardBoms/delete/${id}`, // 표준 자재명세서 삭제 API
     S_BOM_FORWARD_EXPLOSION_API: (parentProductId) => `${API_BASE_URL}/api/production/standardBoms/forward-explosion/${parentProductId}`, // 하위 BOM 조회 API
     S_BOM_BACKWARD_EXPLOSION_API: (childProductId) => `${API_BASE_URL}/api/production/standardBoms/backward-explosion/${childProductId}`, // 상위 BOM 조회 API
-    ROUTING_LIST_API: `${API_BASE_URL}/production/processRouting`, // 전체 processRouting 목록 조회 API
-
-    ROUTING_DETAIL_API: (id) => `${API_BASE_URL}/production/processRouting/${id}`, // 특정 processRouting 조회 API
-    ROUTING_CREATE_API: `${API_BASE_URL}/production/processRouting/new`, // processRouting 생성 API
-    ROUTING_UPDATE_API: (id) => `${API_BASE_URL}/production/processRouting/update/${id}`, // processRouting 수정 API
-    ROUTING_DELETE_API: (id) => `${API_BASE_URL}/production/processRouting/delete/${id}`, // processRouting 삭제 API
-    ROUTING_SEARCH_PROCESS_DETAILS_API: `${API_BASE_URL}/production/processRouting/searchProcessDetails`, // 생산공정 검색 API
-    ROUTING_SEARCH_PRODUCTS_API: `${API_BASE_URL}/production/processRouting/searchProducts`, // 제품 검색 API
-    ROUTING_PREVIEW_PROCESS_DETAILS_API: (id) => `${API_BASE_URL}/production/processRouting/previewProcessDetails/${id}`, // 공정 상세조회 API
-    ROUTING_PREVIEW_PRODUCT_API: (id) => `${API_BASE_URL}/production/processRouting/previewProduct/${id}`, // 제품 상세조회 API
 
     // 자원
     WORKER_LIST_API: `${API_BASE_URL}/api/production/workers`,    //작업자 목록 조회 API
@@ -125,7 +126,7 @@ export const PRODUCTION_API = {
     WORKER_ASSIGNMENT_CHECK_API: `${API_BASE_URL}/api/production/workerAssignment/check`, // 특정 날짜에 작업자 배정 상태 확인 API
     WORKER_ASSIGNMENT_DAILY_API: `${API_BASE_URL}/api/production/workerAssignment/daily`, // 일별 모든 작업장의 작업자 배정 이력 조회 API
     WORKER_ASSIGNMENT_MONTHLY_API: `${API_BASE_URL}/api/production/workerAssignment/monthly`, // 월별 모든 작업장의 작업자 배정 이력 조회 API
-    WORKER_ASSIGNMENT_TODAY_SUMMARY_API: `${API_BASE_URL}/api/production/workerAssignment/today/summary/`, // 오늘의 작업장별 배정인원 상세명단 조회 API
+    WORKER_ASSIGNMENT_TODAY_SUMMARY_API: `${API_BASE_URL}/api/production/workerAssignment/today/summary`, // 오늘의 작업장별 배정인원 상세명단 조회 API
     WORKER_ASSIGNMENT_PRODUCTION_ORDER_SUMMARY_API: (productionOrderId) => `${API_BASE_URL}/api/production/workerAssignment/productionOrder/${productionOrderId}/summary`, // 작업지시별 작업자 명단 조회 API
     WORKER_ASSIGNMENT_WORKER_HISTORY_API: (workerId) => `${API_BASE_URL}/api/production/workerAssignment/worker/${workerId}/assignments`, // 작업자별 배치이력 조회 API
 

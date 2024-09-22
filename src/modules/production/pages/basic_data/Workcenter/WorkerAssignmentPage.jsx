@@ -5,6 +5,7 @@ import { DatePicker, Button } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
 import apiClient from "../../../../../config/apiClient.jsx";
+import { PRODUCTION_API } from "../../../../../config/apiConstants.jsx"
 
 const { RangePicker } = DatePicker;
 
@@ -22,9 +23,11 @@ const WorkerAssignmentPage = () => {
     // API 호출 함수
     const fetchWorkerAssignments = (startDate, endDate) => {
         setLoading(true);  // 로딩 상태 설정
-        apiClient.post('/api/production/workerAssignment/daily', {
+        console.log("API 호출 시작");
+
+        apiClient.post(PRODUCTION_API.WORKER_ASSIGNMENT_TODAY_SUMMARY_API, {
             date: startDate.format('YYYY-MM-DD'),  // 시작 날짜
-            includeShiftType: false,  // 교대유형 포함 여부
+            includeShiftType: true,  // 교대유형 포함 여부
             shiftTypeId: null           // 교대유형 ID (필요 시 설정)
         })
             .then(response => {
@@ -57,7 +60,7 @@ const WorkerAssignmentPage = () => {
 
     return (
         <div>
-            <h1>작업장별 작업자 배정 명단</h1>
+            <h2>작업장별 작업자 배정 명단</h2>
 
             {/* 날짜 범위 선택 */}
             <div style={{ marginBottom: '20px' }}>
