@@ -250,9 +250,10 @@ import { Grid, Grow, Box } from '@mui/material';
 import axios from 'axios';
 import { EMPLOYEE_API } from '../../../config/apiConstants.jsx';
 import { employeeDataHook } from '../hooks/EmployeeDataHook';
-import EmployeeDataListSection from '../components/Employee/EmployeeDataListSection.jsx';
-import { employeeDataListColumn } from '../utils/EmployeeData/EmployeeDataListColumn.jsx';
-import EmployeeDetailModal from '../components/Employee/EmployeeDetailModal';
+import EmployeeDataListSection from '../components/employee/EmployeeDataListSection.jsx';
+import { employeeDataListColumn } from '../utils/employee_data/EmployeeDataListColumn.jsx';
+import EmployeeDetailModal from '../components/employee/EmployeeDetailModal';
+import apiClient from "../../../config/apiClient.jsx";
 
 const EmployeeDataPage = ({ initialData }) => {
     const [isDetailModalVisible, setIsDetailModalVisible] = useState(false); // 상세 모달 표시 상태
@@ -275,7 +276,7 @@ const EmployeeDataPage = ({ initialData }) => {
             // 상태가 렌더링 중에 계속해서 설정되지 않도록 하는 로직
             if (!id) return;  // employeeNumber가 없는 경우 무시
 
-            const response = await axios.get(EMPLOYEE_API.EMPLOYEE_DATA_DETAIL_API(id));
+            const response = await apiClient.get(EMPLOYEE_API.EMPLOYEE_DATA_DETAIL_API(id));
             console.log('response: ', response.data);
             setSelectedEmployee(response.data) // 사원 상세 정보 설정
             setIsDetailModalVisible(true); // 상세 모달 열기
@@ -302,9 +303,9 @@ const EmployeeDataPage = ({ initialData }) => {
         console.log('API URL: ', apiUrl);  // API URL 확인
 
         // 업데이트 요청을 서버로 전송
-        await axios.put(apiUrl, updatedEmployee);
+        await apiClient.put(apiUrl, updatedEmployee);
         // 성공 시 상태 업데이트 (리스트 갱신)
-        const updatedData = await axios.get(EMPLOYEE_API.EMPLOYEE_DATA_API);
+        const updatedData = await apiClient.get(EMPLOYEE_API.EMPLOYEE_DATA_API);
         try {
             setData(updatedData.data); // 전체 리스트 갱신
             setIsDetailModalVisible(false); // 모달 닫기

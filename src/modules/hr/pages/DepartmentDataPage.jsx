@@ -1,8 +1,8 @@
 import React, {useMemo} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import {departmentDataHook} from "../hooks/DepartmentDataHook.jsx"
-import DepartmentDataListSection from "../components/Department/DepartmentDataListSection.jsx"
-import {departmentDataListColumn} from "../utils/DepartmentData/DepartmentDataListColumn.jsx"
+import DepartmentDataListSection from "../components/department/DepartmentDataListSection.jsx"
+import {departmentDataListColumn} from "../utils/department_data/DepartmentDataListColumn.jsx"
 
 const DepartmentDataPage = ({initialData}) => {
 
