@@ -17,13 +17,13 @@ import WorkcenterPage from "../../../production/pages/basic_data/Workcenter/Work
 import ProcessDetailsPage from "../../../production/pages/basic_data/ProcessDetails/ProcessDetailsPage.jsx";
 import WorkerPage from "../../../production/pages/resource_data/WorkerPage.jsx";
 import CustomErrorPage from "../custom_error/CustomErrorPage.jsx";
-import IntegrationDashboardPage from "../../../integration/pages/DashBoard/IntegrationDashboardPage.jsx";
+import DashboardPage from "../../../integration/pages/DashBoard/DashboardPage.jsx";
 import FinanceDashboardPage from "../../../financial/pages/dash_board/dash_board/FinanceDashboardPage.jsx";
 import ProductionDashboardPage from "../../../production/pages/ProductionDashboardPage.jsx";
 import HRDashboardPage from "../../../hr/pages/HRDashboardPage.jsx";
 import LogisticsDashboardPage from "../../../logistics/pages/LogisticsDashboardPage.jsx";
 import PendingVoucherInputPage from "../../../financial/pages/voucher_entry/pending_voucher_input/PendingVoucherInputPage.jsx";
-import UserPermissionPage from "../../../integration/pages/UserPermission/UserPermissionPage.jsx";
+import UserPermissionPage from "../../../integration/pages/basic_information_management/UserPermission/UserPermissionPage.jsx";
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
 import SystemEnvironmentSettingsPage
@@ -43,7 +43,7 @@ const componentsMap = {
     WorkcenterPage,
     ProcessDetailsPage,
     WorkerPage,
-    IntegrationDashboardPage,
+    IntegrationDashboardPage: DashboardPage,
     FinanceDashboardPage,
     ProductionDashboardPage,
     HRDashboardPage,

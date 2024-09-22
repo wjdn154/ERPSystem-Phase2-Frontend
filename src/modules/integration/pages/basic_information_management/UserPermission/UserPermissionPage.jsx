@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {Button, Checkbox, Input, notification, Space, Tag} from 'antd';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
-import WelcomeSection from '../../../common/components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../common/components/WelcomeSection.jsx';
 import { Table } from 'antd';
 import { tabItems, getPermissionData, userColumns, personalPermissionColumns, permissionColumns } from './UserPermissonUtil.jsx';
-import { EMPLOYEE_API, USERS_API } from "../../../../config/apiConstants.jsx";
+import { EMPLOYEE_API, USERS_API } from "../../../../../config/apiConstants.jsx";
 import axios from "axios";
-import { setAuth } from "../../../../config/redux/authSlice.jsx";
+import { setAuth } from "../../../../../config/redux/authSlice.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import apiClient from "../../../../config/apiClient.jsx";
+import apiClient from "../../../../../config/apiClient.jsx";
 
 const UserPermissionPage = ( ) => {
 
@@ -141,6 +141,9 @@ const UserPermissionPage = ( ) => {
                                     pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                     size={'small'}
                                     rowKey="key"
+                                    locale={isAdmin ? {
+                                        emptyText: <Typography>회사 총괄 관리자 입니다.</Typography>,
+                                    } : undefined}
                                 />
                             </Paper>
                         </Grow>
