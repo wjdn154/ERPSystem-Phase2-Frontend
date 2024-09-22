@@ -36,10 +36,7 @@ export const menuItems = [
 export const subMenuItems = {
     '통합관리': [
         {
-            text: '대시보드',
-            items: [
-                { text: '대시보드', component: 'IntegrationDashboardPage', apiPath: undefined, url: '/integration' },  // 관리자 권한
-            ]
+            text: '대시보드', component: 'IntegrationDashboardPage', apiPath: undefined, url: '/integration'
         },
         {
             text: '기초정보관리',
@@ -51,10 +48,7 @@ export const subMenuItems = {
     ],
     '재무회계': [
         {
-            text: '대시보드',
-            items: [
-                { text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/finance', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL' },  // 계정과목 및 적요 등록 권한
-            ]
+            text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/finance', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL'
         },
         {
             text: '기초정보관리',
@@ -135,10 +129,7 @@ export const subMenuItems = {
     ],
     '인사관리': [
         {
-            text: '대시보드',
-            items: [
-                { text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
-            ]
+            text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL'
         },
         {
             text: '기초 정보 관리',
@@ -172,10 +163,7 @@ export const subMenuItems = {
     ],
     '물류관리': [
         {
-            text: '대시보드',
-            items: [
-                { text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
-            ]
+            text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL'
         },
         {
             text: '기초정보관리',
@@ -255,10 +243,7 @@ export const subMenuItems = {
     ],
     '생산관리': [
         {
-            text: '대시보드',
-            items: [
-                { text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production', requiredPermission: 'mpsPermission', permissionLevel: 'GENERAL' },  // 주생산 계획 관리 권한
-            ]
+            text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production', requiredPermission: 'mpsPermission', permissionLevel: 'GENERAL'
         },
         {
             text: '기초정보 관리',
