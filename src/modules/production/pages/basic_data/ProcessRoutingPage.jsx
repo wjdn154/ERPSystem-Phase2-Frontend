@@ -128,14 +128,14 @@ const ProcessRoutingPage = () => {
 
             {/* ProcessRouting 목록 */}
             <Table
-                dataSource={data}
+                dataSource={Array.isArray(data) ? data : []} // 배열로 변환하여 전달
                 columns={processRoutingColumns} // 배열을 직접 전달
                 rowKey="id"
             />
 
             {/* 등록 버튼 */}
             <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
-                새 공정 경로 등록
+                등록
             </Button>
 
             {/* 모달 컴포넌트 */}
