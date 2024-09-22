@@ -48,22 +48,41 @@ const AppContent = () => {
         // 모든 메뉴와 서브메뉴 항목을 순회하면서 동적 라우트를 설정
         for (const mainMenu in subMenuItems) {
             subMenuItems[mainMenu].forEach((subMenu) => {
-                subMenu.items.forEach((subSubItem) => {
+                // 소분류 항목이 없는 경우 바로 경로 설정
+                if (!subMenu.items) {
                     routes.push(
                         <Route
-                            key={subSubItem.url}
-                            path={subSubItem.url}
+                            key={subMenu.url}
+                            path={subMenu.url}
                             element={
                                 <ProtectedRoute
-                                    requiredPermission={subSubItem.requiredPermission}
-                                    permissionLevel={subSubItem.permissionLevel}
+                                    requiredPermission={subMenu.requiredPermission}
+                                    permissionLevel={subMenu.permissionLevel}
                                 >
-                                    <MainContentPage selectedSubSubMenu={subSubItem} />
+                                    <MainContentPage selectedSubSubMenu={subMenu} />
                                 </ProtectedRoute>
                             }
                         />
                     );
-                });
+                } else {
+                    // 소분류가 있는 경우 기존 방식대로 처리
+                    subMenu.items.forEach((subSubItem) => {
+                        routes.push(
+                            <Route
+                                key={subSubItem.url}
+                                path={subSubItem.url}
+                                element={
+                                    <ProtectedRoute
+                                        requiredPermission={subSubItem.requiredPermission}
+                                        permissionLevel={subSubItem.permissionLevel}
+                                    >
+                                        <MainContentPage selectedSubSubMenu={subSubItem} />
+                                    </ProtectedRoute>
+                                }
+                            />
+                        );
+                    });
+                }
             });
         }
 

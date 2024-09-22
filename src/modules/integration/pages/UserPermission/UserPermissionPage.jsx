@@ -31,12 +31,6 @@ const UserPermissionPage = ( ) => {
     const handleUserClick = (user) => {
         setSelectedUser(user);
         fetchUserPermissions(user.email);
-        console.log(isAdmin);
-        console.log(selectedUser.email);
-        console.log(jwtDecode(token).sub);
-        console.log(adminEmployee);
-        console.log(permissions);
-        console.log(selectedUser);
     };
 
     const fetchAdminEmployee = async () => {
