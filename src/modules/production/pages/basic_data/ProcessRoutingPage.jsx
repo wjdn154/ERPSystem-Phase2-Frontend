@@ -3,6 +3,9 @@ import { Row, Col, Button, Modal, Input, Table, Typography, message } from 'antd
 import apiClient from "../../../../config/apiClient.jsx";
 import { PRODUCTION_API } from '../../../../config/apiConstants.jsx';
 import { processRoutingColumns } from '../../utils/basic_data/ProcessRoutingColum.jsx';
+import {Grid} from "@mui/material";
+import WelcomeSection from "../../../common/components/WelcomeSection.jsx";
+import {tabItems} from "../../utils/basic_data/workcenter/WorkcenterUtil.jsx";
 
 const { Text } = Typography;
 
@@ -15,12 +18,24 @@ const ProcessRoutingPage = () => {
 
     // 1. ProcessRouting 전체 조회
     useEffect(() => {
-        console.log("API URL:", PRODUCTION_API.ROUTING_LIST_API);  // URL을 확인
         const fetchProcessRoutings = async () => {
             try {
                 const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
-                console.log("API Response:", response.data); // 응답 데이터가 무엇인지 로그 확인
-                setData(response.data);
+                const rawData = response.data;
+
+                // 각 routing의 step들을 하나의 배열로 플랫하게 변환
+                const formattedData = rawData.map(routing => ({
+                    id: routing.id,
+                    code: routing.code,
+                    name: routing.name,
+                    description: routing.description,
+                    routingSteps: routing.routingSteps.map(step => ({
+                        stepOrder: step.stepOrder,
+                        processRoutingId: step.id.processRoutingId,
+                        processId: step.id.processId
+                    })) // routingSteps를 단순화된 구조로 변환
+                }));
+                setData(formattedData);
             } catch (error) {
                 console.error('Error fetching process routings:', error);
                 message.error('경로 목록을 불러오는 중 오류가 발생했습니다.');
@@ -29,6 +44,7 @@ const ProcessRoutingPage = () => {
 
         fetchProcessRoutings();
     }, []);
+
 
     // 2. ProcessRouting 생성
     const handleAddProcessRouting = async () => {
@@ -115,6 +131,28 @@ const ProcessRoutingPage = () => {
 
     return (
         <div style={{ padding: '24px' }}>
+
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={12}>
+                    <WelcomeSection
+                        title="Routing 관리"
+                        description={(
+                            <Typography>
+                                Routing 관리 페이지는 Routing 관리 시스템에서{' '}
+                                <span style={{ color: '#00C1D8' }}>생산공정경로</span>와{' '}
+                                <span style={{ color: '#00C1D8' }}>공정경로 내역</span>을{' '}
+                                <span style={{ color: '#00C1D8' }}>관리하고 등록</span>하는 중요한 기능을 제공하는 페이지임.
+                                <br />
+                                이 페이지는 Routing의 효율적인 운영과 관리를 지원하며, Routing 상태를 실시간으로 모니터링하는 데 필수적인 역할을 함.
+                            </Typography>
+                        )}
+                        // tabItems={tabItems()}
+                        // activeTabKey={activeTabKey}
+                        // handleTabChange={handleTabChange}
+                    />
+                </Grid>
+            </Grid>
+
             {/* 검색 바 */}
             <Row gutter={16} style={{ marginBottom: '16px' }}>
                 <Col span={8}>
@@ -141,7 +179,7 @@ const ProcessRoutingPage = () => {
             {/* 모달 컴포넌트 */}
             <Modal
                 title={isEditing ? '공정 경로 수정' : '새 공정 경로 등록'}
-                visible={isModalVisible}
+                open={isModalVisible}
                 onOk={isEditing ? handleEditProcessRouting : handleAddProcessRouting}
                 onCancel={handleCloseModal}
             >

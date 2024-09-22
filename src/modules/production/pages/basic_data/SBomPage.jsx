@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Button, Modal, Input, Table, Typography, message } from 'antd';
 import apiClient from "../../../../config/apiClient.jsx";
 import { PRODUCTION_API } from '../../../../config/apiConstants.jsx';
+import {Grid} from "@mui/material";
+import WelcomeSection from "../../../common/components/WelcomeSection.jsx";
 
 const { Text } = Typography;
 
@@ -11,6 +13,7 @@ const SBomPage = () => {
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 열림 여부
     const [newSBom, setNewSBom] = useState({}); // 새로 추가하거나 수정할 BOM 데이터
     const [isEditing, setIsEditing] = useState(false); // 수정 모드 여부
+    const [activeTabKey, setActiveTabKey] = useState('1'); // 탭 관리 상태
 
     // 1. SBom 전체 조회
     useEffect(() => {
@@ -112,14 +115,14 @@ const SBomPage = () => {
             width: '30%',
         },
         {
-            title: '사용 여부',
+            title: '사용',
             dataIndex: 'isActive',
             key: 'isActive',
-            render: (text) => (text ? '사용 중' : '미사용'),
+            render: (text) => (text ? 'Y' : 'N'),
             width: '10%',
         },
         {
-            title: '동작',
+            title: '',
             key: 'action',
             render: (text, record) => (
                 <span>
@@ -127,64 +130,172 @@ const SBomPage = () => {
                     <a style={{ marginLeft: 8 }} onClick={() => handleDeleteSBom(record.id)}>삭제</a>
                 </span>
             ),
-            width: '20%',
+            width: '5%',
         },
     ];
 
     return (
         <div style={{ padding: '24px' }}>
-            {/* BOM 검색 바 */}
-            <Row gutter={16} style={{ marginBottom: '16px' }}>
-                <Col span={8}>
-                    <Input.Search
-                        placeholder="BOM 검색"
-                        enterButton
+
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={12}>
+                    <WelcomeSection
+                        title="BOM 관리"
+                        description={(
+                            <Typography>
+                                BOM 관리 페이지는 BOM 관리 시스템에서{' '}
+                                <span style={{ color: '#00C1D8' }}>품목별 자재명세</span>와{' '}
+                                <span style={{ color: '#00C1D8' }}>명세 변경이력</span>을{' '}
+                                <span style={{ color: '#00C1D8' }}>관리하고 등록</span>하는 중요한 기능을 제공하는 페이지임.
+                                <br />
+                                이 페이지는 BOM의 효율적인 운영과 관리를 지원하며, BOM 상태를 실시간으로 모니터링하는 데 필수적인 역할을 함.
+                            </Typography>
+                        )}
+                        tabItems={tabItems()}
+                        activeTabKey={activeTabKey}
+                        handleTabChange={handleTabChange}
                     />
-                </Col>
-            </Row>
+                </Grid>
+                {activeTabKey === '1' && (
+                    <Grid item xs={12} md={12}>
+                        {/* BOM 검색 바 */}
+                        <Row gutter={16} style={{ marginBottom: '16px' }}>
+                            <Col span={8}>
+                                <Input.Search
+                                    placeholder="BOM 검색"
+                                    enterButton
+                                />
+                            </Col>
+                        </Row>
 
-            {/* SBOM 목록 */}
-            <Table
-                dataSource={data}
-                columns={sbomColumns}
-                rowKey="id"
-            />
+                        {/* SBOM 목록 */}
+                        <Table
+                            dataSource={data}
+                            columns={sbomColumns}
+                            rowKey="id"
+                        />
 
-            {/* 새 BOM 등록 버튼 */}
-            <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
-                새 BOM 등록
-            </Button>
+                        {/* 새 BOM 등록 버튼 */}
+                        <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
+                            등록
+                        </Button>
 
-            {/* 모달 컴포넌트 */}
-            <Modal
-                title={isEditing ? 'BOM 수정' : '새 BOM 등록'}
-                visible={isModalVisible}
-                onOk={isEditing ? handleEditSBom : handleAddSBom}
-                onCancel={handleCloseModal}
-            >
-                <Input
-                    name="code"
-                    placeholder="BOM 코드"
-                    value={newSBom.code}
-                    onChange={handleInputChange}
-                />
-                <Input
-                    name="name"
-                    placeholder="BOM 이름"
-                    value={newSBom.name}
-                    onChange={handleInputChange}
-                    style={{ marginTop: '10px' }}
-                />
-                <Input
-                    name="description"
-                    placeholder="BOM 설명"
-                    value={newSBom.description}
-                    onChange={handleInputChange}
-                    style={{ marginTop: '10px' }}
-                />
-            </Modal>
+                        {/* 모달 컴포넌트 */}
+                        <Modal
+                            title={isEditing ? '수정' : '등록'}
+                            open={isModalVisible}
+                            onOk={isEditing ? handleEditSBom : handleAddSBom}
+                            onCancel={handleCloseModal}
+                        >
+                            <Input
+                                name="code"
+                                placeholder="BOM 코드"
+                                value={newSBom.code}
+                                onChange={handleInputChange}
+                            />
+                            <Input
+                                name="name"
+                                placeholder="BOM 이름"
+                                value={newSBom.name}
+                                onChange={handleInputChange}
+                                style={{ marginTop: '10px' }}
+                            />
+                            <Input
+                                name="description"
+                                placeholder="BOM 설명"
+                                value={newSBom.description}
+                                onChange={handleInputChange}
+                                style={{ marginTop: '10px' }}
+                            />
+                        </Modal>
+
+                    </Grid>
+                )}
+
+                {activeTabKey === '2' && (
+                    <Grid>
+                        {/* BOM 검색 바 */}
+                        <Row gutter={16} style={{ marginBottom: '16px' }}>
+                            <Col span={8}>
+                                <Input.Search
+                                    placeholder="BOM 검색"
+                                    enterButton
+                                />
+                            </Col>
+                        </Row>
+
+                        {/* (임시) SBOM 목록 //TODO Green BOM 으로 변경 */}
+                        <Table
+                            dataSource={data}
+                            columns={sbomColumns}
+                            rowKey="id"
+                        />
+
+                        {/* 새 BOM 등록 버튼 */}
+                        <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
+                            등록
+                        </Button>
+
+                        {/* 모달 컴포넌트 */}
+                        <Modal
+                            title={isEditing ? '수정' : '등록'}
+                            visible={isModalVisible}
+                            onOk={isEditing ? handleEditSBom : handleAddSBom}
+                            onCancel={handleCloseModal}
+                        >
+                            <Input
+                                name="code"
+                                placeholder="BOM 코드"
+                                value={newSBom.code}
+                                onChange={handleInputChange}
+                            />
+                            <Input
+                                name="name"
+                                placeholder="BOM 이름"
+                                value={newSBom.name}
+                                onChange={handleInputChange}
+                                style={{ marginTop: '10px' }}
+                            />
+                            <Input
+                                name="description"
+                                placeholder="BOM 설명"
+                                value={newSBom.description}
+                                onChange={handleInputChange}
+                                style={{ marginTop: '10px' }}
+                            />
+                        </Modal>
+                    </Grid>
+                )}
+
+            </Grid>
         </div>
+
     );
+};
+
+const tabItems = () => {
+    return [
+        {
+            key: '1',
+            label: 'S-BOM',
+            children: <Typography>표준 자재명세서</Typography>,
+        },
+        {
+            key: '2',
+            label: 'Green BOM',
+            children: <Typography>친환경 자재명세서</Typography>,
+        },
+    ];
+}
+
+// 탭 변경 함수
+const handleTabChange = (key) => {
+    console.log("탭변경 확인 key : ", key);
+    setActiveTabKey(key); // 상태 업데이트
+};
+
+const getRowClassName = (record) => {
+    return record.isActive ? 'active-row' : 'inactive-row';
 };
 
 export default SBomPage;

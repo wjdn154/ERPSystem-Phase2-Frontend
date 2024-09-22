@@ -56,14 +56,15 @@ export const LOGISTICS_API = {
 // 생산관리
 export const PRODUCTION_API = {
     // 기초정보
-    WORKCENTER_LIST_API: `${API_BASE_URL}/api/production/workcenters/`, // 작업장 목록 조회 API
-    WORKCENTER_DETAILS_API: (code) => `${API_BASE_URL}/api/production/workcenters/details/${code}/`, // 작업장 세부정보 조회 API
-    WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search?name=${name}/`, // 작업장 이름검색 API
-    SAVE_WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters/create`, // 새 작업장 저장 API
-    UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}/`, // 작업장 수정 API
-    DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete?code=${code}/`, // 작업장 삭제 API
-    PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails`, // 생산공정 목록 조회 API
+    WORKCENTER_LIST_API: `${API_BASE_URL}/api/production/workcenters`, // 작업장 목록 조회 API
+    WORKCENTER_DETAILS_API: (code) => `${API_BASE_URL}/api/production/workcenters/details/${code}`, // 작업장 세부정보 조회 API
+    WORKCENTER_SEARCH_API: (name) => `${API_BASE_URL}/api/production/workcenters/search?name=${name}`, // 작업장 이름검색 API
+    SAVE_WORKCENTER_API: `${API_BASE_URL}/api/production/workcenters/new`, // 새 작업장 저장 API
+    UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}`, // 작업장 수정 API
+    DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete?code=${code}`, // 작업장 삭제 API
+    SEARCH_FACTORIES_API: `${API_BASE_URL}/api/production/workcenters/factories`,
 
+    PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails`, // 생산공정 목록 조회 API
     PROCESS_DETAILS_API: (code) => `${API_BASE_URL}/api/production/processDetails/details/${code}`, // 생산공정 세부정보 조회 API
     PROCESS_SEARCH_API: (name) => `${API_BASE_URL}/api/production/processDetails/search?name=${name}`, // 생산공정 이름검색 API
     SAVE_PROCESS_API: `${API_BASE_URL}/api/production/processDetails/new`, // 새 생산공정 저장 API
@@ -125,7 +126,7 @@ export const PRODUCTION_API = {
     WORKER_ASSIGNMENT_CHECK_API: `${API_BASE_URL}/api/production/workerAssignment/check`, // 특정 날짜에 작업자 배정 상태 확인 API
     WORKER_ASSIGNMENT_DAILY_API: `${API_BASE_URL}/api/production/workerAssignment/daily`, // 일별 모든 작업장의 작업자 배정 이력 조회 API
     WORKER_ASSIGNMENT_MONTHLY_API: `${API_BASE_URL}/api/production/workerAssignment/monthly`, // 월별 모든 작업장의 작업자 배정 이력 조회 API
-    WORKER_ASSIGNMENT_TODAY_SUMMARY_API: `${API_BASE_URL}/api/production/workerAssignment/today/summary/`, // 오늘의 작업장별 배정인원 상세명단 조회 API
+    WORKER_ASSIGNMENT_TODAY_SUMMARY_API: `${API_BASE_URL}/api/production/workerAssignment/today/summary`, // 오늘의 작업장별 배정인원 상세명단 조회 API
     WORKER_ASSIGNMENT_PRODUCTION_ORDER_SUMMARY_API: (productionOrderId) => `${API_BASE_URL}/api/production/workerAssignment/productionOrder/${productionOrderId}/summary`, // 작업지시별 작업자 명단 조회 API
     WORKER_ASSIGNMENT_WORKER_HISTORY_API: (workerId) => `${API_BASE_URL}/api/production/workerAssignment/worker/${workerId}/assignments`, // 작업자별 배치이력 조회 API
 
