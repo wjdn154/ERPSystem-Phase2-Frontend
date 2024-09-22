@@ -250,8 +250,8 @@ export const subMenuItems = {
             items: [
                 { text: '작업장 관리', component: 'WorkcenterPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter', requiredPermission: 'workcenterManagementPermission', permissionLevel: 'GENERAL' },  // 작업장 관리 권한
                 { text: '공정세부정보 관리', component: 'ProcessDetailsPage', apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/basic-data/process-management/details', requiredPermission: 'processDetailsPermission', permissionLevel: 'GENERAL' },  // 공정세부정보 관리 권한
-                { text: 'Routing 관리', component: null, apiPath: undefined, url: '/production/basic-data/process-management/routing', requiredPermission: 'routingManagementPermission', permissionLevel: 'GENERAL' },  // Routing 관리 권한
-                { text: 'BOM 관리', component: null, apiPath: undefined, url: '/production/basic-data/bom', requiredPermission: 'bomManagementPermission', permissionLevel: 'GENERAL' },  // BOM 관리 권한
+                { text: 'Routing 관리', component: 'ProcessRoutingPage', apiPath: PRODUCTION_API.ROUTING_LIST_API, url: '/production/basic-data/process-management/routing', requiredPermission: 'routingManagementPermission', permissionLevel: 'GENERAL' },  // Routing 관리 권한
+                { text: 'BOM 관리', component: 'SBomPage', apiPath: PRODUCTION_API.S_BOM_LIST_API, url: '/production/basic-data/bom', requiredPermission: 'bomManagementPermission', permissionLevel: 'GENERAL' },  // BOM 관리 권한
             ]
         },
         {
@@ -267,7 +267,7 @@ export const subMenuItems = {
         {
             text: '생산 운영 및 계획',
             items: [
-                { text: '생산 의뢰 관리', component: null, apiPath: undefined, url: '/production/common-scheduling/request', requiredPermission: 'productionRequestPermission', permissionLevel: 'GENERAL' },  // 생산 의뢰 관리 권한
+                { text: '생산 의뢰 관리', component: null, apiPath: PRODUCTION_API.PRODUCTION_REQUEST_LIST_API, url: '/production/common-scheduling/request', requiredPermission: 'productionRequestPermission', permissionLevel: 'GENERAL' },  // 생산 의뢰 관리 권한
                 { text: '주생산계획 관리', component: null, apiPath: undefined, url: '/production/planning/mps', requiredPermission: 'mpsPermission', permissionLevel: 'GENERAL' },  // 주생산 계획 관리 권한
                 // { text: '가용생산능력 계획 관리', component: null, apiPath: undefined, url: '/production/planning/crp' },
                 { text: '실자재 투입 현황 관리', component: null, apiPath: undefined, url: '/production/planning/material-input-status', requiredPermission: 'materialInputStatusPermission', permissionLevel: 'GENERAL' },  // 실자재 투입 현황 권한
@@ -279,9 +279,9 @@ export const subMenuItems = {
         {
             text: '작업 지시 관리',
             items: [
-                { text: '교대 유형 관리', component: null, apiPath: undefined, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
-                { text: '작업 지시 관리', component: null, apiPath: undefined, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
-                { text: '작업배정이력 관리', component: null, apiPath: undefined, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
+                { text: '교대 유형 관리', component: null, apiPath: PRODUCTION_API.SHIFT_TYPE_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
+                { text: '작업 지시 관리', component: null, apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
+                { text: '작업배정이력 관리', component: null, apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_PRODUCTION_ORDER_SUMMARY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
             ]
         },
         {
