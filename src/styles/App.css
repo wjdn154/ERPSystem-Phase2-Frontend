@@ -20,6 +20,8 @@
   flex: auto !important;
   min-width: 70px !important;
   max-width: 70px !important;
+  /*min-width: 300px !important;*/
+  /*max-width: 300px !important;*/
   background-color: #fff !important;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px -1px;
 }
@@ -74,6 +76,17 @@
 /* 아이콘 크기 조정 */
 .ant-menu-item-icon {
   font-size: 20px !important;
+}
+
+.dashboard-style {
+  background-color: #fff;
+}
+.dashboard-style:hover {
+  background-color: #EBF1FE;
+}
+
+.dashboard-style {
+  background-color: #fff;
 }
 
 /* 사이드바 영역 끝 */

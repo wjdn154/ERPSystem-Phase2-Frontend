@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Button, Checkbox, Input, notification, Space, Tag} from 'antd';
+import {Button, Checkbox, Input, Modal, notification, Space, Tag} from 'antd';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../common/components/WelcomeSection.jsx';
 import { Table } from 'antd';
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import apiClient from "../../../../../config/apiClient.jsx";
+const { confirm } = Modal;
 
 const UserPermissionPage = ( ) => {
 
@@ -64,32 +65,47 @@ const UserPermissionPage = ( ) => {
     };
 
     const updateUserPermissions = async () => {
-        try {
-            const requestBody = {
-                username: selectedUser.email,
-                permissionDTO: permissions,
-            };
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            async onOk() {
+                try {
+                    const requestBody = {
+                        username: selectedUser.email,
+                        permissionDTO: permissions,
+                    };
 
-            const response = await apiClient.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
-            const permission = response.data;
+                    const response = await apiClient.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
+                    const permission = response.data;
 
-            dispatch(setAuth({ token, permission }));
-            setPermissions(permission);
-            if (selectedUser.email === jwtDecode(token).sub) setMyPermissions(permission);
+                    dispatch(setAuth({token, permission}));
+                    setPermissions(permission);
+                    if (selectedUser.email === jwtDecode(token).sub) setMyPermissions(permission);
 
-            notification.success({
-                message: '성공',
-                description: '권한이 성공적으로 저장되었습니다.',
-                placement: 'bottomLeft',
-            });
+                    notification.success({
+                        message: '성공',
+                        description: '권한이 성공적으로 저장되었습니다.',
+                        placement: 'bottomLeft',
+                    });
 
-        } catch (error) {
-            notification.error({
-                message: '실패',
-                description: error.response ? error.response.data : error.message,
-                placement: 'bottomLeft',
-            });
-        }
+                } catch (error) {
+                    notification.error({
+                        message: '실패',
+                        description: error.response ? error.response.data : error.message,
+                        placement: 'bottomLeft',
+                    });
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '저장 취소',
+                    description: '저장이 취소되었습니다.',
+                    placement: 'bottomLeft',
+                });
+            },
+        });
     };
 
     const handleTabChange = (key) => {
