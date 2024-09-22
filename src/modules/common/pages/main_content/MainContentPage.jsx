@@ -30,6 +30,8 @@ import SystemEnvironmentSettingsPage
     from "../../../financial/pages/basic_information_management/system_environment_settings/SystemEnvironmentSettingsPage.jsx";
 import PendingVoucherApprovalPage
     from "../../../financial/pages/voucher_entry/pending_voucher_approval/PendingVoucherApprovalPage.jsx";
+import ProcessRoutingPage from "../../../production/pages/basic_data/ProcessRoutingPage.jsx";
+import SBomPage from "../../../production/pages/basic_data/SBomPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
@@ -52,6 +54,8 @@ const componentsMap = {
     UserPermissionPage,
     SystemEnvironmentSettingsPage,
     PendingVoucherApprovalPage,
+    ProcessRoutingPage,
+    SBomPage,
 };
 
 // MainContentPage 컴포넌트
