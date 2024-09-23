@@ -1,10 +1,10 @@
 import React, {useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
-import WelcomeSection from '../../../../common/components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../../components/WelcomeSection.jsx';
 import { tabItems } from './CompanyInfoEditUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button} from 'antd';
-import TemporarySection from "../../../../common/components/TemporarySection.jsx";
+import TemporarySection from "../../../../../components/TemporarySection.jsx";
 
 const CompanyInfoEditPage = () => {
     const [activeTabKey, setActiveTabKey] = useState('1');

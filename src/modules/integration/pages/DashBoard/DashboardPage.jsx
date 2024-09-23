@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
-import WelcomeSection from '../../../common/components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { Button } from 'antd';
 import { tabItems } from './DashBoardUtil.jsx';
-import TemporarySection from "../../../common/components/TemporarySection.jsx"; // 그룹웨어 탭 항목
+import TemporarySection from "../../../../components/TemporarySection.jsx"; // 그룹웨어 탭 항목
 
 const DashboardPage = ({ initialData }) => {
     const [activeTabKey, setActiveTabKey] = useState('1'); // 기본 탭 상태

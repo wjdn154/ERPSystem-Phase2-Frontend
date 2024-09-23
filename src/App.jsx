@@ -5,21 +5,21 @@ import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
-import ContentWrapper from './modules/common/pages/main_content/ContentWrapper.jsx';
-import Sidebar from './modules/common/components/Sidebar.jsx';
-import MainContentPage from './modules/common/pages/main_content/MainContentPage.jsx';
-import Headers from './modules/common/components/Headers.jsx';
+import ContentWrapper from './modules/common/main_content/ContentWrapper.jsx';
+import Sidebar from './components/Sidebar.jsx';
+import MainContentPage from './modules/common/main_content/MainContentPage.jsx';
+import Headers from './components/Headers.jsx';
 import { Layout } from "antd";
-import LoginPage from "./modules/common/pages/login/LoginPage.jsx";
+import LoginPage from "./modules/common/login/LoginPage.jsx";
 import ProtectedRoute from "./config/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
 import { setAuth } from "./config/redux/authSlice.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import { subMenuItems } from './config/menuItems.jsx';
-import RegisterPage from "./modules/common/pages/register/RegisterPage.jsx";
+import RegisterPage from "./modules/common/register/RegisterPage.jsx";
 import { notification } from 'antd';
 import { NotificationProvider, useNotificationContext } from "./config/NotificationContext.jsx";
 import { jwtDecode } from "jwt-decode";
-import UnauthorizedPage from "./modules/common/pages/unauthorized/UnauthorizedPage.jsx";
+import UnauthorizedPage from "./modules/common/unauthorized/UnauthorizedPage.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
