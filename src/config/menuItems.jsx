@@ -15,8 +15,8 @@ import {
 
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
-import PaymentItemManagementPage
-    from "../modules/hr/pages/payroll_management/payment_item_management/PaymentItemManagementPage.jsx";
+import ProcessDetailsPage
+    from "../modules/production/basic_information_management/process_details_management/ProcessDetailsPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
@@ -191,76 +191,76 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '품목 관리', component: null, apiPath: undefined, url: '/logistics/basic-info/item-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
-                { text: '품목 그룹 관리', component: null, apiPath: undefined, url: '/logistics/basic-info/item-group-management', requiredPermission: 'itemGroupManagementPermission', permissionLevel: 'GENERAL' },  // 품목 그룹 관리 권한
-                { text: '창고등록', component: 'WarehouseListPage', apiPath: LOGISTICS_API.WAREHOUSE_LIST_API, url: '/logistics/basic-info/warehouse-registration', requiredPermission: 'warehouseRegistrationPermission', permissionLevel: 'GENERAL' },  // 창고등록 권한
+                { text: '품목 관리', component: 'ItemManagementPage', apiPath: undefined, url: '/logistics/basic-info/item-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
+                { text: '품목 그룹 관리', component: 'ItemGroupManagementPage', apiPath: undefined, url: '/logistics/basic-info/item-group-management', requiredPermission: 'itemGroupManagementPermission', permissionLevel: 'GENERAL' },  // 품목 그룹 관리 권한
+                { text: '창고등록', component: 'WarehouseRegistrationPage', apiPath: undefined, url: '/logistics/basic-info/warehouse-registration', requiredPermission: 'warehouseRegistrationPermission', permissionLevel: 'GENERAL' },  // 창고등록 권한
             ]
         },
         {
             text: '영업 관리',
             items: [
-                { text: '견적서', component: null, apiPath: undefined, url: '/logistics/sales/quotation', requiredPermission: 'quotationPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
-                { text: '주문서', component: null, apiPath: undefined, url: '/logistics/sales/order', requiredPermission: 'orderPermission', permissionLevel: 'GENERAL' },  // 주문서 권한
-                { text: '판매', component: null, apiPath: undefined, url: '/logistics/sales/sale', requiredPermission: 'salePermission', permissionLevel: 'GENERAL' },  // 판매 권한
-                { text: '출하지시서', component: null, apiPath: undefined, url: '/logistics/sales/shipping-order', requiredPermission: 'shippingOrderPermission', permissionLevel: 'GENERAL' },  // 출하지시서 권한
-                { text: '출하', component: null, apiPath: undefined, url: '/logistics/sales/shipment', requiredPermission: 'shipmentPermission', permissionLevel: 'GENERAL' },  // 출하 권한
+                { text: '견적서', component: 'QuotationPage', apiPath: undefined, url: '/logistics/sales/quotation', requiredPermission: 'quotationPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
+                { text: '주문서', component: 'OrderFormPage', apiPath: undefined, url: '/logistics/sales/order', requiredPermission: 'orderPermission', permissionLevel: 'GENERAL' },  // 주문서 권한
+                { text: '판매', component: 'SalesPage', apiPath: undefined, url: '/logistics/sales/sale', requiredPermission: 'salePermission', permissionLevel: 'GENERAL' },  // 판매 권한
+                { text: '출하지시서', component: 'ShipmentInstructionPage', apiPath: undefined, url: '/logistics/sales/shipping-order', requiredPermission: 'shippingOrderPermission', permissionLevel: 'GENERAL' },  // 출하지시서 권한
+                { text: '출하', component: 'ShipmentPage', apiPath: undefined, url: '/logistics/sales/shipment', requiredPermission: 'shipmentPermission', permissionLevel: 'GENERAL' },  // 출하 권한
             ]
         },
         {
             text: '구매 관리',
             items: [
-                { text: '발주 요청', component: null, apiPath: undefined, url: '/logistics/purchase/purchase-request', requiredPermission: 'purchaseRequestPermission', permissionLevel: 'GENERAL' },  // 발주 요청 권한
-                { text: '발주 계획', component: null, apiPath: undefined, url: '/logistics/purchase/purchase-plan', requiredPermission: 'purchasePlanPermission', permissionLevel: 'GENERAL' },  // 발주 계획 권한
-                { text: '단가 요청', component: null, apiPath: undefined, url: '/logistics/purchase/price-request', requiredPermission: 'priceRequestPermission', permissionLevel: 'GENERAL' },  // 단가 요청 권한
-                { text: '발주서', component: null, apiPath: undefined, url: '/logistics/purchase/purchase-order', requiredPermission: 'purchaseOrderPermission', permissionLevel: 'GENERAL' },  // 발주서 권한
-                { text: '구매', component: null, apiPath: undefined, url: '/logistics/purchase/purchase', requiredPermission: 'purchasePermission', permissionLevel: 'GENERAL' },  // 구매 권한
-                { text: '입고지시서', component: null, apiPath: undefined, url: '/logistics/purchase/inbound-order', requiredPermission: 'inboundOrderPermission', permissionLevel: 'GENERAL' },  // 입고지시서 권한
+                { text: '발주 요청', component: 'PurchaseRequestPage', apiPath: undefined, url: '/logistics/purchase/purchase-request', requiredPermission: 'purchaseRequestPermission', permissionLevel: 'GENERAL' },  // 발주 요청 권한
+                { text: '발주 계획', component: 'PurchasePlanPage', apiPath: undefined, url: '/logistics/purchase/purchase-plan', requiredPermission: 'purchasePlanPermission', permissionLevel: 'GENERAL' },  // 발주 계획 권한
+                { text: '단가 요청', component: 'PriceRequestPage', apiPath: undefined, url: '/logistics/purchase/price-request', requiredPermission: 'priceRequestPermission', permissionLevel: 'GENERAL' },  // 단가 요청 권한
+                { text: '발주서', component: 'PurchaseOrderPage', apiPath: undefined, url: '/logistics/purchase/purchase-order', requiredPermission: 'purchaseOrderPermission', permissionLevel: 'GENERAL' },  // 발주서 권한
+                { text: '구매', component: 'PurchasePage', apiPath: undefined, url: '/logistics/purchase/purchase', requiredPermission: 'purchasePermission', permissionLevel: 'GENERAL' },  // 구매 권한
+                { text: '입고지시서', component: 'ReceivingInstructionPage', apiPath: undefined, url: '/logistics/purchase/inbound-order', requiredPermission: 'inboundOrderPermission', permissionLevel: 'GENERAL' },  // 입고지시서 권한
             ]
         },
         {
             text: '반품 관리',
             items: [
-                { text: '반품 접수', component: null, apiPath: undefined, url: '/logistics/returns/returns-reception', requiredPermission: 'returnsReceptionPermission', permissionLevel: 'GENERAL' },  // 반품 접수 권한
-                { text: '반품 현황', component: null, apiPath: undefined, url: '/logistics/returns/returns-status', requiredPermission: 'returnsStatusPermission', permissionLevel: 'GENERAL' },  // 반품 현황 권한
+                { text: '반품 접수', component: 'ReturnRequestPage', apiPath: undefined, url: '/logistics/returns/returns-reception', requiredPermission: 'returnsReceptionPermission', permissionLevel: 'GENERAL' },  // 반품 접수 권한
+                { text: '반품 현황', component: 'ReturnStatusPage', apiPath: undefined, url: '/logistics/returns/returns-status', requiredPermission: 'returnsStatusPermission', permissionLevel: 'GENERAL' },  // 반품 현황 권한
             ]
         },
         {
             text: '출하지시서',
             items: [
-                { text: '출하지시서조회', component: null, apiPath: undefined, url: '/logistics/shipping-orders/view', requiredPermission: 'shippingOrderViewPermission', permissionLevel: 'GENERAL' },  // 출하지시서조회 권한
-                { text: '출하지시서입력', component: null, apiPath: undefined, url: '/logistics/shipping-orders/input', requiredPermission: 'shippingOrderInputPermission', permissionLevel: 'GENERAL' },  // 출하지시서입력 권한
+                { text: '출하지시서조회', component: 'ShipmentInstructionInquiryPage', apiPath: undefined, url: '/logistics/shipping-orders/view', requiredPermission: 'shippingOrderViewPermission', permissionLevel: 'GENERAL' },  // 출하지시서조회 권한
+                { text: '출하지시서입력', component: 'ShipmentInstructionEntryPage', apiPath: undefined, url: '/logistics/shipping-orders/input', requiredPermission: 'shippingOrderInputPermission', permissionLevel: 'GENERAL' },  // 출하지시서입력 권한
             ]
         },
         {
             text: '출하',
             items: [
-                { text: '출하조회', component: null, apiPath: undefined, url: '/logistics/shipment/view', requiredPermission: 'shipmentViewPermission', permissionLevel: 'GENERAL' },  // 출하조회 권한
-                { text: '출하입력', component: null, apiPath: undefined, url: '/logistics/shipment/input', requiredPermission: 'shipmentInputPermission', permissionLevel: 'GENERAL' },  // 출하입력 권한
-                { text: '출하현황', component: null, apiPath: undefined, url: '/logistics/shipment/status', requiredPermission: 'shipmentStatusPermission', permissionLevel: 'GENERAL' },  // 출하현황 권한
+                { text: '출하조회', component: 'ShipmentInquiryPage', apiPath: undefined, url: '/logistics/shipment/view', requiredPermission: 'shipmentViewPermission', permissionLevel: 'GENERAL' },  // 출하조회 권한
+                { text: '출하입력', component: 'ShipmentEntryPage', apiPath: undefined, url: '/logistics/shipment/input', requiredPermission: 'shipmentInputPermission', permissionLevel: 'GENERAL' },  // 출하입력 권한
+                { text: '출하현황', component: 'ShipmentStatusPage', apiPath: undefined, url: '/logistics/shipment/status', requiredPermission: 'shipmentStatusPermission', permissionLevel: 'GENERAL' },  // 출하현황 권한
             ]
         },
         {
             text: '입고관리',
             items: [
-                { text: '입고예정', component: null, apiPath: undefined, url: '/logistics/inbound-management/expected', requiredPermission: 'inboundExpectedPermission', permissionLevel: 'GENERAL' },  // 입고예정 권한
-                { text: '입고처리', component: null, apiPath: undefined, url: '/logistics/inbound-management/processing', requiredPermission: 'inboundProcessingPermission', permissionLevel: 'GENERAL' },  // 입고처리 권한
+                { text: '입고예정', component: 'IncomingSchedulePage', apiPath: undefined, url: '/logistics/inbound-management/expected', requiredPermission: 'inboundExpectedPermission', permissionLevel: 'GENERAL' },  // 입고예정 권한
+                { text: '입고처리', component: 'IncomingProcessingPage', apiPath: undefined, url: '/logistics/inbound-management/processing', requiredPermission: 'inboundProcessingPermission', permissionLevel: 'GENERAL' },  // 입고처리 권한
             ]
         },
         {
             text: '출고관리',
             items: [
-                { text: '출고예정', component: null, apiPath: undefined, url: '/logistics/outbound-management/expected', requiredPermission: 'outboundExpectedPermission', permissionLevel: 'GENERAL' },  // 출고예정 권한
-                { text: '출고예정현황', component: null, apiPath: undefined, url: '/logistics/outbound-management/expected-status', requiredPermission: 'outboundExpectedStatusPermission', permissionLevel: 'GENERAL' },  // 출고예정현황 권한
-                { text: '출고처리', component: null, apiPath: undefined, url: '/logistics/outbound-management/processing', requiredPermission: 'outboundProcessingPermission', permissionLevel: 'GENERAL' },  // 출고처리 권한
+                { text: '출고예정', component: 'OutgoingSchedulePage', apiPath: undefined, url: '/logistics/outbound-management/expected', requiredPermission: 'outboundExpectedPermission', permissionLevel: 'GENERAL' },  // 출고예정 권한
+                { text: '출고예정현황', component: 'OutgoingStatusPage', apiPath: undefined, url: '/logistics/outbound-management/expected-status', requiredPermission: 'outboundExpectedStatusPermission', permissionLevel: 'GENERAL' },  // 출고예정현황 권한
+                { text: '출고처리', component: 'OutgoingProcessingPage', apiPath: undefined, url: '/logistics/outbound-management/processing', requiredPermission: 'outboundProcessingPermission', permissionLevel: 'GENERAL' },  // 출고처리 권한
             ]
         },
         {
             text: '재고조정',
             items: [
-                { text: '재고조정진행단계', component: null, apiPath: undefined, url: '/logistics/inventory-adjustment/steps', requiredPermission: 'inventoryAdjustmentStepsPermission', permissionLevel: 'GENERAL' },  // 재고조정진행단계 권한
-                { text: '재고실사조회', component: null, apiPath: undefined, url: '/logistics/inventory-adjustment/inspection-view', requiredPermission: 'inventoryInspectionViewPermission', permissionLevel: 'GENERAL' },  // 재고실사조회 권한
-                { text: '재고실사현황', component: null, apiPath: undefined, url: '/logistics/inventory-adjustment/inspection-status', requiredPermission: 'inventoryInspectionStatusPermission', permissionLevel: 'GENERAL' },  // 재고실사현황 권한
-                { text: '재고조정현황', component: null, apiPath: undefined, url: '/logistics/inventory-adjustment/adjustment-status', requiredPermission: 'inventoryAdjustmentStatusPermission', permissionLevel: 'GENERAL' },  // 재고조정현황 권한
+                { text: '재고조정진행단계', component: 'AdjustmentProgressPage', apiPath: undefined, url: '/logistics/inventory-adjustment/steps', requiredPermission: 'inventoryAdjustmentStepsPermission', permissionLevel: 'GENERAL' },  // 재고조정진행단계 권한
+                { text: '재고실사조회', component: 'InspectionInquiryPage', apiPath: undefined, url: '/logistics/inventory-adjustment/inspection-view', requiredPermission: 'inventoryInspectionViewPermission', permissionLevel: 'GENERAL' },  // 재고실사조회 권한
+                { text: '재고실사현황', component: 'InspectionStatusPage', apiPath: undefined, url: '/logistics/inventory-adjustment/inspection-status', requiredPermission: 'inventoryInspectionStatusPermission', permissionLevel: 'GENERAL' },  // 재고실사현황 권한
+                { text: '재고조정현황', component: 'AdjustmentStatusPage', apiPath: undefined, url: '/logistics/inventory-adjustment/adjustment-status', requiredPermission: 'inventoryAdjustmentStatusPermission', permissionLevel: 'GENERAL' },  // 재고조정현황 권한
             ]
         }
     ],
@@ -271,9 +271,9 @@ export const subMenuItems = {
         {
             text: '기초정보 관리',
             items: [
-                { text: '작업장 관리', component: 'WorkcenterPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter', requiredPermission: 'workcenterManagementPermission', permissionLevel: 'GENERAL' },  // 작업장 관리 권한
+                { text: '작업장 관리', component: 'WorkshopManagementPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter', requiredPermission: 'workcenterManagementPermission', permissionLevel: 'GENERAL' },  // 작업장 관리 권한
                 { text: '공정세부정보 관리', component: 'ProcessDetailsPage', apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/basic-data/process-management/details', requiredPermission: 'processDetailsPermission', permissionLevel: 'GENERAL' },  // 공정세부정보 관리 권한
-                { text: 'Routing 관리', component: 'ProcessRoutingPage', apiPath: PRODUCTION_API.ROUTING_LIST_API, url: '/production/basic-data/process-management/routing', requiredPermission: 'routingManagementPermission', permissionLevel: 'GENERAL' },  // Routing 관리 권한
+                { text: 'Routing 관리', component: 'RoutingManagementPage', apiPath: PRODUCTION_API.ROUTING_LIST_API, url: '/production/basic-data/process-management/routing', requiredPermission: 'routingManagementPermission', permissionLevel: 'GENERAL' },  // Routing 관리 권한
                 { text: 'BOM 관리', component: 'SBomPage', apiPath: PRODUCTION_API.S_BOM_LIST_API, url: '/production/basic-data/bom', requiredPermission: 'bomManagementPermission', permissionLevel: 'GENERAL' },  // BOM 관리 권한
             ]
         },

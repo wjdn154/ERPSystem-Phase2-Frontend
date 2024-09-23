@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {Button, Checkbox, Input, Modal, notification, Space, Tag} from 'antd';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
-import WelcomeSection from '../../../../common/components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../../components/WelcomeSection.jsx';
 import { Table } from 'antd';
 import { tabItems, getPermissionData, userColumns, personalPermissionColumns, permissionColumns } from './UserPermissonUtil.jsx';
 import { EMPLOYEE_API, USERS_API } from "../../../../../config/apiConstants.jsx";
@@ -147,7 +147,7 @@ const UserPermissionPage = ( ) => {
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12} md={6} sx={{ minWidth: '600px !important', maxWidth: '800px !important' }}>
-                        <Grow in={true} timeout={300}>
+                        <Grow in={true} timeout={200}>
                             <Paper elevation={3}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>내 권한</Typography>
                                 <Table
@@ -170,7 +170,7 @@ const UserPermissionPage = ( ) => {
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12} md={5} sx={{ minWidth: '600px !important', maxWidth: '800px !important' }}>
-                        <Grow in={true} timeout={300}>
+                        <Grow in={true} timeout={200}>
                             <Paper elevation={3}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>회원 목록</Typography>
                                 <Table
@@ -194,7 +194,7 @@ const UserPermissionPage = ( ) => {
                     </Grid>
 
                     <Grid item xs={12} md={6} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
-                        <Grow in={!!selectedUser} timeout={300}>
+                        <Grow in={!!selectedUser} timeout={200}>
                             {selectedUser ? (
                                 <Paper elevation={3}>
                                     <Typography variant="h6" sx={{ padding: '20px' }}>

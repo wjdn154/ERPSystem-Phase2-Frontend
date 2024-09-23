@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { COMMON_API } from './apiConstants.jsx'; // API 경로 상수
 import Cookies from 'js-cookie';
+import { logout } from "./redux/authSlice.jsx";
+import {useDispatch} from "react-redux";
+import store from "../store.jsx";
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({
@@ -13,9 +16,18 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
     const token = Cookies.get('jwt');
 
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`; // JWT 토큰을 헤더에 추가
+    if (config.url === COMMON_API.COMPANY_LIST_API || config.url === COMMON_API.COMPANY_SEARCH_API ||
+        config.url === COMMON_API.LOGIN_API || config.url === COMMON_API.REGISTER_API ||
+        config.url === COMMON_API.REFRESH_TOKEN_API) {
+        return config; // 토큰 없이 요청 진행
     }
+
+    if(!token) {
+        store.dispatch(logout());
+        return Promise.reject(new Error('JWT 토큰이 없습니다. 로그아웃 처리됨.'));
+    }
+
+    config.headers.Authorization = `Bearer ${token}`; // JWT 토큰을 헤더에 추가
 
     return config;
 }, (error) => Promise.reject(error)); // 에러 처리
@@ -27,15 +39,15 @@ apiClient.interceptors.response.use(
         const originalRequest = error.config;
 
         // 403 에러 발생 시 리프레시 토큰을 사용하여 재시도
-        if (error.response && error.response.status === 403 && !originalRequest._retry) {
+        if (error.response && error.response.status === 401 && error.response.data.error === 'TOKEN_EXPIRED' && !originalRequest._retry) {
             originalRequest._retry = true; // 리프레시 시도 중인지 플래그 설정
 
             console.log('액세스 토큰 만료. 리프레시 토큰으로 재시도')
             const refreshToken = Cookies.get('refreshToken'); // 리프레시 토큰 가져오기
 
             if (!refreshToken) {
-                console.log('리프레시 토큰이 없음. 로그아웃 필요');
-                return Promise.reject(error);
+                store.dispatch(logout());
+                return Promise.reject(new Error('JWT refresh 토큰이 없습니다. 로그아웃 처리됨.'));
             }
 
             try {
@@ -49,6 +61,7 @@ apiClient.interceptors.response.use(
                         console.log('새 액세스 토큰이 없음. 로그아웃 필요');
                         return Promise.reject(error);
                     }
+                    console.log('새 액세스 토큰 발급:', newToken);
 
                     // 새 JWT 토큰을 쿠키에 저장
                     Cookies.set('jwt', newToken);
