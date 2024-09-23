@@ -316,19 +316,19 @@ export const subMenuItems = {
         {
             text: '품질 관리',
             items: [
-                { text: '불량군/유형 관리', component: null, apiPath: undefined, url: '/production/quality-control/defect-group-type', requiredPermission: 'defectGroupAndTypePermission', permissionLevel: 'GENERAL' },  // 불량군/유형 관리 권한
-                { text: '품질 검사 관리', component: null, apiPath: undefined, url: '/production/quality-control/quality-inspection', requiredPermission: 'qualityInspectionPermission', permissionLevel: 'GENERAL' },  // 품질 검사 관리 권한
-                { text: 'LOT 관리', component: null, apiPath: undefined, url: '/production/quality-control/lot-management', requiredPermission: 'lotManagementPermission', permissionLevel: 'GENERAL' },  // LOT 관리 권한
-                { text: 'Serial No. 관리', component: null, apiPath: undefined, url: '/production/quality-control/serial-management', requiredPermission: 'serialManagementPermission', permissionLevel: 'GENERAL' },  // Serial No 관리 권한
-                { text: '생산품 입고 처리', component: null, apiPath: undefined, url: '/production/quality-control/goods-receipt', requiredPermission: 'goodsReceiptPermission', permissionLevel: 'GENERAL' },  // 생산품 입고 처리 권한
+                { text: '불량군/유형 관리', component: 'DefectTypeManagementPage', apiPath: undefined, url: '/production/quality-control/defect-group-type', requiredPermission: 'defectGroupAndTypePermission', permissionLevel: 'GENERAL' },  // 불량군/유형 관리 권한
+                { text: '품질 검사 관리', component: 'QualityInspectionPage', apiPath: undefined, url: '/production/quality-control/quality-inspection', requiredPermission: 'qualityInspectionPermission', permissionLevel: 'GENERAL' },  // 품질 검사 관리 권한
+                { text: 'LOT 관리', component: 'LotManagementPage', apiPath: undefined, url: '/production/quality-control/lot-management', requiredPermission: 'lotManagementPermission', permissionLevel: 'GENERAL' },  // LOT 관리 권한
+                { text: 'Serial No. 관리', component: 'SerialNumberPage', apiPath: undefined, url: '/production/quality-control/serial-management', requiredPermission: 'serialManagementPermission', permissionLevel: 'GENERAL' },  // Serial No 관리 권한
+                { text: '생산품 입고 처리', component: 'GoodsReceiptPage', apiPath: undefined, url: '/production/quality-control/goods-receipt', requiredPermission: 'goodsReceiptPermission', permissionLevel: 'GENERAL' },  // 생산품 입고 처리 권한
             ]
         },
         {
             text: '외주/계약 관리',
             items: [
-                { text: '외주 단가 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/price', requiredPermission: 'outsourcingPricePermission', permissionLevel: 'GENERAL' },  // 외주 단가 관리 권한
-                { text: '외주 발주 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/order', requiredPermission: 'outsourcingOrderPermission', permissionLevel: 'GENERAL' },  // 외주 발주 관리 권한
-                { text: '외주 검사 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/inspection', requiredPermission: 'outsourcingInspectionPermission', permissionLevel: 'GENERAL' },  // 외주 검사 관리 권한
+                { text: '외주 단가 관리', component: 'OutsourcingCostPage', apiPath: undefined, url: '/production/outsourcing-management/price', requiredPermission: 'outsourcingPricePermission', permissionLevel: 'GENERAL' },  // 외주 단가 관리 권한
+                { text: '외주 발주 관리', component: 'OutsourcingOrderPage', apiPath: undefined, url: '/production/outsourcing-management/order', requiredPermission: 'outsourcingOrderPermission', permissionLevel: 'GENERAL' },  // 외주 발주 관리 권한
+                { text: '외주 검사 관리', component: 'OutsourcingInspectionPage', apiPath: undefined, url: '/production/outsourcing-management/inspection', requiredPermission: 'outsourcingInspectionPermission', permissionLevel: 'GENERAL' },  // 외주 검사 관리 권한
                 { text: '외주 실적 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/performance', requiredPermission: 'outsourcingPerformancePermission', permissionLevel: 'GENERAL' },  // 외주 실적 관리 권한
             ]
         }

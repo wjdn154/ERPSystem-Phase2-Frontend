@@ -193,6 +193,17 @@ import MonthlyWorkReportPage
     from "../../production/production_performance_management/monthly_work_report/MonthlyWorkReportPage.jsx";
 import DailyWorkReportPage
     from "../../production/production_performance_management/daily_work_report/DailyWorkReportPage.jsx";
+import DefectTypeManagementPage
+    from "../../production/quality_management/defect_type_management/DefectTypeManagementPage.jsx";
+import QualityInspectionPage
+    from "../../production/quality_management/quality_inspection_management/QualityInspectionPage.jsx";
+import LotManagementPage from "../../production/quality_management/lot_management/LotManagementPage.jsx";
+import SerialNumberPage from "../../production/quality_management/serial_number_management/SerialNumberPage.jsx";
+import GoodsReceiptPage from "../../production/quality_management/goods_receipt_management/GoodsReceiptPage.jsx";
+import OutsourcingOrderPage
+    from "../../production/outsourcing_management/outsourcing_order_management/OutsourcingOrderPage.jsx";
+import OutsourcingInspectionPage
+    from "../../production/outsourcing_management/outsourcing_inspection_management/OutsourcingInspectionPage.jsx";
 
 // 필요한 페이지 컴포넌트들
 
@@ -216,8 +227,8 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
     AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,
     MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ShiftTypePage, ProductionOrderPage, AssignmentHistoryPage,
-    WorkPerformancePage, MonthlyWorkReportPage, DailyWorkReportPage,
-
+    WorkPerformancePage, MonthlyWorkReportPage, DailyWorkReportPage, DefectTypeManagementPage, QualityInspectionPage, LotManagementPage, SerialNumberPage, GoodsReceiptPage,
+    OutsourcingOrderPage, OutsourcingInspectionPage,
 };
 
 // MainContentPage 컴포넌트

@@ -1,12 +1,12 @@
 import React, {useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './MonthlyWorkReportUtil.jsx';
+import { tabItems } from './GoodsRecieptUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 
-const MonthlyWorkReportPage = () => {
+const GoodsReceiptPage = () => {
     const [activeTabKey, setActiveTabKey] = useState('1');
 
     const handleTabChange = (key) => {
@@ -18,10 +18,10 @@ const MonthlyWorkReportPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="생산 월보"
+                        title="생산품 입고 처리"
                         description={(
                             <Typography>
-                                생산 월보 등록 페이지는 <span>월간 생산 성과를 집계하고 보고하는 곳</span>임. 이 페이지에서는 <span>한 달 동안의 생산 실적, 작업 시간, 불량 발생률</span> 등을 등록하고, 월간 목표 달성 여부를 확인할 수 있음. 월간 보고서를 통해 <span>전체 생산 흐름</span>을 파악하고, <span>장기적인 생산 계획 수립</span>에 기여함.
+                                생산품 입고 처리 페이지는 <span>생산된 제품을 입고 처리하고 그 내역을 관리</span>하는 곳임. 이 페이지에서는 <span>생산품의 입고 수량, 입고 일자, 창고 위치</span> 등을 기록하여 <span>재고 관리</span>와 <span>물류 흐름</span>을 최적화할 수 있음. 이를 통해 <span>입고 절차의 투명성</span>을 확보하고, <span>재고 상태</span>를 정확히 유지할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -58,4 +58,4 @@ const MonthlyWorkReportPage = () => {
     );
 };
 
-export default MonthlyWorkReportPage;
+export default GoodsReceiptPage;
