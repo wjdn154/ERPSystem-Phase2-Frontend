@@ -5,7 +5,7 @@ import {
     fetchWorkerDetail,
     updateWorkerDetail,
     fetchWorkerAttendanceAssignmentList
-} from "../../services/resource_data/WorkerApi.jsx";
+} from "./WorkerApi.jsx";
 
 export const workerHook = (initialData) => {
 

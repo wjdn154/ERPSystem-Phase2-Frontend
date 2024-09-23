@@ -1,12 +1,12 @@
 import React, {useMemo} from "react";
 import {Box, Grid, Grow, Typography} from "@mui/material";
-import {MaintenanceHistoryListColumn} from "../../utils/resource_data/MaintenanceHistoryListColumn.jsx";
-import MaintenanceHistoryListSection from "../../components/resourceData/MaintenanceHistoryListSection.jsx"
-import WelcomeSection from "../../../../../components/WelcomeSection.jsx";
-import {maintenanceTabItems} from "../../utils/resource_data/MaintenanceHistoryUtil.jsx"
-import {maintenanceHistoryHook} from "../../hooks/resource_data/MaintenanceHistoryHook.jsx";
-import MaintenanceHistoryDetailSection from "../../components/resourceData/MaintenanceHistoryDetailSection.jsx";
-import EquipmentDataDetailSection from "../../components/resourceData/MaintenanceHistoryDetailSection.jsx";
+import {MaintenanceHistoryListColumn} from "./MaintenanceHistoryListColumn.jsx";
+import MaintenanceHistoryListSection from "./MaintenanceHistoryListSection.jsx"
+import WelcomeSection from "../../../../components/WelcomeSection.jsx";
+import {maintenanceTabItems} from "./MaintenanceHistoryUtil.jsx"
+import {maintenanceHistoryHook} from "./MaintenanceHistoryHook.jsx";
+import MaintenanceHistoryDetailSection from "./MaintenanceHistoryDetailSection.jsx";
+import EquipmentDataDetailSection from "./MaintenanceHistoryDetailSection.jsx";
 
 
 const MaintenanceHistoryPage = ({initialData}) => {

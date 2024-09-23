@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import MainContentHook from './MainContentHook.jsx';
 import AntdSkeleton from "./AntdSkeleton.jsx";
 import AccountSubjectPage from "../../financial/basic_information_management/account_subject/AccountSubjectPage.jsx";
-import EquipmentDataPage from "../../production/Existing/pages/resource_data/EquipmentDataPage.jsx";
-import MaintenanceHistoryPage from "../../production/Existing/pages/resource_data/MaintenanceHistoryPage.jsx";
+import EquipmentDataPage from "../../production/resource_data_management/equipment_data_management/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../../production/resource_data_management/maintenance_history_management/MaintenanceHistoryPage.jsx";
 import ClientRegistrationPage
     from "../../financial/basic_information_management/client_registration/ClientRegistrationPage.jsx";
 import UserPermissionPage
@@ -53,7 +53,7 @@ import JournalPage from "../../financial/ledger/journal/JournalPage.jsx";
 import AssignmentManagementPage
     from "../../hr/basic_information_management/assignment_management/AssignmentManagementPage.jsx";
 import AssetRegisterPage from "../../financial/fixed_assets_and_depreciation/asset_register/AssetRegisterPage.jsx";
-import ProductionDashboardPage from "../../production/Existing/pages/ProductionDashboardPage.jsx";
+import ProductionDashboardPage from "../../production/dash_board/ProductionDashboardPage.jsx";
 import OtherIncomeManagementPage
     from "../../hr/tax_management/other_income_management/OtherIncomeManagementPage.jsx";
 import ClientAccountLedgerPage from "../../financial/ledger/client_account_ledger/ClientAccountLedgerPage.jsx";
@@ -67,7 +67,7 @@ import RetirementBenefitEstimationPage
 import PreviousIncomeStatementPage
     from "../../financial/previous_financial_statement/previous_income_statement/PreviousIncomeStatementPage.jsx";
 import IntegrationDashboardPage from "../../integration/pages/DashBoard/DashboardPage.jsx";
-import WorkerPage from "../../production/Existing/pages/resource_data/WorkerPage.jsx";
+import WorkerPage from "../../production/resource_data_management/worker_management/WorkerPage.jsx";
 import HRDashboardPage from "../../hr/dash_board/HRDashboardPage.jsx";
 import PreviousCostStatementPage
     from "../../financial/previous_financial_statement/previous_cost_statement/PreviousCostStatementPage.jsx";

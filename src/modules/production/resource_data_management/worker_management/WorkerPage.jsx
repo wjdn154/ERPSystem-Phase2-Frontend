@@ -1,12 +1,12 @@
 import React, {useMemo} from "react";
 import {Box, Grid, Grow, Typography} from "@mui/material";
-import {workerHook} from '../../hooks/resource_data/WorkerHook.jsx';
-import WorkerListSection from "../../components/resourceData/WorkerListSection.jsx";
-import {workerListColumn} from "../../utils/resource_data/WorkerListColumn.jsx"
-import WelcomeSection from "../../../../../components/WelcomeSection.jsx";
-import {workerTabItems} from "../../utils/resource_data/WorkerUtil.jsx";
-import WorkerAttendanceListSection from "../../components/resourceData/WorkerAttendanceListSection.jsx";
-import {workerAttendanceListColumn} from "../../utils/resource_data/WorkerAttendanceListColumn.jsx"
+import {workerHook} from './WorkerHook.jsx';
+import WorkerListSection from "./WorkerListSection.jsx";
+import {workerListColumn} from "./WorkerListColumn.jsx"
+import WelcomeSection from "../../../../components/WelcomeSection.jsx";
+import {workerTabItems} from "./WorkerUtil.jsx";
+import WorkerAttendanceListSection from "./WorkerAttendanceListSection.jsx";
+import {workerAttendanceListColumn} from "./WorkerAttendanceListColumn.jsx"
 
 
 const WorkerPage = ({initialData}) => {

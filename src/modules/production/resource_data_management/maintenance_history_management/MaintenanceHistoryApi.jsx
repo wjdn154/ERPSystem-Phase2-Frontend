@@ -1,6 +1,6 @@
 import axios from "axios";
-import {PRODUCTION_API} from "../../../../../config/apiConstants.jsx";
-import apiClient from "../../../../../config/apiClient.jsx";
+import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import apiClient from "../../../../config/apiClient.jsx";
 
 //유지보수 리스트 호출 함수
 export const fetchMaintenanceHistoryList = async () => {

@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Grid,Paper,Typography}  from "@mui/material";
 import {Button, Table as AntTable, Modal, Input, Select, DatePicker} from "antd";
 import moment from "moment";
-import {workerAttendanceListColumn} from "../../utils/resource_data/WorkerAttendanceListColumn.jsx";
+import {workerAttendanceListColumn} from "./WorkerAttendanceListColumn.jsx";
 const {Option} = Select;
 
 const mergeAttendanceAndAssignment = (attendanceList, assignmentList) => {

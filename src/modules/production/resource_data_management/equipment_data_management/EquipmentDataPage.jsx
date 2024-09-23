@@ -1,11 +1,11 @@
 import React, {useMemo} from "react";
 import {Box, Grid, Grow, Typography} from "@mui/material";
-import {equipmentDataHook} from '../../hooks/resource_data/EquipmentDataHook.jsx';
-import EquipmentDataListSection from "../../components/resourceData/EquipmentDataListSection.jsx";
-import {equipmentDataListColumn} from "../../utils/resource_data/EquipmentDataListColumn.jsx";
-import EquipmentDataDetailSection from "../../components/resourceData/EquipmentDataDetailSection.jsx";
-import {equipmentTabItems} from "../../utils/resource_data/EquipmentDataUtil.jsx"
-import WelcomeSection from "../../../../../components/WelcomeSection.jsx";
+import {equipmentDataHook} from './EquipmentDataHook.jsx';
+import EquipmentDataListSection from "./EquipmentDataListSection.jsx";
+import {equipmentDataListColumn} from "./EquipmentDataListColumn.jsx";
+import EquipmentDataDetailSection from "./EquipmentDataDetailSection.jsx";
+import {equipmentTabItems} from "./EquipmentDataUtil.jsx"
+import WelcomeSection from "../../../../components/WelcomeSection.jsx";
 
 
 const EquipmentDataPage = ({initialData}) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {Box, Grid, Typography} from '@mui/material';
-import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from '../utils/dash_board/DashBoardUtil.jsx';
+import WelcomeSection from '../../../components/WelcomeSection.jsx';
+import { tabItems } from './DashBoardUtil.jsx';
 
 const ProductionDashboardPage = ({ initialData }) => {
     const [activeTabKey, setActiveTabKey] = useState('1');

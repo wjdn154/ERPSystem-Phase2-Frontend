@@ -1,6 +1,6 @@
 import axios from "axios";
-import {PRODUCTION_API} from "../../../../../config/apiConstants.jsx";
-import apiClient from "../../../../../config/apiClient.jsx";
+import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import apiClient from "../../../../config/apiClient.jsx";
 
 //작업자 정보 기본 호출 함수
 export const fetchWorkerList = async () => {
