@@ -274,7 +274,7 @@ export const subMenuItems = {
                 { text: '작업장 관리', component: 'WorkshopManagementPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter', requiredPermission: 'workcenterManagementPermission', permissionLevel: 'GENERAL' },  // 작업장 관리 권한
                 { text: '공정세부정보 관리', component: 'ProcessDetailsPage', apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/basic-data/process-management/details', requiredPermission: 'processDetailsPermission', permissionLevel: 'GENERAL' },  // 공정세부정보 관리 권한
                 { text: 'Routing 관리', component: 'RoutingManagementPage', apiPath: PRODUCTION_API.ROUTING_LIST_API, url: '/production/basic-data/process-management/routing', requiredPermission: 'routingManagementPermission', permissionLevel: 'GENERAL' },  // Routing 관리 권한
-                { text: 'BOM 관리', component: 'SBomPage', apiPath: PRODUCTION_API.S_BOM_LIST_API, url: '/production/basic-data/bom', requiredPermission: 'bomManagementPermission', permissionLevel: 'GENERAL' },  // BOM 관리 권한
+                { text: 'BOM 관리', component: 'BomPage', apiPath: PRODUCTION_API.S_BOM_LIST_API, url: '/production/basic-data/bom', requiredPermission: 'bomManagementPermission', permissionLevel: 'GENERAL' },  // BOM 관리 권한
             ]
         },
         {

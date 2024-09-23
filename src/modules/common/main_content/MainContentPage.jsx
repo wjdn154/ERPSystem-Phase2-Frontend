@@ -74,7 +74,7 @@ import PreviousCostStatementPage
 import DepositsStatusPage from "../../financial/fund_management/deposits_status/DepositsStatusPage.jsx";
 import VoucherPrintPage from "../../financial/ledger/voucher_print/VoucherPrintPage.jsx";
 import FinanceDashboardPage from "../../financial/dash_board/FinanceDashboardPage.jsx";
-import SBomPage from "../../production/Existing/pages/basic_data/SBomPage.jsx";
+import BomPage from "../../production/basic_information_management/bom_management/BomPage.jsx";
 import SystemEnvironmentSettingsPage
     from "../../financial/basic_information_management/system_environment_settings/SystemEnvironmentSettingsPage.jsx";
 import WorkcenterPage from "../../production/Existing/pages/basic_data/Workcenter/WorkcenterPage.jsx";
@@ -176,7 +176,7 @@ import RoutingManagementPage
 // 컴포넌트 매핑 객체 생성
 const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage, WorkcenterPage,
     WorkerPage, IntegrationDashboardPage,FinanceDashboardPage, ProductionDashboardPage, HRDashboardPage, LogisticsDashboardPage, PendingVoucherInputPage,
-    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, SBomPage, CompanyInfoEditPage, VoucherListPage,
+    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, CompanyInfoEditPage, VoucherListPage,
     SalesPurchaseVoucherEntryPage, ElectronicTaxInvoicePage, ClientLedgerPage, ClientAccountLedgerPage, AccountLedgerPage, CashBookPage, DailyMonthlyReportPage,
     JournalPage, GeneralLedgerPage, SalesPurchaseLedgerPage, TaxInvoiceStatusPage, VoucherPrintPage, ClosingDataEntryPage, TrialBalancePage, FinancialPositionPage, IncomeStatementPage, CostStatementPage, ProfitDistributionStatementPage,
     CashFlowStatementPage, EquityChangesStatementPage, ClosingAnnexStatementPage, PreviousFinancialPositionPage, PreviousIncomeStatementPage,
