@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import MainContentHook from './MainContentHook.jsx';
 import AntdSkeleton from "./AntdSkeleton.jsx";
 import AccountSubjectPage from "../../financial/basic_information_management/account_subject/AccountSubjectPage.jsx";
-import EquipmentDataPage from "../../production/Existing/pages/resource_data/EquipmentDataPage.jsx";
-import MaintenanceHistoryPage from "../../production/Existing/pages/resource_data/MaintenanceHistoryPage.jsx";
+import EquipmentDataPage from "../../production/resource_data_management/equipment_data_management/EquipmentDataPage.jsx";
+import MaintenanceHistoryPage from "../../production/resource_data_management/maintenance_history_management/MaintenanceHistoryPage.jsx";
 import ClientRegistrationPage
     from "../../financial/basic_information_management/client_registration/ClientRegistrationPage.jsx";
 import UserPermissionPage
@@ -53,7 +53,7 @@ import JournalPage from "../../financial/ledger/journal/JournalPage.jsx";
 import AssignmentManagementPage
     from "../../hr/basic_information_management/assignment_management/AssignmentManagementPage.jsx";
 import AssetRegisterPage from "../../financial/fixed_assets_and_depreciation/asset_register/AssetRegisterPage.jsx";
-import ProductionDashboardPage from "../../production/Existing/pages/ProductionDashboardPage.jsx";
+import ProductionDashboardPage from "../../production/dash_board/ProductionDashboardPage.jsx";
 import OtherIncomeManagementPage
     from "../../hr/tax_management/other_income_management/OtherIncomeManagementPage.jsx";
 import ClientAccountLedgerPage from "../../financial/ledger/client_account_ledger/ClientAccountLedgerPage.jsx";
@@ -67,17 +67,16 @@ import RetirementBenefitEstimationPage
 import PreviousIncomeStatementPage
     from "../../financial/previous_financial_statement/previous_income_statement/PreviousIncomeStatementPage.jsx";
 import IntegrationDashboardPage from "../../integration/pages/DashBoard/DashboardPage.jsx";
-import WorkerPage from "../../production/Existing/pages/resource_data/WorkerPage.jsx";
+import WorkerPage from "../../production/resource_data_management/worker_management/WorkerPage.jsx";
 import HRDashboardPage from "../../hr/dash_board/HRDashboardPage.jsx";
 import PreviousCostStatementPage
     from "../../financial/previous_financial_statement/previous_cost_statement/PreviousCostStatementPage.jsx";
 import DepositsStatusPage from "../../financial/fund_management/deposits_status/DepositsStatusPage.jsx";
 import VoucherPrintPage from "../../financial/ledger/voucher_print/VoucherPrintPage.jsx";
 import FinanceDashboardPage from "../../financial/dash_board/FinanceDashboardPage.jsx";
-import SBomPage from "../../production/Existing/pages/basic_data/SBomPage.jsx";
+import BomPage from "../../production/basic_information_management/bom_management/BomPage.jsx";
 import SystemEnvironmentSettingsPage
     from "../../financial/basic_information_management/system_environment_settings/SystemEnvironmentSettingsPage.jsx";
-import WorkcenterPage from "../../production/Existing/pages/basic_data/Workcenter/WorkcenterPage.jsx";
 import SalesPurchaseVoucherEntryPage
     from "../../financial/voucher_entry/sales_purchase_voucher_entry/SalesPurchaseVoucherEntryPage.jsx";
 import CashBookPage from "../../financial/ledger/cash_book/CashBookPage.jsx";
@@ -164,19 +163,54 @@ import AdjustmentProgressPage
 import InspectionInquiryPage from "../../logistics/inventory_adjustment/inventory_inspection/InspectionInquiryPage.jsx";
 import InspectionStatusPage from "../../logistics/inventory_adjustment/inspection_status/InspectionStatusPage.jsx";
 import AdjustmentStatusPage from "../../logistics/inventory_adjustment/adjustment_status/AdjustmentStatusPage.jsx";
-import WorkshopManagementPage
-    from "../../production/basic_information_management/workshop_management/WorkshopManagementPage.jsx";
+import WorkcenterManagementPage
+    from "../../production/basic_information_management/workcenter_management/WorkcenterManagementPage.jsx";
 import ProcessDetailsPage
     from "../../production/basic_information_management/process_details_management/ProcessDetailsPage.jsx";
 import RoutingManagementPage
     from "../../production/basic_information_management/routing_management/RoutingManagementPage.jsx";
+import MaterialDataPage from "../../production/resource_data_management/material_data_management/MaterialDataPage.jsx";
+import WasteManagementPage from "../../production/resource_data_management/waste_management/WasteManagementPage.jsx";
+import ProductionRequestPage
+    from "../../production/production_schedule_management/production_request/ProductionRequestPage.jsx";
+import MasterProductionPage
+    from "../../production/production_schedule_management/master_production_schedule/MasterProductionPage.jsx";
+import MaterialInputStatusPage
+    from "../../production/production_schedule_management/material_input_status_management/MaterialInputStatusPage.jsx";
+import MrpPage from "../../production/production_schedule_management/material_requirements_planning/MrpPage.jsx";
+import MakeToOrderPlanPage
+    from "../../production/production_schedule_management/make_to_order_plan/MakeToOrderPlanPage.jsx";
+import MakeToStockPlanPage
+    from "../../production/production_schedule_management/make_to_stock_plan/MakeToStockPlanPage.jsx";
+import ShiftTypePage from "../../production/work_order_management/shift_type_management/ShiftTypePage.jsx";
+import ProductionOrderPage
+    from "../../production/work_order_management/production_order_management/ProductionOrderPage.jsx";
+import AssignmentHistoryPage
+    from "../../production/work_order_management/assignment_history_management/AssignmentHistoryPage.jsx";
+import WorkPerformancePage
+    from "../../production/production_performance_management/work_performance_management/WorkPerformancePage.jsx";
+import MonthlyWorkReportPage
+    from "../../production/production_performance_management/monthly_work_report/MonthlyWorkReportPage.jsx";
+import DailyWorkReportPage
+    from "../../production/production_performance_management/daily_work_report/DailyWorkReportPage.jsx";
+import DefectTypeManagementPage
+    from "../../production/quality_management/defect_type_management/DefectTypeManagementPage.jsx";
+import QualityInspectionPage
+    from "../../production/quality_management/quality_inspection_management/QualityInspectionPage.jsx";
+import LotManagementPage from "../../production/quality_management/lot_management/LotManagementPage.jsx";
+import SerialNumberPage from "../../production/quality_management/serial_number_management/SerialNumberPage.jsx";
+import GoodsReceiptPage from "../../production/quality_management/goods_receipt_management/GoodsReceiptPage.jsx";
+import OutsourcingOrderPage
+    from "../../production/outsourcing_management/outsourcing_order_management/OutsourcingOrderPage.jsx";
+import OutsourcingInspectionPage
+    from "../../production/outsourcing_management/outsourcing_inspection_management/OutsourcingInspectionPage.jsx";
 
 // 필요한 페이지 컴포넌트들
 
 // 컴포넌트 매핑 객체 생성
-const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage, WorkcenterPage,
+const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage,
     WorkerPage, IntegrationDashboardPage,FinanceDashboardPage, ProductionDashboardPage, HRDashboardPage, LogisticsDashboardPage, PendingVoucherInputPage,
-    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, SBomPage, CompanyInfoEditPage, VoucherListPage,
+    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, CompanyInfoEditPage, VoucherListPage,
     SalesPurchaseVoucherEntryPage, ElectronicTaxInvoicePage, ClientLedgerPage, ClientAccountLedgerPage, AccountLedgerPage, CashBookPage, DailyMonthlyReportPage,
     JournalPage, GeneralLedgerPage, SalesPurchaseLedgerPage, TaxInvoiceStatusPage, VoucherPrintPage, ClosingDataEntryPage, TrialBalancePage, FinancialPositionPage, IncomeStatementPage, CostStatementPage, ProfitDistributionStatementPage,
     CashFlowStatementPage, EquityChangesStatementPage, ClosingAnnexStatementPage, PreviousFinancialPositionPage, PreviousIncomeStatementPage,
@@ -191,8 +225,10 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
-    AdjustmentStatusPage, WorkshopManagementPage, ProcessDetailsPage, RoutingManagementPage
-
+    AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,
+    MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ShiftTypePage, ProductionOrderPage, AssignmentHistoryPage,
+    WorkPerformancePage, MonthlyWorkReportPage, DailyWorkReportPage, DefectTypeManagementPage, QualityInspectionPage, LotManagementPage, SerialNumberPage, GoodsReceiptPage,
+    OutsourcingOrderPage, OutsourcingInspectionPage,
 };
 
 // MainContentPage 컴포넌트

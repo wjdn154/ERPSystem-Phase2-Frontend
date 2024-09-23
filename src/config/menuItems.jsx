@@ -15,8 +15,6 @@ import {
 
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
-import ProcessDetailsPage
-    from "../modules/production/basic_information_management/process_details_management/ProcessDetailsPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
@@ -271,66 +269,66 @@ export const subMenuItems = {
         {
             text: '기초정보 관리',
             items: [
-                { text: '작업장 관리', component: 'WorkshopManagementPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter', requiredPermission: 'workcenterManagementPermission', permissionLevel: 'GENERAL' },  // 작업장 관리 권한
+                { text: '작업장 관리', component: 'WorkcenterManagementPage', apiPath: PRODUCTION_API.WORKCENTER_LIST_API, url: '/production/basic-data/workcenter', requiredPermission: 'workcenterManagementPermission', permissionLevel: 'GENERAL' },  // 작업장 관리 권한
                 { text: '공정세부정보 관리', component: 'ProcessDetailsPage', apiPath: PRODUCTION_API.PROCESS_LIST_API, url: '/production/basic-data/process-management/details', requiredPermission: 'processDetailsPermission', permissionLevel: 'GENERAL' },  // 공정세부정보 관리 권한
                 { text: 'Routing 관리', component: 'RoutingManagementPage', apiPath: PRODUCTION_API.ROUTING_LIST_API, url: '/production/basic-data/process-management/routing', requiredPermission: 'routingManagementPermission', permissionLevel: 'GENERAL' },  // Routing 관리 권한
-                { text: 'BOM 관리', component: 'SBomPage', apiPath: PRODUCTION_API.S_BOM_LIST_API, url: '/production/basic-data/bom', requiredPermission: 'bomManagementPermission', permissionLevel: 'GENERAL' },  // BOM 관리 권한
+                { text: 'BOM 관리', component: 'BomPage', apiPath: PRODUCTION_API.S_BOM_LIST_API, url: '/production/basic-data/bom', requiredPermission: 'bomManagementPermission', permissionLevel: 'GENERAL' },  // BOM 관리 권한
             ]
         },
         {
             text: '자원 관리',
             items: [
                 { text: '작업자 관리', component: 'WorkerPage', apiPath: PRODUCTION_API.WORKER_LIST_API, url: '/production/resource-management/worker-management', requiredPermission: 'workerManagementPermission', permissionLevel: 'GENERAL' },  // 작업자 관리 권한
-                { text: '자재 정보 관리', component: null, apiPath: undefined, url: '/production/resource-management/material-management', requiredPermission: 'materialManagementPermission', permissionLevel: 'GENERAL' },  // 자재 정보 관리 권한
+                { text: '자재 정보 관리', component: 'MaterialDataPage', apiPath: undefined, url: '/production/resource-management/material-management', requiredPermission: 'materialManagementPermission', permissionLevel: 'GENERAL' },  // 자재 정보 관리 권한
                 { text: '설비 정보 관리', component: 'EquipmentDataPage', apiPath: PRODUCTION_API.EQUIPMENT_DATA_API, url: '/production/resource-management/equipment-management', requiredPermission: 'equipmentManagementPermission', permissionLevel: 'GENERAL' },  // 설비 정보 관리 권한
                 { text: '유지보수 이력 관리', component: 'MaintenanceHistoryPage', apiPath: PRODUCTION_API.MAINTENANCE_HISTORY_API, url: '/production/resource-management/maintenance-history', requiredPermission: 'maintenanceHistoryPermission', permissionLevel: 'GENERAL' },  // 유지보수 이력 관리 권한
-                { text: '폐기물 관리', component: null, apiPath: undefined, url: '/production/resource-management/waste-management', requiredPermission: 'wasteManagementPermission', permissionLevel: 'GENERAL' },  // 폐기물 관리 권한
+                { text: '폐기물 관리', component: 'WasteManagementPage', apiPath: undefined, url: '/production/resource-management/waste-management', requiredPermission: 'wasteManagementPermission', permissionLevel: 'GENERAL' },  // 폐기물 관리 권한
             ]
         },
         {
             text: '생산 운영 및 계획',
             items: [
-                { text: '생산 의뢰 관리', component: null, apiPath: PRODUCTION_API.PRODUCTION_REQUEST_LIST_API, url: '/production/common-scheduling/request', requiredPermission: 'productionRequestPermission', permissionLevel: 'GENERAL' },  // 생산 의뢰 관리 권한
-                { text: '주생산계획 관리', component: null, apiPath: undefined, url: '/production/planning/mps', requiredPermission: 'mpsPermission', permissionLevel: 'GENERAL' },  // 주생산 계획 관리 권한
+                { text: '생산 의뢰 관리', component: 'ProductionRequestPage', apiPath: PRODUCTION_API.PRODUCTION_REQUEST_LIST_API, url: '/production/common-scheduling/request', requiredPermission: 'productionRequestPermission', permissionLevel: 'GENERAL' },  // 생산 의뢰 관리 권한
+                { text: '주생산계획 관리', component: 'MasterProductionPage', apiPath: undefined, url: '/production/planning/mps', requiredPermission: 'mpsPermission', permissionLevel: 'GENERAL' },  // 주생산 계획 관리 권한
                 // { text: '가용생산능력 계획 관리', component: null, apiPath: undefined, url: '/production/planning/crp' },
-                { text: '실자재 투입 현황 관리', component: null, apiPath: undefined, url: '/production/planning/material-input-status', requiredPermission: 'materialInputStatusPermission', permissionLevel: 'GENERAL' },  // 실자재 투입 현황 권한
-                { text: '자재소요량 계획 관리', component: null, apiPath: undefined, url: '/production/planning/mrp', requiredPermission: 'mrpPermission', permissionLevel: 'GENERAL' },  // 자재소요량 계획 관리 권한
-                { text: '주문 생산 계획 관리', component: null, apiPath: undefined, url: '/production/strategy/plan-of-mto', requiredPermission: 'planOfMakeToOrderPermission', permissionLevel: 'GENERAL' },  // 주문 생산 계획 관리 권한
-                { text: '재고 생산 계획 관리', component: null, apiPath: undefined, url: '/production/strategy/plan-of-mts', requiredPermission: 'planOfMakeToStockPermission', permissionLevel: 'GENERAL' },  // 재고 생산 계획 관리 권한
+                { text: '실자재 투입 현황 관리', component: 'MaterialInputStatusPage', apiPath: undefined, url: '/production/planning/material-input-status', requiredPermission: 'materialInputStatusPermission', permissionLevel: 'GENERAL' },  // 실자재 투입 현황 권한
+                { text: '자재소요량 계획 관리', component: 'MrpPage', apiPath: undefined, url: '/production/planning/mrp', requiredPermission: 'mrpPermission', permissionLevel: 'GENERAL' },  // 자재소요량 계획 관리 권한
+                { text: '주문 생산 계획 관리', component: 'MakeToOrderPlanPage', apiPath: undefined, url: '/production/strategy/plan-of-mto', requiredPermission: 'planOfMakeToOrderPermission', permissionLevel: 'GENERAL' },  // 주문 생산 계획 관리 권한
+                { text: '재고 생산 계획 관리', component: 'MakeToStockPlanPage', apiPath: undefined, url: '/production/strategy/plan-of-mts', requiredPermission: 'planOfMakeToStockPermission', permissionLevel: 'GENERAL' },  // 재고 생산 계획 관리 권한
             ]
         },
         {
             text: '작업 지시 관리',
             items: [
-                { text: '교대 유형 관리', component: null, apiPath: PRODUCTION_API.SHIFT_TYPE_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
-                { text: '작업 지시 관리', component: null, apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
-                { text: '작업배정이력 관리', component: null, apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_PRODUCTION_ORDER_SUMMARY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
+                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.SHIFT_TYPE_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
+                { text: '작업 지시 관리', component: 'ProductionOrderPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
+                { text: '작업배정이력 관리', component: 'AssignmentHistoryPage', apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_MONTHLY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
             ]
         },
         {
             text: '생산 실적 관리',
             items: [
-                { text: '작업 실적 관리', component: null, apiPath: undefined, url: '/production/performance-management/work-performance', requiredPermission: 'workPerformancePermission', permissionLevel: 'GENERAL' },  // 작업 실적 관리 권한
-                { text: '생산 일보 등록', component: null, apiPath: undefined, url: '/production/performance-management/daily-report', requiredPermission: 'dailyReportPermission', permissionLevel: 'GENERAL' },  // 생산 일보 등록 권한
-                { text: '생산 월보 등록', component: null, apiPath: undefined, url: '/production/performance-management/monthly-report', requiredPermission: 'monthlyReportPermission', permissionLevel: 'GENERAL' },  // 생산 월보 등록 권한
+                { text: '작업 실적 관리', component: 'WorkPerformancePage', apiPath: undefined, url: '/production/performance-management/work-performance', requiredPermission: 'workPerformancePermission', permissionLevel: 'GENERAL' },  // 작업 실적 관리 권한
+                { text: '생산 일보 등록', component: 'DailyWorkReportPage', apiPath: undefined, url: '/production/performance-management/daily-report', requiredPermission: 'dailyReportPermission', permissionLevel: 'GENERAL' },  // 생산 일보 등록 권한
+                { text: '생산 월보 등록', component: 'MonthlyWorkReportPage', apiPath: undefined, url: '/production/performance-management/monthly-report', requiredPermission: 'monthlyReportPermission', permissionLevel: 'GENERAL' },  // 생산 월보 등록 권한
             ]
         },
         {
             text: '품질 관리',
             items: [
-                { text: '불량군/유형 관리', component: null, apiPath: undefined, url: '/production/quality-control/defect-group-type', requiredPermission: 'defectGroupAndTypePermission', permissionLevel: 'GENERAL' },  // 불량군/유형 관리 권한
-                { text: '품질 검사 관리', component: null, apiPath: undefined, url: '/production/quality-control/quality-inspection', requiredPermission: 'qualityInspectionPermission', permissionLevel: 'GENERAL' },  // 품질 검사 관리 권한
-                { text: 'LOT 관리', component: null, apiPath: undefined, url: '/production/quality-control/lot-management', requiredPermission: 'lotManagementPermission', permissionLevel: 'GENERAL' },  // LOT 관리 권한
-                { text: 'Serial No. 관리', component: null, apiPath: undefined, url: '/production/quality-control/serial-management', requiredPermission: 'serialManagementPermission', permissionLevel: 'GENERAL' },  // Serial No 관리 권한
-                { text: '생산품 입고 처리', component: null, apiPath: undefined, url: '/production/quality-control/goods-receipt', requiredPermission: 'goodsReceiptPermission', permissionLevel: 'GENERAL' },  // 생산품 입고 처리 권한
+                { text: '불량군/유형 관리', component: 'DefectTypeManagementPage', apiPath: undefined, url: '/production/quality-control/defect-group-type', requiredPermission: 'defectGroupAndTypePermission', permissionLevel: 'GENERAL' },  // 불량군/유형 관리 권한
+                { text: '품질 검사 관리', component: 'QualityInspectionPage', apiPath: undefined, url: '/production/quality-control/quality-inspection', requiredPermission: 'qualityInspectionPermission', permissionLevel: 'GENERAL' },  // 품질 검사 관리 권한
+                { text: 'LOT 관리', component: 'LotManagementPage', apiPath: undefined, url: '/production/quality-control/lot-management', requiredPermission: 'lotManagementPermission', permissionLevel: 'GENERAL' },  // LOT 관리 권한
+                { text: 'Serial No. 관리', component: 'SerialNumberPage', apiPath: undefined, url: '/production/quality-control/serial-management', requiredPermission: 'serialManagementPermission', permissionLevel: 'GENERAL' },  // Serial No 관리 권한
+                { text: '생산품 입고 처리', component: 'GoodsReceiptPage', apiPath: undefined, url: '/production/quality-control/goods-receipt', requiredPermission: 'goodsReceiptPermission', permissionLevel: 'GENERAL' },  // 생산품 입고 처리 권한
             ]
         },
         {
             text: '외주/계약 관리',
             items: [
-                { text: '외주 단가 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/price', requiredPermission: 'outsourcingPricePermission', permissionLevel: 'GENERAL' },  // 외주 단가 관리 권한
-                { text: '외주 발주 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/order', requiredPermission: 'outsourcingOrderPermission', permissionLevel: 'GENERAL' },  // 외주 발주 관리 권한
-                { text: '외주 검사 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/inspection', requiredPermission: 'outsourcingInspectionPermission', permissionLevel: 'GENERAL' },  // 외주 검사 관리 권한
+                { text: '외주 단가 관리', component: 'OutsourcingCostPage', apiPath: undefined, url: '/production/outsourcing-management/price', requiredPermission: 'outsourcingPricePermission', permissionLevel: 'GENERAL' },  // 외주 단가 관리 권한
+                { text: '외주 발주 관리', component: 'OutsourcingOrderPage', apiPath: undefined, url: '/production/outsourcing-management/order', requiredPermission: 'outsourcingOrderPermission', permissionLevel: 'GENERAL' },  // 외주 발주 관리 권한
+                { text: '외주 검사 관리', component: 'OutsourcingInspectionPage', apiPath: undefined, url: '/production/outsourcing-management/inspection', requiredPermission: 'outsourcingInspectionPermission', permissionLevel: 'GENERAL' },  // 외주 검사 관리 권한
                 { text: '외주 실적 관리', component: null, apiPath: undefined, url: '/production/outsourcing-management/performance', requiredPermission: 'outsourcingPerformancePermission', permissionLevel: 'GENERAL' },  // 외주 실적 관리 권한
             ]
         }
