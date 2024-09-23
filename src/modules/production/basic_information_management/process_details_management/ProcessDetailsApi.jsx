@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { PRODUCTION_API } from '../../../../../../config/apiConstants.jsx';
-import apiClient from "../../../../../../config/apiClient.jsx";
+import { PRODUCTION_API } from '../../../../config/apiConstants.jsx';
+import apiClient from "../../../../config/apiClient.jsx";
 
 // 공정 상세 정보 목록 조회 함수
 export const fetchProcessDetails = async () => {

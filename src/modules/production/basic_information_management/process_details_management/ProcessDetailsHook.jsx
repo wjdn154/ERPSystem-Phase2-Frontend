@@ -6,8 +6,8 @@ import {
     deleteProcessDetail,
     createProcessDetail,
     searchProcessDetails,
-} from '../../../services/basic_data/process_details/ProcessDetailsApi.jsx';
-import { filterProcessDetails  } from '../../../utils/basic_data/process_details/ProcessDetailsUtil.jsx';
+} from './ProcessDetailsApi.jsx';
+import { filterProcessDetails  } from '../../Existing/utils/basic_data/process_details/ProcessDetailsUtil.jsx';
 
 import {Modal} from "antd";
 
@@ -20,12 +20,12 @@ export const useProcessDetails = (initialData) => {
     const [isEditing, setIsEditing] = useState(false);
     const [searchData, setSearchData] = useState([]);
     const [isSearchActive, setIsSearchActive] = useState(false);
+    const [activeTabKey, setActiveTabKey] = useState('1');
 
     // 초기 데이터 로딩
     useEffect(() => {
         const loadProcessDetails = async () => {
             try {
-                console.log("초기 데이터 로드 시도");
                 if (!initialData || initialData.length === 0) {
                     const fetchedData = await fetchProcessDetails();
                     console.log("로드된 데이터:", fetchedData);
@@ -201,6 +201,11 @@ export const useProcessDetails = (initialData) => {
         }
     };
 
+    const handleTabChange = (key) => {
+        setActiveTabKey(key);
+    };
+
+
     return {
         data,
         processDetail,
@@ -217,5 +222,6 @@ export const useProcessDetails = (initialData) => {
         isSearchActive,
         setIsSearchActive,
         setSearchData,
+        setActiveTabKey,
     };
 };

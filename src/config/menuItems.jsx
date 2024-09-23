@@ -15,8 +15,6 @@ import {
 
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
-import ProcessDetailsPage
-    from "../modules/production/basic_information_management/process_details_management/ProcessDetailsPage.jsx";
 
 // 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [

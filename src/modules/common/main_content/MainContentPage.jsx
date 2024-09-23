@@ -77,7 +77,6 @@ import FinanceDashboardPage from "../../financial/dash_board/FinanceDashboardPag
 import BomPage from "../../production/basic_information_management/bom_management/BomPage.jsx";
 import SystemEnvironmentSettingsPage
     from "../../financial/basic_information_management/system_environment_settings/SystemEnvironmentSettingsPage.jsx";
-import WorkcenterPage from "../../production/Existing/pages/basic_data/Workcenter/WorkcenterPage.jsx";
 import SalesPurchaseVoucherEntryPage
     from "../../financial/voucher_entry/sales_purchase_voucher_entry/SalesPurchaseVoucherEntryPage.jsx";
 import CashBookPage from "../../financial/ledger/cash_book/CashBookPage.jsx";
@@ -174,7 +173,7 @@ import RoutingManagementPage
 // 필요한 페이지 컴포넌트들
 
 // 컴포넌트 매핑 객체 생성
-const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage, WorkcenterPage,
+const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage,
     WorkerPage, IntegrationDashboardPage,FinanceDashboardPage, ProductionDashboardPage, HRDashboardPage, LogisticsDashboardPage, PendingVoucherInputPage,
     UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, CompanyInfoEditPage, VoucherListPage,
     SalesPurchaseVoucherEntryPage, ElectronicTaxInvoicePage, ClientLedgerPage, ClientAccountLedgerPage, AccountLedgerPage, CashBookPage, DailyMonthlyReportPage,
