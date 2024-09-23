@@ -127,7 +127,7 @@ export const BomPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 {/* BOM 검색 바 */}
