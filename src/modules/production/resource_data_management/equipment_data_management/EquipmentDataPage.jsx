@@ -63,10 +63,10 @@ const EquipmentDataPage = ({initialData}) => {
             </Grid>
             {/* 설비정보 리스트 영역 */}
             {activeTabKey === '1' && (
-                <Grid container spacing={2}
-                      justifyContent="center"  // 수평 중앙 정렬
-                      alignItems="center"      // 수직 중앙 정렬
-                >
+                // <Grid container spacing={2}
+                //       justifyContent="center"  // 수평 중앙 정렬
+                //       alignItems="center"      // 수직 중앙 정렬
+                // >
                     <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <div>
@@ -88,12 +88,12 @@ const EquipmentDataPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                </Grid>
+                // </Grid>
             )}
-            <Grid container spacing={2} sx={{ marginTop: 3 }}
-                  justifyContent="center"  // 수평 중앙 정렬
-                  alignItems="center"      // 수직 중앙 정렬
-            >
+            {/*<Grid container spacing={2} sx={{ marginTop: 3 }}*/}
+            {/*      justifyContent="center"  // 수평 중앙 정렬*/}
+            {/*      alignItems="center"      // 수직 중앙 정렬*/}
+            {/*>*/}
                 <Grid item xs={11} >
                     {equipmentDataDetail && (
                         <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
@@ -114,7 +114,7 @@ const EquipmentDataPage = ({initialData}) => {
                         </Grow>
                     )}
                 </Grid>
-            </Grid>
+            {/*</Grid>*/}
             {activeTabKey === '2' && (
                     <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                         <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
