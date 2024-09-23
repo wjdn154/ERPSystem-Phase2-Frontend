@@ -169,6 +169,7 @@ import ProcessDetailsPage
     from "../../production/basic_information_management/process_details_management/ProcessDetailsPage.jsx";
 import RoutingManagementPage
     from "../../production/basic_information_management/routing_management/RoutingManagementPage.jsx";
+import MaterialDataPage from "../../production/resource_data_management/material_data_management/MaterialDataPage.jsx";
 
 // 필요한 페이지 컴포넌트들
 
@@ -190,7 +191,7 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
-    AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage
+    AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage,
 
 };
 
