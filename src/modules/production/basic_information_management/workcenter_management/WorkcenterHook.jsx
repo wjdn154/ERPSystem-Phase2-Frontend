@@ -5,8 +5,8 @@ import {
     updateWorkcenter,
     deleteWorkcenter,
     createWorkcenter,
-} from '../../../services/basic_data/workcenter/WorkcenterApi.jsx';
-import { useSearch } from '../../../utils/common/useSearch.jsx';
+} from './WorkcenterApi.jsx';
+import { useSearch } from '../../Existing/utils/common/useSearch.jsx';
 
 import { Modal } from "antd";
 

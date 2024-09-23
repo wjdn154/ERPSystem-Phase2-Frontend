@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Row, Col } from "antd";
-import { fetchWorkcenters } from "../../../services/basic_data/workcenter/WorkcenterApi.jsx";
+import { fetchWorkcenters } from "./WorkcenterApi.jsx";
 import {Cell, Pie, PieChart, ResponsiveContainer} from "recharts";
 import {Grid} from "@mui/material";
 

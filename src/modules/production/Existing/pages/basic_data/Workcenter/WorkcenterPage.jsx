@@ -1,18 +1,18 @@
 import React from 'react';
 import { Row, Col, Button, Modal, Typography } from 'antd';
 import SearchBar from '../../../utils/common/SearchBar.jsx';
-import WorkcenterListSection from '../../../components/basic_data/workcenter/WorkcenterListSection.jsx';
-import SelectedWorkcenterSection from '../../../components/basic_data/workcenter/SelectedWorkcenterSection.jsx';
-import FactorySelectSection from '../../../components/basic_data/workcenter/FactorySelectSection.jsx'; // 여기서 .jsx.jsx 수정
-import { useWorkcenter } from '../../../hooks/basic_data/workcenter/WorkcenterHook.jsx';
-import { workcenterColumns } from '../../../utils/basic_data/workcenter/WorkcenterColumn.jsx';
-import { getRowClassName } from '../../../utils/basic_data/workcenter/WorkcenterUtil.jsx';
+import WorkcenterListSection from '../../../../basic_information_management/workcenter_management/WorkcenterListSection.jsx';
+import SelectedWorkcenterSection from '../../../../basic_information_management/workcenter_management/SelectedWorkcenterSection.jsx';
+import FactorySelectSection from '../../../../basic_information_management/workcenter_management/FactorySelectSection.jsx'; // 여기서 .jsx.jsx 수정
+import { useWorkcenter } from '../../../../basic_information_management/workcenter_management/WorkcenterHook.jsx';
+import { workcenterColumns } from '../../../../basic_information_management/workcenter_management/WorkcenterColumn.jsx';
+import { getRowClassName } from '../../../../basic_information_management/workcenter_management/WorkcenterUtil.jsx';
 import { filterDataByTerm } from '../../../utils/common/filterDataByTerm.jsx';
-import WorkcenterDashboard from "./WorkcenterDashboard.jsx";
+import WorkcenterDashboard from "../../../../basic_information_management/workcenter_management/WorkcenterDashboard.jsx";
 import { Box, Grid } from "@mui/material";
 import WelcomeSection from "../../../../../../components/WelcomeSection.jsx";
-import WorkerAssignmentPage from "./WorkerAssignmentPage.jsx";
-import { tabItems } from "../../../utils/basic_data/workcenter/WorkcenterUtil.jsx";
+import WorkerAssignmentPage from "../../../../basic_information_management/workcenter_management/WorkerAssignmentPage.jsx";
+import { tabItems } from "../../../../basic_information_management/workcenter_management/WorkcenterUtil.jsx";
 
 const { Text } = Typography;
 

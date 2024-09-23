@@ -1,17 +1,44 @@
 import React, {useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './WorkcenterManagementUtil.jsx';
+import { tabItems } from './WorkcenterUtil.jsx';
+// import { tabItems } from './WorkcenterManagementUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button} from 'antd';
+import {Button, Col, Modal, Row} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
+import WorkcenterDashboard from "./WorkcenterDashboard.jsx";
+import SearchBar from "../../Existing/utils/common/SearchBar.jsx";
+import WorkcenterListSection from "./WorkcenterListSection.jsx";
+import {workcenterColumns} from "./WorkcenterColumn.jsx";
+import {getRowClassName} from "./WorkcenterUtil.jsx";
+import SelectedWorkcenterSection from "./SelectedWorkcenterSection.jsx";
+import FactorySelectSection from "./FactorySelectSection.jsx";
+import WorkerAssignmentPage from "./WorkerAssignmentPage.jsx";
+import {useWorkcenter} from "./WorkcenterHook.jsx";
 
-const WorkcenterManagementPage = () => {
-    const [activeTabKey, setActiveTabKey] = useState('1');
+const WorkcenterManagementPage = ({ initialData }) => {
 
-    const handleTabChange = (key) => {
-        setActiveTabKey(key);
-    };
+    const {
+        data,
+        workcenter,
+        handleSave,
+        handleSelectedRow,
+        handleDeleteWorkcenter,
+        isWorkcenterModalVisible,
+        handleClose,
+        handleInputChange,
+        handleAddWorkcenter,
+        handleSearch,
+        searchData,
+        isSearchActive,
+        handleTabChange,
+        activeTabKey,
+    } = useWorkcenter(initialData);
+    // const [activeTabKey, setActiveTabKey] = useState('1');
+    //
+    // const handleTabChange = (key) => {
+    //     setActiveTabKey(key);
+    // };
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -33,10 +60,73 @@ const WorkcenterManagementPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12} >
                         <Grow in={true} timeout={200}>
                             <div>
-                                <TemporarySection />
+                                {/* 사용중 작업장 대시보드 */}
+                                <div style={{ marginBottom: '16px' }}>
+                                    <WorkcenterDashboard />
+                                </div>
+                                {/* 검색 바 */}
+                                <Row gutter={16} style={{ marginBottom: '16px' }}>
+                                    <Col span={8}>
+                                        <SearchBar onSearch={handleSearch} />
+                                    </Col>
+                                </Row>
+
+                                {/* 검색 결과 목록 또는 경고 메시지 */}
+                                {isSearchActive && (
+                                    <>
+                                        {searchData && searchData.length > 0 ? (
+                                            <Row gutter={16} style={{ marginBottom: '16px' }}>
+                                                <Col span={24}>
+                                                    <WorkcenterListSection
+                                                        columns={workcenterColumns}
+                                                        data={searchData}
+                                                        handleSelectedRow={handleSelectedRow}
+                                                        rowClassName={getRowClassName}
+                                                    />
+                                                </Col>
+                                            </Row>
+                                        ) : (
+                                            <Text type="warning">검색하신 작업장을 찾을 수 없습니다.</Text>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* 기본 데이터 목록 */}
+                                <Row gutter={16} style={{ marginTop: isSearchActive && searchData && searchData.length > 0 ? '16px' : '0' }}>
+                                    <Col span={24}>
+                                        <WorkcenterListSection
+                                            columns={workcenterColumns}
+                                            data={data}
+                                            handleSelectedRow={handleSelectedRow}
+                                            rowClassName={getRowClassName}
+                                        />
+                                    </Col>
+                                </Row>
+
+                                {/* 작업장 추가 버튼 */}
+                                <Button type="primary" onClick={handleAddWorkcenter} style={{ marginTop: '16px' }}>
+                                    등록
+                                </Button>
+
+                                {/* 모달 컴포넌트 */}
+                                {workcenter && (
+                                    <Modal
+                                        visible={isWorkcenterModalVisible} // 모달 상태에 따라 표시
+                                        onCancel={handleClose} // 모달을 닫는 함수
+                                        footer={null} // 모달의 하단 버튼 제거
+                                    >
+                                        <SelectedWorkcenterSection
+                                            workcenter={workcenter}
+                                            handleClose={handleClose}
+                                            handleInputChange={handleInputChange}
+                                            handleSave={handleSave}
+                                            handleDeleteWorkcenter={handleDeleteWorkcenter}
+                                        />
+                                    </Modal>
+                                )}
                             </div>
                         </Grow>
                     </Grid>
@@ -45,10 +135,21 @@ const WorkcenterManagementPage = () => {
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={6} sx={{ minWidth: '700px !important', maxWidth: '1200px !important' }}>
                         <Grow in={true} timeout={200}>
                             <div>
-                                <TemporarySection />
+                                {/* 공장 선택 */}
+                                <div style={{ marginTop: '16px' }}>
+                                    <FactorySelectSection />
+                                </div>
+
+                                {/* 작업장별 오늘의 작업자 배정 명단 */}
+                                <div style={{ marginBottom: '16px' }}>
+                                    <WorkerAssignmentPage />
+                                </div>
+
+                                {/* 출력 버튼 */}
+                                <Button type="primary" onClick={handleAddWorkcenter} style={{ marginTop: '16px' }}>출력</Button>
                             </div>
                         </Grow>
                     </Grid>

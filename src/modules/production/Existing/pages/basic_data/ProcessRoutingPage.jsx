@@ -5,7 +5,7 @@ import { PRODUCTION_API } from '../../../../../config/apiConstants.jsx';
 import { processRoutingColumns } from '../../utils/basic_data/ProcessRoutingColum.jsx';
 import {Grid} from "@mui/material";
 import WelcomeSection from "../../../../../components/WelcomeSection.jsx";
-import {tabItems} from "../../utils/basic_data/workcenter/WorkcenterUtil.jsx";
+import {tabItems} from "../../../basic_information_management/workcenter_management/WorkcenterUtil.jsx";
 
 const { Text } = Typography;
 

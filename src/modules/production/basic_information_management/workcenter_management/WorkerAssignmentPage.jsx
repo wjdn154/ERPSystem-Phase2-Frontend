@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import WorkerAssignmentPerWorkcenterList from './WorkerAssignmentPerWorkcenterList.jsx';
-import { workerAssignmentColumns } from '../../../utils/basic_data/workcenter/WorkerAssignmentColumns.jsx'; // 컬럼 설정
+import { workerAssignmentColumns } from './WorkerAssignmentColumns.jsx'; // 컬럼 설정
 import { DatePicker, Button } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
-import apiClient from "../../../../../../config/apiClient.jsx";
-import { PRODUCTION_API } from "../../../../../../config/apiConstants.jsx"
+import apiClient from "../../../../config/apiClient.jsx";
+import { PRODUCTION_API } from "../../../../config/apiConstants.jsx"
 
 const { RangePicker } = DatePicker;
 
