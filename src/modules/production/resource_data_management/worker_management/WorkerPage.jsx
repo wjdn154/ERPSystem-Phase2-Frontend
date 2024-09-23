@@ -13,6 +13,8 @@ const WorkerPage = ({initialData}) => {
 
     const workerMemoizedData = useMemo(() => initialData, [initialData]);
     console.log(initialData);
+
+
     const {
         data,
         showDetail,
@@ -39,20 +41,18 @@ const WorkerPage = ({initialData}) => {
     }
 
     return (
-        <Box sx={{ flexGrow: 1, p: 3 }}>
-            <Grid container spacing={2}
-                  sx={{ marginTop: 2 }}
-                  justifyContent="center"  // 수평 중앙 정렬
-                  alignItems="center"      // 수직 중앙 정렬
-           >
+        <Box sx={{ margin: '20px' }}>
+            <Grid container spacing={3}>
+           {/*       sx={{ marginTop: 2 }}*/}
+           {/*       justifyContent="center"  // 수평 중앙 정렬*/}
+           {/*       alignItems="center"      // 수직 중앙 정렬*/}
+           {/*>*/}
                     <Grid item xs={12}>
                         <WelcomeSection
                             title="작업자 관리"
                             description={(
                                 <Typography>
-                                    작업자 관리 페이지는 생산관리 시스템에서{' '}
-                                    <span style={{ color: '#00C1D8' }}>부서가 생산에 해당하는 작업자 </span>정보를
-                                    <span style={{ color: '#00C1D8' }}> 조회 및 수정</span>하는 기능을 제공하는 페이지
+                                    작업자 관리 페이지는 <span>생산 현장에서 일하는 작업자의 정보</span>를 관리하는 곳임. 이 페이지에서는 <span>작업자 추가, 수정, 삭제</span>가 가능하며, 각 작업자의 <span>역할, 담당 공정, 근무 시간</span> 등을 기록하고 관리할 수 있음. 작업자들의 배치와 작업량을 효율적으로 조정하여 <span>생산성과 작업 효율성</span>을 극대화하는 데 도움이 됨.
                                 </Typography>
                             )}
                             tabItems={workerTabItems()}
@@ -61,13 +61,14 @@ const WorkerPage = ({initialData}) => {
                         />
                     </Grid>
                 </Grid>
+
                 {/* 작업자 목록 및 상세내용 영역 */}
-            {activeTabKey === '1' && (
-            <Grid container spacing={2}
-                  justifyContent="center"  // 수평 중앙 정렬
-                  alignItems="center"      // 수직 중앙 정렬
-            >
-                <Grid item xs={11}>
+                {activeTabKey === '1' && (
+                // <Grid container spacing={2}
+                //       justifyContent="center"  // 수평 중앙 정렬
+                //       alignItems="center"      // 수직 중앙 정렬
+                // >
+                <Grid item xs={12} md={12}>
                     <Grow in={true} timeout={200}>
                         <div>
                             <WorkerListSection
@@ -86,15 +87,16 @@ const WorkerPage = ({initialData}) => {
                         </div>
                     </Grow>
                 </Grid>
-            </Grid>
+            // </Grid>
             )}
+
             {/* 작업자 작업배치 및 근태목록 영역 */}
             {activeTabKey === '2' && (
-                <Grid container spacing={2}
-                      justifyContent="center"  // 수평 중앙 정렬
-                      alignItems="center"      // 수직 중앙 정렬
-                >
-                    <Grid item xs={11}>
+                // <Grid container spacing={2}
+                //       justifyContent="center"  // 수평 중앙 정렬
+                //       alignItems="center"      // 수직 중앙 정렬
+                // >
+                    <Grid item xs={12}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <WorkerAttendanceListSection
@@ -116,7 +118,7 @@ const WorkerPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                </Grid>
+                // </Grid>
             )}
         </Box>
     )
