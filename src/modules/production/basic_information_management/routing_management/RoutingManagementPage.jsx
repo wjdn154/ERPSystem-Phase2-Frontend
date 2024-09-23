@@ -1,14 +1,13 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './RoutingManagementUtil.jsx';
+import {processRoutingColumns, tabItems} from './RoutingManagementUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button, Col, Input, message, Modal, Row, Table} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
-import {processRoutingColumns} from "../../Existing/utils/basic_data/ProcessRoutingColum.jsx";
 
 const RoutingManagementPage = () => {
     const [activeTabKey, setActiveTabKey] = useState('1');
