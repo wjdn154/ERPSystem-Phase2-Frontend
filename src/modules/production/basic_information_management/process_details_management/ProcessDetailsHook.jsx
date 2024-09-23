@@ -201,9 +201,7 @@ export const useProcessDetails = (initialData) => {
         }
     };
 
-    const handleTabChange = (key) => {
-        setActiveTabKey(key);
-    };
+
 
 
     return {
@@ -222,6 +220,5 @@ export const useProcessDetails = (initialData) => {
         isSearchActive,
         setIsSearchActive,
         setSearchData,
-        setActiveTabKey,
     };
 };

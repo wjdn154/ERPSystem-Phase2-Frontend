@@ -6,7 +6,7 @@ import {
     deleteWorkcenter,
     createWorkcenter,
 } from './WorkcenterApi.jsx';
-import { useSearch } from '../../Existing/utils/common/useSearch.jsx';
+import { useSearch } from '../../common/useSearch.jsx';
 
 import { Modal } from "antd";
 

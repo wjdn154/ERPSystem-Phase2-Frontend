@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import {Typography} from '@mui/material';
@@ -11,6 +11,8 @@ import SelectedProcessDetailsSection from "./SelectedProcessDetailsSection.jsx";
 import {getRowClassName, tabItems, processDetailsColumn} from "./ProcessDetailsUtil.jsx";
 
 const ProcessDetailsPage = ({ initialData }) => {
+
+    const [activeTabKey, setActiveTabKey] = useState('1');
     const {
         data,
         processDetail,
@@ -24,9 +26,16 @@ const ProcessDetailsPage = ({ initialData }) => {
         handleSearch,
         searchData,
         isSearchActive,
-        handleTabChange,
-        activeTabKey,
     } = useProcessDetails(initialData);
+
+    useEffect(() => {
+        console.log("현재 activeTabKey: ", activeTabKey);
+    }, [activeTabKey]);
+
+    const handleTabChange = (key) => {
+        console.log("Tab 변경됨:", key);  // 디버그 로그 추가
+        setActiveTabKey(key);
+    };
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -48,7 +57,7 @@ const ProcessDetailsPage = ({ initialData }) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12} >
                         <Grow in={true} timeout={200}>
                             <div>
                                 {/* 검색 바 */}

@@ -7,7 +7,7 @@ import {Typography} from '@mui/material';
 import {Button, Col, Modal, Row} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import WorkcenterDashboard from "./WorkcenterDashboard.jsx";
-import SearchBar from "../../Existing/utils/common/SearchBar.jsx";
+import SearchBar from "../../common/SearchBar.jsx";
 import WorkcenterListSection from "./WorkcenterListSection.jsx";
 import {workcenterColumns} from "./WorkcenterColumn.jsx";
 import {getRowClassName} from "./WorkcenterUtil.jsx";
@@ -34,11 +34,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
         handleTabChange,
         activeTabKey,
     } = useWorkcenter(initialData);
-    // const [activeTabKey, setActiveTabKey] = useState('1');
-    //
-    // const handleTabChange = (key) => {
-    //     setActiveTabKey(key);
-    // };
 
     return (
         <Box sx={{ margin: '20px' }}>

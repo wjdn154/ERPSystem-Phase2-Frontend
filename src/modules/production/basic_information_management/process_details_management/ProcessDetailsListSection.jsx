@@ -6,6 +6,8 @@ const { confirm } = Modal;
 const ProcessDetailsListSection = ({ columns, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
 
     if (!data) {
+        console.log("Table data:", data);
+
         return null;
     }
 
@@ -15,8 +17,8 @@ const ProcessDetailsListSection = ({ columns, data, handleRowSelection, handleSe
                 columns={columns}
                 dataSource={data}
                 pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                rowSelection={handleSelectedRow} // checkbox or radio btn active
-                size="small"
+                // rowSelection={handleSelectedRow} // checkbox or radio btn active
+                size="default"
                 rowKey="code"
                 onRow={(record) => ({
                     onClick: () => handleSelectedRow(record), // 행 클릭 시 해당 공정 선택

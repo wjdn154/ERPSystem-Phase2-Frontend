@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Space, Modal, Form, Input, Select } from 'antd';
-import { ActionButtons, showDeleteConfirm} from "../../Existing/utils/common/commonActions.jsx";
-import { isTrueOptions } from "../../Existing/utils/common/dropdownOptions.jsx";
+import { ActionButtons, showDeleteConfirm} from "../../common/commonActions.jsx";
+import { isTrueOptions } from "../../common/dropdownOptions.jsx";
 
 const { confirm } = Modal;
 

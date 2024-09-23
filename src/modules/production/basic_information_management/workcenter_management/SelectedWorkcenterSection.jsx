@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Select } from 'antd';
-import { ActionButtons, showDeleteConfirm } from '../../Existing/utils/common/commonActions.jsx';  // 공통 버튼 및 다이얼로그
-import { isTrueOptions, workcenterTypeOptions } from '../../Existing/utils/common/dropdownOptions.jsx';  // 공통 드롭다운 옵션
+import { ActionButtons, showDeleteConfirm } from '../../common/commonActions.jsx';  // 공통 버튼 및 다이얼로그
+import { isTrueOptions, workcenterTypeOptions } from '../../common/dropdownOptions.jsx';  // 공통 드롭다운 옵션
 
 const SelectedWorkcenterSection = ({
                                      workcenter,
