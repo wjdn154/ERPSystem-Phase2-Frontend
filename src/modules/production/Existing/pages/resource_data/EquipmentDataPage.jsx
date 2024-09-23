@@ -4,6 +4,7 @@ import {equipmentDataHook} from '../../hooks/resource_data/EquipmentDataHook.jsx
 import EquipmentDataListSection from "../../components/resourceData/EquipmentDataListSection.jsx";
 import {equipmentDataListColumn} from "../../utils/resource_data/EquipmentDataListColumn.jsx";
 import EquipmentDataDetailSection from "../../components/resourceData/EquipmentDataDetailSection.jsx";
+import {equipmentTabItems} from "../../utils/resource_data/EquipmentDataUtil.jsx"
 import WelcomeSection from "../../../../../components/WelcomeSection.jsx";
 
 
