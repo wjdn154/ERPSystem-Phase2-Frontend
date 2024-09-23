@@ -1,12 +1,12 @@
 import React, {useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './WorkshopManagementUtil.jsx';
+import { tabItems } from './WorkcenterManagementUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 
-const WorkshopManagementPage = () => {
+const WorkcenterManagementPage = () => {
     const [activeTabKey, setActiveTabKey] = useState('1');
 
     const handleTabChange = (key) => {
@@ -59,4 +59,4 @@ const WorkshopManagementPage = () => {
     );
 };
 
-export default WorkshopManagementPage;
+export default WorkcenterManagementPage;

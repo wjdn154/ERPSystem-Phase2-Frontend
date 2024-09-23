@@ -164,8 +164,8 @@ import AdjustmentProgressPage
 import InspectionInquiryPage from "../../logistics/inventory_adjustment/inventory_inspection/InspectionInquiryPage.jsx";
 import InspectionStatusPage from "../../logistics/inventory_adjustment/inspection_status/InspectionStatusPage.jsx";
 import AdjustmentStatusPage from "../../logistics/inventory_adjustment/adjustment_status/AdjustmentStatusPage.jsx";
-import WorkshopManagementPage
-    from "../../production/basic_information_management/workshop_management/WorkshopManagementPage.jsx";
+import WorkcenterManagementPage
+    from "../../production/basic_information_management/workcenter_management/WorkcenterManagementPage.jsx";
 import ProcessDetailsPage
     from "../../production/basic_information_management/process_details_management/ProcessDetailsPage.jsx";
 import RoutingManagementPage
@@ -191,7 +191,7 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
-    AdjustmentStatusPage, WorkshopManagementPage, ProcessDetailsPage, RoutingManagementPage
+    AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage
 
 };
 
