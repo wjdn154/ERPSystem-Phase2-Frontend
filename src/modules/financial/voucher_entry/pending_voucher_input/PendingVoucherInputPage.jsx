@@ -3,7 +3,8 @@ import { Box, Grid, Typography, Grow, Paper } from '@mui/material';
 import { Form, Input, Select, DatePicker, Button, Table, Popconfirm } from 'antd';
 import moment from 'moment';
 import WelcomeSection from "../../../../components/WelcomeSection.jsx";
-import {tabItems} from "../../basic_information_management/account_subject/AccountSubjectUtil.jsx";
+import {tabItems, VoucherColumns} from "./PendingVoucherInputUtil.jsx";
+import dayjs from "dayjs";
 
 const PendingVoucherInputPage = () => {
     const [form] = Form.useForm();
@@ -15,6 +16,18 @@ const PendingVoucherInputPage = () => {
     const [dataSource, setDataSource] = useState([]); // 테이블 데이터
     const [count, setCount] = useState(0); // 행을 추가할 때마다 ID 증가
     const [activeTabKey, setActiveTabKey] = useState('1');
+    const [voucherData, setVoucherData] = useState({
+        date: null,
+        entries: [{
+            key: 0,
+            type: '',
+            accountSubject: '',
+            client: '',
+            description: '',
+            debitAmount: '',
+            creditAmount: '',
+        }],
+    });
 
     const handleTabChange = (key) => {
         setActiveTabKey(key);
@@ -39,132 +52,18 @@ const PendingVoucherInputPage = () => {
         }
     }, []);
 
-    // 테이블 컬럼 설정
-    const columns = [
-        {
-            title: '구분',
-            dataIndex: 'type',
-            key: 'type',
-            render: (text, record) => (
-                <Select
-                    value={record.type}
-                    onChange={(value) => handleFieldChange(value, 'type', record.key)}
-                    placeholder="구분 선택"
-                    style={{ width: '100%' }}
-                >
-                    <Select.Option value="출금">출금</Select.Option>
-                    <Select.Option value="입금">입금</Select.Option>
-                    <Select.Option value="차변">차변</Select.Option>
-                    <Select.Option value="대변">대변</Select.Option>
-                    <Select.Option value="결산차변">결산차변</Select.Option>
-                    <Select.Option value="결산대변">결산대변</Select.Option>
-                </Select>
-            ),
-            width: 150,
-        },
-        {
-            title: '계정과목',
-            dataIndex: 'accountSubject',
-            key: 'accountSubject',
-            render: (text, record) => (
-                <Select
-                    showSearch
-                    placeholder="계정과목 선택"
-                    options={accountSubjects}
-                    value={record.accountSubject}
-                    onChange={(value) => handleFieldChange(value, 'accountSubject', record.key)}
-                    style={{ width: '100%' }}
-                />
-            ),
-            width: 150,
-        },
-        {
-            title: '거래처',
-            dataIndex: 'client',
-            key: 'client',
-            render: (text, record) => (
-                <Select
-                    showSearch
-                    placeholder="거래처 선택"
-                    options={clients}
-                    value={record.client}
-                    onChange={(value) => handleFieldChange(value, 'client', record.key)}
-                    style={{ width: '100%' }}
-                />
-            ),
-            width: 150,
-        },
-        {
-            title: '적요',
-            dataIndex: 'description',
-            key: 'description',
-            render: (text, record) => (
-                <Input
-                    value={record.description}
-                    onChange={(e) => handleFieldChange(e.target.value, 'description', record.key)}
-                    placeholder="적요 입력"
-                />
-            ),
-            width: 200,
-        },
-        {
-            title: '차변',
-            dataIndex: 'debitAmount',
-            key: 'debitAmount',
-            render: (text, record) => (
-                <Input
-                    type="number"
-                    value={record.debitAmount}
-                    onChange={(e) => handleFieldChange(e.target.value, 'debitAmount', record.key)}
-                    placeholder="차변 입력"
-                    disabled={record.type === '대변' || record.type === '결산대변'}
-                />
-            ),
-            width: 150,
-        },
-        {
-            title: '대변',
-            dataIndex: 'creditAmount',
-            key: 'creditAmount',
-            render: (text, record) => (
-                <Input
-                    type="number"
-                    value={record.creditAmount}
-                    onChange={(e) => handleFieldChange(e.target.value, 'creditAmount', record.key)}
-                    placeholder="대변 입력"
-                    disabled={record.type === '차변' || record.type === '결산차변'}
-                />
-            ),
-            width: 150,
-        },
-        {
-            title: '삭제',
-            key: 'action',
-            render: (_, record) =>
-                dataSource.length >= 1 ? (
-                    <Popconfirm title="삭제하시겠습니까?" onConfirm={() => handleDelete(record.key)}>
-                        <Button>삭제</Button>
-                    </Popconfirm>
-                ) : null,
-            width: 100,
-        },
-    ];
-
     // 필드 변경 처리
     const handleFieldChange = (value, field, key) => {
-        const newData = [...dataSource];
-        const index = newData.findIndex((item) => key === item.key);
-        if (index > -1) {
-            const item = newData[index];
-            newData.splice(index, 1, { ...item, [field]: value });
-            setDataSource(newData);
-        }
+        const newEntries = voucherData.entries.map((entry) =>
+            entry.key === key ? { ...entry, [field]: value } : entry
+        );
+        setVoucherData({ ...voucherData, entries: newEntries });
     };
 
     // 행 추가
     const handleAdd = () => {
-        const newData = {
-            key: count,
+        const newEntry = {
+            key: voucherData.entries.length,
             type: '',
             accountSubject: '',
             client: '',
@@ -172,14 +71,16 @@ const PendingVoucherInputPage = () => {
             debitAmount: '',
             creditAmount: '',
         };
-        setDataSource([...dataSource, newData]);
-        setCount(count + 1);
+        setVoucherData({
+            ...voucherData,
+            entries: [...voucherData.entries, newEntry]
+        });
     };
 
     // 행 삭제
     const handleDelete = (key) => {
-        const newData = dataSource.filter((item) => item.key !== key);
-        setDataSource(newData);
+        const newEntries = voucherData.entries.filter((entry) => entry.key !== key);
+        setVoucherData({ ...voucherData, entries: newEntries });
     };
 
     // 저장 로직
@@ -210,57 +111,61 @@ const PendingVoucherInputPage = () => {
                 </Grid>
             </Grid>
 
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={3}>
-                    <Form.Item label="날짜 선택">
-                        <DatePicker
-                            format="YYYY-MM-DD"
-                            value={selectedDate ? moment(selectedDate) : null}
-                            onChange={(date) => setSelectedDate(date)}
-                            placeholder="날짜 선택"
-                            style={{ width: '100%' }}
-                        />
-                    </Form.Item>
+            {activeTabKey === '1' && (
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={12} md={12}>
+                        <Grow in={true} timeout={200}>
+                            <div>
+                                {/* 전표 입력 테이블 */}
+                                <Paper elevation={3} sx={{ padding: '20px', height: '100%' }}>
+                                    <Typography variant="h6" sx={{ marginBottom: '20px' }}>전표 입력</Typography>
+
+                                    <Form.Item label="날짜 선택">
+                                        <DatePicker
+                                            format="YYYY-MM-DD"
+                                            value={voucherData.date ? dayjs(voucherData.date) : null}
+                                            onChange={(date) => setVoucherData({ ...voucherData, date })}
+                                            placeholder="날짜 선택"
+                                            style={{ width: '200px' }}
+                                        />
+                                    </Form.Item>
+
+                                    {/* 테이블 영역 */}
+                                    <Table
+                                        dataSource={voucherData.entries}
+                                        columns={VoucherColumns(handleFieldChange, accountSubjects, clients, voucherData.entries, handleDelete)}
+                                        pagination={false}
+                                        bordered
+                                        size={'small'}
+                                    />
+
+                                    <div style={{ marginTop: 16 }}>
+                                        <Button
+                                            onClick={handleAdd}
+                                            type="primary"
+                                            style={{
+                                                marginRight: 16,
+                                            }}
+                                        >
+                                            행 추가
+                                        </Button>
+
+                                        <Button type="primary" onClick={handleSave}>
+                                            저장
+                                        </Button>
+                                    </div>
+                                </Paper>
+                            </div>
+                        </Grow>
+                    </Grid>
                 </Grid>
-            </Grid>
+            )}
 
-            {/* 전표 입력 테이블 */}
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <Grow in={true} timeout={200}>
-                        <div>
-                            <Paper elevation={3} sx={{ padding: '20px', height: '100%' }}>
-                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>전표 입력</Typography>
-
-                                {/* 테이블 영역 */}
-                                <Table
-                                    dataSource={dataSource}
-                                    columns={columns}
-                                    pagination={false}
-                                    bordered
-                                    scroll={{ x: 'max-content' }} // 화면 크기에 맞게 테이블 스크롤
-                                />
-
-                                <div style={{ marginTop: 16 }}>
-                                    <Button
-                                        onClick={handleAdd}
-                                        type="primary"
-                                        style={{
-                                            marginRight: 16,
-                                        }}
-                                    >
-                                        행 추가
-                                    </Button>
-
-                                    <Button type="primary" onClick={handleSave}>
-                                        저장
-                                    </Button>
-                                </div>
-                            </Paper>
-                        </div>
-                    </Grow>
+            {activeTabKey === '2' && (
+                <Grid>
+                    asd
                 </Grid>
-            </Grid>
+            )}
         </Box>
     );
 };
