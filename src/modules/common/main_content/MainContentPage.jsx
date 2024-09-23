@@ -171,6 +171,28 @@ import RoutingManagementPage
     from "../../production/basic_information_management/routing_management/RoutingManagementPage.jsx";
 import MaterialDataPage from "../../production/resource_data_management/material_data_management/MaterialDataPage.jsx";
 import WasteManagementPage from "../../production/resource_data_management/waste_management/WasteManagementPage.jsx";
+import ProductionRequestPage
+    from "../../production/production_schedule_management/production_request/ProductionRequestPage.jsx";
+import MasterProductionPage
+    from "../../production/production_schedule_management/master_production_schedule/MasterProductionPage.jsx";
+import MaterialInputStatusPage
+    from "../../production/production_schedule_management/material_input_status_management/MaterialInputStatusPage.jsx";
+import MrpPage from "../../production/production_schedule_management/material_requirements_planning/MrpPage.jsx";
+import MakeToOrderPlanPage
+    from "../../production/production_schedule_management/make_to_order_plan/MakeToOrderPlanPage.jsx";
+import MakeToStockPlanPage
+    from "../../production/production_schedule_management/make_to_stock_plan/MakeToStockPlanPage.jsx";
+import ShiftTypePage from "../../production/work_order_management/shift_type_management/ShiftTypePage.jsx";
+import ProductionOrderPage
+    from "../../production/work_order_management/production_order_management/ProductionOrderPage.jsx";
+import AssignmentHistoryPage
+    from "../../production/work_order_management/assignment_history_management/AssignmentHistoryPage.jsx";
+import WorkPerformancePage
+    from "../../production/production_performance_management/work_performance_management/WorkPerformancePage.jsx";
+import MonthlyWorkReportPage
+    from "../../production/production_performance_management/monthly_work_report/MonthlyWorkReportPage.jsx";
+import DailyWorkReportPage
+    from "../../production/production_performance_management/daily_work_report/DailyWorkReportPage.jsx";
 
 // 필요한 페이지 컴포넌트들
 
@@ -192,7 +214,9 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
-    AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage,
+    AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,
+    MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ShiftTypePage, ProductionOrderPage, AssignmentHistoryPage,
+    WorkPerformancePage, MonthlyWorkReportPage, DailyWorkReportPage,
 
 };
 

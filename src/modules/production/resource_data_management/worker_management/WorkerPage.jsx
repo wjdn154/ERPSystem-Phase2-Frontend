@@ -36,9 +36,10 @@ const WorkerPage = ({initialData}) => {
 
     } = workerHook(initialData);
 
-    if(!data || data.length === 0) {
-        return <div>데이터가 없습니다.</div>
-    }
+    // TODO 페이지 확인 위해 주석함 데이터는 여전히 null임
+    // if(!data || data.length === 0) {
+    //     return <div>데이터가 없습니다.</div>
+    // }
 
     return (
         <Box sx={{ margin: '20px' }}>
