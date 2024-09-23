@@ -280,6 +280,8 @@ export const equipmentDataHook = (initialData) => {
     }
 
 
+
+
     return {
         data,
         showDetail,
