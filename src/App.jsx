@@ -1,78 +1,112 @@
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { themeSettings } from './modules/Common/utils/AppUtil.jsx';
+import { themeSettings } from './config/AppUtil.jsx';
 import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-import {BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
-import ContentWrapper from './modules/Common/components/MainContent/ContentWrapper.jsx';
-import Sidebar from './modules/Common/components/Slidbar/Sidebar.jsx';
-import MainContentPage from './modules/Common/pages/MainContentPage.jsx';
-import Headers from './modules/Common/components/Header/Headers.jsx';
-import { subMenuItems } from './config/menuItems.jsx';
+import ContentWrapper from './modules/common/main_content/ContentWrapper.jsx';
+import Sidebar from './components/Sidebar.jsx';
+import MainContentPage from './modules/common/main_content/MainContentPage.jsx';
+import Headers from './components/Headers.jsx';
 import { Layout } from "antd";
-import LoginPage from "./modules/Common/pages/LoginPage.jsx";
-import ProtectedRoute from "./modules/Common/pages/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
-import { setAuth } from "./modules/Common/utils/redux/authSlice.jsx";
-import { useDispatch } from "react-redux";
-import RegisterPage from "./modules/Common/pages/RegisterPage.jsx";
+import LoginPage from "./modules/common/login/LoginPage.jsx";
+import ProtectedRoute from "./config/ProtectedRoute.jsx"; // 쿠키 기반 보호 경로
+import { setAuth } from "./config/redux/authSlice.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import { subMenuItems } from './config/menuItems.jsx';
+import RegisterPage from "./modules/common/register/RegisterPage.jsx";
 import { notification } from 'antd';
-import {NotificationProvider, useNotificationContext} from "./modules/Common/utils/NotificationContext.jsx";
+import { NotificationProvider, useNotificationContext } from "./config/NotificationContext.jsx";
+import { jwtDecode } from "jwt-decode";
+import UnauthorizedPage from "./modules/common/unauthorized/UnauthorizedPage.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
 
 const AppContent = () => {
+    const { token, isAdmin, permission, companyId } = useSelector((state) => state.auth);
     const notify = useNotificationContext();
     const location = useLocation();
     const navigate = useNavigate();
-
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        const token = Cookies.get('jwt');
-        if (token) {
-            dispatch(setAuth(token));  // 쿠키에 있는 토큰으로 Redux 상태 초기화
-        }
-    }, [dispatch]);
 
     useEffect(() => {
         if (location.state?.login) {
             notify('success', '로그인 성공', '환영합니다! 메인 페이지로 이동했습니다.', 'top');
-            navigate('/groupware', {replace: true, state: {}});
+            navigate('/integration', { replace: true, state: {} });
         }
     }, [location.state, notify]);
 
 
     const renderRoutes = () => {
-        const routes = [];
+        if (!subMenuItems) {
+            return null; // subMenuItems가 로드될 때까지는 아무것도 렌더링하지 않음
+        }
 
+        const routes = [];
         // 모든 메뉴와 서브메뉴 항목을 순회하면서 동적 라우트를 설정
         for (const mainMenu in subMenuItems) {
             subMenuItems[mainMenu].forEach((subMenu) => {
-                subMenu.items.forEach((subSubItem) => {
+                // 소분류 항목이 없는 경우 바로 경로 설정
+                if (!subMenu.items) {
                     routes.push(
                         <Route
-                            key={subSubItem.url}
-                            path={subSubItem.url}
-                            element={<MainContentPage selectedSubSubMenu={subSubItem} />}
+                            key={subMenu.url}
+                            path={subMenu.url}
+                            element={
+                                <ProtectedRoute
+                                    requiredPermission={subMenu.requiredPermission}
+                                    permissionLevel={subMenu.permissionLevel}
+                                >
+                                    <MainContentPage selectedSubSubMenu={subMenu} />
+                                </ProtectedRoute>
+                            }
                         />
                     );
-                });
+                } else {
+                    // 소분류가 있는 경우 기존 방식대로 처리
+                    subMenu.items.forEach((subSubItem) => {
+                        routes.push(
+                            <Route
+                                key={subSubItem.url}
+                                path={subSubItem.url}
+                                element={
+                                    <ProtectedRoute
+                                        requiredPermission={subSubItem.requiredPermission}
+                                        permissionLevel={subSubItem.permissionLevel}
+                                    >
+                                        <MainContentPage selectedSubSubMenu={subSubItem} />
+                                    </ProtectedRoute>
+                                }
+                            />
+                        );
+                    });
+                }
             });
         }
 
         return routes;
     };
 
+    // 로그인 전에는 LoginPage 또는 RegisterPage로만 이동 가능
+    if (!token) {
+        return (
+            <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+        );
+    }
+
     return (
         <>
             <Routes>
-                {/* 로그인 페이지는 전체화면으로 렌더링 */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-
-                {/* 그 외의 경로에서는 헤더와 사이드바가 보이는 일반 레이아웃을 사용 */}
+                <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                {/* 로그인 후에는 메인 레이아웃으로 이동 */}
                 <Route
                     path="/*"
                     element={
@@ -91,7 +125,7 @@ const AppContent = () => {
                                                     path="/"
                                                     element={
                                                         <ProtectedRoute>
-                                                            <Navigate to="/groupware" replace />
+                                                            <Navigate to="/integration" replace />
                                                         </ProtectedRoute>
                                                     }
                                                 />
@@ -108,14 +142,11 @@ const AppContent = () => {
                                                         }
                                                     />
                                                 ))}
-                                                {/* 정의되지 않은 경로는 JWT 토큰이 유효한지에 따라 메인 페이지 또는 로그인 페이지로 리다이렉트 */}
+
+                                                {/* 정의되지 않은 경로는 메인 페이지로 리다이렉트 */}
                                                 <Route
                                                     path="*"
-                                                    element={
-                                                        Cookies.get('jwt')
-                                                            ? <Navigate to="/groupware" replace /> // JWT 토큰이 있으면 메인 페이지로 리다이렉트
-                                                            : <Navigate to="/login" replace /> // JWT 토큰이 없으면 로그인 페이지로 리다이렉트
-                                                    }
+                                                    element={<Navigate to="/integration" replace />}
                                                 />
                                             </Routes>
                                         </ContentWrapper>
