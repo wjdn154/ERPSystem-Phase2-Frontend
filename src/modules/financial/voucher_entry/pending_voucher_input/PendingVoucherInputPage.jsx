@@ -137,6 +137,7 @@ const PendingVoucherInputPage = () => {
                                         pagination={false}
                                         bordered
                                         size={'small'}
+                                        style={{ padding: '0px' }}
                                     />
 
                                     <div style={{ marginTop: 16 }}>

@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import {styled, Typography} from "@mui/material";
 import {Button, Input, Popconfirm, Select} from "antd";
 import React from "react";
 import DebounceSelect from "../../../../components/DebounceSelect.jsx";
@@ -36,7 +36,7 @@ const fetchInitialAccountSubject = async () => {
     try {
         const response = await apiClient.post(FINANCIAL_API.ACCOUNT_SUBJECTS_API);
         return response.data.accountSubjects.map((accountSubject) => ({
-            label: accountSubject.name,
+            label:  + accountSubject.code + ". " + accountSubject.name,
             value: accountSubject.id,
         }));
     } catch (error) {
@@ -49,7 +49,7 @@ const fetchAccountSubjects = async (searchText) => {
     try {
         const response = await apiClient.post(FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API, { searchText });
         return response.data.map((accountSubject) => ({
-            label: accountSubject.name,
+            label:  + accountSubject.code + ". " + accountSubject.name,
             value: accountSubject.id,
         }));
     } catch (error) {
@@ -72,22 +72,27 @@ const fetchClients = async (searchText) => {
 };
 
 export const VoucherColumns = (handleFieldChange, accountSubjects, clients, dataSource, handleDelete) => [
+
     {
         title: '구분',
         dataIndex: 'type',
         key: 'type',
+        align: 'center',
         render: (text, record) => (
-            <Select
-                value={record.type}
-                onChange={(value) => handleFieldChange(value, 'type', record.key)}
-                placeholder="구분 선택"
-                style={{ width: '100%', padding: '0' }} // 패딩을 0으로 설정하여 더 플랫하게 만듦
-            >
-                <Select.Option value="출금">출금</Select.Option>
-                <Select.Option value="입금">입금</Select.Option>
-                <Select.Option value="차변">차변</Select.Option>
-                <Select.Option value="대변">대변</Select.Option>
-            </Select>
+
+            <div className="custom-select">
+                <Select
+                    value={record.type}
+                    onChange={(value) => handleFieldChange(value, 'type', record.key)}
+                    placeholder="구분 선택"
+                    style={{ width: '100%', borderRadius: '0px !important' }}
+                >
+                    <Select.Option value="출금">출금</Select.Option>
+                    <Select.Option value="입금">입금</Select.Option>
+                    <Select.Option value="차변">차변</Select.Option>
+                    <Select.Option value="대변">대변</Select.Option>
+                </Select>
+            </div>
         ),
         width: 150,
     },
@@ -95,15 +100,18 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
         title: '계정과목',
         dataIndex: 'accountSubject',
         key: 'accountSubject',
+        align: 'center',
         render: (text, record) => (
-            <DebounceSelect
-                value={record.accountSubject}
-                placeholder="계정과목 선택"
-                fetchInitialOptions={fetchInitialAccountSubject}
-                fetchSearchOptions={fetchAccountSubjects}
-                onChange={(value) => handleFieldChange(value, 'accountSubject', record.key)}
-                style={{ width: '100%', padding: '0' }} // 테이블에 맞도록 스타일을 플랫하게 만듦
-            />
+            <div className="custom-select">
+                <DebounceSelect
+                    value={record.accountSubject}
+                    placeholder="계정과목 선택"
+                    fetchInitialOptions={fetchInitialAccountSubject}
+                    fetchSearchOptions={fetchAccountSubjects}
+                    onChange={(value) => handleFieldChange(value, 'accountSubject', record.key)}
+                    style={{ width: '100%', borderRadius: '0px' }}
+                />
+            </div>
         ),
         width: 150,
     },
@@ -111,15 +119,18 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
         title: '거래처',
         dataIndex: 'client',
         key: 'client',
+        align: 'center',
         render: (text, record) => (
-            <DebounceSelect
-                value={record.client}
-                placeholder="거래처 선택"
-                fetchInitialOptions={fetchClients}
-                fetchSearchOptions={fetchClients}
-                onChange={(value) => handleFieldChange(value, 'client', record.key)}
-                style={{ width: '100%', padding: '0' }} // 테이블에 맞게 플랫하게 조정
-            />
+            <div className="custom-select">
+                <DebounceSelect
+                    value={record.client}
+                    placeholder="거래처 선택"
+                    fetchInitialOptions={fetchClients}
+                    fetchSearchOptions={fetchClients}
+                    onChange={(value) => handleFieldChange(value, 'client', record.key)}
+                    style={{ width: '100%', borderRadius: '0px' }}
+                />
+            </div>
         ),
         width: 150,
     },
@@ -127,12 +138,13 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
         title: '적요',
         dataIndex: 'description',
         key: 'description',
+        align: 'center',
         render: (text, record) => (
             <Input
                 value={record.description}
                 onChange={(e) => handleFieldChange(e.target.value, 'description', record.key)}
                 placeholder="적요 입력"
-                style={{ width: '100%', padding: '4px', border: 'none' }} // 플랫하게 보이도록 패딩과 테두리 제거
+                style={{ width: '100%', borderRadius: '0px' }}
             />
         ),
         width: 200,
@@ -141,6 +153,7 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
         title: '차변',
         dataIndex: 'debitAmount',
         key: 'debitAmount',
+        align: 'center',
         render: (text, record) => (
             <Input
                 type="number"
@@ -148,7 +161,7 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
                 onChange={(e) => handleFieldChange(e.target.value, 'debitAmount', record.key)}
                 placeholder="차변 입력"
                 disabled={record.type === '대변' || record.type === '결산대변'}
-                style={{ width: '100%', padding: '4px', border: 'none' }} // 입력 요소를 플랫하게 만듦
+                style={{ width: '100%', borderRadius: '0px' }}
             />
         ),
         width: 150,
@@ -157,6 +170,7 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
         title: '대변',
         dataIndex: 'creditAmount',
         key: 'creditAmount',
+        align: 'center',
         render: (text, record) => (
             <Input
                 type="number"
@@ -164,7 +178,7 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
                 onChange={(e) => handleFieldChange(e.target.value, 'creditAmount', record.key)}
                 placeholder="대변 입력"
                 disabled={record.type === '차변' || record.type === '결산차변'}
-                style={{ width: '100%', padding: '4px', border: 'none' }} // 플랫 스타일 적용
+                style={{ width: '100%', borderRadius: '0px' }} // 플랫 스타일 적용
             />
         ),
         width: 150,
@@ -172,6 +186,7 @@ export const VoucherColumns = (handleFieldChange, accountSubjects, clients, data
     {
         title: '삭제',
         key: 'action',
+        align: 'center',
         render: (_, record) =>
             dataSource.length >= 1 ? (
                 <Popconfirm title="삭제하시겠습니까?" onConfirm={() => handleDelete(record.key)}>

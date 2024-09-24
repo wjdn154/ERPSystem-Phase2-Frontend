@@ -149,6 +149,10 @@ input.ant-input[readonly] {
   margin-right: 5px;
 }
 
+.custom-select > div > div {
+  border-radius: 0 !important;
+}
+
 .ant-select-selector, .ant-select {
 }
 
