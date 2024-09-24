@@ -21,7 +21,7 @@ import FinanceDashboardPage from "../../financial/pages/FinanceDashboardPage.jsx
 import ProductionDashboardPage from "../../production/pages/ProductionDashboardPage.jsx";
 import HRDashboardPage from "../../hr/pages/HRDashboardPage.jsx";
 import LogisticsDashboardPage from "../../logistics/pages/LogisticsDashboardPage.jsx";
-import MaterialDataPage from "../../production/pages/resourceData/MaterialDataPage.jsx";
+//import MaterialDataPage from "../../production/pages/resourceData/MaterialDataPage.jsx";
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = {
@@ -39,7 +39,7 @@ const componentsMap = {
     ProductionDashboardPage,
     HRDashboardPage,
     LogisticsDashboardPage,
-    MaterialDataPage,
+    //MaterialDataPage,
 };
 
 // MainContentPage 컴포넌트
