@@ -1,24 +1,18 @@
 import {useEffect, useMemo, useState, useRef} from "react";
 import axios from "axios";
 import {
-    fetchMaterialDetail,
-    fetchMaterialDataList,
-    updateMaterialData,
-    saveMaterialData,
-    deleteMaterialData,
-    fetchProductMaterialList,
-    updateMaterialProductList,
-    deleteMaterialProduct,
-    fetchHazardousMaterialList,
-    updateMaterialHazardousList
-} from "./MaterialDataApi.jsx";
+    fetchHazardousMaterial,
+    updateHazardousMaterial,
+    saveHazardousMaterial,
+    deleteHazardousMaterial
+} from "./HazardousMaterialApi.jsx";
 
-export const materialDataHook = (initialData) => {
+export const hazardousMaterialHook = (initialData) => {
 
     const [data, setData] = useState(initialData);
     const [showDetail, setShowDetail] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);    //선택된 행
-    const [materialDataDetail, setMaterialDataDetail] = useState(null);   //상세정보
+    const [hazardousMaterialDetail, setHazardousMaterialDetail] = useState(null);   //상세정보
     const [isInsertModalVisible, setIsInsertModalVisible] = useState(false); //삭제 모달 상태
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
     const [activeTabKey, setActiveTabKey] = useState('1'); // tabs state
@@ -28,12 +22,12 @@ export const materialDataHook = (initialData) => {
 
     //데이터가 변경될 때마다 컴포넌트를 새로 렌더링
     useEffect(() => {
-        if (materialDataDetail) {
+        if (hazardousMaterialDetail) {
             setShowDetail(true);
         } else {
             setShowDetail(false);
         }
-    }, [materialDataDetail]);
+    }, [hazardousMaterialDetail]);
 
     // 행 선택 핸들러 설정
     const handleRowSelection =  {
@@ -58,12 +52,12 @@ export const materialDataHook = (initialData) => {
 
         try {
             console.log('selectedRow.id : ',selectedRow.id);
-            const detail = await fetchMaterialDetail(selectedRow.id);     //비동기 api 호출
+            const detail = await fetchHazardousMaterial(selectedRow.id);     //비동기 api 호출
             console.log('fetch detail : ',detail);
             // 원래 유해물질 코드 따로 저장
-            setMaterialDataDetail({
+            setHazardousMaterialDetail({
                 ...detail,
-                originMaterialCode: detail.materialCode  // 원래 유해물질 코드 저장
+                originHazardousMaterialCode: detail.hazardousMaterialCode  // 원래 유해물질 코드 저장
             });
 
         } catch (error) {
@@ -75,7 +69,7 @@ export const materialDataHook = (initialData) => {
     const handleInputChange = (e, key) => {
         const value = e.target.value;
 
-        setMaterialDataDetail(prevState => ({
+        setHazardousMaterialDetail(prevState => ({
             ...prevState,
             [key] : value,
         }));
@@ -84,15 +78,11 @@ export const materialDataHook = (initialData) => {
     //등록 버튼 누를 시 값 초기화되는 함수
     const handleOpenInsertModal=() => {
         setIsInsertModalVisible(true);
-        setMaterialDataDetail({  // 모든 필드를 초기화
-            materialCode: '',
-            materialName: '',
-            materialType: '',
-            stockQuantity: '',
-            purchasePrice: '',
-            representativeCode: '',
-            representativeName: '',
-            hazardousMaterialQuantity: ''
+        setHazardousMaterialDetail({  // 모든 필드를 초기화
+            hazardousMaterialCode: '',
+            hazardousMaterialName: '',
+            hazardLevel: '',
+            description: ''
         });
     };
 
@@ -102,9 +92,9 @@ export const materialDataHook = (initialData) => {
             const confirmSave = window.confirm("저장하시겠습니까?");
 
             if (!confirmSave) return;
-            console.log("저장버튼 클릭 시 hazardousMaterial : ",materialDataDetail);
-            await saveMaterialData(materialDataDetail);
-            const savedData = await fetchMaterialDataList();  //등록 후 새로운 리스트 반환
+            console.log("저장버튼 클릭 시 hazardousMaterial : ",hazardousMaterialDetail);
+            await saveHazardousMaterial(hazardousMaterialDetail);
+            const savedData = await fetchHazardousMaterial();  //등록 후 새로운 리스트 반환
             window.alert("저장되었습니다.");
             setIsInsertModalVisible(false);
             setData(savedData);
@@ -123,36 +113,16 @@ export const materialDataHook = (initialData) => {
     }
     const handleInsertOk = async () => {
 
-        if (!materialDataDetail.materialCode) {
-            alert("자재 코드를 입력하세요.");
+        if (!hazardousMaterialDetail.hazardousMaterialCode) {
+            alert("유해물질 코드를 입력하세요.");
             return;
         }
-        if (!materialDataDetail.materialName) {
-            alert("자재 명을 입력하세요.");
+        if (!hazardousMaterialDetail.hazardousMaterialName) {
+            alert("유해물질 명을 입력하세요.");
             return;
         }
-        if (!materialDataDetail.materialType) {
-            alert("자재유형을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.stockQuantity) {
-            alert("재고 수량을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.purchasePrice) {
-            alert("구매 가격을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeCode) {
-            alert("거래처 코드를 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeName) {
-            alert("커래처 명을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.hazardousMaterialQuantity) {
-            alert("유해물질 개수를 입력하세요.");
+        if (!hazardousMaterialDetail.hazardLevel) {
+            alert("위험등급을 입력하세요.");
             return;
         }
 
@@ -166,36 +136,16 @@ export const materialDataHook = (initialData) => {
     };
 
     const handleUpdateOk = async () => {
-        if (!materialDataDetail.materialCode) {
-            alert("자재 코드를 입력하세요.");
+        if (!hazardousMaterialDetail.hazardousMaterialCode) {
+            alert("유해물질 코드를 입력하세요.");
             return;
         }
-        if (!materialDataDetail.materialName) {
-            alert("자재 명을 입력하세요.");
+        if (!hazardousMaterialDetail.hazardousMaterialName) {
+            alert("유해물질 명을 입력하세요.");
             return;
         }
-        if (!materialDataDetail.materialType) {
-            alert("자재유형을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.stockQuantity) {
-            alert("재고 수량을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.purchasePrice) {
-            alert("구매 가격을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeCode) {
-            alert("거래처 코드를 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeName) {
-            alert("커래처 명을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.hazardousMaterialQuantity) {
-            alert("유해물질 개수를 입력하세요.");
+        if (!hazardousMaterialDetail.hazardLevel) {
+            alert("위험등급을 입력하세요.");
             return;
         }
 
@@ -206,10 +156,10 @@ export const materialDataHook = (initialData) => {
     const handleUpdate = async () => {
         try {
             const confirmSave = window.confirm("수정하시겠습니까?");
-            console.log("수정버튼 클릭시 id ,materialDataDetail : ",materialDataDetail.id, materialDataDetail);
+            console.log("수정버튼 클릭시 id ,hazardousMaterialDetail : ",hazardousMaterialDetail.id, hazardousMaterialDetail);
 
-            await updateMaterialData(materialDataDetail.id, materialDataDetail);
-            const updatedData = await fetchMaterialDataList();
+            await updateHazardousMaterial(hazardousMaterialDetail.id, hazardousMaterialDetail);
+            const updatedData = await fetchHazardousMaterial();
             setData(updatedData);
             window.alert("수정완료되었습니다.");
             setIsUpdateModalVisible(false);
@@ -225,10 +175,9 @@ export const materialDataHook = (initialData) => {
     //삭제 버튼 선택 클릭 시 실행되는 함수
     const handleDelete = async () => {
         const confirmDelete = window.confirm("정말로 삭제 하시겠습니까?");
-        if(!confirmDelete || !materialDataDetail || !materialDataDetail.id) return;
         try{
-            await deleteMaterialData(materialDataDetail.id);
-            const deletedData = await fetchMaterialDataList();
+            await deleteHazardousMaterial(hazardousMaterialDetail.id);
+            const deletedData = await fetchHazardousMaterial();
             window.alert('삭제 완료되었습니다.');
             setData(deletedData);
         }catch (error){
@@ -241,14 +190,16 @@ export const materialDataHook = (initialData) => {
         setActiveTabKey(key);
     };
 
+
+
     return {
         data,
         showDetail,
         selectedRow,
         handleSelectedRow,
         handleRowSelection,
-        materialDataDetail,
-        setMaterialDataDetail,
+        hazardousMaterialDetail,
+        setHazardousMaterialDetail,
         handleInputChange,
         handleSave,
         handleUpdate,
