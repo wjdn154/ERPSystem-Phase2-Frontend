@@ -117,10 +117,10 @@ export const PRODUCTION_API = {
     PRODUCTION_REQUEST_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/delete/${id}`, // 생산 요청 삭제 API
 
     // 작업지시
-    SHIFT_TYPE_LIST_API: `${API_BASE_URL}/api/production/shiftType/`, // 전체 교대유형 목록 조회 API
-    SHIFT_TYPE_DETAIL_API: (id) => `${API_BASE_URL}/api/production/shiftType/${id}/`, // 특정 교대유형 조회 API
-    SHIFT_TYPE_CREATE_API: `${API_BASE_URL}/api/production/shiftType/new/`, // 교대유형 생성 API
-    SHIFT_TYPE_UPDATE_API: `${API_BASE_URL}/api/production/shiftType/update/`, // 교대유형 수정 API
+    SHIFT_TYPE_LIST_API: `${API_BASE_URL}/api/production/shiftType`, // 전체 교대유형 목록 조회 API
+    SHIFT_TYPE_DETAIL_API: (id) => `${API_BASE_URL}/api/production/shiftType/${id}`, // 특정 교대유형 조회 API
+    SHIFT_TYPE_CREATE_API: `${API_BASE_URL}/api/production/shiftType/new`, // 교대유형 생성 API
+    SHIFT_TYPE_UPDATE_API: `${API_BASE_URL}/api/production/shiftType/update`, // 교대유형 수정 API
     SHIFT_TYPE_DELETE_API: (id) => `${API_BASE_URL}/api/production/shiftType/delete/${id}`, // 교대유형 삭제 API
 
     WORKER_ASSIGNMENT_WORKCENTER_COUNT_API: `${API_BASE_URL}/api/production/workerAssignment/workcenters/count`, // 전체 작업장별 배정된 인원수 조회 API

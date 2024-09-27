@@ -1,15 +1,39 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './ProcessDetailsUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button} from 'antd';
+import {Button, Col, Modal, Row} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
+import {useProcessDetails} from "./ProcessDetailsHook.jsx";
+import SearchBar from "./SearchBar.jsx";
+import ProcessDetailsListSection from "./ProcessDetailsListSection.jsx";
+import SelectedProcessDetailsSection from "./SelectedProcessDetailsSection.jsx";
+import {getRowClassName, tabItems, processDetailsColumn} from "./ProcessDetailsUtil.jsx";
 
-const ProcessDetailsPage = () => {
+const ProcessDetailsPage = ({ initialData }) => {
+
     const [activeTabKey, setActiveTabKey] = useState('1');
+    const {
+        data,
+        processDetail,
+        handleSave,
+        handleSelectedRow,
+        handleDeleteProcessDetail,
+        isProcessModalVisible,
+        handleClose,
+        handleInputChange,
+        handleAddProcess,
+        handleSearch,
+        searchData,
+        isSearchActive,
+    } = useProcessDetails(initialData);
+
+    useEffect(() => {
+        console.log("현재 activeTabKey: ", activeTabKey);
+    }, [activeTabKey]);
 
     const handleTabChange = (key) => {
+        console.log("Tab 변경됨:", key);  // 디버그 로그 추가
         setActiveTabKey(key);
     };
 
@@ -33,10 +57,70 @@ const ProcessDetailsPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12} >
                         <Grow in={true} timeout={200}>
                             <div>
-                                <TemporarySection />
+                                {/* 검색 바 */}
+                                <Row gutter={16} style={{marginBottom: '16px'}}>
+                                    <Col span={8}>
+                                        <SearchBar onSearch={handleSearch}/>
+                                    </Col>
+                                </Row>
+
+                                {/* 검색 결과 목록 또는 경고 메시지 */}
+                                {isSearchActive && (
+                                    <>
+                                        {searchData && searchData.length > 0 ? (
+                                            <Row gutter={16} style={{marginBottom: '16px'}}>
+                                                <Col span={24}>
+                                                    <ProcessDetailsListSection
+                                                        columns={processDetailsColumn}
+                                                        data={searchData}
+                                                        handleSelectedRow={handleSelectedRow}
+                                                        rowClassName={getRowClassName}
+                                                    />
+                                                </Col>
+                                            </Row>
+                                        ) : (
+                                            <Text type="warning">검색하신 공정명을 찾을 수 없습니다.</Text>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* 기본 데이터 목록 */}
+                                <Row gutter={16}
+                                     style={{marginTop: isSearchActive && searchData && searchData.length > 0 ? '16px' : '0'}}>
+                                    <Col span={24}>
+                                        <ProcessDetailsListSection
+                                            columns={processDetailsColumn}
+                                            data={data}
+                                            handleSelectedRow={handleSelectedRow}
+                                            rowClassName={getRowClassName}
+                                        />
+                                    </Col>
+                                </Row>
+
+                                {/* 공정 추가 버튼 */}
+                                <Button type="primary" onClick={handleAddProcess} style={{marginTop: '16px'}}>
+                                    등록
+                                </Button>
+
+                                {/* 모달 컴포넌트 */}
+                                {processDetail && (
+                                    <Modal
+                                        visible={isProcessModalVisible} // 모달 상태에 따라 표시
+                                        onCancel={handleClose} // 모달을 닫는 함수
+                                        footer={null} // 모달의 하단 버튼 제거
+                                    >
+                                        <SelectedProcessDetailsSection
+                                            processDetail={processDetail}
+                                            handleClose={handleClose}
+                                            handleInputChange={handleInputChange}
+                                            handleSave={handleSave}
+                                            handleDeleteProcessDetail={handleDeleteProcessDetail}
+                                        />
+                                    </Modal>
+                                )}
                             </div>
                         </Grow>
                     </Grid>
@@ -44,11 +128,11 @@ const ProcessDetailsPage = () => {
             )}
 
             {activeTabKey === '2' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                <Grid sx={{padding: '0px 20px 0px 20px'}} container spacing={3}>
+                    <Grid item xs={12} md={5} sx={{minWidth: '500px !important', maxWidth: '700px !important'}}>
                         <Grow in={true} timeout={200}>
                             <div>
-                                <TemporarySection />
+                                <TemporarySection/>
                             </div>
                         </Grow>
                     </Grid>
