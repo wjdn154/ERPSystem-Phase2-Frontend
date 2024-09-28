@@ -2,10 +2,10 @@ import React from 'react';
 import {Layout, Row, Col, Avatar, Dropdown, Button, notification} from 'antd';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
-import LogoWhite from "../assets/favicon/OMZ.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../config/redux/authSlice.jsx";
 import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Box, Grid, Grow } from '@mui/material';
 import {useNotificationContext} from "../config/NotificationContext.jsx";
 
 const { Header } = Layout;
@@ -14,11 +14,6 @@ function Headers() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const userNickname = useSelector(state => state.auth.userNickname);
-
-    // 로고 클릭 시
-    const handleLogoClick = () => {
-        navigate('/integration');
-    };
 
     const handleProfile = () => {
         notification.error({
@@ -66,7 +61,7 @@ function Headers() {
     return (
         <Header style={styles.header}>
             <Row justify="space-between" align="middle" style={styles.row}>
-                <img onClick={handleLogoClick} src={LogoWhite} alt="로고" style={styles.img} />
+                <Box />
                 <Col>
                     {userNickname ? (
                         <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>

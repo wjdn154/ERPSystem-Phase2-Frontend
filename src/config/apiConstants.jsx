@@ -24,6 +24,7 @@ export const FINANCIAL_API = {
     UPDATE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/update/${code}`, // 계정과목 수정 API
     DELETE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/delete/${code}`, // 계정과목 삭제 API
     CLIENT_SEARCH_API: `${API_BASE_URL}/api/financial/client/search`, // 거래처 검색 API
+    UNRESOLVED_VOUCHER_SEARCH_API: `${API_BASE_URL}/api/financial/general-voucher-entry/showUnresolvedVoucher`, // 미결 전표 조회 API
 };
 
 // 인사관리 - 사원

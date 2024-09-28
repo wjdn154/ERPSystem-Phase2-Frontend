@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Layout, Menu } from 'antd';
+import { Box, Grid, Grow } from '@mui/material';
+import {Layout, Menu, Typography} from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/App.css';
 import { menuItems, subMenuItems } from '../config/menuItems.jsx';
 import {useDispatch, useSelector} from "react-redux";
 import openKeys from "lodash";
 import {setSelectedMenu, setSelectedSubMenu, setSelectedSubSubMenu} from "../config/redux/menuSlice.jsx";
+import LogoWhite from "../assets/favicon/OMZ_white.svg";
 
 const { Sider } = Layout;
 
@@ -19,6 +21,11 @@ const Sidebar = () => {
 
     // Redux에서 선택된 메뉴 상태 가져오기
     const { selectedMenu, selectedSubMenu, selectedSubSubMenu } = useSelector((state) => state.menu);
+
+
+    const handleLogoClick = () => {
+        navigate('/integration');
+    };
 
     useEffect(() => {
         const path = location.pathname;
@@ -146,11 +153,29 @@ const Sidebar = () => {
     return (
         <Sider
             className="custom-sidebar"
+            theme={'dark'}
             onMouseEnter={handleMouseEnter} // 마우스가 사이드바에 들어왔을 때
             onMouseLeave={handleMouseLeave} // 마우스가 사이드바에서 떠났을 때
         >
+            <Box style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '64px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis' }}>
+                {hovering ? (
+                    <Typography onClick={handleLogoClick}>
+                        Think Global, Act Local
+                    </Typography>
+                ) : (
+                        <img onClick={handleLogoClick} src={LogoWhite} alt={'logo'} style={{ width: '50px'}} />
+                )}
+            </Box>
             <Menu
                 mode="inline"
+                theme={'dark'}
                 selectedKeys={[selectedKey]} // 선택된 메뉴 항목 설정
                 openKeys={hovering ? openKeys : []} // 현재 열려있는 메뉴 설정
                 onOpenChange={handleOpenChange} // 메뉴 토글
