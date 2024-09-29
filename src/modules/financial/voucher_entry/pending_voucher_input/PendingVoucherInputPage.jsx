@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material'
 import { DeleteOutlined, PlusOutlined, SaveOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import { Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal } from 'antd'
+import {Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import dayjs from "dayjs"
@@ -9,6 +9,9 @@ import WelcomeSection from "../../../../components/WelcomeSection"
 import { tabItems } from "./PendingVoucherInputUtil"
 import TemporarySection from "../../../../components/TemporarySection"
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
+import axios from "axios";
+import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
+import apiClient from "../../../../config/apiClient.jsx";
 
 const { Option } = Select
 
@@ -16,70 +19,85 @@ const PendingVoucherInputPage = () => {
     const notify = useNotificationContext();
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [entries, setEntries] = useState([])
-    const [totalAmount, setTotalAmount] = useState({ debit: 0, credit: 0 })
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState(null)
     const [activeTabKey, setActiveTabKey] = useState('1')
-    const [newEntry, setNewEntry] = useState({
-        type: '차변',
-        account: '',
-        accountName: '',
-        counterpart: '',
-        counterpartName: '',
-        details: '',
-        debit: 0,
-        credit: 0
-    })
+    const [newEntry, setNewEntry] = useState({})
     const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
     const [isCounterpartModalOpen, setIsCounterpartModalOpen] = useState(false)
-    const [detailOptions, setDetailOptions] = useState([])
 
     const handleTabChange = (key) => {
         setActiveTabKey(key)
     }
 
     const fetchData = useCallback(async () => {
-        setIsLoading(true)
-        setError(null)
         try {
-            // API call would go here
-            const response = await new Promise(resolve => setTimeout(() => {
-                resolve([
-                    { id: 1, date: selectedDate, code: '00001', type: '차변', accountCode: '0110', accountName: '받을어음', counterpart: '00101', counterpartName: '(주)한아름', details: '상품매출 관련 어음수취', debit: 10000000, credit: 0 },
-                    { id: 2, date: selectedDate, code: '00002', type: '차변', accountCode: '0113', accountName: '대손충당금', counterpart: '00101', counterpartName: '(주)한아름', details: '대손충당금 설정', debit: 123456000, credit: 0 },
-                    { id: 3, date: selectedDate, code: '00003', type: '대변', accountCode: '0101', accountName: '현금', counterpart: '00101', counterpartName: '(주)한아름', details: '거스름 입금', debit: 0, credit: 50000000 },
-                ])
-            }, 0))
-            setEntries(response)
-            calculateTotal(response)
+            // 백엔드로부터 데이터를 불러옴
+            const response = await apiClient.post(FINANCIAL_API.UNRESOLVED_VOUCHER_SEARCH_API, {
+                searchDate: selectedDate.toISOString().split('T')[0] // LocalDate 형식으로 전송
+            });
+
+            const responseData = response.data;
+            console.log('responseData:', responseData);
+
+            // 응답 데이터에서 전표 리스트 추출 및 합계 행 추가
+            const formattedEntries = responseData.voucherDtoList.map((entry, index) => ({
+                ...entry,
+                key: `${entry.voucherNumber}-${entry.voucherType}-${index}`, // 고유한 키 생성
+            }));
+
+            // 합계 행 추가
+            const totalRow = {
+                voucherNumber: '합계',
+                voucherDate: '',
+                voucherType: '',
+                accountSubjectCode: '',
+                accountSubjectName: '',
+                clientCode: '',
+                clientName: '',
+                transactionDescription: '',
+                debitAmount: responseData.totalDebit,
+                creditAmount: responseData.totalCredit,
+                key: 'total', // 고유 키
+            };
+
+            // 실제 전표 리스트와 합계 행 설정
+            setEntries([...formattedEntries, totalRow]);
+
         } catch (err) {
-            setError('데이터를 불러오는 중 오류가 발생했습니다.')
+            console.error('데이터를 불러오는 중 오류 발생:', err);
             notify('error', '오류', '데이터를 불러오는 중 오류가 발생했습니다.', 'top');
-        } finally {
-            setIsLoading(false)
         }
-    }, [selectedDate])
+    }, [selectedDate]);
 
+    // selectedDate 변경 시 fetchData 호출
     useEffect(() => {
-        fetchData()
-    }, [fetchData])
-
-    const calculateTotal = (entries) => {
-        const totalDebit = entries.reduce((sum, entry) => sum + entry.debit, 0);
-        const totalCredit = entries.reduce((sum, entry) => sum + entry.credit, 0);
-        setTotalAmount({ debit: totalDebit, credit: totalCredit }); // 합계 저장
-    };
+        fetchData();
+    }, [selectedDate, fetchData]);
 
     const handleInputChange = (field, value) => {
         setNewEntry(prev => ({ ...prev, [field]: value }))
     }
 
     const handleSubmit = async () => {
-        setIsLoading(true);
         try {
-            const updatedEntries = [...entries, { ...newEntry, id: Date.now(), date: selectedDate, code: `0000${entries.length + 1}` }];
+            // 서버로 보낼 새로운 항목 데이터 정의
+            const newEntryData = {
+                ...newEntry,
+                id: Date.now(),
+                date: selectedDate.toISOString().split('T')[0], // 날짜를 ISO 형식으로 변환
+                code: `0000${entries.length + 1}`
+            };
+
+            // 서버에 새로운 항목을 저장하는 API 호출
+            const response = await axios.post(FINANCIAL_API.SAVE_ACCOUNT_SUBJECT_API, newEntryData);
+
+            // 서버 응답에서 새로운 항목을 받아 로컬 상태 업데이트
+            const updatedEntries = [...entries, response.data];
             setEntries(updatedEntries);
-            calculateTotal(updatedEntries);
+
+            // 저장 완료 알림
+            notify('success', '저장 완료', '새 항목이 저장되었습니다.', 'bottomLeft');
+
+            // 입력 폼 초기화
             setNewEntry({
                 type: '차변',
                 accountCode: '',
@@ -90,118 +108,110 @@ const PendingVoucherInputPage = () => {
                 debit: 0,
                 credit: 0
             });
-            notify('success', '저장 완료', '새 항목이 저장되었습니다.', 'bottomLeft');
         } catch (err) {
+            // 오류 발생 시 알림
             notify('error', '저장 실패', '항목 저장 중 오류가 발생했습니다.', 'bottomLeft');
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const formattedDate = useMemo(() => {
-        return format(selectedDate, 'yyyy년 MM월 dd일', { locale: ko })
-    }, [selectedDate])
-
-    const entriesWithTotal = useMemo(() => {
-        if (entries.length === 0) return entries;
-        return [
-            ...entries,
-            {
-                id: 'total',
-                date: null,
-                code: null,
-                type: null,
-                accountCode: null,
-                accountName: null,
-                counterpart: null,
-                details: null,
-                debit: totalAmount.debit,
-                credit: totalAmount.credit
-            }
-        ];
-    }, [entries, totalAmount]);
+        return format(selectedDate, 'yyyy-MM-dd', { locale: ko });
+    }, [selectedDate]);
 
     const voucherColumns = [
         {
-            title: <span style={{ fontSize:'0.8rem' }}>날짜</span>,
-            dataIndex: 'date',
-            key: 'date',
+            title: <span style={{ fontSize: '0.8rem' }}>날짜</span>,
+            dataIndex: 'voucherDate',
+            key: 'voucherDate',
             width: '10%',
             align: 'center',
+            render: (text, record) => (record.key === 'total' ? <Typography>합계</Typography> : <span style={{ fontSize: '0.7rem' }}>{text || formattedDate}</span>)
+        },
+        {
+            title: <span style={{ fontSize: '0.8rem' }}>전표번호</span>,
+            dataIndex: 'voucherNumber',
+            key: 'voucherNumber',
+            width: '5%',
+            align: 'center',
+            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
+        },
+        {
+            title: <span style={{ fontSize: '0.8rem' }}>구분</span>,
+            dataIndex: 'voucherType',
+            key: 'voucherType',
+            width: '10%',
+            align: 'center',
+            render: (text, record) => {
+                if (record.key === 'total') {
+                    return null;
+                }
 
-            render: (text, record) => (record.id === 'total' ? <strong>합계</strong> : <span style={{ fontSize: '0.7rem' }}>{formattedDate}</span> || '-')
+                let color;
+                let value;
+                switch (text) {
+                    case 'DEPOSIT':
+                        color = 'green';
+                        value = '입금';
+                        break;
+                    case 'WITHDRAWAL':
+                        color = 'red';
+                        value = '출금';
+                        break;
+                    case 'DEBIT':
+                        color = 'blue';
+                        value = '차변';
+                        break;
+                    case 'CREDIT':
+                        color = 'orange';
+                        value = '대변';
+                        break;
+                    default:
+                        color = 'gray';
+                        value = text;
+                }
+
+                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+            }
         },
         {
-            title: <span style={{ fontSize:'0.8rem' }}>전표번호</span>,
-            dataIndex: 'code',
-            key: 'code',
+            title: <span style={{ fontSize: '0.8rem' }}>계정과목</span>,
+            dataIndex: 'accountSubjectCode',
+            key: 'accountSubjectCode',
             width: '10%',
             align: 'center',
-            render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>
+            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span>)
         },
         {
-            title: <span style={{ fontSize:'0.8rem' }}>구분</span>,
-            dataIndex: 'type',
-            key: 'type',
+            title: <span style={{ fontSize: '0.8rem' }}>거래처</span>,
+            dataIndex: 'clientCode',
+            key: 'clientCode',
             width: '10%',
             align: 'center',
-            render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>
+            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>[{text}] {record.clientName}</span>)
         },
         {
-            title: <span style={{ fontSize:'0.8rem' }}>코드</span>,
-            dataIndex: 'accountCode',
-            key: 'accountCode',
-            width: '5%',
-            align: 'center',
-            render: (text, record) => (record.id === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
-        },
-        {
-            title: <span style={{ fontSize:'0.8rem' }}>계정과목명</span>,
-            dataIndex: 'accountCode',
-            key: 'accountCode',
-            width: '10%',
-            align: 'center',
-            render: (text, record) => (record.id === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{record.accountName}</span>)
-        },
-        {
-            title: <span style={{ fontSize:'0.8rem' }}>코드</span>,
-            dataIndex: 'counterpart',
-            key: 'counterpart',
-            width: '5%',
-            align: 'center',
-            render: (text, record) => (record.id === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
-        },
-        {
-            title: <span style={{ fontSize:'0.8rem' }}>거래처명</span>,
-            dataIndex: 'counterpart',
-            key: 'counterpart',
-            width: '10%',
-            align: 'center',
-            render: (text, record) => (record.id === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{record.counterpartName}</span>)
-        },
-        {
-            title: <span style={{ fontSize:'0.8rem' }}>적요</span>,
-            dataIndex: 'details',
-            key: 'details',
+            title: <span style={{ fontSize: '0.8rem' }}>적요</span>,
+            dataIndex: 'transactionDescription',
+            key: 'transactionDescription',
             width: '20%',
             align: 'center',
-            render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>
+            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
         },
         {
-            title: <span style={{ fontSize:'0.8rem' }}>차변</span>,
-            dataIndex: 'debit',
-            key: 'debit',
+            title: <span style={{ fontSize: '0.8rem' }}>차변</span>,
+            dataIndex: 'debitAmount',
+            key: 'debitAmount',
             width: '10%',
             align: 'right',
-            render: (text, record) => (record.id === 'total' ? <strong>{text.toLocaleString()}원</strong> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
+            render: (text, record) => (record.key === 'total' ? <span>{text.toLocaleString()}</span> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
         },
         {
-            title: <span style={{ fontSize:'0.8rem' }}>대변</span>,
-            dataIndex: 'credit',
-            key: 'credit',
+            title: <span style={{ fontSize: '0.8rem' }}>대변</span>,
+            dataIndex: 'creditAmount',
+            key: 'creditAmount',
             width: '10%',
             align: 'right',
-            render: (text, record) => (record.id === 'total' ? <strong>{text.toLocaleString()}원</strong> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
+            render: (text, record) => (record.key === 'total' ? <span>{text.toLocaleString()}</span> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
         }
     ];
 
@@ -211,17 +221,6 @@ const PendingVoucherInputPage = () => {
 
     const handleCounterpartClick = () => {
         setIsCounterpartModalOpen(true)
-    }
-
-    const handleDetailsSearch = (value) => {
-        // This would typically be an API call
-        setDetailOptions(
-            !value ? [] : [
-                { value: '상품매출' },
-                { value: '대손충당금 설정' },
-                { value: '거스름 입금' },
-            ]
-        )
     }
 
     return (
@@ -257,25 +256,14 @@ const PendingVoucherInputPage = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        {isLoading ? (
-                                            <div style={{ textAlign: 'center', padding: '24px' }}>
-                                                <Spin size="large" />
-                                            </div>
-                                        ) : error ? (
-                                            <div style={{ textAlign: 'center', color: '#ff4d4f', padding: '24px' }}>
-                                                <ExclamationCircleOutlined style={{ fontSize: '24px', marginBottom: '8px' }} />
-                                                <p>{error}</p>
-                                            </div>
-                                        ) : (
-                                            <Table
-                                                columns={voucherColumns}
-                                                dataSource={entriesWithTotal} // 합계 행 포함
-                                                rowKey="id"
-                                                pagination={false}
-                                                size="small"
-                                                scroll={{ x: 'max-content' }}
-                                            />
-                                        )}
+                                        <Table
+                                            columns={voucherColumns}
+                                            dataSource={entries} // 합계 행 포함
+                                            rowKey={(record) => record.key}
+                                            pagination={false}
+                                            size="small"
+                                            scroll={{ x: 'max-content' }}
+                                        />
                                     </Grid>
                                 </Grid>
                             </Paper>
@@ -360,7 +348,6 @@ const PendingVoucherInputPage = () => {
                                             type="primary"
                                             icon={<SaveOutlined />}
                                             onClick={handleSubmit}
-                                            loading={isLoading}
                                         >
                                             저장
                                         </Button>

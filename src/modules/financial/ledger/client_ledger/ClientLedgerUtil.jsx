@@ -12,14 +12,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '거래처별 미수금/미지급금',
-            children: (
-                <Typography>
-                    특정 거래처에 대해 남아 있는 미수금과 미지급금을 조회하고 관리할 수 있는 탭임.
-                </Typography>
-            ),
-        },
     ];
 }

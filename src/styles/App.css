@@ -129,9 +129,14 @@
 
 /* Form 영역 시작 */
 
+
 input.ant-input[readonly] {
   background-color: #FAFAFA !important;
   pointer-events: none;
+}
+
+.read-only-input {
+  background-color: #FFF !important;
 }
 
 .input-field {
@@ -183,6 +188,15 @@ input.ant-input[readonly] {
 /* Form 영역 끝 */
 
  /*antd 테이블 영역 시작 */
+
+/* 모든 테이블 제목에 적용 */
+.ant-table-thead th {
+}
+
+/* 테이블의 두 줄 제목 설정 */
+.ant-table-thead th .title-multi-line {
+}
+
 .MuiTableCell-root {
 }
 .ant-table-wrapper {
