@@ -17,11 +17,18 @@ export const COMMON_API = {
 // 재무회계
 export const FINANCIAL_API = {
     ACCOUNT_SUBJECTS_API: `${API_BASE_URL}/api/financial/accountSubjects/`, // 계정과목 목록 조회 API
+    ACCOUNT_SUBJECTS_SEARCH_API: `${API_BASE_URL}/api/financial/accountSubjects/search`, // 계정과목 검색 API
     ACCOUNT_SUBJECT_DETAIL_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/${code}`, // 계정과목 상세 조회 API
     SAVE_MEMO_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/saveMemo/${code}`, // 적요 저장 API
     SAVE_ACCOUNT_SUBJECT_API: `${API_BASE_URL}/api/financial/accountSubjects/save`, // 계정과목 저장 API
     UPDATE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/update/${code}`, // 계정과목 수정 API
     DELETE_ACCOUNT_SUBJECT_API: (code) => `${API_BASE_URL}/api/financial/accountSubjects/delete/${code}`, // 계정과목 삭제 API
+    CLIENT_SEARCH_API: `${API_BASE_URL}/api/financial/client/search`, // 거래처 검색 API
+    UNRESOLVED_VOUCHER_SEARCH_API: `${API_BASE_URL}/api/financial/general-voucher-entry/showUnresolvedVoucher`, // 미결 전표 조회 API
+    CLIENT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/clientLedger/show`, // 거래처원장 목록 조회 API
+    CLIENT_AND_ACCOUNT_SUBJECT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/clientAndAccountSubject/show`, // 거래처별 계정과목별 원장 목록 조회 API
+    CLIENT_AND_ACCOUNT_SUBJECT_LEDGER_DETAIL_API: `${API_BASE_URL}/api/financial/ledger/clientAndAccountSubject/showDetail`, // 거래처별 계정과목별 원장 상제 조회 API
+    JOURNAL_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/journal/show`, // 분개장 목록 조회 API
 };
 
 // 인사관리 - 사원
