@@ -8,12 +8,12 @@
 
 /* 사이드바 영역 시작 */
 
-/* 서브 메뉴 배경색 변경 */
-.custom-sidebar .ant-menu-submenu-title {
-  border-radius: 0px;
-  margin: 0px;
-  background-color: #fff !important; /* 서브 메뉴 배경색 */
-}
+/*!* 서브 메뉴 배경색 변경 *!*/
+/*.custom-sidebar .ant-menu-submenu-title {*/
+/*  border-radius: 0px;*/
+/*  margin: 0px;*/
+/*  background-color: #fff !important; !* 서브 메뉴 배경색 *!*/
+/*}*/
 
 .custom-sidebar {
   width: 70px !important; /* 기본 너비 */
@@ -22,7 +22,7 @@
   max-width: 70px !important;
   /*min-width: 300px !important;*/
   /*max-width: 300px !important;*/
-  background-color: #fff !important;
+  /*background-color: #fff !important;*/
   box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px -1px;
 }
 
@@ -34,33 +34,38 @@
 }
 
 .ant-menu-submenu-title:hover, .ant-menu-item:hover {
-  background-color: #EBF1FE !important;
+  background-color: #1677FF !important;
 }
 
-.ant-menu-submenu {
-  background-color: #fff !important;
-}
+/*.ant-menu-submenu {*/
+/*  background-color: #fff !important;*/
+/*}*/
 
 .ant-menu-item {
   width: 100% !important;
   margin: 0px !important;
   border-radius: 0px !important;
 }
-
-.ant-menu-submenu-selected > .ant-menu-submenu-title {
-  font-weight: 700;
-  background-color: #EBF1FE !important;
+.ant-menu-submenu-title {
+  width: 100% !important;
+  margin: 0px !important;
+  border-radius: 0px !important;
 }
+
+/*.ant-menu-submenu-selected > .ant-menu-submenu-title {*/
+/*  font-weight: 700;*/
+/*  background-color: #EBF1FE !important;*/
+/*}*/
 
 .ant-menu-selected, .ant-menu-item-selected {
   font-weight: 700;
-  background-color: #EBF1FE !important; /* 선택된 항목의 배경색 */
-  border-right: 3px solid #3E79F7;
+  background-color: #1677FF !important; /* 선택된 항목의 배경색 */
+  border-right: 3px solid #fff;
 }
 
-.ant-menu-submenu-title {
-  width: 100% !important;
-}
+/*.ant-menu-submenu-title {*/
+/*  width: 100% !important;*/
+/*}*/
 
 .custom-sidebar .ant-menu-submenu-arrow {
   display: none;
@@ -78,15 +83,11 @@
   font-size: 20px !important;
 }
 
-.dashboard-style {
-  background-color: #fff;
-}
-.dashboard-style:hover {
-  background-color: #EBF1FE;
-}
-
-.dashboard-style {
-  background-color: #fff;
+.ant-layout-sider-children > .MuiBox-root .ant-typography {
+  cursor: pointer;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1.5rem;
 }
 
 /* 사이드바 영역 끝 */
@@ -128,9 +129,14 @@
 
 /* Form 영역 시작 */
 
+
 input.ant-input[readonly] {
   background-color: #FAFAFA !important;
   pointer-events: none;
+}
+
+.read-only-input {
+  background-color: #FFF !important;
 }
 
 .input-field {
@@ -147,6 +153,10 @@ input.ant-input[readonly] {
   width: 18px !important;
   height: 18px !important;
   margin-right: 5px;
+}
+
+.custom-select > div > div {
+  border-radius: 0 !important;
 }
 
 .ant-select-selector, .ant-select {
@@ -178,6 +188,15 @@ input.ant-input[readonly] {
 /* Form 영역 끝 */
 
  /*antd 테이블 영역 시작 */
+
+/* 모든 테이블 제목에 적용 */
+.ant-table-thead th {
+}
+
+/* 테이블의 두 줄 제목 설정 */
+.ant-table-thead th .title-multi-line {
+}
+
 .MuiTableCell-root {
 }
 .ant-table-wrapper {
