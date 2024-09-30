@@ -36,7 +36,6 @@ const PendingVoucherInputPage = () => {
             });
 
             const responseData = response.data;
-            console.log('responseData:', responseData);
 
             // 응답 데이터에서 전표 리스트 추출 및 합계 행 추가
             const formattedEntries = responseData.voucherDtoList.map((entry, index) => ({
@@ -56,7 +55,8 @@ const PendingVoucherInputPage = () => {
                 transactionDescription: '',
                 debitAmount: responseData.totalDebit,
                 creditAmount: responseData.totalCredit,
-                key: 'total', // 고유 키
+                key: 'total',
+                total: true, // 고유 키
             };
 
             // 실제 전표 리스트와 합계 행 설정
@@ -73,16 +73,11 @@ const PendingVoucherInputPage = () => {
         fetchData();
     }, [selectedDate, fetchData]);
 
-    const handleInputChange = (field, value) => {
-        setNewEntry(prev => ({ ...prev, [field]: value }))
-    }
-
     const handleSubmit = async () => {
         try {
             // 서버로 보낼 새로운 항목 데이터 정의
             const newEntryData = {
                 ...newEntry,
-                id: Date.now(),
                 date: selectedDate.toISOString().split('T')[0], // 날짜를 ISO 형식으로 변환
                 code: `0000${entries.length + 1}`
             };
@@ -125,7 +120,7 @@ const PendingVoucherInputPage = () => {
             key: 'voucherDate',
             width: '10%',
             align: 'center',
-            render: (text, record) => (record.key === 'total' ? <Typography>합계</Typography> : <span style={{ fontSize: '0.7rem' }}>{text || formattedDate}</span>)
+            render: (text, record) => (record.total ? <Typography style={{ fontSize: '0.9rem' }}>합계</Typography> : <span style={{ fontSize: '0.7rem' }}>{text || formattedDate}</span>)
         },
         {
             title: <span style={{ fontSize: '0.8rem' }}>전표번호</span>,
@@ -133,7 +128,7 @@ const PendingVoucherInputPage = () => {
             key: 'voucherNumber',
             width: '5%',
             align: 'center',
-            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
+            render: (text, record) => (record.total ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
         },
         {
             title: <span style={{ fontSize: '0.8rem' }}>구분</span>,
@@ -142,9 +137,7 @@ const PendingVoucherInputPage = () => {
             width: '10%',
             align: 'center',
             render: (text, record) => {
-                if (record.key === 'total') {
-                    return null;
-                }
+                if (record.total)  return null;
 
                 let color;
                 let value;
@@ -158,11 +151,11 @@ const PendingVoucherInputPage = () => {
                         value = '출금';
                         break;
                     case 'DEBIT':
-                        color = 'blue';
+                        color = 'green';
                         value = '차변';
                         break;
                     case 'CREDIT':
-                        color = 'orange';
+                        color = 'red';
                         value = '대변';
                         break;
                     default:
@@ -179,7 +172,7 @@ const PendingVoucherInputPage = () => {
             key: 'accountSubjectCode',
             width: '10%',
             align: 'center',
-            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span>)
+            render: (text, record) => (record.total ? null : <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span>)
         },
         {
             title: <span style={{ fontSize: '0.8rem' }}>거래처</span>,
@@ -187,7 +180,7 @@ const PendingVoucherInputPage = () => {
             key: 'clientCode',
             width: '10%',
             align: 'center',
-            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>[{text}] {record.clientName}</span>)
+            render: (text, record) => (record.total ? null : <span style={{ fontSize: '0.7rem' }}>[{text}] {record.clientName}</span>)
         },
         {
             title: <span style={{ fontSize: '0.8rem' }}>적요</span>,
@@ -195,7 +188,7 @@ const PendingVoucherInputPage = () => {
             key: 'transactionDescription',
             width: '20%',
             align: 'center',
-            render: (text, record) => (record.key === 'total' ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
+            render: (text, record) => (record.total ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>)
         },
         {
             title: <span style={{ fontSize: '0.8rem' }}>차변</span>,
@@ -203,7 +196,7 @@ const PendingVoucherInputPage = () => {
             key: 'debitAmount',
             width: '10%',
             align: 'right',
-            render: (text, record) => (record.key === 'total' ? <span>{text.toLocaleString()}</span> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
+            render: (text, record) => (record.total ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
         },
         {
             title: <span style={{ fontSize: '0.8rem' }}>대변</span>,
@@ -211,17 +204,33 @@ const PendingVoucherInputPage = () => {
             key: 'creditAmount',
             width: '10%',
             align: 'right',
-            render: (text, record) => (record.key === 'total' ? <span>{text.toLocaleString()}</span> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
+            render: (text, record) => (record.total ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>)
         }
     ];
 
-    const handleAccountClick = () => {
-        setIsAccountModalOpen(true)
-    }
+    const handleAddRow = () => {
+        setNewEntry([...newEntry, {
+            type: '',
+            accountName: '',
+            counterpartName: '',
+            details: '',
+            debit: 0,
+            credit: 0,
+            key: Date.now(),
+        }]);
+    };
 
-    const handleCounterpartClick = () => {
-        setIsCounterpartModalOpen(true)
-    }
+    const handleDeleteRow = (index) => {
+        const updatedEntries = entries.filter((_, i) => i !== index);
+        setEntries(updatedEntries);
+    };
+
+    const canSave = useMemo(() => {
+        const totalDebit = entries.reduce((sum, entry) => sum + (entry.debit || 0), 0);
+        const totalCredit = entries.reduce((sum, entry) => sum + (entry.credit || 0), 0);
+        return totalDebit === totalCredit;
+    }, [entries]);
+
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -263,6 +272,10 @@ const PendingVoucherInputPage = () => {
                                             pagination={false}
                                             size="small"
                                             scroll={{ x: 'max-content' }}
+                                            rowClassName={(record) => {
+                                                if (record.total) return 'summary-row'
+                                                return '';
+                                            }}
                                         />
                                     </Grid>
                                 </Grid>
@@ -308,7 +321,7 @@ const PendingVoucherInputPage = () => {
                                     </Grid>
 
                                     {/* 적요 입력 */}
-                                    <Grid item xs={4}>
+                                    <Grid item xs={3}>
                                         <AutoComplete
                                             style={{ width: '100%' }}
                                             placeholder="적요"
@@ -324,7 +337,7 @@ const PendingVoucherInputPage = () => {
                                             placeholder="차변"
                                             value={newEntry.debit}
                                             onChange={(value) => setNewEntry({ ...newEntry, debit: value })}
-                                            disabled={newEntry.type === '대변'}
+                                            disabled={newEntry.type === '대변' || newEntry.type === '출금'} // 출금일 경우 차변 비활성화
                                         />
                                     </Grid>
 
@@ -335,8 +348,13 @@ const PendingVoucherInputPage = () => {
                                             placeholder="대변"
                                             value={newEntry.credit}
                                             onChange={(value) => setNewEntry({ ...newEntry, credit: value })}
-                                            disabled={newEntry.type === '차변'}
+                                            disabled={newEntry.type === '차변' || newEntry.type === '입금'} // 입금일 경우 대변 비활성화
                                         />
+                                    </Grid>
+
+                                    {/* 삭제 버튼 */}
+                                    <Grid item xs={1}>
+                                        <Button style={{ width: '100%' }} danger onClick={() => handleDeleteRow(index)}>삭제</Button>
                                     </Grid>
 
                                 </Grid>
@@ -346,8 +364,17 @@ const PendingVoucherInputPage = () => {
                                     <Grid item>
                                         <Button
                                             type="primary"
-                                            icon={<SaveOutlined />}
+                                            icon={<PlusOutlined />}
+                                            onClick={handleAddRow}
+                                        >
+                                            행 추가
+                                        </Button>
+                                    </Grid>
+                                    <Grid item>
+                                        <Button
+                                            type="primary"
                                             onClick={handleSubmit}
+                                            disabled={!canSave}  // 차변 대변 차액이 0이 아니면 비활성화
                                         >
                                             저장
                                         </Button>

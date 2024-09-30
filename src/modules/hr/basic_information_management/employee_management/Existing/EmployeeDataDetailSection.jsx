@@ -71,7 +71,6 @@ const EmployeeDataDetailSection = ({
 
     // 폼 제출 핸들러
     const handleFormSubmit = () => {
-        console.log('Form data:', formData);
         // 제출 로직 추가
         handleClose();
         setIsModalVisible(false); // 모달 닫기
