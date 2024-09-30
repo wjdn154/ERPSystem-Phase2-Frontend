@@ -7,7 +7,7 @@ const AccountSubjectListSection = ({ accountSubjectColumn, data, handleRowSelect
     if (!data) {
         return null;
     }
-    // console.log(data);
+
     return (
         <Paper elevation={3} sx={{ height: '100%' }}>
             <Typography variant="h6" sx={{ padding: '20px' }} >계정과목 목록</Typography>

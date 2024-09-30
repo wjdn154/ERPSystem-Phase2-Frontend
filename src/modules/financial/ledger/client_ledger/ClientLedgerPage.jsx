@@ -168,7 +168,7 @@ const ClientLedgerPage = () => {
 
     const summaryRow = totals ? (
         ledgerData && ledgerData.length > 0 &&
-        <Table.Summary.Row >
+        <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
             <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>합계</Typography></Table.Summary.Cell>
             <Table.Summary.Cell></Table.Summary.Cell>
             <Table.Summary.Cell></Table.Summary.Cell>
