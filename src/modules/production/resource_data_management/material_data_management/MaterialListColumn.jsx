@@ -59,8 +59,8 @@ export const
         },
         {
             title: <span>유해물질 개수</span>,
-            dataIndex: 'representativeCode',
-            key:'representativeCode',
+            dataIndex: 'hazardousMaterialQuantity',
+            key:'hazardousMaterialQuantity',
             width: '10%',
         },
     ];

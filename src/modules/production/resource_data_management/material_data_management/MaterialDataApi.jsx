@@ -1,10 +1,11 @@
 import axios from "axios";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import apiClient from "../../../../config/apiClient.jsx";
 
 //자재 리스트 호출 함수
 export const fetchMaterialDataList = async () => {
     try {
-        const response = await axios.post(PRODUCTION_API.MATERIAL_LIST_API);
+        const response = await apiClient.post(PRODUCTION_API.MATERIAL_LIST_API);
         return response.data;
     }catch (error){
         console.error("자재 리스트를 가져오는 중 오류 발생 : " + error);
@@ -15,18 +16,21 @@ export const fetchMaterialDataList = async () => {
 //특정 자제 조회 함수
 export const fetchMaterialDetail = async (id) => {
     try {
-        const response = await axios.post(PRODUCTION_API.MATERIAL_DETAIL_API(id));
+        const response = await apiClient.post(PRODUCTION_API.MATERIAL_DETAIL_API(id));
+
+        console.log('response.data : ', response.data);
         return response.data;
-    }catch (error){
+    } catch (error) {
         console.error("해당 자재 정보를 가져오는 중 오류 발생 : " + error);
         throw error;
     }
 };
 
+
 //자재 정보 등록 함수
 export const saveMaterialData = async (materialDataDetail) => {
     try {
-        await axios.post(PRODUCTION_API.SAVE_MATERIAL_DETAIL_API, materialDataDetail);
+        await apiClient.post(PRODUCTION_API.SAVE_MATERIAL_DETAIL_API, materialDataDetail);
     }catch (error){
         if (error.response) {
             // 서버 응답 오류 처리
@@ -47,7 +51,7 @@ export const updateMaterialData= async (id , materialDataDetail) => {
     console.log('api 정보 : ',id,materialDataDetail);
     try {
         // axios 요청의 결과를 response에 저장
-        const response = await axios.put(PRODUCTION_API.UPDATE_MATERIAL_API(id), materialDataDetail);
+        const response = await apiClient.put(PRODUCTION_API.UPDATE_MATERIAL_API(id), materialDataDetail);
 
         // 응답 데이터 출력
         console.log('응답 데이터:', response.data);
@@ -68,7 +72,7 @@ export const updateMaterialData= async (id , materialDataDetail) => {
 //자재 정보 삭제 함수
 export const deleteMaterialData = async (id) => {
     try {
-        await axios.delete(PRODUCTION_API.DELETE_MATERIAL_API(id));
+        await apiClient.delete(PRODUCTION_API.DELETE_MATERIAL_API(id));
     }catch (error){
         console.error("자재 정보를 삭제하는 중 오류 발생 : " + error);
         throw error;
@@ -78,7 +82,7 @@ export const deleteMaterialData = async (id) => {
 //해당 자재 유해물질 목록 조회 함수
 export const fetchHazardousMaterialList = async (id) => {
     try {
-        const response = await axios.post(PRODUCTION_API.MATERIAL_HAZARDOUS_LIST_API(id));
+        const response = await apiClient.post(PRODUCTION_API.MATERIAL_HAZARDOUS_LIST_API(id));
         return response.data;
     }catch (error){
         console.error("해당 자재의 유해물질 정보를 가져오는 중 오류 발생 : " + error);
@@ -91,7 +95,7 @@ export const updateMaterialHazardousList= async (id , materialHazardousDetail) =
     console.log('api 정보 : ',id, materialHazardousDetail);
     try {
         // axios 요청의 결과를 response에 저장
-        const response = await axios.post(
+        const response = await apiClient.post(
             PRODUCTION_API.SAVE_MATERIAL_HAZARDOUS_LIST_API(id), materialHazardousDetail
         );
 
@@ -114,7 +118,7 @@ export const updateMaterialHazardousList= async (id , materialHazardousDetail) =
 //해당 자재 품목 목록 조회 함수
 export const fetchProductMaterialList = async (id) => {
     try {
-        const response = await axios.post(PRODUCTION_API.MATERIAL_PRODUCT_LIST_API(id));
+        const response = await apiClient.post(PRODUCTION_API.MATERIAL_PRODUCT_LIST_API(id));
         return response.data;
     }catch (error){
         console.error("해당 자재의 품목 정보를 가져오는 중 오류 발생 : " + error);
@@ -127,7 +131,7 @@ export const updateMaterialProductList= async (id , materialProductDetail) => {
     console.log('api 정보 : ',id, materialProductDetail);
     try {
         // axios 요청의 결과를 response에 저장
-        const response = await axios.post(
+        const response = await apiClient.post(
             PRODUCTION_API.SAVE_MATERIAL_PRODUCT_LIST_API(id), materialProductDetail
         );
 
@@ -150,7 +154,7 @@ export const updateMaterialProductList= async (id , materialProductDetail) => {
 //해당 자재 품목 제거
 export const deleteMaterialProduct = async (materialId, productCode) => {
     try {
-        await axios.delete(PRODUCTION_API.DELETE_MATERIAL_PRODUCT_API(materialId, productCode));
+        await apiClient.delete(PRODUCTION_API.DELETE_MATERIAL_PRODUCT_API(materialId, productCode));
     }catch (error){
         console.error("해당 자재 품목 정보를 제거하는 중 오류 발생 : " + error);
         throw error;

@@ -33,6 +33,16 @@ const MaterialDataPage = ({initialData}) => {
         handleOpenInsertModal,
         handleTabChange,
         activeTabKey,
+        filteredProductData,
+        filterHazardousData,
+        onMaterialRowClick,
+        onProductRowClick,
+        handleDeleteProduct,
+        handleProductRowSelection,
+        handleProductInsertOk,
+        handleProductSave,
+        handleHazardousInsertOk,
+        handleHazardousSave
     } = materialDataHook(initialData);
 
     return (
@@ -43,7 +53,7 @@ const MaterialDataPage = ({initialData}) => {
                         title="자재 관리"
                         description={(
                             <Typography>
-                                자재 정보 관리 페이지는 <span>생산에 필요한 자재의 기본 정보를 관리</span>하는 곳임. 이 페이지에서는 <span>자재 추가, 수정, 삭제</span>가 가능하며, 자재의 <span>재고 및 자재 흐름</span>을 체계적으로 관리할 수 있음.
+                                자재 정보 관리 페이지는 <span>생산에 필요한 자재의 기본 정보</span>를 관리하며, 자재의 <span>재고 및 자재 흐름</span>을 체계적으로 관리할 수 있음.
                             </Typography>
                         )}
                         tabItems={materialTabItems()}
@@ -85,7 +95,7 @@ const MaterialDataPage = ({initialData}) => {
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '30% !important' }}>
+                    <Grid item xs={12} md={10} >
                         <Grow in={true} timeout={200}>
                             <div>
                                 <SecondMaterialListSection
@@ -93,7 +103,14 @@ const MaterialDataPage = ({initialData}) => {
                                     materialDataDetail={materialDataDetail}
                                     setMaterialDataDetail={setMaterialDataDetail}
                                     handleRowSelection={handleRowSelection}
-                                    handleSelectedRow={handleSelectedRow}
+                                    filteredProductData={filteredProductData}
+                                    filterHazardousData={filterHazardousData}
+                                    onMaterialRowClick={onMaterialRowClick}
+                                    onProductRowClick={onProductRowClick}
+                                    handleDeleteProduct={handleDeleteProduct}
+                                    handleProductRowSelection={handleProductRowSelection}
+                                    handleProductInsertOk={handleProductInsertOk}
+                                    handleHazardousInsertOk={handleHazardousInsertOk}
                                 />
                             </div>
                         </Grow>

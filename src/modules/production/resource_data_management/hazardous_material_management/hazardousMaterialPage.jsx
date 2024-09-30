@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { materialTabItems } from './MaterialDataUtil.jsx';
+import { materialTabItems } from '../material_data_management/MaterialDataUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
