@@ -42,9 +42,6 @@ const MaintenanceHistoryPage = ({initialData}) => {
 
     } = maintenanceHistoryHook(initialData);
 
-    if(!data || data.length === 0) {
-        return <div>데이터가 없습니다.</div>
-    }
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -53,7 +50,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
                   // justifyContent="center"  // 수평 중앙 정렬
                   // alignItems="center"      // 수직 중앙 정렬
             >
-                <Grid item xs={12} md={12}>
+                <Grid item xs={12} md={10}>
                     <WelcomeSection
                         title="유지보수 이력 관리"
                         description={(
@@ -73,7 +70,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
                 //       justifyContent="center"  // 수평 중앙 정렬
                 //       alignItems="center"      // 수직 중앙 정렬
                 // >
-                <Grid item xs={12} md={12}>
+                <Grid item xs={12} md={10}>
                     <Grow in={true} timeout={200}>
                         <div>
                             <MaintenanceHistoryListSection

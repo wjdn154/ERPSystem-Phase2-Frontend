@@ -67,7 +67,7 @@ const EquipmentDataPage = ({initialData}) => {
                 //       justifyContent="center"  // 수평 중앙 정렬
                 //       alignItems="center"      // 수직 중앙 정렬
                 // >
-                    <Grid item xs={12} md={12}>
+                    <Grid item xs={12} md={10} mb={5}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <EquipmentDataListSection
