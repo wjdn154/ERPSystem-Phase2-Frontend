@@ -29,6 +29,10 @@ export const FINANCIAL_API = {
     CLIENT_AND_ACCOUNT_SUBJECT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/clientAndAccountSubject/show`, // 거래처별 계정과목별 원장 목록 조회 API
     CLIENT_AND_ACCOUNT_SUBJECT_LEDGER_DETAIL_API: `${API_BASE_URL}/api/financial/ledger/clientAndAccountSubject/showDetail`, // 거래처별 계정과목별 원장 상제 조회 API
     JOURNAL_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/journal/show`, // 분개장 목록 조회 API
+    CASH_JOURNAL_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/cashJournal/show`, // 분개장 목록 조회 API
+    GENERAL_ACCOUNT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/general/show`, // 총계정원장 목록 조회 API
+    GENERAL_ACCOUNT_LEDGER_DETAIL_API: `${API_BASE_URL}/api/financial/ledger/general/selectShow`, // 총계정원장 상세 조회 API
+    SAVE_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/unresolvedVoucherEntry`, // 총계정원장 상세 조회 API
 };
 
 // 인사관리 - 사원
@@ -58,7 +62,10 @@ export const DEPARTMENT_API = {
 export const LOGISTICS_API = {
     WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse`, // 창고 목록 조회 API
     WAREHOUSE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/${id}`, // 창고 상세 조회 API
-    WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics//warehouse/updateWarehouse/${id}`
+    WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics//warehouse/updateWarehouse/${id}`,
+
+    //품목
+    PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/products/`,   //품목 목록 조회 API
 };
 // 생산관리
 export const PRODUCTION_API = {
@@ -113,6 +120,22 @@ export const PRODUCTION_API = {
     SAVE_MAINTENANCE_HISTORY_API: `${API_BASE_URL}/api/production/maintenanceHistory/createMaintenance`,    //유지보수 이력 등록 API
     UPDATE_MAINTENANCE_HISTORY_API: (id) => `${API_BASE_URL}/api/production/maintenanceHistory/updateMaintenance/${id}`, //유지보수 이력 수정 API
     DELETE_MAINTENANCE_HISTORY_API:(id) => `${API_BASE_URL}/api/production/maintenanceHistory/deleteMaintenance/${id}`,  //유지보수 이력 삭제 API
+
+    MATERIAL_LIST_API: `${API_BASE_URL}/api/production/materials`,    //자재 목록 조회 API
+    MATERIAL_DETAIL_API:(id) => `${API_BASE_URL}/api/production/material/${id}`,   //특정 자재 상세 조회 API
+    UPDATE_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/material/updateMaterial/${id}`,   //자재 리스트 수정 API
+    SAVE_MATERIAL_DETAIL_API: `${API_BASE_URL}/api/production/material/createMaterial`,   //자재 상세 등록 API
+    DELETE_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/material/deleteMaterial/${id}`,   //자재 삭제 API
+    MATERIAL_HAZARDOUS_LIST_API:(materialId) => `${API_BASE_URL}/api/production/material/${materialId}/hazardousMaterials`, //해당 자재 유해물질 리스트 조회 API
+    SAVE_MATERIAL_HAZARDOUS_LIST_API:(materialId) => `${API_BASE_URL}/api/production/material/hazardousMaterial/add/${materialId}`,  //해당 자재 유해물질 추가(수정) API
+    MATERIAL_PRODUCT_LIST_API:(materialId) => `${API_BASE_URL}/api/production/material/${materialId}/productMaterials`,  //해당 자재 품목 리스트 조회 API
+    SAVE_MATERIAL_PRODUCT_LIST_API:(materialId) => `${API_BASE_URL}/api/production/material/productMaterial/add/${materialId}`,  //해당 자재 품목 추가 API
+    DELETE_MATERIAL_PRODUCT_API:(materialId, productCode) => `${API_BASE_URL}/api/production/material/${materialId}/productMaterial/${productCode}`, //해당 자재 품목 삭제 API
+
+    HAZARDOUS_MATERIAL_LIST_API: `${API_BASE_URL}/api/production/hazardousMaterials`, //유해물질 목록 조회 API
+    SAVE_HAZARDOUS_MATERIAL_API: `${API_BASE_URL}/api/production/hazardousMaterial/createMaterial`, //유해물질 등록 API
+    UPDATE_HAZARDOUS_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/hazardousMaterial/updateMaterial/${id}`, //유해물질 수정 API
+    DELETE_HAZARDOUS_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/hazardousMaterial/deleteMaterial/${id}`, //유해물질 삭제 API
 
     // 생산운영 및 계획
     PRODUCTION_REQUEST_LIST_API: `${API_BASE_URL}/api/production/productionRequest`, // 전체 생산 요청 목록 조회 API
