@@ -13,19 +13,18 @@ import axios from "axios";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import { useSelector } from 'react-redux';
+import {jwtDecode} from "jwt-decode";
 
 const { Option } = Select
 
 const PendingVoucherInputPage = () => {
-    const userNickname = useSelector(state => state.auth.userNickname);
+    const token = useSelector(state => state.auth.token);
     const notify = useNotificationContext();
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [searchData, setSearchData] = useState([])
     const [activeTabKey, setActiveTabKey] = useState('1')
     const [voucher, setVoucher] = useState({});
     const [vouchers, setVouchers] = useState([]);
-    const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
-    const [isCounterpartModalOpen, setIsCounterpartModalOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
     const [modalData, setModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -45,12 +44,12 @@ const PendingVoucherInputPage = () => {
 
             // 구분이 'Credit' 또는 'Withdrawal'일 경우 차변 값 0으로 설정
             if (value === 'Credit' || value === 'Withdrawal') {
-                updatedVoucher.debitAmount = 0;
+                updatedVoucher.creditAmount = 0;
             }
 
             // 구분이 'Debit' 또는 'Deposit'일 경우 대변 값 0으로 설정
             if (value === 'Debit' || value === 'Deposit') {
-                updatedVoucher.creditAmount = 0;
+                updatedVoucher.debitAmount = 0;
             }
 
             return updatedVoucher;
@@ -137,15 +136,20 @@ const PendingVoucherInputPage = () => {
             }];
 
             const processedVouchers = updatedVouchers.map((v) => {
-                // 필수 입력값이 없는 경우 에러 발생
-                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) {
-                    throw new Error("필수 입력값이 누락되었습니다.");
-                }
 
                 // 차변, 대변, 입금, 출금이 함께 존재하면 에러 발생
                 if ((v.voucherType === 'Debit' || v.voucherType === 'Credit') &&
                     (v.voucherType === 'Deposit' || v.voucherType === 'Withdrawal')) {
                     throw new Error("차변/대변과 입금/출금은 동시에 사용할 수 없습니다.");
+                }
+
+                if (v.debitAmount < 0 || v.creditAmount < 0) {
+                    throw new Error("금액은 음수가 될 수 없습니다.");
+                }
+
+                // 필수 입력값이 없는 경우 에러 발생
+                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) {
+                    throw new Error("필수 입력값이 누락되었습니다.");
                 }
 
                 if(v.voucherType === 'Debit' || v.voucherType === 'Credit') {
@@ -162,7 +166,7 @@ const PendingVoucherInputPage = () => {
                     ...v,
                     voucherDate: format(selectedDate, 'yyyy-MM-dd'), // 정확한 날짜 포맷
                     voucherKind: "General",
-                    voucherManagerId: 1,
+                    voucherManagerId: jwtDecode(token).employeeId,
                 };
             });
 
@@ -356,15 +360,15 @@ const PendingVoucherInputPage = () => {
                                             size="small"
                                             scroll={{ x: 'max-content' }}
                                             summary={() =>  (
-                                                <Table.Summary.Row>
-                                                    <Table.Summary.Cell index={0}>합계</Table.Summary.Cell>
+                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>합계</Typography></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1} />
                                                     <Table.Summary.Cell index={2} />
                                                     <Table.Summary.Cell index={3} />
                                                     <Table.Summary.Cell index={4} />
                                                     <Table.Summary.Cell index={5} />
-                                                    <Table.Summary.Cell index={6}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={7}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalCredit).toLocaleString()}</Typography></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><Typography sx={{ textAlign: 'right', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={7}><Typography sx={{ textAlign: 'right', fontSize: '0.9rem'}}>{Number(searchData.totalCredit).toLocaleString()}</Typography></Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             )}
                                         />
