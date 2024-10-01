@@ -21,7 +21,6 @@ const UsersDataPage = ({initialData}) => {
         setUsersDataDetail
 
     } = usersDataHook(initialData);
-    console.log('rendered data:',data);
 
     return (
         <Box sx={{flewGrow: 1, p:3}}>

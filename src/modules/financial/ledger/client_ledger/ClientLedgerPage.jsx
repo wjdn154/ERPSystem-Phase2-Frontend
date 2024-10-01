@@ -168,16 +168,16 @@ const ClientLedgerPage = () => {
 
     const summaryRow = totals ? (
         ledgerData && ledgerData.length > 0 &&
-        <Table.Summary.Row >
-            <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>합계</Typography></Table.Summary.Cell>
-            <Table.Summary.Cell></Table.Summary.Cell>
-            <Table.Summary.Cell></Table.Summary.Cell>
-            <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumPreviousCash.toLocaleString()}</Typography></Table.Summary.Cell>
-            <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumDebitAmount.toLocaleString()}</Typography></Table.Summary.Cell>
-            <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumCreditAmount.toLocaleString()}</Typography></Table.Summary.Cell>
-            <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumTotalCashAmount.toLocaleString()}</Typography></Table.Summary.Cell>
-            <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}></Typography></Table.Summary.Cell>
-            <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}></Typography></Table.Summary.Cell>
+        <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+            <Table.Summary.Cell index={0}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>합계</Typography></Table.Summary.Cell>
+            <Table.Summary.Cell index={1}></Table.Summary.Cell>
+            <Table.Summary.Cell index={2}></Table.Summary.Cell>
+            <Table.Summary.Cell index={3}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumPreviousCash.toLocaleString()}</Typography></Table.Summary.Cell>
+            <Table.Summary.Cell index={4}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumDebitAmount.toLocaleString()}</Typography></Table.Summary.Cell>
+            <Table.Summary.Cell index={5}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumCreditAmount.toLocaleString()}</Typography></Table.Summary.Cell>
+            <Table.Summary.Cell index={6}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{totals.totalSumTotalCashAmount.toLocaleString()}</Typography></Table.Summary.Cell>
+            <Table.Summary.Cell index={7}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}></Typography></Table.Summary.Cell>
+            <Table.Summary.Cell index={8}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}></Typography></Table.Summary.Cell>
         </Table.Summary.Row>
     ) : null;
 
