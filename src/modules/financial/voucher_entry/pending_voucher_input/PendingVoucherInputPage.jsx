@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material'
 import { DeleteOutlined, PlusOutlined, SaveOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import {Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
+import { Space, Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import dayjs from "dayjs"
@@ -136,30 +136,20 @@ const PendingVoucherInputPage = () => {
             }];
 
             const processedVouchers = updatedVouchers.map((v) => {
-
-                // 차변, 대변, 입금, 출금이 함께 존재하면 에러 발생
+                if (v.debitAmount < 0 || v.creditAmount < 0) throw new Error("금액은 음수가 될 수 없습니다.");
+                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) throw new Error("필수 입력값이 누락되었습니다.");
+                if (v.voucherType === 'Deposit' && v.accountSubjectCode === '101') throw new Error("전표 구분이 입금일 경우 현금 계정과목을 사용 할 수 없습니다.");
+                if (v.voucherType === 'Deposit' && v.creditAmount === 0) throw new Error("전표 구분이 입금일 경우 금액을 입력해주세요.");
+                if (v.voucherType === 'Withdrawal' && v.debitAmount === 0) throw new Error("전표 구분이 출금일 경우 금액을 입력해주세요.");
                 if ((v.voucherType === 'Debit' || v.voucherType === 'Credit') &&
                     (v.voucherType === 'Deposit' || v.voucherType === 'Withdrawal')) {
                     throw new Error("차변/대변과 입금/출금은 동시에 사용할 수 없습니다.");
                 }
-
-                if (v.debitAmount < 0 || v.creditAmount < 0) {
-                    throw new Error("금액은 음수가 될 수 없습니다.");
-                }
-
-                // 필수 입력값이 없는 경우 에러 발생
-                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) {
-                    throw new Error("필수 입력값이 누락되었습니다.");
-                }
-
                 if(v.voucherType === 'Debit' || v.voucherType === 'Credit') {
-                    // 차변, 대변 합계가 0이 아닐 경우 에러 발생
                     const totalDebit = updatedVouchers.reduce((sum, item) => sum + (item.debitAmount || 0), 0);
                     const totalCredit = updatedVouchers.reduce((sum, item) => sum + (item.creditAmount || 0), 0);
 
-                    if (totalDebit !== totalCredit) {
-                        throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
-                    }
+                    if (totalDebit !== totalCredit) throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
                 }
 
                 return {
@@ -439,9 +429,9 @@ const PendingVoucherInputPage = () => {
 
                                         {/* 적요 입력 */}
                                         <Grid item xs={2}>
-                                            <Input.Group compact>
+                                            <Space.Compact>
                                                 <Input
-                                                    style={{ width: '30%', color: '#000' }}
+                                                    style={{ width: '30%', color: '#000', backgroundColor: '#FAFAFA' }}
                                                     value="적요"
                                                     disabled
                                                 />
@@ -453,7 +443,7 @@ const PendingVoucherInputPage = () => {
                                                     showSearch
                                                     defaultActiveFirstOption
                                                 />
-                                            </Input.Group>
+                                            </Space.Compact>
                                         </Grid>
 
                                         {/* 차변 금액 입력 */}
