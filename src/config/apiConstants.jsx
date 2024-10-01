@@ -33,6 +33,7 @@ export const FINANCIAL_API = {
     GENERAL_ACCOUNT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/general/show`, // 총계정원장 목록 조회 API
     GENERAL_ACCOUNT_LEDGER_DETAIL_API: `${API_BASE_URL}/api/financial/ledger/general/selectShow`, // 총계정원장 상세 조회 API
     SAVE_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/unresolvedVoucherEntry`, // 총계정원장 상세 조회 API
+    FIND_ALL_CLIENT_API: `${API_BASE_URL}/api/financial/client/findAll`, // 거래처 목록 조회 API
 };
 
 // 인사관리 - 사원
