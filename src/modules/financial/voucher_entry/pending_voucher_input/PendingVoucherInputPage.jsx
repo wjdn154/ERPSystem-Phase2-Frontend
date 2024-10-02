@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material'
 import { DeleteOutlined, PlusOutlined, SaveOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import {Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
+import { Space, Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import dayjs from "dayjs"
@@ -13,19 +13,18 @@ import axios from "axios";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import { useSelector } from 'react-redux';
+import {jwtDecode} from "jwt-decode";
 
 const { Option } = Select
 
 const PendingVoucherInputPage = () => {
-    const userNickname = useSelector(state => state.auth.userNickname);
+    const token = useSelector(state => state.auth.token);
     const notify = useNotificationContext();
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [searchData, setSearchData] = useState([])
     const [activeTabKey, setActiveTabKey] = useState('1')
     const [voucher, setVoucher] = useState({});
     const [vouchers, setVouchers] = useState([]);
-    const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
-    const [isCounterpartModalOpen, setIsCounterpartModalOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
     const [modalData, setModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -45,12 +44,12 @@ const PendingVoucherInputPage = () => {
 
             // 구분이 'Credit' 또는 'Withdrawal'일 경우 차변 값 0으로 설정
             if (value === 'Credit' || value === 'Withdrawal') {
-                updatedVoucher.debitAmount = 0;
+                updatedVoucher.creditAmount = 0;
             }
 
             // 구분이 'Debit' 또는 'Deposit'일 경우 대변 값 0으로 설정
             if (value === 'Debit' || value === 'Deposit') {
-                updatedVoucher.creditAmount = 0;
+                updatedVoucher.debitAmount = 0;
             }
 
             return updatedVoucher;
@@ -137,32 +136,27 @@ const PendingVoucherInputPage = () => {
             }];
 
             const processedVouchers = updatedVouchers.map((v) => {
-                // 필수 입력값이 없는 경우 에러 발생
-                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) {
-                    throw new Error("필수 입력값이 누락되었습니다.");
-                }
-
-                // 차변, 대변, 입금, 출금이 함께 존재하면 에러 발생
+                if (v.debitAmount < 0 || v.creditAmount < 0) throw new Error("금액은 음수가 될 수 없습니다.");
+                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) throw new Error("필수 입력값이 누락되었습니다.");
+                if (v.voucherType === 'Deposit' && v.accountSubjectCode === '101') throw new Error("전표 구분이 입금일 경우 현금 계정과목을 사용 할 수 없습니다.");
+                if (v.voucherType === 'Deposit' && v.creditAmount === 0) throw new Error("전표 구분이 입금일 경우 금액을 입력해주세요.");
+                if (v.voucherType === 'Withdrawal' && v.debitAmount === 0) throw new Error("전표 구분이 출금일 경우 금액을 입력해주세요.");
                 if ((v.voucherType === 'Debit' || v.voucherType === 'Credit') &&
                     (v.voucherType === 'Deposit' || v.voucherType === 'Withdrawal')) {
                     throw new Error("차변/대변과 입금/출금은 동시에 사용할 수 없습니다.");
                 }
-
                 if(v.voucherType === 'Debit' || v.voucherType === 'Credit') {
-                    // 차변, 대변 합계가 0이 아닐 경우 에러 발생
                     const totalDebit = updatedVouchers.reduce((sum, item) => sum + (item.debitAmount || 0), 0);
                     const totalCredit = updatedVouchers.reduce((sum, item) => sum + (item.creditAmount || 0), 0);
 
-                    if (totalDebit !== totalCredit) {
-                        throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
-                    }
+                    if (totalDebit !== totalCredit) throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
                 }
 
                 return {
                     ...v,
                     voucherDate: format(selectedDate, 'yyyy-MM-dd'), // 정확한 날짜 포맷
                     voucherKind: "General",
-                    voucherManagerId: 1,
+                    voucherManagerId: jwtDecode(token).employeeId,
                 };
             });
 
@@ -356,15 +350,15 @@ const PendingVoucherInputPage = () => {
                                             size="small"
                                             scroll={{ x: 'max-content' }}
                                             summary={() =>  (
-                                                <Table.Summary.Row>
-                                                    <Table.Summary.Cell index={0}>합계</Table.Summary.Cell>
+                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>합계</Typography></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1} />
                                                     <Table.Summary.Cell index={2} />
                                                     <Table.Summary.Cell index={3} />
                                                     <Table.Summary.Cell index={4} />
                                                     <Table.Summary.Cell index={5} />
-                                                    <Table.Summary.Cell index={6}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={7}><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalCredit).toLocaleString()}</Typography></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><Typography sx={{ textAlign: 'right', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={7}><Typography sx={{ textAlign: 'right', fontSize: '0.9rem'}}>{Number(searchData.totalCredit).toLocaleString()}</Typography></Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             )}
                                         />
@@ -435,9 +429,9 @@ const PendingVoucherInputPage = () => {
 
                                         {/* 적요 입력 */}
                                         <Grid item xs={2}>
-                                            <Input.Group compact>
+                                            <Space.Compact>
                                                 <Input
-                                                    style={{ width: '30%', color: '#000' }}
+                                                    style={{ width: '30%', color: '#000', backgroundColor: '#FAFAFA' }}
                                                     value="적요"
                                                     disabled
                                                 />
@@ -449,7 +443,7 @@ const PendingVoucherInputPage = () => {
                                                     showSearch
                                                     defaultActiveFirstOption
                                                 />
-                                            </Input.Group>
+                                            </Space.Compact>
                                         </Grid>
 
                                         {/* 차변 금액 입력 */}
