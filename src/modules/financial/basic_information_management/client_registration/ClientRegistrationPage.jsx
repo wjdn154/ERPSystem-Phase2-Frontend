@@ -3,17 +3,19 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './ClientRegistrationUtil.jsx';
 import { Typography } from '@mui/material';
-import {Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin} from 'antd';
+import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
+const { Option } = Select;
 
 const ClientRegistrationPage = ( {initialData} ) => {
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
+    const [clientList, setClientList] = useState(initialData); // 활성 탭 키 상태
     const [activeTabKey, setActiveTabKey] = useState('1'); // 활성 탭 키 상태
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
     const [editClient, setEditClient] = useState(false); // 거래처 등록 수정 탭 활성화 여부 상태
@@ -24,16 +26,25 @@ const ClientRegistrationPage = ( {initialData} ) => {
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
     const [isEndDateDisable, setIsEndDateDisable] = useState(false); // 거래 종료일 비활성화 여부 상태
+    const [displayValues, setDisplayValues] = useState({});
 
-    // console.log(initialData);
+    console.log(initialData);
 
     // 거래처 조회 데이터가 있을 경우 폼에 데이터 셋팅
     useEffect(() => {
-        if (fetchClientData) {
-            form.setFieldsValue(fetchClientData);
-            setClientParam(fetchClientData);
-            console.log(fetchClientData);
-        }
+
+        if (!fetchClientData) return;
+
+        form.setFieldsValue(fetchClientData);
+        setClientParam(fetchClientData);
+
+        setDisplayValues({
+            bank: `[${fetchClientData.bankAccount.bank.code}] ${fetchClientData.bankAccount.bank.name}`,
+            employee: `[${fetchClientData.employee.employeeNumber}] ${fetchClientData.employee.lastName}${fetchClientData.employee.firstName}`,
+            liquor: `[${fetchClientData.liquor.id}] ${fetchClientData.liquor.name}`,
+            category: `[${fetchClientData.category.code}] ${fetchClientData.category.name}`,
+        });
+
     }, [fetchClientData, form]);
 
     // 모달창 열기 핸들러
@@ -52,9 +63,9 @@ const ClientRegistrationPage = ( {initialData} ) => {
         setIsLoading(true);
         let apiPath;
         if(fieldName === 'bank') apiPath = FINANCIAL_API.FETCH_BANK_LIST_API;
-        if(fieldName === 'startAccountSubjectCode') apiPath = FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API;
-        if(fieldName === 'startAccountSubjectCode') apiPath = FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API;
-        if(fieldName === 'startAccountSubjectCode') apiPath = FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API;
+        if(fieldName === 'employee') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
+        if(fieldName === 'liquor') apiPath = FINANCIAL_API.FETCH_LIQUOR_LIST_API;
+        if(fieldName === 'category') apiPath = FINANCIAL_API.FETCH_CATEGORY_LIST_API;
 
         try {
             const response = await apiClient.post(apiPath);
@@ -79,53 +90,117 @@ const ClientRegistrationPage = ( {initialData} ) => {
                             id: record.id,
                             code: record.code,
                             name: record.name,
+                            businessNumber: record.businessNumber,
                         },
                     },
                 }));
-                form.setFieldsValue({
-                    bankAccount: {
-                        bank: {
-                            name: record.name
-                        }
-                    }
-                });
-                setIsModalVisible(false);
-                break;
-            case 'manager':
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    bank: `[${record.code}] ${record.name}`,
+                }));
+            break;
+            case 'employee':
                 setClientParam((prevParams) => ({
                     ...prevParams,
                     employee: {
+                        id: record.id,
+                        firstName: record.firstName,
+                        lastName: record.lastName,
+                        employeeNumber: record.employeeNumber,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    employee: `[${record.employeeNumber}] ${record.lastName}${record.firstName}`,
+                }));
+            break;
+            case 'liquor':
+                setClientParam((prevParams) => ({
+                    ...prevParams,
+                    liquor: {
                         id: record.id,
                         code: record.code,
                         name: record.name,
                     },
                 }));
-                form.setFieldsValue({
-                    employee: {
-                        name: record.name
-                    }
-                });
-                setIsModalVisible(false);
-                break;
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    liquor: `[${record.id}] ${record.name}`,
+                }));
+            break;
+            case 'category':
+                setClientParam((prevParams) => ({
+                    ...prevParams,
+                    category: {
+                        id: record.id,
+                        code: record.code,
+                        name: record.name,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    category: `[${record.id}] ${record.name}`,
+                }));
+            break;
         }
-  // 모달창 닫기
+
+
+        // 모달창 닫기
+        setIsModalVisible(false);
     };
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values) => {
-        setClientParam((prevState) => ({
-            ...prevState,
-            ...values,
-            transactionStartDate: dayjs(clientParam.transactionStartDate).format('YYYY-MM-DD'),
-            transactionEndDate: dayjs(clientParam.transactionEndDate).format('YYYY-MM-DD')
-        }));
 
-        console.log(clientParam);
+        values.id = fetchClientData.id;
+        values.code = fetchClientData.code;
+        values.transactionStartDate = dayjs(fetchClientData.transactionStartDate).format('YYYY-MM-DD');
+        values.transactionEndDate = dayjs(fetchClientData.transactionEndDate).format('YYYY-MM-DD');
+        values.bankAccount.bank = {
+            id: fetchClientData.bankAccount.bank.id,
+            code: fetchClientData.bankAccount.bank.code,
+            name: fetchClientData.bankAccount.bank.name,
+            businessNumber: fetchClientData.bankAccount.bank.businessNumber,
+        };
+        values.employee = {
+            id: fetchClientData.employee.id,
+            firstName: fetchClientData.employee.firstName,
+            lastName: fetchClientData.employee.lastName,
+            employeeNumber: fetchClientData.employee.employeeNumber,
+        };
+        values.liquor = {
+            id: fetchClientData.liquor.id,
+            code: fetchClientData.liquor.code,
+            name: fetchClientData.liquor.name,
+        };
+        values.category = {
+            id: fetchClientData.category.id,
+            code: fetchClientData.category.code,
+            name: fetchClientData.category.name,
+        };
 
         try {
-            const response = await apiClient.put(FINANCIAL_API.UPDATE_CLIENT_API, clientParam);
-            console.log(response);
-            notify('success', '거래처 조회', '거래처 정보 조회 성공.', 'bottomLeft')
+            const response = await apiClient.put(FINANCIAL_API.UPDATE_CLIENT_API(values.id), values);
+            const updatedData = response.data;
+            console.log(updatedData);
+            setClientList((prevClientList) =>
+                prevClientList.map((client) =>
+                    client.id === updatedData.id ? {
+                        ...client,
+                        id: updatedData.id,
+                        representativeName: updatedData.representativeName,
+                        printClientName: updatedData.printClientName,
+                        roadAddress: updatedData.address.roadAddress,
+                        detailedAddress: updatedData.address.detailedAddress,
+                        phoneNumber: updatedData.contactInfo.phoneNumber,
+                        businessType: updatedData.businessInfo.businessType,
+                        transactionStartDate: updatedData.transactionStartDate,
+                        transactionEndDate: updatedData.transactionEndDate,
+                        remarks: updatedData.remarks,
+                    } : client
+                )
+            );
+            notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomLeft')
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         }
@@ -212,7 +287,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >거래처 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Table
-                                        dataSource={initialData}
+                                        dataSource={clientList}
                                         columns={[
                                             {
                                                 title: <span style={{ fontSize: '0.8rem' }}>대표자명</span>,
@@ -313,6 +388,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                     const response = await apiClient.post(FINANCIAL_API.FETCH_CLIENT_API(id));
                                                     setFetchClientData(response.data);
                                                     setEditClient(true);
+
                                                     notify('success', '거래처 조회', '거래처 정보 조회 성공.', 'bottomLeft')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -347,12 +423,12 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             </Col>
                                             <Col span={6}>
                                                 <Form.Item name="businessRegistrationNumber">
-                                                    <Input addonBefore="사업자 등록번호" maxLength={12} placeholder="123-45-67890" />
+                                                    <Input addonBefore="사업자 등록번호" maxLength={12} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
                                                 <Form.Item name="idNumber">
-                                                    <Input addonBefore="주민등록번호" maxLength={14} placeholder="123456-1234567" />
+                                                    <Input addonBefore="주민등록번호" maxLength={14} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
@@ -408,9 +484,10 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>금융 정보</Divider>
                                         <Row gutter={16}>
                                             <Col span={4}>
-                                                <Form.Item name={['bankAccount', 'bank', 'name']}>
+                                                <Form.Item>
                                                     <Input
                                                         addonBefore="은행명"
+                                                        value={displayValues.bank}
                                                         onClick={() => handleInputClick('bank')}
                                                         style={{
                                                             caretColor: 'transparent',
@@ -444,7 +521,9 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                         <Row gutter={16}>
                                             <Col span={8}>
                                                 <Form.Item name={['managerInfo', 'clientManagerPhoneNumber']}>
-                                                    <Input addonBefore="거래처 담당자 전화번호" value={formatPhoneNumber(form.getFieldValue(['managerInfo', 'clientManagerPhoneNumber']))} />
+                                                    <Input
+                                                        addonBefore="거래처 담당자 전화번호"
+                                                    />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={8}>
@@ -453,10 +532,11 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={8}>
-                                                <Form.Item name={['employee', 'employeeNumber']}>
+                                                <Form.Item>
                                                     <Input
                                                         addonBefore="자사 담당자 정보"
-                                                        onClick={() => handleInputClick('manager')}
+                                                        onClick={() => handleInputClick('employee')}
+                                                        value={displayValues.employee}
                                                         style={{
                                                             caretColor: 'transparent',
                                                         }}
@@ -499,36 +579,50 @@ const ClientRegistrationPage = ( {initialData} ) => {
 
                                         {/* 주류 및 카테고리 정보 (모달 선택) */}
                                         <Row gutter={16}>
-                                            <Col span={6}>
-                                                <Form.Item name={['liquor', 'id']}>
+                                            <Col span={5}>
+                                                <Form.Item>
                                                     <Input
-                                                        addonBefore="주류 ID 선택"
-                                                        onClick={() => handleInputClick('manager')}
+                                                        addonBefore="주류코드"
+                                                        onClick={() => handleInputClick('liquor')}
+                                                        value={displayValues.liquor}
                                                         style={{
                                                             caretColor: 'transparent',
                                                         }}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
-                                                <Form.Item name={['category', 'id']}>
+                                            <Col span={5}>
+                                                <Form.Item>
                                                     <Input
-                                                        addonBefore="카테고리 ID 선택"
-                                                        onClick={() => handleInputClick('manager')}
+                                                        addonBefore="카테고리"
+                                                        onClick={() => handleInputClick('category')}
+                                                        value={displayValues.category}
                                                         style={{
                                                             caretColor: 'transparent',
                                                         }}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
+                                            <Col span={5}>
                                                 <Form.Item name="remarks">
                                                     <Input addonBefore="비고" />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
+                                            <Col span={5}>
+                                                <Form.Item name="transactionType">
+                                                    <Space.Compact>
+                                                        <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="거래유형" disabled />
+                                                        <Select style={{ width: '60%' }}>
+                                                            <Option value="SALES">매출</Option>
+                                                            <Option value="PURCHASE">매입</Option>
+                                                            <Option value="BOTH">동시</Option>
+                                                        </Select>
+                                                    </Space.Compact>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={4}>
                                                 <Form.Item name="isActive" valuePropName="checked">
-                                                    <Checkbox>활성 여부</Checkbox>
+                                                    <Checkbox>거래처 활성화 여부</Checkbox>
                                                 </Form.Item>
                                             </Col>
                                         </Row>
@@ -560,9 +654,84 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                                 columns={[
                                                                     { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
                                                                     { title: '은행명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    { title: '사업자번호', dataIndex: 'businessNumber', key: 'businessNumber', align: 'center' },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="code"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'employee' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            자사 담당자 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '사원번호', dataIndex: 'employeeNumber', key: 'employeeNumber', align: 'center' },
+                                                                    {
+                                                                        title: '이름',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text, record) => `${record.lastName}${record.firstName}`, // firstName과 lastName을 합쳐서 출력
+                                                                    },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'liquor' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            주류코드 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'category' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            카테고리 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
                                                                 size={'small'}
                                                                 pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                                                 onRow={(record) => ({

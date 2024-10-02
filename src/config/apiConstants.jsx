@@ -35,8 +35,10 @@ export const FINANCIAL_API = {
     SAVE_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/unresolvedVoucherEntry`, // 총계정원장 상세 조회 API
     FETCH_CLIENT_LIST_API: `${API_BASE_URL}/api/financial/client/fetchClientList`, // 거래처 목록 조회 API
     FETCH_CLIENT_API: (id) => `${API_BASE_URL}/api/financial/client/fetchClient/${id}`, // 거래처 조회 API
-    UPDATE_CLIENT_API: `${API_BASE_URL}/api/financial/client/update`, // 거래처 수정 API
-    FETCH_BANK_LIST_API: `${API_BASE_URL}/api/financial/bankAccount/fetchBankList`, // 은행 목록 조회 API
+    UPDATE_CLIENT_API: (id) => `${API_BASE_URL}/api/financial/client/update/${id}`, // 거래처 수정 API
+    FETCH_BANK_LIST_API: `${API_BASE_URL}/api/financial/client/fetchBankList`, // 은행 목록 조회 API
+    FETCH_LIQUOR_LIST_API: `${API_BASE_URL}/api/financial/client/fetchLiquorList`, // 은행 목록 조회 API
+    FETCH_CATEGORY_LIST_API: `${API_BASE_URL}/api/financial/client/fetchCategoryList`, // 은행 목록 조회 API
 };
 
 // 인사관리 - 사원
