@@ -3,17 +3,23 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './ClientRegistrationUtil.jsx';
 import { Typography } from '@mui/material';
-import {Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin} from 'antd';
+import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API, USERS_API} from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
+import {setAuth} from "../../../../config/redux/authSlice.jsx";
+import {jwtDecode} from "jwt-decode";
+const { Option } = Select;
+const { confirm } = Modal;
 
 const ClientRegistrationPage = ( {initialData} ) => {
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
+    const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [clientList, setClientList] = useState(initialData);
     const [activeTabKey, setActiveTabKey] = useState('1'); // 활성 탭 키 상태
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
     const [editClient, setEditClient] = useState(false); // 거래처 등록 수정 탭 활성화 여부 상태
@@ -24,16 +30,23 @@ const ClientRegistrationPage = ( {initialData} ) => {
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
     const [isEndDateDisable, setIsEndDateDisable] = useState(false); // 거래 종료일 비활성화 여부 상태
-
-    // console.log(initialData);
+    const [displayValues, setDisplayValues] = useState({});
 
     // 거래처 조회 데이터가 있을 경우 폼에 데이터 셋팅
     useEffect(() => {
-        if (fetchClientData) {
-            form.setFieldsValue(fetchClientData);
-            setClientParam(fetchClientData);
-            console.log(fetchClientData);
-        }
+
+        if (!fetchClientData) return;
+
+        form.setFieldsValue(fetchClientData);
+        setClientParam(fetchClientData);
+
+        setDisplayValues({
+            bank: `[${fetchClientData.bankAccount.bank.code}] ${fetchClientData.bankAccount.bank.name}`,
+            employee: `[${fetchClientData.employee.employeeNumber}] ${fetchClientData.employee.lastName}${fetchClientData.employee.firstName}`,
+            liquor: `[${fetchClientData.liquor.id}] ${fetchClientData.liquor.name}`,
+            category: `[${fetchClientData.category.code}] ${fetchClientData.category.name}`,
+        });
+
     }, [fetchClientData, form]);
 
     // 모달창 열기 핸들러
@@ -52,9 +65,9 @@ const ClientRegistrationPage = ( {initialData} ) => {
         setIsLoading(true);
         let apiPath;
         if(fieldName === 'bank') apiPath = FINANCIAL_API.FETCH_BANK_LIST_API;
-        if(fieldName === 'startAccountSubjectCode') apiPath = FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API;
-        if(fieldName === 'startAccountSubjectCode') apiPath = FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API;
-        if(fieldName === 'startAccountSubjectCode') apiPath = FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API;
+        if(fieldName === 'employee') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
+        if(fieldName === 'liquor') apiPath = FINANCIAL_API.FETCH_LIQUOR_LIST_API;
+        if(fieldName === 'category') apiPath = FINANCIAL_API.FETCH_CATEGORY_LIST_API;
 
         try {
             const response = await apiClient.post(apiPath);
@@ -79,63 +92,157 @@ const ClientRegistrationPage = ( {initialData} ) => {
                             id: record.id,
                             code: record.code,
                             name: record.name,
+                            businessNumber: record.businessNumber,
                         },
                     },
                 }));
-                form.setFieldsValue({
-                    bankAccount: {
-                        bank: {
-                            name: record.name
-                        }
-                    }
-                });
-                setIsModalVisible(false);
-                break;
-            case 'manager':
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    bank: `[${record.code}] ${record.name}`,
+                }));
+            break;
+            case 'employee':
                 setClientParam((prevParams) => ({
                     ...prevParams,
                     employee: {
+                        id: record.id,
+                        firstName: record.firstName,
+                        lastName: record.lastName,
+                        employeeNumber: record.employeeNumber,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    employee: `[${record.employeeNumber}] ${record.lastName}${record.firstName}`,
+                }));
+            break;
+            case 'liquor':
+                setClientParam((prevParams) => ({
+                    ...prevParams,
+                    liquor: {
                         id: record.id,
                         code: record.code,
                         name: record.name,
                     },
                 }));
-                form.setFieldsValue({
-                    employee: {
-                        name: record.name
-                    }
-                });
-                setIsModalVisible(false);
-                break;
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    liquor: `[${record.id}] ${record.name}`,
+                }));
+            break;
+            case 'category':
+                setClientParam((prevParams) => ({
+                    ...prevParams,
+                    category: {
+                        id: record.id,
+                        code: record.code,
+                        name: record.name,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    category: `[${record.id}] ${record.name}`,
+                }));
+            break;
         }
-  // 모달창 닫기
+
+
+        // 모달창 닫기
+        setIsModalVisible(false);
     };
 
     // 폼 제출 핸들러
-    const handleFormSubmit = async (values) => {
-        setClientParam((prevState) => ({
-            ...prevState,
-            ...values,
-            transactionStartDate: dayjs(clientParam.transactionStartDate).format('YYYY-MM-DD'),
-            transactionEndDate: dayjs(clientParam.transactionEndDate).format('YYYY-MM-DD')
-        }));
+    const handleFormSubmit = async (values, type) => {
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                // 확인 버튼 클릭 시 실행되는 저장 로직
+                values.id = clientParam.id;
+                values.code = fetchClientData ? fetchClientData.code : null;
+                values.transactionStartDate = dayjs(clientParam.transactionStartDate).format('YYYY-MM-DD');
+                values.transactionEndDate = dayjs(clientParam.transactionEndDate).format('YYYY-MM-DD');
+                values.financialInfo.creditLimit =  removeComma(values.financialInfo.creditLimit);
+                values.financialInfo.collateralAmount = removeComma(values.financialInfo.collateralAmount);
+                values.transactionType = clientParam.transactionType;
+                values.bankAccount.bank = {
+                    id: clientParam.bankAccount.bank.id,
+                    code: clientParam.bankAccount.bank.code,
+                    name: clientParam.bankAccount.bank.name,
+                    businessNumber: clientParam.bankAccount.bank.businessNumber,
+                };
+                values.employee = {
+                    id: clientParam.employee.id,
+                    firstName: clientParam.employee.firstName,
+                    lastName: clientParam.employee.lastName,
+                    employeeNumber: clientParam.employee.employeeNumber,
+                };
+                values.liquor = {
+                    id: clientParam.liquor.id,
+                    code: clientParam.liquor.code,
+                    name: clientParam.liquor.name,
+                };
+                values.category = {
+                    id: clientParam.category.id,
+                    code: clientParam.category.code,
+                    name: clientParam.category.name,
+                };
 
-        console.log(clientParam);
+                try {
+                    const API_PATH = type === 'update' ? FINANCIAL_API.UPDATE_CLIENT_API : FINANCIAL_API.SAVE_CLIENT_API;
+                    const response = await apiClient.post(API_PATH, values);
+                    const updatedData = response.data;
+                    setClientList((prevClientList) =>
+                        prevClientList.map((client) =>
+                            client.id === updatedData.id
+                                ? {
+                                    ...client,
+                                    id: values.id,
+                                    representativeName: values.representativeName,
+                                    printClientName: values.printClientName,
+                                    roadAddress: values.address.roadAddress,
+                                    detailedAddress: values.address.detailedAddress,
+                                    phoneNumber: values.contactInfo.phoneNumber,
+                                    businessType: values.businessInfo.businessType,
+                                    transactionStartDate: values.transactionStartDate,
+                                    transactionEndDate: values.transactionEndDate,
+                                    remarks: values.remarks,
+                                }
+                                : client
+                        )
+                    );
+                    setEditClient(false);
+                    setFetchClientData(null);
+                    setClientParam({
+                        transactionStartDate: dayjs(),  // 현재 날짜로 설정
+                        transactionEndDate: "9999-12-31",  // 종료일을 9999-12-31로 설정
+                        transactionType: 'BOTH',
+                    });
+                    setDisplayValues({});
+                    type === 'update'
+                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomLeft')
+                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomLeft'), registrationForm.resetFields());
 
-        try {
-            const response = await apiClient.put(FINANCIAL_API.UPDATE_CLIENT_API, clientParam);
-            console.log(response);
-            notify('success', '거래처 조회', '거래처 정보 조회 성공.', 'bottomLeft')
-        } catch (error) {
-            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
-        }
-
+                } catch (error) {
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '저장 취소',
+                    description: '저장이 취소되었습니다.',
+                    placement: 'bottomLeft',
+                });
+            },
+        });
     };
 
     // 사업자등록번호, 주민등록번호, 전화번호, 팩스번호 포맷 함수
     const formatPhoneNumber = (value) => {
         if (!value) return '';
-        const cleanValue = value.replace(/\D/g, ''); // 숫자 외의 모든 문자 제거
+        const cleanValue = value.replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
         if (cleanValue.length <= 3) return cleanValue;
         if (cleanValue.length <= 7) return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3)}`;
         return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 7)}-${cleanValue.slice(7)}`;
@@ -144,7 +251,30 @@ const ClientRegistrationPage = ( {initialData} ) => {
     // 금액 포맷 함수
     const formatNumberWithComma = (value) => {
         if (!value) return '';
-        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const cleanValue = value.toString().replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
+        return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    // 콤마 제거 함수
+    const removeComma = (value) => {
+        return value ? value.toString().replace(/,/g, '') : value;
+    };
+
+    // 사업자등록번호 포맷 함수
+    const formatBusinessRegistrationNumber = (value) => {
+        if (!value) return '';
+        const cleanValue = value.replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
+        if (cleanValue.length <= 3) return cleanValue;
+        if (cleanValue.length <= 5) return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3)}`;
+        return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 5)}-${cleanValue.slice(5)}`;
+    };
+
+    // 주민등록번호 포맷 함수
+    const formatIdNumber = (value) => {
+        if (!value) return '';
+        const cleanValue = value.replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
+        if (cleanValue.length <= 6) return cleanValue;
+        return `${cleanValue.slice(0, 6)}-${cleanValue.slice(6)}`;
     };
 
     // 거래 시작일 변경 핸들러
@@ -181,6 +311,19 @@ const ClientRegistrationPage = ( {initialData} ) => {
 
     // 탭 변경 핸들러
     const handleTabChange = (key) => {
+        setEditClient(false);
+        setFetchClientData(null);
+        setClientParam({
+            transactionStartDate: dayjs(),  // 현재 날짜로 설정
+            transactionEndDate: "9999-12-31",  // 종료일을 9999-12-31로 설정
+            transactionType: 'BOTH',
+        });
+        setDisplayValues({});
+
+        form.resetFields(); // 1탭 폼 초기화
+        registrationForm.resetFields(); // 2탭 폼 초기화
+        registrationForm.setFieldValue('isActive', true);
+
         setActiveTabKey(key);
     };
 
@@ -212,7 +355,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >거래처 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Table
-                                        dataSource={initialData}
+                                        dataSource={clientList}
                                         columns={[
                                             {
                                                 title: <span style={{ fontSize: '0.8rem' }}>대표자명</span>,
@@ -313,6 +456,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                     const response = await apiClient.post(FINANCIAL_API.FETCH_CLIENT_API(id));
                                                     setFetchClientData(response.data);
                                                     setEditClient(true);
+
                                                     notify('success', '거래처 조회', '거래처 정보 조회 성공.', 'bottomLeft')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -333,73 +477,73 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >거래처 등록 및 수정</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form
-                                        layout="vertical"
                                         initialValues={fetchClientData}
                                         form={form}
-                                        onFinish={(values) => { handleFormSubmit(values) }}
+                                        onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                     >
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>기초 정보</Divider>
                                         <Row gutter={16}>
                                             <Col span={6}>
-                                                <Form.Item name="representativeName">
+                                                <Form.Item name="representativeName" rules={[{ required: true, message: '대표자 이름을 입력하세요.' }]}>
                                                     <Input addonBefore="대표자 이름" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name="businessRegistrationNumber">
-                                                    <Input addonBefore="사업자 등록번호" maxLength={12} placeholder="123-45-67890" />
+                                                <Form.Item name="businessRegistrationNumber" rules={[{ required: true, message: '사업자 등록번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="사업자 등록번호" maxLength={12} onChange={(e) => form.setFieldValue('businessRegistrationNumber', formatBusinessRegistrationNumber(e.target.value))} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name="idNumber">
-                                                    <Input addonBefore="주민등록번호" maxLength={14} placeholder="123456-1234567" />
+                                                <Form.Item name="idNumber" rules={[{ required: true, message: '주민등록번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="주민등록번호" maxLength={14} onChange={(e) => form.setFieldValue('idNumber', formatIdNumber(e.target.value))} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name="printClientName">
+                                                <Form.Item name="printClientName" rules={[{ required: true, message: '거래처 인쇄명을 입력하세요.' }]}>
                                                     <Input addonBefore="거래처 인쇄명" />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                         <Row gutter={16}>
                                             <Col span={6}>
-                                                <Form.Item name={['address', 'postalCode']}>
+                                                <Form.Item name={['address', 'postalCode']} rules={[{ required: true, message: '우편번호를 입력하세요.' }]}>
                                                     <Input addonBefore="우편번호" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={12}>
-                                                <Form.Item name={['address', 'roadAddress']}>
+                                                <Form.Item name={['address', 'roadAddress']} rules={[{ required: true, message: '도로명 주소를 입력하세요.' }]}>
                                                     <Input addonBefore="도로명 주소" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name={['address', 'detailedAddress']}>
+                                                <Form.Item name={['address', 'detailedAddress']} rules={[{ required: true, message: '상세 주소를 입력하세요.' }]}>
                                                     <Input addonBefore="상세 주소" />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                         <Row gutter={16}>
                                             <Col span={12}>
-                                                <Form.Item name={['contactInfo', 'phoneNumber']}>
-                                                    <Input addonBefore="전화번호" value={formatPhoneNumber(form.getFieldValue(['contactInfo', 'phoneNumber']))} />
+                                                <Form.Item name={['contactInfo', 'phoneNumber']} rules={[{ required: true, message: '전화번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="전화번호" onChange={(e) => form.setFieldValue(['contactInfo', 'phoneNumber'], formatPhoneNumber(e.target.value))} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={12}>
-                                                <Form.Item name={['contactInfo', 'faxNumber']}>
-                                                    <Input addonBefore="팩스번호" value={formatPhoneNumber(form.getFieldValue(['contactInfo', 'faxNumber']))} />
+                                                <Form.Item name={['contactInfo', 'faxNumber']} rules={[{ required: true, message: '팩스번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="팩스번호" onChange={(e) => form.setFieldValue(['contactInfo', 'faxNumber'], formatPhoneNumber(e.target.value))} />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
 
+                                        {/* 사업 정보 */}
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>사업 정보</Divider>
                                         <Row gutter={16}>
                                             <Col span={6}>
-                                                <Form.Item name={['businessInfo', 'businessType']}>
+                                                <Form.Item name={['businessInfo', 'businessType']} rules={[{ required: true, message: '업태를 입력하세요.' }]}>
                                                     <Input addonBefore="업태" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name={['businessInfo', 'businessItem']}>
+                                                <Form.Item name={['businessInfo', 'businessItem']} rules={[{ required: true, message: '종목을 입력하세요.' }]}>
                                                     <Input addonBefore="종목" />
                                                 </Form.Item>
                                             </Col>
@@ -408,34 +552,33 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>금융 정보</Divider>
                                         <Row gutter={16}>
                                             <Col span={4}>
-                                                <Form.Item name={['bankAccount', 'bank', 'name']}>
+                                                <Form.Item>
                                                     <Input
                                                         addonBefore="은행명"
+                                                        value={displayValues.bank}
                                                         onClick={() => handleInputClick('bank')}
-                                                        style={{
-                                                            caretColor: 'transparent',
-                                                        }}
+                                                        onFocus={(e) => e.target.blur()}
                                                     />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={5}>
-                                                <Form.Item name={['bankAccount', 'accountNumber']}>
+                                                <Form.Item name={['bankAccount', 'accountNumber']} rules={[{ required: true, message: '계좌번호를 입력하세요.' }]}>
                                                     <Input addonBefore="계좌번호" placeholder="123-4567-890123" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={5}>
-                                                <Form.Item name={['bankAccount', 'accountHolder']}>
+                                                <Form.Item name={['bankAccount', 'accountHolder']} rules={[{ required: true, message: '예금주를 입력하세요.' }]}>
                                                     <Input addonBefore="예금주" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={5}>
-                                                <Form.Item name={['financialInfo', 'collateralAmount']}>
-                                                    <Input addonBefore="담보 금액" value={formatNumberWithComma(form.getFieldValue(['financialInfo', 'collateralAmount']))} />
+                                                <Form.Item name={['financialInfo', 'collateralAmount']} rules={[{ required: true, message: '담보 금액을 입력하세요.' }]}>
+                                                    <Input addonBefore="담보 금액" onChange={(e) => form.setFieldValue(['financialInfo', 'collateralAmount'], formatNumberWithComma(e.target.value))} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={5}>
-                                                <Form.Item name={['financialInfo', 'creditLimit']}>
-                                                    <Input addonBefore="신용 한도" value={formatNumberWithComma(form.getFieldValue(['financialInfo', 'creditLimit']))} />
+                                                <Form.Item name={['financialInfo', 'creditLimit']} rules={[{ required: true, message: '신용 한도를 입력하세요.' }]}>
+                                                    <Input addonBefore="신용 한도" onChange={(e) => form.setFieldValue(['financialInfo', 'creditLimit'], formatNumberWithComma(e.target.value))} />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
@@ -443,23 +586,22 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>담당자 정보</Divider>
                                         <Row gutter={16}>
                                             <Col span={8}>
-                                                <Form.Item name={['managerInfo', 'clientManagerPhoneNumber']}>
-                                                    <Input addonBefore="거래처 담당자 전화번호" value={formatPhoneNumber(form.getFieldValue(['managerInfo', 'clientManagerPhoneNumber']))} />
+                                                <Form.Item name={['managerInfo', 'clientManagerPhoneNumber']} rules={[{ required: true, message: '거래처 담당자 전화번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="거래처 담당자 전화번호" onChange={(e) => form.setFieldValue(['managerInfo', 'clientManagerPhoneNumber'], formatPhoneNumber(e.target.value))} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={8}>
-                                                <Form.Item name={['managerInfo', 'clientManagerEmail']}>
+                                                <Form.Item name={['managerInfo', 'clientManagerEmail']} rules={[{ required: true, message: '거래처 담당자 이메일을 입력하세요.' }]}>
                                                     <Input type="email" addonBefore="거래처 담당자 이메일" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={8}>
-                                                <Form.Item name={['employee', 'employeeNumber']}>
+                                                <Form.Item>
                                                     <Input
                                                         addonBefore="자사 담당자 정보"
-                                                        onClick={() => handleInputClick('manager')}
-                                                        style={{
-                                                            caretColor: 'transparent',
-                                                        }}
+                                                        onClick={() => handleInputClick('employee')}
+                                                        value={displayValues.employee}
+                                                        onFocus={(e) => e.target.blur()}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -471,7 +613,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 <Typography>거래시작일</Typography>
                                             </Col>
                                             <Col>
-                                                <Form.Item style={{ marginBottom: 0 }}>
+                                                <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 시작일을 입력하세요.' }]}>
                                                     <DatePicker
                                                         value={dayjs(clientParam.transactionStartDate)}
                                                         onChange={handleStartDateChange}
@@ -482,7 +624,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 <Typography>거래종료일</Typography>
                                             </Col>
                                             <Col span={4}>
-                                                <Form.Item style={{ marginBottom: 0 }}>
+                                                <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 종료일을 입력하세요.' }]}>
                                                     <DatePicker
                                                         value={dayjs(clientParam.transactionEndDate)}
                                                         onChange={handleEndDateChange}
@@ -499,40 +641,59 @@ const ClientRegistrationPage = ( {initialData} ) => {
 
                                         {/* 주류 및 카테고리 정보 (모달 선택) */}
                                         <Row gutter={16}>
-                                            <Col span={6}>
-                                                <Form.Item name={['liquor', 'id']}>
+                                            <Col span={5}>
+                                                <Form.Item>
                                                     <Input
-                                                        addonBefore="주류 ID 선택"
-                                                        onClick={() => handleInputClick('manager')}
-                                                        style={{
-                                                            caretColor: 'transparent',
-                                                        }}
+                                                        addonBefore="주류코드"
+                                                        onClick={() => handleInputClick('liquor')}
+                                                        value={displayValues.liquor}
+                                                        onFocus={(e) => e.target.blur()}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
-                                                <Form.Item name={['category', 'id']}>
+                                            <Col span={5}>
+                                                <Form.Item>
                                                     <Input
-                                                        addonBefore="카테고리 ID 선택"
-                                                        onClick={() => handleInputClick('manager')}
-                                                        style={{
-                                                            caretColor: 'transparent',
-                                                        }}
+                                                        addonBefore="카테고리"
+                                                        onClick={() => handleInputClick('category')}
+                                                        value={displayValues.category}
+                                                        onFocus={(e) => e.target.blur()}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
+                                            <Col span={5}>
                                                 <Form.Item name="remarks">
                                                     <Input addonBefore="비고" />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
+                                            <Col span={5}>
+                                                <Form.Item name="transactionType">
+                                                    <Space.Compact>
+                                                        <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="거래유형" disabled />
+                                                        <Select
+                                                            style={{ width: '60%' }}
+                                                            value={clientParam.transactionType}
+                                                            onChange={(value) => {
+                                                                setClientParam((prevState) => ({
+                                                                    ...prevState,
+                                                                    transactionType: value, // 선택된 값을 transactionType에 반영
+                                                                }));
+                                                            }}
+                                                        >
+                                                        <Option value="SALES">매출</Option>
+                                                            <Option value="PURCHASE">매입</Option>
+                                                            <Option value="BOTH">동시</Option>
+                                                        </Select>
+                                                    </Space.Compact>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={4}>
                                                 <Form.Item name="isActive" valuePropName="checked">
-                                                    <Checkbox>활성 여부</Checkbox>
+                                                    <Checkbox>거래처 활성화 여부</Checkbox>
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                        <Divider/>
+                                        <Divider />
 
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                             <Button type="primary" htmlType="submit">
@@ -540,7 +701,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             </Button>
                                         </Box>
 
-                                        {/* 모달창 예시 */}
+                                        {/* 모달창 */}
                                         <Modal
                                                open={isModalVisible}
                                                onCancel={handleModalCancel}
@@ -560,9 +721,84 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                                 columns={[
                                                                     { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
                                                                     { title: '은행명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    { title: '사업자번호', dataIndex: 'businessNumber', key: 'businessNumber', align: 'center' },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="code"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'employee' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            자사 담당자 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '사원번호', dataIndex: 'employeeNumber', key: 'employeeNumber', align: 'center' },
+                                                                    {
+                                                                        title: '이름',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text, record) => `${record.lastName}${record.firstName}`, // firstName과 lastName을 합쳐서 출력
+                                                                    },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'liquor' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            주류코드 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'category' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            카테고리 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
                                                                 size={'small'}
                                                                 pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                                                 onRow={(record) => ({
@@ -593,11 +829,364 @@ const ClientRegistrationPage = ( {initialData} ) => {
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>거래처 등록</Typography>
+                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Form
+                                        layout="vertical"
+                                        onFinish={(values) => { handleFormSubmit(values, 'register') }}
+                                        form={registrationForm}
+                                    >
+                                        {/* 기본 정보 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>기초 정보</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name="representativeName" rules={[{ required: true, message: '대표자 이름을 입력하세요.' }]}>
+                                                    <Input addonBefore="대표자 이름" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="businessRegistrationNumber" rules={[{ required: true, message: '사업자 등록번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="사업자 등록번호" maxLength={12} onChange={(e) => registrationForm.setFieldValue('businessRegistrationNumber', formatBusinessRegistrationNumber(e.target.value))} />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="idNumber" rules={[{ required: true, message: '주민등록번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="주민등록번호" maxLength={14} onChange={(e) => registrationForm.setFieldValue('idNumber', formatIdNumber(e.target.value))} />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="printClientName" rules={[{ required: true, message: '거래처 인쇄명을 입력하세요.' }]}>
+                                                    <Input addonBefore="거래처 인쇄명" />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+                                        {/* 주소 정보 */}
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name={['address', 'postalCode']} rules={[{ required: true, message: '우편번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="우편번호" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={12}>
+                                                <Form.Item name={['address', 'roadAddress']} rules={[{ required: true, message: '도로명 주소를 입력하세요.' }]}>
+                                                    <Input addonBefore="도로명 주소" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name={['address', 'detailedAddress']} rules={[{ required: true, message: '상세 주소를 입력하세요.' }]}>
+                                                    <Input addonBefore="상세 주소" />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+                                        {/* 연락처 정보 */}
+                                        <Row gutter={16}>
+                                            <Col span={12}>
+                                                <Form.Item name={['contactInfo', 'phoneNumber']} rules={[{ required: true, message: '전화번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="전화번호" onChange={(e) => registrationForm.setFieldValue(['contactInfo', 'phoneNumber'], formatPhoneNumber(e.target.value))} />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={12}>
+                                                <Form.Item name={['contactInfo', 'faxNumber']} rules={[{ required: true, message: '팩스번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="팩스번호" onChange={(e) => registrationForm.setFieldValue(['contactInfo', 'faxNumber'], formatPhoneNumber(e.target.value))} />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+                                        {/* 사업 정보 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>사업 정보</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name={['businessInfo', 'businessType']} rules={[{ required: true, message: '업태를 입력하세요.' }]}>
+                                                    <Input addonBefore="업태" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name={['businessInfo', 'businessItem']} rules={[{ required: true, message: '종목을 입력하세요.' }]}>
+                                                    <Input addonBefore="종목" />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+                                        {/* 금융 정보 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>금융 정보</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={4}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="은행명"
+                                                        value={displayValues.bank}
+                                                        onClick={() => handleInputClick('bank')}
+                                                        onFocus={(e) => e.target.blur()}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Form.Item name={['bankAccount', 'accountNumber']} rules={[{ required: true, message: '계좌번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="계좌번호" placeholder="123-4567-890123" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Form.Item name={['bankAccount', 'accountHolder']} rules={[{ required: true, message: '예금주를 입력하세요.' }]}>
+                                                    <Input addonBefore="예금주" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Form.Item name={['financialInfo', 'collateralAmount']} rules={[{ required: true, message: '담보 금액을 입력하세요.' }]}>
+                                                    <Input addonBefore="담보 금액" onChange={(e) => registrationForm.setFieldValue(['financialInfo', 'collateralAmount'], formatNumberWithComma(e.target.value))} />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Form.Item name={['financialInfo', 'creditLimit']} rules={[{ required: true, message: '신용 한도를 입력하세요.' }]}>
+                                                    <Input addonBefore="신용 한도" onChange={(e) => registrationForm.setFieldValue(['financialInfo', 'creditLimit'], formatNumberWithComma(e.target.value))} />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+                                        {/* 담당자 정보 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>담당자 정보</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={8}>
+                                                <Form.Item name={['managerInfo', 'clientManagerPhoneNumber']} rules={[{ required: true, message: '거래처 담당자 전화번호를 입력하세요.' }]}>
+                                                    <Input addonBefore="거래처 담당자 전화번호" onChange={(e) => registrationForm.setFieldValue(['managerInfo', 'clientManagerPhoneNumber'], formatPhoneNumber(e.target.value))} />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item name={['managerInfo', 'clientManagerEmail']} rules={[{ required: true, message: '거래처 담당자 이메일을 입력하세요.' }]}>
+                                                    <Input type="email" addonBefore="거래처 담당자 이메일" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="자사 담당자 정보"
+                                                        onClick={() => handleInputClick('employee')}
+                                                        value={displayValues.employee}
+                                                        onFocus={(e) => e.target.blur()}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+                                        {/* 거래 정보 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>추가 정보</Divider>
+                                        <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
+                                            <Col>
+                                                <Typography>거래시작일</Typography>
+                                            </Col>
+                                            <Col>
+                                                <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 시작일을 입력하세요.' }]}>
+                                                    <DatePicker
+                                                        value={dayjs(clientParam.transactionStartDate)}
+                                                        onChange={handleStartDateChange}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col>
+                                                <Typography>거래종료일</Typography>
+                                            </Col>
+                                            <Col span={4}>
+                                                <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 종료일을 입력하세요.' }]}>
+                                                    <DatePicker
+                                                        value={dayjs(clientParam.transactionEndDate)}
+                                                        onChange={handleEndDateChange}
+                                                        disabled={isEndDateDisable}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Checkbox onChange={handleEndDateDisableChange}>
+                                                    거래종료일 비활성화
+                                                </Checkbox>
+                                            </Col>
+                                        </Row>
+
+                                        {/* 카테고리 및 주류코드 정보 */}
+                                        <Row gutter={16}>
+                                            <Col span={5}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="주류코드"
+                                                        onClick={() => handleInputClick('liquor')}
+                                                        value={displayValues.liquor}
+                                                        onFocus={(e) => e.target.blur()}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="카테고리"
+                                                        onClick={() => handleInputClick('category')}
+                                                        value={displayValues.category}
+                                                        onFocus={(e) => e.target.blur()}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Form.Item name="remarks">
+                                                    <Input addonBefore="비고" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={5}>
+                                                <Form.Item name="transactionType">
+                                                    <Space.Compact>
+                                                        <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="거래유형" disabled />
+                                                        <Select
+                                                            style={{ width: '60%' }}
+                                                            value={clientParam.transactionType}
+                                                            onChange={(value) => {
+                                                                setClientParam((prevState) => ({
+                                                                    ...prevState,
+                                                                    transactionType: value, // 선택된 값을 transactionType에 반영
+                                                                }));
+                                                            }}
+                                                        >
+                                                            <Option value="SALES">매출</Option>
+                                                            <Option value="PURCHASE">매입</Option>
+                                                            <Option value="BOTH">동시</Option>
+                                                        </Select>
+                                                    </Space.Compact>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={4}>
+                                                <Form.Item name="isActive" valuePropName="checked">
+                                                    <Checkbox>거래처 활성화 여부</Checkbox>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Divider />
+
+                                        {/* 저장 버튼 */}
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                            <Button type="primary" htmlType="submit">
+                                                저장
+                                            </Button>
+                                        </Box>
+                                        {/* 모달창 */}
+                                        <Modal
+                                            open={isModalVisible}
+                                            onCancel={handleModalCancel}
+                                            width="40vw"
+                                            footer={null}
+                                        >{isLoading ? (
+                                            <Spin />  // 로딩 스피너
+                                        ) : (
+                                            <>
+                                                {currentField === 'bank' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            은행 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                    { title: '은행명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    { title: '사업자번호', dataIndex: 'businessNumber', key: 'businessNumber', align: 'center' },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="code"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'employee' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            자사 담당자 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '사원번호', dataIndex: 'employeeNumber', key: 'employeeNumber', align: 'center' },
+                                                                    {
+                                                                        title: '이름',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text, record) => `${record.lastName}${record.firstName}`, // firstName과 lastName을 합쳐서 출력
+                                                                    },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'liquor' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            주류코드 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'category' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            카테고리 선택
+                                                        </Typography>
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="id"
+                                                                size={'small'}
+                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+
+                                                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                    <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
+                                                        닫기
+                                                    </Button>
+                                                </Box>
+                                            </>
+                                        )}
+                                        </Modal>
+                                    </Form>
+                                </Grid>
+                            </Paper>
                         </Grow>
                     </Grid>
                 </Grid>
