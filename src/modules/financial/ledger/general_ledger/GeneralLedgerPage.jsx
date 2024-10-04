@@ -208,7 +208,7 @@ const GeneralLedgerPage = () => {
                                             dataIndex: 'accountCode',
                                             key: 'accountId',
                                             align: 'center',
-                                            render: (text, record) => <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountName}</span>,
+                                            render: (text, record) => <span style={{ fontSize: '0.8rem' }}>[{text}] {record.accountName}</span>,
                                         },
                                     ]}
                                     rowKey="accountId"
@@ -273,22 +273,22 @@ const GeneralLedgerPage = () => {
                                                 key: 'month',
                                                 align: 'center',
                                                 render: (text, record) => record.isPrevious ?
-                                                    <Typography style={{fontSize: '0.8rem'}}>{text}</Typography> :
-                                                    <span style={{fontSize: '0.7rem'}}>{text}</span>
+                                                    <Typography style={{fontSize: '0.9rem'}}>{text}</Typography> :
+                                                    <span style={{fontSize: '0.8rem'}}>{text}</span>
                                             },
                                             {
                                                 title: '차변',
                                                 dataIndex: 'totalDebit',
                                                 key: 'totalDebit',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span> : ''
                                             },
                                             {
                                                 title: '대변',
                                                 dataIndex: 'totalCredit',
                                                 key: 'totalCredit',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span> : ''
                                             },
                                             {
                                                 title: '잔액',
@@ -297,8 +297,8 @@ const GeneralLedgerPage = () => {
                                                 align: 'center',
 
                                                 render: (text, record) => record.isPrevious ?
-                                                    <Typography style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</Typography> :
-                                                    <span style={{fontSize: '0.7rem'}}>{Number(text).toLocaleString()}</span>
+                                                    <Typography style={{fontSize: '0.9rem'}}>{Number(text).toLocaleString()}</Typography> :
+                                                    <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
                                             }
                                         ]}
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
@@ -306,14 +306,14 @@ const GeneralLedgerPage = () => {
                                         size={'small'}
                                         summary={() => (
                                             <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>합계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>합계</Typography></Table.Summary.Cell>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
                                                     {searchDetailData.totalDebitAmount.toLocaleString()}
                                                 </Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
                                                     {searchDetailData.totalCreditAmount.toLocaleString()}
                                                 </Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
                                                     {searchDetailData.totalCashAmount.toLocaleString()}
                                                 </Typography></Table.Summary.Cell>
                                             </Table.Summary.Row>
