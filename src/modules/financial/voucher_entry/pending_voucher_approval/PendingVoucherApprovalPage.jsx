@@ -78,8 +78,14 @@ const PendingVoucherApprovalPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid item xs={12} md={3} sx={{ marginBottom: '20px' }}>
                                         <DatePicker
-                                            value={dayjs(selectedDate)}
-                                            onChange={(date) => setSelectedDate(date.toDate())}
+                                            value={selectedDate ? dayjs(selectedDate) : null}
+                                            onChange={(date) => {
+                                                if (date) {
+                                                    setSelectedDate(date.toDate());
+                                                } else {
+                                                    setSelectedDate(null);
+                                                }
+                                            }}
                                             style={{ width: '100%' }}
                                         />
                                     </Grid>
