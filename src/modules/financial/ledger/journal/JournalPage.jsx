@@ -15,15 +15,10 @@ const JournalPage = () => {
     const notify = useNotificationContext();
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [journalData, setJournalData] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
     const [searchParams, setSearchParams] = useState({
         startDate: null,
         endDate: null,
     });
-
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [currentField, setCurrentField] = useState('');
-    const [modalData, setModalData] = useState(null);
 
 
     const handleTabChange = (key) => {
@@ -53,7 +48,6 @@ const JournalPage = () => {
         try {
             const response = await apiClient.post(FINANCIAL_API.JOURNAL_LEDGER_API, searchParams);
             const data = response.data;
-            console.log(data);
             setJournalData(data);
         } catch (error) {
             notify('error', '조회 오류', '분개장 조회 중 오류가 발생했습니다.', 'top');
@@ -80,7 +74,7 @@ const JournalPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={8} sx={{ minWidth: '1000px'}}>
+                    <Grid item xs={12} md={8} sx={{ minWidth: '1200px'}}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >분개장 조회</Typography>
@@ -100,7 +94,7 @@ const JournalPage = () => {
                                         </Button>
                                     </Grid>
                                     <Table
-                                        dataSource={journalData?.resolvedVoucherShowAllDTO}
+                                        dataSource={journalData?.journalShowDetailDTO}
                                         columns={[
                                             {
                                                 title: '전표일자',
@@ -134,11 +128,11 @@ const JournalPage = () => {
                                                             value = '출금';
                                                             break;
                                                         case 'DEBIT':
-                                                            color = 'blue';
+                                                            color = 'green';
                                                             value = '차변';
                                                             break;
                                                         case 'CREDIT':
-                                                            color = 'orange';
+                                                            color = 'red';
                                                             value = '대변';
                                                             break;
                                                         default:
@@ -154,6 +148,7 @@ const JournalPage = () => {
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
                                                 render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span> : ''
+                                                // render: (text, record) => { return <span><Tag style={{ marginLeft: '5px' }} color='gray'>{text}</Tag>{record.accountSubjectName}</span>; }
                                             },
                                             {
                                                 title: (
@@ -193,6 +188,14 @@ const JournalPage = () => {
                                                 key: 'clientCode',
                                                 align: 'center',
                                                 render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>[{text.padStart(5, '0')}] {record.clientName}</span> : ''
+                                                // render: (text, record) => { return <span><Tag style={{ marginLeft: '5px' }} color='gray'>{text.padStart(5, '0')}</Tag>{record.clientName}</span>; }
+                                            },
+                                            {
+                                                title: '등록번호',
+                                                dataIndex: 'clientRegisterNumber',
+                                                key: 'clientRegisterNumber',
+                                                align: 'center',
+                                                render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
                                             },
                                             {
                                                 title: '담당자',
@@ -201,19 +204,43 @@ const JournalPage = () => {
                                                 align: 'center',
                                                 render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
                                             },
+                                            {
+                                                title: '유형',
+                                                dataIndex: 'voucherKind',
+                                                key: 'voucherKind',
+                                                align: 'center',
+                                                render: (text, record) => {
+                                                    let color;
+                                                    let value;
+                                                    switch (text) {
+                                                        case 'SALE_AND_PURCHASE':
+                                                            color = 'blue';
+                                                            value = '매출매입전표';
+                                                            break;
+                                                        case 'GENERAL':
+                                                            color = 'orange';
+                                                            value = '일반전표';
+                                                            break;
+                                                        default:
+                                                            color = 'gray';
+                                                            value = text;
+                                                    }
+                                                    return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+                                                }
+                                            },
                                         ]}
                                         rowKey="id"
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         // pagination={false}
                                         size={'small'}
                                         summary={() => (
-                                            <Table.Summary.Row>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>총 합계</Typography></Table.Summary.Cell>
+                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA'}}>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>총 합계</Typography></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>{journalData?.totalCredit.toLocaleString()}</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>{journalData?.totalDebit.toLocaleString()}</Typography></Table.Summary.Cell>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalVoucherCount}건</Typography></Table.Summary.Cell>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalCredit.toLocaleString()}</Typography></Table.Summary.Cell>
+                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalDebit.toLocaleString()}</Typography></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>

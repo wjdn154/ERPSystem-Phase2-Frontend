@@ -190,6 +190,9 @@ input.ant-input[readonly] {
  /*antd 테이블 영역 시작 */
 
 /* 모든 테이블 제목에 적용 */
+.summary-row {
+  background-color: #fafafa;
+}
 .ant-table-thead th {
 }
 

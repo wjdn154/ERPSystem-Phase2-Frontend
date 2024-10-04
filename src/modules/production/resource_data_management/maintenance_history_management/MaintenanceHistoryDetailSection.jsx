@@ -112,11 +112,11 @@ const MaintenanceHistoryDetailSection = ({
                 <Input value={"설치된 작업장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
                        readOnly/>
                 <Input value={maintenanceDataDetail?.workcenterCode} style={{marginRight: '30px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'workcenterCode')}/>
+                       onChange={(e) => handleInputChange(e, 'workcenterCode')} readOnly/>
                 <Input value={"설치된 공장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
                        readOnly/>
                 <Input value={maintenanceDataDetail?.factoryCode || ''} style={{flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'factoryCode')}/>
+                       onChange={(e) => handleInputChange(e, 'factoryCode')} readOnlyn/>
 
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
