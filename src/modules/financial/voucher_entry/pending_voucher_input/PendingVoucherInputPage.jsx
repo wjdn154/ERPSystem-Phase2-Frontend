@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material'
 import { DeleteOutlined, PlusOutlined, SaveOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import {Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
+import { Space, Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import dayjs from "dayjs"
@@ -44,12 +44,12 @@ const PendingVoucherInputPage = () => {
 
             // 구분이 'Credit' 또는 'Withdrawal'일 경우 차변 값 0으로 설정
             if (value === 'Credit' || value === 'Withdrawal') {
-                updatedVoucher.creditAmount = 0;
+                updatedVoucher.creditAmount = null;
             }
 
             // 구분이 'Debit' 또는 'Deposit'일 경우 대변 값 0으로 설정
             if (value === 'Debit' || value === 'Deposit') {
-                updatedVoucher.debitAmount = 0;
+                updatedVoucher.debitAmount = null;
             }
 
             return updatedVoucher;
@@ -136,41 +136,43 @@ const PendingVoucherInputPage = () => {
             }];
 
             const processedVouchers = updatedVouchers.map((v) => {
-
-                // 차변, 대변, 입금, 출금이 함께 존재하면 에러 발생
+                // 유효성 검사
+                if ((v.voucherType === 'Withdrawal' || v.voucherType === 'Deposit') && v.accountSubjectCode === '101') throw new Error("입금, 출금 전표는 현금 계정과목을 사용 할 수 없습니다.");
+                if (v.debitAmount < 0 || v.creditAmount < 0) throw new Error("금액은 음수가 될 수 없습니다.");
+                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) throw new Error("필수 입력값이 누락되었습니다.");
+                if (v.voucherType === 'Deposit' && v.creditAmount === 0) throw new Error("전표 구분이 입금일 경우 금액을 입력해주세요.");
+                if (v.voucherType === 'Withdrawal' && v.debitAmount === 0) throw new Error("전표 구분이 출금일 경우 금액을 입력해주세요.");
                 if ((v.voucherType === 'Debit' || v.voucherType === 'Credit') &&
                     (v.voucherType === 'Deposit' || v.voucherType === 'Withdrawal')) {
                     throw new Error("차변/대변과 입금/출금은 동시에 사용할 수 없습니다.");
                 }
-
-                if (v.debitAmount < 0 || v.creditAmount < 0) {
-                    throw new Error("금액은 음수가 될 수 없습니다.");
-                }
-
-                // 필수 입력값이 없는 경우 에러 발생
-                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) {
-                    throw new Error("필수 입력값이 누락되었습니다.");
-                }
-
-                if(v.voucherType === 'Debit' || v.voucherType === 'Credit') {
-                    // 차변, 대변 합계가 0이 아닐 경우 에러 발생
+                if (v.voucherType === 'Debit' || v.voucherType === 'Credit') {
                     const totalDebit = updatedVouchers.reduce((sum, item) => sum + (item.debitAmount || 0), 0);
                     const totalCredit = updatedVouchers.reduce((sum, item) => sum + (item.creditAmount || 0), 0);
-
-                    if (totalDebit !== totalCredit) {
-                        throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
-                    }
+                    if (totalDebit !== totalCredit) throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
                 }
 
+                // formattedAccountSubjectCode와 formattedClientCode에서 숫자만 추출하고 반환
+                const { formattedAccountSubjectCode, formattedClientCode, ...rest } = v;
+
+                const accountSubjectCode = formattedAccountSubjectCode ? formattedAccountSubjectCode.match(/\d+/)[0] : rest.accountSubjectCode;
+                const clientCode = formattedClientCode ? formattedClientCode.match(/\d+/)[0] : rest.clientCode;
+
                 return {
-                    ...v,
-                    voucherDate: format(selectedDate, 'yyyy-MM-dd'), // 정확한 날짜 포맷
+                    ...rest, // 나머지 필드 유지 (formattedAccountSubjectCode와 formattedClientCode는 포함되지 않음)
+                    voucherDate: format(selectedDate, 'yyyy-MM-dd'),
                     voucherKind: "General",
                     voucherManagerId: jwtDecode(token).employeeId,
+                    debitAmount: v.debitAmount ? v.debitAmount : 0,
+                    creditAmount: v.creditAmount ? v.creditAmount : 0,
+                    accountSubjectCode, // 숫자로 변환된 accountSubjectCode
+                    clientCode, // 숫자로 변환된 clientCode
+                    transactionDescription: v.transactionDescription,
+                    voucherType: v.voucherType,
                 };
             });
 
-            console.log(processedVouchers);
+            console.log("Processed Vouchers:", processedVouchers);
 
             // 데이터 저장
             await apiClient.post(FINANCIAL_API.SAVE_UNRESOLVED_VOUCHER_API, processedVouchers); // API 호출
@@ -256,8 +258,14 @@ const PendingVoucherInputPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid item xs={12} md={3} sx={{ marginBottom: '20px' }}>
                                         <DatePicker
-                                            value={dayjs(selectedDate)}
-                                            onChange={(date) => setSelectedDate(date.toDate())}
+                                            value={selectedDate ? dayjs(selectedDate) : null}  // selectedDate가 null일 때를 처리
+                                            onChange={(date) => {
+                                                if (date) {
+                                                    setSelectedDate(date.toDate());  // 날짜가 선택된 경우
+                                                } else {
+                                                    setSelectedDate(null);  // 날짜가 삭제된 경우 (X 버튼 클릭)
+                                                }
+                                            }}
                                             style={{ width: '100%' }}
                                         />
                                     </Grid>
@@ -416,7 +424,6 @@ const PendingVoucherInputPage = () => {
                                                 value={displayValues.accountSubjectCode}
                                                 onClick={() => handleInputClick('accountSubjectCode')}
                                                 style={{
-                                                    cursor: 'pointer',
                                                     caretColor: 'transparent',
                                                 }}
                                             />
@@ -439,9 +446,9 @@ const PendingVoucherInputPage = () => {
 
                                         {/* 적요 입력 */}
                                         <Grid item xs={2}>
-                                            <Input.Group compact>
+                                            <Space.Compact>
                                                 <Input
-                                                    style={{ width: '30%', color: '#000' }}
+                                                    style={{ width: '30%', color: '#000', backgroundColor: '#FAFAFA' }}
                                                     value="적요"
                                                     disabled
                                                 />
@@ -453,7 +460,7 @@ const PendingVoucherInputPage = () => {
                                                     showSearch
                                                     defaultActiveFirstOption
                                                 />
-                                            </Input.Group>
+                                            </Space.Compact>
                                         </Grid>
 
                                         {/* 차변 금액 입력 */}
@@ -561,7 +568,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "debitAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>,
+                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{(text || 0).toLocaleString()}</span>,
                                             },
                                             {
                                                 title: "대변",
@@ -569,7 +576,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "creditAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>,
+                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{(text || 0).toLocaleString()}</span>,
                                             }
                                         ]}
                                         rowKey={(record) => record.key}
@@ -578,24 +585,44 @@ const PendingVoucherInputPage = () => {
                                         summary={() => (
                                             vouchers.length > 0 &&
                                             <>
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA'}}>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>총 합계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{vouchers.reduce((acc, cur) => acc + cur.debitAmount, 0).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{vouchers.reduce((acc, cur) => acc + cur.creditAmount, 0).toLocaleString()}</Typography></Table.Summary.Cell>
-                                            </Table.Summary.Row>
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA'}}>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>대차차액</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{(Number(vouchers.reduce((acc, cur) => acc + cur.debitAmount, 0)) - Number(vouchers.reduce((acc, cur) => acc + cur.creditAmount, 0))).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{(Number(vouchers.reduce((acc, cur) => acc + cur.creditAmount, 0)) - Number(vouchers.reduce((acc, cur) => acc + cur.debitAmount, 0))).toLocaleString()}</Typography></Table.Summary.Cell>
-                                            </Table.Summary.Row>
+                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0}>
+                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>합계</Typography>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={4}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}>
+                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}
+                                                        </Typography>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}>
+                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}
+                                                        </Typography>
+                                                    </Table.Summary.Cell>
+                                                </Table.Summary.Row>
+                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0}>
+                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>대차차액</Typography>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={4}></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}>
+                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}
+                                                        </Typography>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}>
+                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}
+                                                        </Typography>
+                                                    </Table.Summary.Cell>
+                                                </Table.Summary.Row>
                                             </>
                                         )}
                                         locale={{
