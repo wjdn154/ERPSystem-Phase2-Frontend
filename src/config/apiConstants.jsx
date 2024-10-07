@@ -58,6 +58,9 @@ export const FINANCIAL_API = {
     // 계정별원장 관련 API
     ACCOUNT_SUBJECT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/accountLedger/show`, // 계정별원장 목록 조회 API
     ACCOUNT_SUBJECT_LEDGER_DETAIL_API: `${API_BASE_URL}/api/financial/ledger/accountLedger/showDetail`, // 계정별원장 상세 조회 API
+
+    // 매입매출장 관련 API
+    PURCHASE_SALES_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/SalesAndPurchase/show`, // 매입매출장 목록 조회 API
 };
 
 // 인사관리 - 사원
