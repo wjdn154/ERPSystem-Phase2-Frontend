@@ -615,8 +615,14 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 시작일을 입력하세요.' }]}>
                                                     <DatePicker
-                                                        value={dayjs(clientParam.transactionStartDate)}
-                                                        onChange={handleStartDateChange}
+                                                        value={clientParam.transactionStartDate && dayjs(clientParam.transactionStartDate).isValid() ? dayjs(clientParam.transactionStartDate) : null}
+                                                        onChange={(date) => {
+                                                            if (date) {
+                                                                handleStartDateChange();
+                                                            } else {
+                                                                handleStartDateChange(null);
+                                                            }
+                                                        }}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -626,7 +632,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col span={4}>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 종료일을 입력하세요.' }]}>
                                                     <DatePicker
-                                                        value={dayjs(clientParam.transactionEndDate)}
+                                                        value={clientParam.transactionEndDate && dayjs(clientParam.transactionEndDate).isValid() ? dayjs(clientParam.transactionEndDate) : null}
                                                         onChange={handleEndDateChange}
                                                         disabled={isEndDateDisable}
                                                     />

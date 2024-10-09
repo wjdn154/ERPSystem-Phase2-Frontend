@@ -14,18 +14,25 @@ const { RangePicker } = DatePicker;
 const DailyMonthlyReportPage = () => {
     const notify = useNotificationContext();
     const [activeTabKey, setActiveTabKey] = useState('1');
-    const [DMReportData, setDMReportData] = useState(null);
-    const [processedData, setProcessedData] = useState([]);
-    const [searchParams, setSearchParams] = useState({
+    const [dailyReportData, setDailyReportData] = useState(null);
+    const [monthlyReportData, setMonthlyReportData] = useState(null);
+    const [dailyProcessedData, setDailyProcessedData] = useState([]);
+    const [monthlyProcessedData, setMonthlyProcessedData] = useState([]);
+    const [searchParamsDaily, setSearchParamsDaily] = useState({
+        journalType: null,
+        startDate: null,
+        endDate: null,
+    });
+    const [searchParamsMonthly, setSearchParamsMonthly] = useState({
         journalType: null,
         startDate: null,
         endDate: null,
     });
 
     useEffect(() => {
-        if (DMReportData) {
+        if (dailyReportData) {
             let categoryCounter = 1; // Medium_category 카운터 초기화
-            const newData = DMReportData.map((item) => {
+            const newData = dailyReportData.map((item) => {
                 if (item.level === 'Medium_category' && !item.isCounted) {
                     item.name = `${categoryCounter}. [${item.name}]`;
                     item.isCounted = true;
@@ -33,9 +40,24 @@ const DailyMonthlyReportPage = () => {
                 }
                 return item;
             });
-            setProcessedData(newData);
+            setDailyProcessedData(newData);
         }
-    }, [DMReportData]);
+    }, [dailyReportData]);
+
+    useEffect(() => {
+        if (monthlyReportData) {
+            let categoryCounter = 1; // Medium_category 카운터 초기화
+            const newData = monthlyReportData.map((item) => {
+                if (item.level === 'Medium_category' && !item.isCounted) {
+                    item.name = `${categoryCounter}. [${item.name}]`;
+                    item.isCounted = true;
+                    categoryCounter++;
+                }
+                return item;
+            });
+            setMonthlyProcessedData(newData);
+        }
+    }, [monthlyReportData]);
 
     const handleRenderName = (level, text) => {
         if (level === 'Medium_category') {
@@ -50,10 +72,19 @@ const DailyMonthlyReportPage = () => {
     };
 
     // 날짜 선택 처리
-    const handleDateChange = (dates) => {
+    const handleDailyDateChange = (dates) => {
         if (dates) {
-            setSearchParams({
-                ...searchParams,
+            setSearchParamsDaily({
+                ...searchParamsDaily,
+                startDate: dates[0].format('YYYY-MM-DD'),
+                endDate: dates[1].format('YYYY-MM-DD'),
+            });
+        }
+    };
+    const handleMonthlyDateChange = (dates) => {
+        if (dates) {
+            setSearchParamsMonthly({
+                ...searchParamsMonthly,
                 startDate: dates[0].format('YYYY-MM-DD'),
                 endDate: dates[1].format('YYYY-MM-DD'),
             });
@@ -71,10 +102,17 @@ const DailyMonthlyReportPage = () => {
         }
 
         try {
-            const response = await apiClient.post(FINANCIAL_API.DAILY_AND_MONTH_JOURNAL_LEDGER_API, params);
-            const data = response.data;
-            setDMReportData(data);
-            console.log(data);
+            if (journalType === 'Daily') {
+                const response = await apiClient.post(FINANCIAL_API.DAILY_AND_MONTH_JOURNAL_LEDGER_API, params);
+                const data = response.data;
+                setDailyReportData(data);
+                console.log(data);
+            }else if (journalType === 'Monthly') {
+                const response = await apiClient.post(FINANCIAL_API.DAILY_AND_MONTH_JOURNAL_LEDGER_API, params);
+                const data = response.data;
+                setMonthlyReportData(data);
+                console.log(data);
+            }
         } catch (error) {
             notify('error', '조회 오류', '일계표/월계표 조회 중 오류가 발생했습니다.', 'top');
         }
@@ -104,25 +142,25 @@ const DailyMonthlyReportPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >일계표 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
-                                            onChange={handleDateChange}
+                                            onChange={handleDailyDateChange}
                                             style={{ marginRight: '10px' }}
                                             defaultValue={[
-                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                searchParamsDaily.startDate ? dayjs(searchParamsDaily.startDate, 'YYYY-MM-DD') : null,
+                                                searchParamsDaily.endDate ? dayjs(searchParamsDaily.endDate, 'YYYY-MM-DD') : null,
                                             ]}
                                             format="YYYY-MM-DD"
                                         />
                                         <Button
                                             type="primary"
                                             onClick={() => {
-                                                setSearchParams((prevParams) => {
+                                                setSearchParamsDaily((prevParams) => {
                                                     const updatedParams = {
                                                         ...prevParams,
                                                         journalType: 'Daily',
@@ -137,7 +175,7 @@ const DailyMonthlyReportPage = () => {
                                     </Grid>
                                     <Table
                                         style={{ marginBottom: '20px' }}
-                                        dataSource={processedData ? processedData.map((item, index) => ({
+                                        dataSource={dailyProcessedData ? dailyProcessedData.map((item, index) => ({
                                             key: `entry-${index}`,
                                             level: item.level,
                                             name: item.name,
@@ -159,7 +197,9 @@ const DailyMonthlyReportPage = () => {
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
                                                             <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
-                                                            : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '대체',
@@ -168,7 +208,9 @@ const DailyMonthlyReportPage = () => {
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
                                                             <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
-                                                            : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '합계',
@@ -177,7 +219,9 @@ const DailyMonthlyReportPage = () => {
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
                                                             <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
-                                                            : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
                                                     },
                                                 ],
                                             },
@@ -186,6 +230,10 @@ const DailyMonthlyReportPage = () => {
                                                 dataIndex: 'name',
                                                 key: 'name',
                                                 align: 'center',
+                                                width: '15%',
+                                                onCell: () => ({
+                                                    style: { backgroundColor: '#FAFAFA' },
+                                                }),
                                                 render: (text, record) => handleRenderName(record.level, text),
                                             },
                                             {
@@ -198,7 +246,9 @@ const DailyMonthlyReportPage = () => {
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
                                                             <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
-                                                            : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '대체',
@@ -207,7 +257,9 @@ const DailyMonthlyReportPage = () => {
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
                                                             <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
-                                                            : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '합계',
@@ -216,7 +268,9 @@ const DailyMonthlyReportPage = () => {
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
                                                             <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
-                                                            : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
                                                     },
                                                 ],
                                             }
@@ -238,11 +292,150 @@ const DailyMonthlyReportPage = () => {
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >월계표 조회</Typography>
+                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
+                                        <RangePicker
+                                            onChange={handleMonthlyDateChange}
+                                            style={{ marginRight: '10px' }}
+                                            picker="month"  // 월 단위로 설정
+                                            defaultValue={[
+                                                searchParamsMonthly.startDate ? dayjs(searchParamsMonthly.startDate, 'YYYY-MM') : null,
+                                                searchParamsMonthly.endDate ? dayjs(searchParamsMonthly.endDate, 'YYYY-MM') : null,
+                                            ]}
+                                            format="YYYY-MM"  // 년-월 형식으로 변경
+                                        />
+                                        <Button
+                                            type="primary"
+                                            onClick={() => {
+                                                setSearchParamsMonthly((prevParams) => {
+                                                    const updatedParams = {
+                                                        ...prevParams,
+                                                        journalType: 'Monthly',
+                                                    };
+                                                    handleSearch(updatedParams); // 상태 업데이트 후 바로 검색 실행
+                                                    return updatedParams;
+                                                });
+                                            }}
+                                        >
+                                            검색
+                                        </Button>
+                                    </Grid>
+                                    <Table
+                                        style={{ marginBottom: '20px' }}
+                                        dataSource={monthlyProcessedData ? monthlyProcessedData.map((item, index) => ({
+                                            key: `entry-${index}`,
+                                            level: item.level,
+                                            name: item.name,
+                                            cashTotalDebit: item.cashTotalDebit,
+                                            subTotalDebit: item.subTotalDebit,
+                                            sumTotalDebit: item.sumTotalDebit,
+                                            cashTotalCredit: item.cashTotalCredit,
+                                            subTotalCredit: item.subTotalCredit,
+                                            sumTotalCredit: item.sumTotalCredit,
+                                        })) : []}
+                                        columns={[
+                                            {
+                                                title: '차변',
+                                                children: [
+                                                    {
+                                                        title: '현금',
+                                                        dataIndex: 'cashTotalDebit',
+                                                        key: 'cashTotalDebit',
+                                                        align: 'center',
+                                                        render: (text, record) => record.level === null ?
+                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                    },
+                                                    {
+                                                        title: '대체',
+                                                        dataIndex: 'subTotalDebit',
+                                                        key: 'subTotalDebit',
+                                                        align: 'center',
+                                                        render: (text, record) => record.level === null ?
+                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                    },
+                                                    {
+                                                        title: '합계',
+                                                        dataIndex: 'sumTotalDebit',
+                                                        key: 'sumTotalDebit',
+                                                        align: 'center',
+                                                        render: (text, record) => record.level === null ?
+                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                title: '계정과목',
+                                                dataIndex: 'name',
+                                                key: 'name',
+                                                align: 'center',
+                                                width: '15%',
+                                                onCell: () => ({
+                                                    style: { backgroundColor: '#FAFAFA' },
+                                                }),
+                                                render: (text, record) => handleRenderName(record.level, text),
+                                            },
+                                            {
+                                                title: '대변',
+                                                children: [
+                                                    {
+                                                        title: '현금',
+                                                        dataIndex: 'cashTotalCredit',
+                                                        key: 'cashTotalCredit',
+                                                        align: 'center',
+                                                        render: (text, record) => record.level === null ?
+                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                    },
+                                                    {
+                                                        title: '대체',
+                                                        dataIndex: 'subTotalCredit',
+                                                        key: 'subTotalCredit',
+                                                        align: 'center',
+                                                        render: (text, record) => record.level === null ?
+                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                    },
+                                                    {
+                                                        title: '합계',
+                                                        dataIndex: 'sumTotalCredit',
+                                                        key: 'sumTotalCredit',
+                                                        align: 'center',
+                                                        render: (text, record) => record.level === null ?
+                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            : record.level !== 'Account_name' ?
+                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                    },
+                                                ],
+                                            }
+                                        ]}
+                                        rowKey="key"
+                                        // pagination={{ pageSize: 30, position: ['bottomCenter'], showSizeChanger: false }}
+                                        pagination={ false }
+                                        size={'small'}
+                                        rowClassName={(record) => {
+                                            return record.level !== 'Account_name' ? 'summary-row' : '';
+                                        }}
+                                    />
+                                </Grid>
+                            </Paper>
                         </Grow>
                     </Grid>
                 </Grid>
