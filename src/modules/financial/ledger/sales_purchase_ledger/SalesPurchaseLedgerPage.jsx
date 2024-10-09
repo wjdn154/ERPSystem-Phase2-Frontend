@@ -25,36 +25,6 @@ const SalesPurchaseLedgerPage = () => {
         setActiveTabKey(key);
     };
 
-    // 날짜 선택 처리
-    const handleDateChange = (dates) => {
-        if (dates) {
-            setSearchParams({
-                ...searchParams,
-                startDate: dates[0].format('YYYY-MM-DD'),
-                endDate: dates[1].format('YYYY-MM-DD'),
-            });
-        }
-    };
-
-    // 검색 처리
-    const handleSearch = async () => {
-        const { startDate, endDate } = searchParams;
-        // 입력값 검증
-        if (!startDate || !endDate) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
-            return;
-        }
-
-        try {
-            const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
-            const data = response.data;
-            console.log(data);
-            setSearchData(data);
-        } catch (error) {
-            notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
-        }
-    };
-
     return (
         <Box sx={{ margin: '20px' }}>
             <Grid container spacing={3}>
@@ -82,7 +52,16 @@ const SalesPurchaseLedgerPage = () => {
                                 <Grid sx={{ padding: '0px 20px 20px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
-                                            onChange={handleDateChange}
+                                            onChange={ (dates) => {
+                                                    if (dates) {
+                                                        setSearchParams({
+                                                            ...searchParams,
+                                                            startDate: dates[0].format('YYYY-MM-DD'),
+                                                            endDate: dates[1].format('YYYY-MM-DD'),
+                                                        });
+                                                    }
+                                                }
+                                            }
                                             style={{ marginRight: '10px' }}
                                             defaultValue={[
                                                 searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
@@ -90,7 +69,24 @@ const SalesPurchaseLedgerPage = () => {
                                             ]}
                                             format="YYYY-MM-DD"
                                         />
-                                        <Button type="primary" onClick={handleSearch} >
+                                        <Button type="primary" onClick={async () => {
+                                                const { startDate, endDate } = searchParams;
+                                                // 입력값 검증
+                                                if (!startDate || !endDate) {
+                                                    notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+                                                    return;
+                                                }
+
+                                                try {
+                                                    const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
+                                                    const data = response.data;
+                                                    console.log(data);
+                                                    setSearchData(data);
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                            }
+                                        } >
                                             검색
                                         </Button>
                                     </Grid>
@@ -125,7 +121,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'vatTypeName',
                                                 key: 'vatTypeName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
                                             },
                                             {
                                                 title: '일자',
@@ -136,7 +132,7 @@ const SalesPurchaseLedgerPage = () => {
                                                     return record.isSummary ? (
                                                         <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{text}</span>
                                                     ) : (
-                                                        <span style={{ fontSize: '0.8rem' }}>{new Date(text).toLocaleDateString()}</span>
+                                                        <span style={{ fontSize: '0.9rem' }}>{new Date(text).toLocaleDateString()}</span>
                                                     );
                                                 },
                                             },
@@ -145,7 +141,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'itemName',
                                                 key: 'itemName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
                                             },
                                             {
                                                 title: '공급가액',
@@ -153,9 +149,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'supplyAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -164,9 +160,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'vatAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -175,9 +171,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'sumAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -185,7 +181,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.8rem' }}>[{text}] {record.clientName}</span> : '',
+                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.clientName} </span> : '',
                                             },
                                             {
                                                 title: '전자',
@@ -226,21 +222,21 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'journalEntryName',
                                                 key: 'journalEntryName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
                                             },
                                             {
                                                 title: '계정과목',
                                                 dataIndex: 'accountSubjectCode',
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
-                                                render: (text, render) => text ? <span style={{ fontSize: '0.8rem' }}>[{text}] {render.accountSubjectName}</span> : '',
+                                                render: (text, render) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {render.accountSubjectName}</span> : '',
                                             },
                                             {
                                                 title: '담당자',
                                                 dataIndex: 'voucherManagerCode',
                                                 key: 'voucherManagerCode',
                                                 align: 'center',
-                                                render: (text, render) => text ? <span style={{ fontSize: '0.8rem' }}>[{text}] {render.voucherManagerName}</span> : '',
+                                                render: (text, render) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {render.voucherManagerName}</span> : '',
                                             },
                                             {
                                                 title: '담당부서',
@@ -282,68 +278,72 @@ const SalesPurchaseLedgerPage = () => {
                                             return '';
                                         }}
                                         summary={() =>  (
-                                            <>
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell index={0} ></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold'}}>[월계]</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={2} />
-                                                <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
-                                                {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9r, fontWeight: 500em'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                <Table.Summary.Cell index={6} />
-                                                <Table.Summary.Cell index={7} />
-                                                <Table.Summary.Cell index={8} />
-                                                <Table.Summary.Cell index={9} />
-                                                <Table.Summary.Cell index={10} />
-                                                <Table.Summary.Cell index={11} />
-                                            </Table.Summary.Row>
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell index={0} ></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold'}}>[분기계]</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={2} />
-                                                <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
-                                                {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                <Table.Summary.Cell index={6} />
-                                                <Table.Summary.Cell index={7} />
-                                                <Table.Summary.Cell index={8} />
-                                                <Table.Summary.Cell index={9} />
-                                                <Table.Summary.Cell index={10} />
-                                                <Table.Summary.Cell index={11} />
-                                            </Table.Summary.Row>
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell index={0} ></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold'}}>[반기계]</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={2} />
-                                                <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
-                                                {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                <Table.Summary.Cell index={6} />
-                                                <Table.Summary.Cell index={7} />
-                                                <Table.Summary.Cell index={8} />
-                                                <Table.Summary.Cell index={9} />
-                                                <Table.Summary.Cell index={10} />
-                                                <Table.Summary.Cell index={11} />
-                                            </Table.Summary.Row>
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell index={0} />
-                                                <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold'}}>[누계]</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={2} />
-                                                <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
-                                                {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={6} />
-                                                <Table.Summary.Cell index={7} />
-                                                <Table.Summary.Cell index={8} />
-                                                <Table.Summary.Cell index={9} />
-                                                <Table.Summary.Cell index={10} />
-                                                <Table.Summary.Cell index={11} />
-                                            </Table.Summary.Row>
-                                            </>
+                                            searchData ? (
+                                                <>
+                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                        <Table.Summary.Cell index={0} ></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[월계]</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={2} />
+                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
+                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9r, fontWeight: 500em'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
+                                                        <Table.Summary.Cell index={6} />
+                                                        <Table.Summary.Cell index={7} />
+                                                        <Table.Summary.Cell index={8} />
+                                                        <Table.Summary.Cell index={9} />
+                                                        <Table.Summary.Cell index={10} />
+                                                        <Table.Summary.Cell index={11} />
+                                                    </Table.Summary.Row>
+                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                        <Table.Summary.Cell index={0} ></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[분기계]</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={2} />
+                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
+                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
+                                                        <Table.Summary.Cell index={6} />
+                                                        <Table.Summary.Cell index={7} />
+                                                        <Table.Summary.Cell index={8} />
+                                                        <Table.Summary.Cell index={9} />
+                                                        <Table.Summary.Cell index={10} />
+                                                        <Table.Summary.Cell index={11} />
+                                                    </Table.Summary.Row>
+                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                        <Table.Summary.Cell index={0} ></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[반기계]</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={2} />
+                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
+                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
+                                                        <Table.Summary.Cell index={6} />
+                                                        <Table.Summary.Cell index={7} />
+                                                        <Table.Summary.Cell index={8} />
+                                                        <Table.Summary.Cell index={9} />
+                                                        <Table.Summary.Cell index={10} />
+                                                        <Table.Summary.Cell index={11} />
+                                                    </Table.Summary.Row>
+                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
+                                                        <Table.Summary.Cell index={0} />
+                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[누계]</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={2} />
+                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
+                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
+                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={6} />
+                                                        <Table.Summary.Cell index={7} />
+                                                        <Table.Summary.Cell index={8} />
+                                                        <Table.Summary.Cell index={9} />
+                                                        <Table.Summary.Cell index={10} />
+                                                        <Table.Summary.Cell index={11} />
+                                                    </Table.Summary.Row>
+                                                </>
+                                            ) : (
+                                                <></>
+                                            )
                                         )}
                                     />
                                 </Grid>
