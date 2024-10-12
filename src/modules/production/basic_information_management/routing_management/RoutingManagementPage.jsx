@@ -3,7 +3,7 @@ import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { processRoutingColumns, tabItems} from './RoutingManagementUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button, Col, Input, message, Modal, Row, Table} from 'antd';
+import {Button, Col, Form, Input, message, Modal, Row, Table} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import { PRODUCTION_API } from "../../../../config/apiConstants.jsx";
@@ -20,6 +20,16 @@ const RoutingManagementPage = () => {
     const [searchText, setSearchText] = useState(''); // 검색어 상태
     const [activeColumn, setActiveColumn] = useState(null); // 검색 중인 컬럼 상태
 
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
+    const [form] = Form.useForm(); // 폼 인스턴스 생성
+    const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
+    const [editClient, setEditClient] = useState(false); // 거래처 등록 수정 탭 활성화 여부 상태
+    const [fetchClientData, setFetchClientData] = useState(false); // 거래처 조회한 정보 상태
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+    const [currentField, setCurrentField] = useState(''); // 모달 분기 할 필드 상태
+    const [modalData, setModalData] = useState(null); // 모달 데이터 상태
+    const [displayValues, setDisplayValues] = useState({});
 
     // 검색 필터링 로직
     const handleFilter = (value, dataIndex) => {
@@ -29,6 +39,24 @@ const RoutingManagementPage = () => {
         setFilteredData(filtered);
         setSearchText(value);
     };
+
+    // 금액 포맷 함수
+    const formatNumberWithComma = (value) => {
+        if (!value) return '';
+        const cleanValue = value.toString().replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
+        return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    // 모달창 열기 핸들러
+    const handleInputClick = (fieldName) => {
+        setCurrentField(fieldName);
+        setModalData(null); // 모달 열기 전에 데이터를 초기화
+        fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
+        setIsModalVisible(true);  // 모달창 열기
+    };
+
+    // 모달창 닫기 핸들러
+    const handleModalCancel = () => setIsModalVisible(false);
 
     // 1. ProcessRouting 전체 조회
     useEffect(() => {
