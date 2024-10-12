@@ -258,8 +258,14 @@ const PendingVoucherInputPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid item xs={12} md={3} sx={{ marginBottom: '20px' }}>
                                         <DatePicker
-                                            value={dayjs(selectedDate)}
-                                            onChange={(date) => setSelectedDate(date.toDate())}
+                                            value={selectedDate ? dayjs(selectedDate) : null}  // selectedDate가 null일 때를 처리
+                                            onChange={(date) => {
+                                                if (date) {
+                                                    setSelectedDate(date.toDate());  // 날짜가 선택된 경우
+                                                } else {
+                                                    setSelectedDate(null);  // 날짜가 삭제된 경우 (X 버튼 클릭)
+                                                }
+                                            }}
                                             style={{ width: '100%' }}
                                         />
                                     </Grid>

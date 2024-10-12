@@ -34,7 +34,6 @@ const ClientRegistrationPage = ( {initialData} ) => {
 
     // 거래처 조회 데이터가 있을 경우 폼에 데이터 셋팅
     useEffect(() => {
-
         if (!fetchClientData) return;
 
         form.setFieldsValue(fetchClientData);
@@ -457,12 +456,10 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                     setFetchClientData(response.data);
                                                     setEditClient(true);
 
-                                                    notify('success', '거래처 조회', '거래처 정보 조회 성공.', 'bottomLeft')
+                                                    notify('success', '거래처 조회', '거래처 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
-
-
                                             },
                                         })}
                                     />
@@ -615,8 +612,14 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 시작일을 입력하세요.' }]}>
                                                     <DatePicker
-                                                        value={dayjs(clientParam.transactionStartDate)}
-                                                        onChange={handleStartDateChange}
+                                                        value={clientParam.transactionStartDate && dayjs(clientParam.transactionStartDate).isValid() ? dayjs(clientParam.transactionStartDate) : null}
+                                                        onChange={(date) => {
+                                                            if (date) {
+                                                                handleStartDateChange();
+                                                            } else {
+                                                                handleStartDateChange(null);
+                                                            }
+                                                        }}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -626,7 +629,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col span={4}>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 종료일을 입력하세요.' }]}>
                                                     <DatePicker
-                                                        value={dayjs(clientParam.transactionEndDate)}
+                                                        value={clientParam.transactionEndDate && dayjs(clientParam.transactionEndDate).isValid() ? dayjs(clientParam.transactionEndDate) : null}
                                                         onChange={handleEndDateChange}
                                                         disabled={isEndDateDisable}
                                                     />
