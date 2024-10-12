@@ -1,21 +1,34 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import {processRoutingColumns, tabItems} from './RoutingManagementUtil.jsx';
+import { processRoutingColumns, tabItems} from './RoutingManagementUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button, Col, Input, message, Modal, Row, Table} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import { PRODUCTION_API } from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 const RoutingManagementPage = () => {
     const [activeTabKey, setActiveTabKey] = useState('1');
-    const [data, setData] = useState([]);
+    const [data, setData] = useState([]); // 원본데이터
     const [selectedRouting, setSelectedRouting] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [newRouting, setNewRouting] = useState({});
     const [isEditing, setIsEditing] = useState(false);
+    const [filteredData, setFilteredData] = useState([]); // 필터링된 데이터
+    const [searchText, setSearchText] = useState(''); // 검색어 상태
+    const [activeColumn, setActiveColumn] = useState(null); // 검색 중인 컬럼 상태
+
+
+    // 검색 필터링 로직
+    const handleFilter = (value, dataIndex) => {
+        const filtered = data.filter((item) =>
+            item[dataIndex] ? item[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : false
+        );
+        setFilteredData(filtered);
+        setSearchText(value);
+    };
 
     // 1. ProcessRouting 전체 조회
     useEffect(() => {
@@ -23,6 +36,11 @@ const RoutingManagementPage = () => {
             try {
                 const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
                 const rawData = response.data;
+
+                // rawData가 배열인지 확인
+                if (!Array.isArray(rawData)) {
+                    throw new Error('API 응답이 배열이 아닙니다.');
+                }
 
                 // 각 routing의 step들을 하나의 배열로 플랫하게 변환
                 const formattedData = rawData.map(routing => ({
@@ -155,29 +173,12 @@ const RoutingManagementPage = () => {
                     <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <div>
-                                {/* 검색 바 */}
-                                <Row gutter={16} style={{ marginBottom: '16px' }}>
-                                    <Col span={8}>
-                                        <Input.Search
-                                            placeholder="생산 공정 검색"
-                                            onSearch={handleSearchProcessDetails}
-                                            enterButton
-                                        />
-                                    </Col>
-                                </Row>
-
                                 {/* ProcessRouting 목록 */}
                                 <Table
-                                    dataSource={Array.isArray(data) ? data : []} // 배열로 변환하여 전달
-                                    columns={processRoutingColumns} // 배열을 직접 전달
+                                    dataSource={Array.isArray(filteredData) && filteredData.length > 0 ? filteredData : data} // 필터링된 데이터 사용
+                                    columns={processRoutingColumns(activeColumn, searchText, setActiveColumn, handleFilter)} // 상태와 함수 전달
                                     rowKey="id"
                                 />
-
-                                {/* 등록 버튼 */}
-                                <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
-                                    등록
-                                </Button>
-
                                 {/* 모달 컴포넌트 */}
                                 <Modal
                                     title={isEditing ? '공정 경로 수정' : '새 공정 경로 등록'}
