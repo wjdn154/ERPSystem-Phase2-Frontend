@@ -111,12 +111,12 @@ const AppContent = () => {
                     path="/*"
                     element={
                         <Layout style={{ minHeight: '100vh' }}>
-                            <Headers />
                             <Layout>
                                 <Sider className="custom-sidebar">
                                     <Sidebar />
                                 </Sider>
-
+                                <Box  style={{ width: '100%' }}>
+                                <Headers />
                                 <Content style={{ transition: 'margin-left 0.3s ease' }}>
                                     <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
                                         <ContentWrapper>
@@ -152,6 +152,7 @@ const AppContent = () => {
                                         </ContentWrapper>
                                     </Box>
                                 </Content>
+                                </Box>
                             </Layout>
                         </Layout>
                     }

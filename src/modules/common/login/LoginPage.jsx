@@ -11,6 +11,7 @@ import background from "../../../assets/img/background3.png";
 import DebounceSelect from '../../../components/DebounceSelect.jsx';
 import {useNotificationContext} from "../../../config/NotificationContext.jsx";
 import apiClient from "../../../config/apiClient.jsx";
+import {jwtDecode} from "jwt-decode";
 
 const LoginPage = () => {
     const notify = useNotificationContext();
