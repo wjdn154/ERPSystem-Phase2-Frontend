@@ -55,13 +55,9 @@ const WorkcenterManagementPage = ({ initialData }) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} >
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <div>
-                                {/* 사용중 작업장 대시보드 */}
-                                <div style={{ marginBottom: '16px' }}>
-                                    <WorkcenterDashboard />
-                                </div>
                                 {/* 검색 바 */}
                                 <Row gutter={16} style={{ marginBottom: '16px' }}>
                                     <Col span={8}>
@@ -100,12 +96,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                         />
                                     </Col>
                                 </Row>
-
-                                {/* 작업장 추가 버튼 */}
-                                <Button type="primary" onClick={handleAddWorkcenter} style={{ marginTop: '16px' }}>
-                                    등록
-                                </Button>
-
                                 {/* 모달 컴포넌트 */}
                                 {workcenter && (
                                     <Modal
