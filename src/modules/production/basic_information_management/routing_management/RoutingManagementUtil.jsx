@@ -19,7 +19,8 @@ export const processRoutingColumns = (activeColumn, searchText, setActiveColumn,
         ),
         dataIndex: 'code',
         key: 'code',
-        width: '20%',
+        // width: '10%',
+        align: 'center',
     },
     {
         title: activeColumn === 'name' ? (
@@ -38,7 +39,9 @@ export const processRoutingColumns = (activeColumn, searchText, setActiveColumn,
         ),
         dataIndex: 'name',
         key: 'name',
-        width: '20%',
+        // width: '20%',
+        align: 'center',
+
     },
     {
         title: activeColumn === 'description' ? (
@@ -57,14 +60,31 @@ export const processRoutingColumns = (activeColumn, searchText, setActiveColumn,
         ),
         dataIndex: 'description',
         key: 'description',
-        width: '30%',
+        // width: '30%',
+        align: 'center',
+
     },
     {
         title: '표준 여부',
         dataIndex: 'isStandard',
         key: 'isStandard',
-        render: (text) => (text ? '예' : '아니요'),
-        width: '10%',
+        render: (text) => {
+            let color;
+            switch (text) {
+                case 'true':
+                    color = 'red';
+                    break;
+                case 'false':
+                    color = 'blue';
+                    break;
+                default:
+                    color = 'gray'; // 기본 색상
+            }
+            return <Tag style={{marginLeft: '5px'}} color={color}>{text}</Tag>;
+        },
+        // width: '10%',
+        align: 'center',
+
     },
     {
         title: '사용 여부',
@@ -84,7 +104,9 @@ export const processRoutingColumns = (activeColumn, searchText, setActiveColumn,
             }
             return <Tag style={{marginLeft: '5px'}} color={color}>{text}</Tag>;
         },
-        width: '10%',
+        // width: '10%',
+        align: 'center',
+
     },
 ];
 
