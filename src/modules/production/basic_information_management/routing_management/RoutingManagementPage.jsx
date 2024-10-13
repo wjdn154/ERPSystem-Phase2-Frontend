@@ -76,7 +76,7 @@ const RoutingManagementPage = () => {
         // 해당 필드에 맞는 데이터를 비동기적으로 가져오는 로직 추가
         if (fieldName === 'processDetails') {
             try {
-                const response = await apiClient.get(PRODUCTION_API.PROCESS_DETAILS_API);
+                const response = await apiClient.post(PRODUCTION_API.ROUTING_PREVIEW_PROCESS_DETAILS_API);
                 setModalData(response.data);
             } catch (error) {
                 console.error('Error fetching modal data:', error);
@@ -113,13 +113,12 @@ const RoutingManagementPage = () => {
                             return;
                         }
 
-                        // 공정 단계의 순서가 올바른지 확인 (예: 1, 2, 3, ...)
-                        const sortedSteps = [...values.routingSteps].sort((a, b) => a.stepOrder - b.stepOrder);
-                        for (let i = 0; i < sortedSteps.length; i++) {
-                            if (sortedSteps[i].stepOrder !== i + 1) {
-                                notify('error', '저장 실패', '공정 단계의 순서가 올바르지 않습니다. 1, 2, 3,... 순으로 입력해주세요.', 'top');
-                                return;
-                            }
+                        // routingSteps에 stepOrder 자동 할당
+                        if (values.routingSteps && values.routingSteps.length > 0) {
+                            values.routingSteps = values.routingSteps.map((step, index) => ({
+                                ...step,
+                                stepOrder: index + 1,
+                            }));
                         }
 
                         // API 요청
@@ -207,7 +206,7 @@ const RoutingManagementPage = () => {
     useEffect(() => {
         const fetchProcesses = async () => {
             try {
-                const response = await apiClient.get(PRODUCTION_API.PROCESS_LIST_API); // 공정 목록 API 엔드포인트
+                const response = await apiClient.post(PRODUCTION_API.PROCESS_LIST_API); // 공정 목록 API 엔드포인트
                 setProcessOptions(response.data);
             } catch (error) {
                 console.error('Error fetching processes:', error);
@@ -221,7 +220,7 @@ const RoutingManagementPage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await apiClient.get(LOGISTICS_API.PRODUCT_LIST_API); // 제품 목록 API 엔드포인트
+                const response = await apiClient.post(LOGISTICS_API.PRODUCT_LIST_API); // 제품 목록 API 엔드포인트
                 setProductOptions(response.data); // [{ id: 1, name: '제품 A' }, { id: 2, name: '제품 B' }, ...]
             } catch (error) {
                 console.error('Error fetching products:', error);
@@ -361,6 +360,30 @@ const RoutingManagementPage = () => {
         setActiveTabKey(key);
     };
 
+    // 공정 단계 순서 자동 재정렬
+    useEffect(() => {
+        const adjustStepOrder = () => {
+            const steps = registrationForm.getFieldValue('routingSteps') || [];
+            const updatedSteps = steps.map((step, index) => ({
+                ...step,
+                stepOrder: index + 1,
+            }));
+            registrationForm.setFieldsValue({ routingSteps: updatedSteps });
+        };
+
+        // // 등록 폼이 렌더링될 때마다 stepOrder를 조정
+        // const unsubscribe = registrationForm.subscribe(({ values }) => {
+        //     if (values.routingSteps) {
+        //         adjustStepOrder();
+        //     }
+        // });
+
+        // cleanup
+        return () => {
+            unsubscribe();
+        };
+    }, [registrationForm]);
+
     return (
         <Box sx={{ margin: '20px' }}>
             <Grid container spacing={3}>
@@ -465,6 +488,10 @@ const RoutingManagementPage = () => {
                                             layout="vertical"
                                             onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                             form={registrationForm}
+
+                                            initialValues={{
+                                                routingSteps: [], // 공정 단계 초기값 설정
+                                            }}
                                         >
                                             <Row gutter={16}>
                                                 <Col span={6}>
@@ -483,12 +510,18 @@ const RoutingManagementPage = () => {
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
-                                                    <Form.Item name="isStandard" rules={[{ required: true, message: '표준 여부를 선택하세요.' }]}>
+                                                    <Form.Item
+                                                        name="isStandard" rules={[{ required: false }]}
+                                                        label="표준 여부" valuePropName="checked"
+                                                    >
                                                         <Checkbox>표준 여부</Checkbox>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
-                                                    <Form.Item name="isActive" rules={[{ required: true, message: '사용 여부를 선택하세요.' }]}>
+                                                    <Form.Item 
+                                                        name="isActive" rules={[{ required: false }]}
+                                                        label="사용 여부" valuePropName="checked"
+                                                    >
                                                         <Checkbox>사용 여부</Checkbox>
                                                     </Form.Item>
                                                 </Col>
@@ -497,66 +530,87 @@ const RoutingManagementPage = () => {
                                                 <Divider orientation="left">공정 단계</Divider>
                                                 {/* 공정 단계 추가 */}
                                                 <Form.List name="routingSteps">
-                                                    {(fields, { add, remove }) => (
-                                                        <>
-                                                            {fields.map(({ key, name, fieldKey, ...restField }) => (
-                                                                <Row gutter={16} key={key} align="middle">
+                                                    {(fields, { add, remove }) => {
+                                                        // 공정 단계 추가 시 stepOrder 자동 설정
+                                                        const handleAdd = () => {
+                                                            const steps = registrationForm.getFieldValue('routingSteps') || [];
+                                                            const maxStepOrder = steps.length > 0 ? Math.max(...steps.map(step => step.stepOrder)) : 0;
+                                                            add({ stepOrder: maxStepOrder + 1 });
+                                                        };
+
+                                                        // 공정 단계 삭제 시 stepOrder 재정렬
+                                                        const handleRemove = (name) => {
+                                                            remove(name);
+                                                            // 상태 업데이트 후 stepOrder 재정렬
+                                                            setTimeout(() => {
+                                                                const steps = registrationForm.getFieldValue('routingSteps') || [];
+                                                                const updatedSteps = steps.map((step, index) => ({
+                                                                    ...step,
+                                                                    stepOrder: index + 1,
+                                                                }));
+                                                                registrationForm.setFieldsValue({ routingSteps: updatedSteps });
+                                                            }, 0);
+                                                        };
+
+                                                        return (
+                                                            <>
+                                                                {fields.map(({ key, name, fieldKey, ...restField }) => (
+                                                                    <Row gutter={16} key={key} align="middle">
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'stepOrder']}
+                                                                                fieldKey={[fieldKey, 'stepOrder']}
+                                                                                label="순서"
+                                                                            >
+                                                                                <Input type="number" min={1} disabled />
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={12}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'processId']}
+                                                                                fieldKey={[fieldKey, 'processId']}
+                                                                                label="공정"
+                                                                                rules={[{ required: true, message: '공정을 선택하세요.' }]}
+                                                                            >
+                                                                                <Select placeholder="공정을 선택하세요">
+                                                                                    {processOptions.map((process) => (
+                                                                                        <Option key={process.id} value={process.id}>
+                                                                                            {process.name}
+                                                                                        </Option>
+                                                                                    ))}
+                                                                                </Select>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={6} style={{ display: 'flex', alignItems: 'flex-end', marginTop: '5px' }}>
+                                                                            <Button
+                                                                                type="danger"
+                                                                                onClick={() => remove(name)}
+                                                                            >
+                                                                                삭제
+                                                                            </Button>
+                                                                        </Col>
+                                                                    </Row>
+                                                                ))}
+                                                                <Row gutter={16} style={{ marginTop: '30px' }} justify="start" align="middle">
                                                                     <Col span={6}>
-                                                                        <Form.Item
-                                                                            {...restField}
-                                                                            name={[name, 'stepOrder']}
-                                                                            fieldKey={[fieldKey, 'stepOrder']}
-                                                                            label="순서"
-                                                                            rules={[{ required: true, message: '순서를 입력하세요.' }]}
-                                                                        >
-                                                                            <Input type="number" min={1} />
+                                                                        <Form.Item>
+                                                                            <Button type="dashed" onClick={() => add()} block style={{ minWidth: '80px' }}>
+                                                                                단계 추가
+                                                                            </Button>
                                                                         </Form.Item>
                                                                     </Col>
                                                                     <Col span={12}>
-                                                                        <Form.Item
-                                                                            {...restField}
-                                                                            name={[name, 'processId']}
-                                                                            fieldKey={[fieldKey, 'processId']}
-                                                                            label="공정"
-                                                                            rules={[{ required: true, message: '공정을 선택하세요.' }]}
-                                                                        >
-                                                                            <Select placeholder="공정을 선택하세요">
-                                                                                {processOptions.map((process) => (
-                                                                                    <Option key={process.id} value={process.id}>
-                                                                                        {process.name}
-                                                                                    </Option>
-                                                                                ))}
-                                                                            </Select>
-                                                                        </Form.Item>
+                                                                        {/* 빈 공간 유지 */}
                                                                     </Col>
-                                                                    <Col span={6} style={{ display: 'flex', alignItems: 'flex-end', marginTop: '5px' }}>
-                                                                        <Button
-                                                                            type="danger"
-                                                                            onClick={() => remove(name)}
-                                                                        >
-                                                                            삭제
-                                                                        </Button>
+                                                                    <Col span={6}>
+                                                                        {/* 빈 공간 유지 */}
                                                                     </Col>
                                                                 </Row>
-                                                            ))}
-                                                            <Row gutter={16} style={{ marginTop: '30px' }} justify="start" align="middle">
-                                                                <Col span={6}>
-                                                                    <Form.Item>
-                                                                        <Button type="dashed" onClick={() => add()} block style={{ minWidth: '80px' }}>
-                                                                            단계 추가
-                                                                        </Button>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={12}>
-                                                                    {/* 빈 공간 유지 */}
-                                                                </Col>
-                                                                <Col span={6}>
-                                                                    {/* 빈 공간 유지 */}
-                                                                </Col>
-                                                            </Row>
-
-                                                        </>
-                                                    )}
+                                                            </>
+                                                        );
+                                                    }}
                                                 </Form.List>
 
                                             </Row>
