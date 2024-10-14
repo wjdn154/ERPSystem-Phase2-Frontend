@@ -144,7 +144,7 @@ const CashBookPage = () => {
                                                 key: 'voucherDate',
                                                 align: 'center',
                                                 render: (text, record) => {
-                                                    return (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ?  <span style={{ fontSize: '0.8rem' }}>{text}</span> : <span style={{ fontSize: '0.7rem' }}>{text}</span>;
+                                                    return (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ?  <span className="medium-text">{text}</span> : <span className="small-text">{text}</span>;
                                                 },
                                             },
                                             {
@@ -153,7 +153,7 @@ const CashBookPage = () => {
                                                 key: 'transactionDescription',
                                                 align: 'center',
                                                 render: (text, record) => {
-                                                    return text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : '';
+                                                    return text ? <span className="small-text">{text}</span> : '';
                                                 },
                                             },
                                             {
@@ -163,7 +163,7 @@ const CashBookPage = () => {
                                                 align: 'center',
                                                 render: (text, record) => {
                                                     if (record.isSummary || record.isPreviousBalance) return ''; // 월계 및 누계는 거래처 코드 공백
-                                                    return text ? <span style={{ fontSize: '0.7rem' }}>[{text.padStart(5, '0')}] {record.clientName}</span> : '';
+                                                    return text ? <span className="small-text">[{text}] {record.clientName}</span> : '';
                                                 },
                                             },
                                             {
@@ -171,24 +171,24 @@ const CashBookPage = () => {
                                                 dataIndex: 'depositAmount',
                                                 key: 'depositAmount',
                                                 align: 'center',
-                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> :
-                                                    <span style={{fontSize: '0.7rem'}}>{text.toLocaleString()}</span>,
+                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span className="medium-text">{text.toLocaleString()}</span> :
+                                                    <span className="small-text">{text.toLocaleString()}</span>,
                                             },
                                             {
                                                 title: '출금',
                                                 dataIndex: 'withdrawalAmount',
                                                 key: 'withdrawalAmount',
                                                 align: 'center',
-                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> :
-                                                    <span style={{fontSize: '0.7rem'}}>{text.toLocaleString()}</span>,
+                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span className="medium-text">{text.toLocaleString()}</span> :
+                                                    <span className="small-text">{text.toLocaleString()}</span>,
                                             },
                                             {
                                                 title: '잔액',
                                                 dataIndex: 'cashAmount',
                                                 key: 'cashAmount',
                                                 align: 'center',
-                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> :
-                                                    <span style={{fontSize: '0.7rem'}}>{text.toLocaleString()}</span>,
+                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span className="medium-text">{text.toLocaleString()}</span> :
+                                                    <span className="small-text">{text.toLocaleString()}</span>,
                                             },
                                         ]}
                                         rowKey="key"
