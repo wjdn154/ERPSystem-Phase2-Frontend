@@ -70,6 +70,20 @@ export const
             key: 'productGroupName',
             width: '30%',
         },
-
-
     ];
+export const productCodeColumn = [
+
+    {
+        title: <span>품목 코드</span>,  // 컬럼 제목
+        dataIndex: 'productCode',  // 데이터 인덱스: 이 필드는 데이터 객체의 'productCode' 속성과 연결됩니다.
+        key:'productCode',
+        width: '30%',  // 컬럼 너비 설정
+    },
+    {
+        title: <span>품목 명</span>,
+        dataIndex: 'productName',
+        key: 'productName',
+        width: '40%',
+    }
+
+]

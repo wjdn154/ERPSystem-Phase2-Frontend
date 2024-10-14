@@ -93,13 +93,13 @@ const AccountLedgerPage = () => {
         const { startDate, endDate, startAccountCode, endAccountCode } = searchParams;
         // 입력값 검증
         if (!startDate || !endDate || !startAccountCode || !endAccountCode) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
         // 계정과목 코드 순서 검증
         if (Number(startAccountCode) > Number(endAccountCode)) {
-            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomLeft');
+            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomRight');
             return;
         }
 
@@ -229,7 +229,7 @@ const AccountLedgerPage = () => {
                                                     // API 호출 시 updatedParams 사용
                                                     const response = await apiClient.post(FINANCIAL_API.ACCOUNT_SUBJECT_LEDGER_DETAIL_API, { ...updatedParams });
                                                     setSearchDetailData(response.data);
-                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomLeft');
+                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -270,7 +270,7 @@ const AccountLedgerPage = () => {
                                                     })),
                                                     {
                                                         voucherDate: '',
-                                                        transactionDescription: '[월계]',
+                                                        transactionDescription: '[월 계]',
                                                         clientCode: '',
                                                         clientName: '',
                                                         debitAmount: entry.monthlyTotalDebitAmount,
@@ -285,7 +285,7 @@ const AccountLedgerPage = () => {
                                                     },
                                                     {
                                                         voucherDate: '',
-                                                        transactionDescription: '[누계]',
+                                                        transactionDescription: '[누 계]',
                                                         clientCode: '',
                                                         clientName: '',
                                                         debitAmount: entry.cumulativeTotalDebitAmount,
@@ -306,7 +306,7 @@ const AccountLedgerPage = () => {
                                                     dataIndex: 'voucherDate',
                                                     key: 'voucherDate',
                                                     align: 'center',
-                                                    render: (text) => text ? <span style={{fontSize: '0.8rem'}}>{new Date(text).toLocaleDateString()}</span> : ''
+                                                    render: (text) => text ? <span className="small-text">{new Date(text).toLocaleDateString()}</span> : ''
                                                 },
                                                 {
                                                     title: '적요',
@@ -314,15 +314,15 @@ const AccountLedgerPage = () => {
                                                     key: 'transactionDescription',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem', fontWeight: 500 }}>{text}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                        <span className="medium-text">{text}</span> :
+                                                        <span className="small-text">{text}</span>
                                                 },
                                                 {
                                                     title: '거래처',
                                                     dataIndex: 'clientCode',
                                                     key: 'clientCode',
                                                     align: 'center',
-                                                    render: (text, record) => text ? <span style={{fontSize: '0.8rem'}}>[{text}] {record.clientName}</span> : ''
+                                                    render: (text, record) => text ? <span className="small-text">[{text}] {record.clientName}</span> : ''
                                                 },
                                                 {
                                                     title: '차변',
@@ -330,8 +330,8 @@ const AccountLedgerPage = () => {
                                                     key: 'debitAmount',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                        <span className="medium-text">{Number(text).toLocaleString()}</span> :
+                                                        <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 },
                                                 {
                                                     title: '대변',
@@ -339,8 +339,8 @@ const AccountLedgerPage = () => {
                                                     key: 'creditAmount',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                        <span className="medium-text">{Number(text).toLocaleString()}</span> :
+                                                        <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 },
                                                 {
                                                     title: '잔액',
@@ -348,36 +348,36 @@ const AccountLedgerPage = () => {
                                                     key: 'cashAmount',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                        <span className="medium-text">{Number(text).toLocaleString()}</span> :
+                                                        <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 },
                                                 {
                                                     title: '전표번호',
                                                     dataIndex: 'voucherNumber',
                                                     key: 'voucherNumber',
                                                     align: 'center',
-                                                    render: (text) => <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    render: (text) => <span className="small-text">{text}</span>
                                                 },
                                                 {
                                                     title: '등록일시',
                                                     dataIndex: 'voucherRegistrationTime',
                                                     key: 'voucherRegistrationTime',
                                                     align: 'center',
-                                                    render: (text) => text ? <span style={{fontSize: '0.8rem'}}>{new Date(text).toLocaleString()}</span> : ''
+                                                    render: (text) => text ? <span className="small-text">{new Date(text).toLocaleString()}</span> : ''
                                                 },
                                                 {
                                                     title: '부서명',
                                                     dataIndex: 'departmentName',
                                                     key: 'departmentName',
                                                     align: 'center',
-                                                    render: (text) => <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    render: (text) => <span className="small-text">{text}</span>
                                                 },
                                                 {
                                                     title: '담당자',
                                                     dataIndex: 'voucherManagerName',
                                                     key: 'voucherManagerName',
                                                     align: 'center',
-                                                    render: (text) => <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    render: (text) => <span className="small-text">{text}</span>
                                                 }
                                             ]}
                                             pagination={ false }

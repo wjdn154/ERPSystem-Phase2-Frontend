@@ -114,18 +114,7 @@ const EquipmentDataPage = ({initialData}) => {
                         </Grow>
                     )}
                 </Grid>
-            {/*</Grid>*/}
-            {activeTabKey === '2' && (
-                    <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                        <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
-                            <Grow in={true} timeout={200}>
-                                <div>
-                                    <TemporarySection />
-                                </div>
-                            </Grow>
-                        </Grid>
-                    </Grid>
-                )}
+
         </Box>
     );
 };

@@ -6,7 +6,7 @@ import { Typography } from '@mui/material';
 import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {EMPLOYEE_API, FINANCIAL_API, USERS_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
@@ -144,8 +144,6 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 }));
             break;
         }
-
-
         // 모달창 닫기
         setIsModalVisible(false);
     };
@@ -221,8 +219,8 @@ const ClientRegistrationPage = ( {initialData} ) => {
                     });
                     setDisplayValues({});
                     type === 'update'
-                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomLeft')
-                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomLeft'), registrationForm.resetFields());
+                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomRight')
+                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomRight'), registrationForm.resetFields());
 
                 } catch (error) {
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -232,7 +230,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 notification.warning({
                     message: '저장 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
+                    placement: 'bottomRight',
                 });
             },
         });
@@ -721,7 +719,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         </Typography>
                                                         {modalData && (
                                                             <Table
-                                                                columns={[
+                                                                 columns={[
                                                                     { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
                                                                     { title: '은행명', dataIndex: 'name', key: 'name', align: 'center' },
                                                                     { title: '사업자번호', dataIndex: 'businessNumber', key: 'businessNumber', align: 'center' },

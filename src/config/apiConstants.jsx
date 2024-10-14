@@ -61,6 +61,9 @@ export const FINANCIAL_API = {
 
     // 매입매출장 관련 API
     PURCHASE_SALES_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/SalesAndPurchase/show`, // 매입매출장 목록 조회 API
+
+    // 전자세금계산서 관련 API
+    TAX_INVOICE_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/taxInvoice/show`, // 전자세금계산서 목록 조회 API
 };
 
 // 인사관리 - 사원
@@ -71,9 +74,7 @@ export const EMPLOYEE_API = {
     SAVE_EMPLOYEE_DATA_API: `${API_BASE_URL}/api/hr/employee/createEmployee`, // 사원 등록 API
     UPDATE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/hr/employee/updateEmployee/${id}`, // 사원 수정 API
     DELETE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/hr/employee/del/${id}`,
-};
 // 인사관리 - 사용자
-export const USERS_API = {
     USERS_PERMISSION_API: (username) => `${API_BASE_URL}/api/hr/users/permission/${username}`, // 사용자 권한 조회 API
     UPDATE_USERS_PERMISSION_API: `${API_BASE_URL}/api/hr/users/permission/update`,
     USERS_DATA_API: `${API_BASE_URL}/api/hr/users/all`,
@@ -81,10 +82,11 @@ export const USERS_API = {
     SAVE_USERS_DATA_API: `${API_BASE_URL}/api/hr/users/create`,
     UPDATE_USERS_DATA_API: (id)=> `${API_BASE_URL}/api/hr/users/put/${id}`,
     DELETE_USERS_DATA_API: (id) =>`${API_BASE_URL}/api/hr/users/del/${id}`,
-}
 // 인사관리 - 부서
-export const DEPARTMENT_API = {
     DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/all`,
+    SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
+    DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
+    DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
 }
 // 물류관리
 export const LOGISTICS_API = {

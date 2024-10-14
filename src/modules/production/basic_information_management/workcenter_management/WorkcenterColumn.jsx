@@ -1,4 +1,5 @@
-import { Select } from 'antd';
+import {Select, Tag} from 'antd';
+import React from "react";
 
 // 전체 조회 컬럼 (기존 컬럼 유지)
 export const workcenterColumns = [
@@ -21,18 +22,40 @@ export const workcenterColumns = [
         width: '10%',
         render: (workcenterType) => {
             const typeToKorean = {
-                PRESS: "프레스",
-                WELDING: "용접",
-                PAINT: "도장",
-                MACHINING: "정밀 가공",
-                ASSEMBLY: "조립",
-                QUALITY_INSPECTION: "품질 검사",
-                CASTING: "주조",
-                FORGING: "단조",
-                HEAT_TREATMENT: "열처리",
-                PLASTIC_MOLDING: "플라스틱 성형"
+                "Press": "프레스",
+                "Welding": "용접",
+                "Paint": "도장",
+                "Machining": "정밀 가공",
+                "Assembly": "조립",
+                "Quality Inspection": "품질 검사",
+                "Casting": "주조",
+                "Forging": "단조",
+                "Heat Treatment": "열처리",
+                "Plastic Molding": "플라스틱 성형"
             };
-            return typeToKorean[workcenterType] || '-'; // 대응되는 한국어가 없을 경우 '-' 표시
+
+            const typeToColor = {
+                "Press": "blue",
+                "Welding": "green",
+                "Paint": "orange",
+                "Machining": "volcano",
+                "Assembly": "purple",
+                "Quality Inspection": "geekblue",
+                "Casting": "red",
+                "Forging": "gold",
+                "Heat Treatment": "cyan",
+                "Plastic Molding": "lime"
+            };
+
+            // workcenterType 값이 typeToKorean에 없으면 기본 '-'
+            const label = typeToKorean[workcenterType] || '기타';
+            const color = typeToColor[workcenterType] || 'gray';
+
+            return (
+                <Tag color={color}>
+                    {label}
+                </Tag>
+            );
         }
     },
     {
@@ -74,7 +97,13 @@ export const workcenterColumns = [
         dataIndex: 'isActive',  // DTO의 isActive 필드에 접근
         key: 'isActive',
         width: '5%',
-        render: (text) => text ? 'Y' : 'N', // Boolean 값을 'Y' 또는 'N'으로 표시
+        render: (isActive) => {
+            return (
+                <Tag color={isActive ? 'green' : 'red'}>
+                    {isActive ? '사용중' : '미사용'}
+                </Tag>
+            );
+        }
     },
 ];
 
@@ -100,16 +129,16 @@ export const workcenterDetailColumns = [
         width: '10%',
         render: (workcenterType) => {
             const typeToKorean = {
-                PRESS: "프레스",
-                WELDING: "용접",
-                PAINT: "도장",
-                MACHINING: "정밀 가공",
-                ASSEMBLY: "조립",
-                QUALITY_INSPECTION: "품질 검사",
-                CASTING: "주조",
-                FORGING: "단조",
-                HEAT_TREATMENT: "열처리",
-                PLASTIC_MOLDING: "플라스틱 성형"
+                Press: "프레스",
+                Welding: "용접",
+                Paint: "도장",
+                Machining: "정밀 가공",
+                Assembly: "조립",
+                'Quality Inspection': "품질 검사",
+                Casting: "주조",
+                Forging: "단조",
+                'Heat Treatment': "열처리",
+                'Plastic Molding': "플라스틱 성형"
             };
             return typeToKorean[workcenterType] || '-';
         },
@@ -127,7 +156,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'factoryName',
         key: 'factoryName',
         width: '10%',
-        editable: false, // 수정 불가
+        editable: true,
         render: (text) => text || '-',
     },
     {
@@ -135,7 +164,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'processName',
         key: 'processName',
         width: '10%',
-        editable: false, // 수정 불가
+        editable: true, // 수정 불가
         render: (text) => text || '-',
     },
     {
@@ -143,7 +172,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'workerAssignments',
         key: 'workerAssignments',
         width: '10%',
-        editable: false, // 수정 불가
+        editable: true, // 수정 불가
         render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-',
     },
     {
@@ -151,7 +180,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'equipmentList',
         key: 'equipmentList',
         width: '10%',
-        editable: false, // 수정 불가
+        editable: true, // 수정 불가
         render: (equipmentList) => equipmentList ? equipmentList.length : '-',
     },
     {
@@ -159,8 +188,26 @@ export const workcenterDetailColumns = [
         dataIndex: 'isActive',
         key: 'isActive',
         width: '5%',
-        render: (text) => text ? 'Y' : 'N',
-        editable: true, // 수정 가능
+        render: (_, record) => (
+            <Select
+                value={record.isActive ? '사용중' : '미사용'} // 드롭다운의 현재 값
+                onChange={(value) => {
+                    // 선택된 값에 따라 isActive를 true 또는 false로 설정
+                    const isActive = value === '사용중';
+                    // 값이 변경되었을 때 상태 업데이트
+                    record.isActive = isActive;
+                    // 업데이트한 레코드를 setWorkcenter로 저장
+                    setWorkcenter({
+                        ...record,
+                        isActive: isActive
+                    });
+                }}
+            >
+                <Option value="사용중">사용중</Option>
+                <Option value="미사용">미사용</Option>
+            </Select>
+        ),
+        editable: true
     },
 ];
 
