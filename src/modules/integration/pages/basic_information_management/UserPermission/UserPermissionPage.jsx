@@ -4,7 +4,7 @@ import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../../components/WelcomeSection.jsx';
 import { Table } from 'antd';
 import { tabItems, getPermissionData, userColumns, personalPermissionColumns, permissionColumns } from './UserPermissonUtil.jsx';
-import { EMPLOYEE_API, USERS_API } from "../../../../../config/apiConstants.jsx";
+import { EMPLOYEE_API } from "../../../../../config/apiConstants.jsx";
 import axios from "axios";
 import { setAuth } from "../../../../../config/redux/authSlice.jsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -56,7 +56,7 @@ const UserPermissionPage = ( ) => {
 
     const fetchUserPermissions = async (username) => {
         try {
-            const response = await apiClient.post(USERS_API.USERS_PERMISSION_API(username));
+            const response = await apiClient.post(EMPLOYEE_API.USERS_PERMISSION_API(username));
             const data = response.data;
             setPermissions(data);
         } catch (error) {
@@ -77,7 +77,7 @@ const UserPermissionPage = ( ) => {
                         permissionDTO: permissions,
                     };
 
-                    const response = await apiClient.post(USERS_API.UPDATE_USERS_PERMISSION_API, requestBody);
+                    const response = await apiClient.post(EMPLOYEE_API.UPDATE_USERS_PERMISSION_API, requestBody);
                     const permission = response.data;
 
                     dispatch(setAuth({token, permission}));
