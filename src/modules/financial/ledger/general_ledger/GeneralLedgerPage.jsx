@@ -185,6 +185,7 @@ const GeneralLedgerPage = () => {
                                 </Grid>
                                 <Grid sx={{ marginTop: '20px' }}>
                                     <RangePicker
+                                        disabledDate={(current) => current && current.year() !== 2024}
                                         onChange={handleDateChange}
                                         style={{ width: '80%', marginRight: '10px' }}
                                         defaultValue={[
@@ -273,22 +274,22 @@ const GeneralLedgerPage = () => {
                                                 key: 'month',
                                                 align: 'center',
                                                 render: (text, record) => record.isPrevious ?
-                                                    <Typography style={{fontSize: '0.9rem'}}>{text}</Typography> :
-                                                    <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    <span className="medium-text">{text}</span> :
+                                                    <span className="small-text">{text}</span>
                                             },
                                             {
                                                 title: '차변',
                                                 dataIndex: 'totalDebit',
                                                 key: 'totalDebit',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : ''
                                             },
                                             {
                                                 title: '대변',
                                                 dataIndex: 'totalCredit',
                                                 key: 'totalCredit',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : ''
                                             },
                                             {
                                                 title: '잔액',
@@ -297,25 +298,19 @@ const GeneralLedgerPage = () => {
                                                 align: 'center',
 
                                                 render: (text, record) => record.isPrevious ?
-                                                    <Typography style={{fontSize: '0.9rem'}}>{Number(text).toLocaleString()}</Typography> :
-                                                    <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                    <span className="medium-text">{Number(text).toLocaleString()}</span> :
+                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
                                             }
                                         ]}
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         rowKey={(record) => record.month}  // 전기이월과 월을 기준으로 키 설정
                                         size={'small'}
                                         summary={() => (
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>합계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                                                    {searchDetailData.totalDebitAmount.toLocaleString()}
-                                                </Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                                                    {searchDetailData.totalCreditAmount.toLocaleString()}
-                                                </Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                                                    {searchDetailData.totalCashAmount.toLocaleString()}
-                                                </Typography></Table.Summary.Cell>
+                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                <Table.Summary.Cell><span className="medium-text">합계</span></Table.Summary.Cell>
+                                                <Table.Summary.Cell><span className="medium-text">{searchDetailData.totalDebitAmount.toLocaleString()}</span></Table.Summary.Cell>
+                                                <Table.Summary.Cell><span className="medium-text">{searchDetailData.totalCreditAmount.toLocaleString()}</span></Table.Summary.Cell>
+                                                <Table.Summary.Cell><span className="medium-text">{searchDetailData.totalCashAmount.toLocaleString()}</span></Table.Summary.Cell>
                                             </Table.Summary.Row>
                                         )}
                                         rowClassName={(record) => {

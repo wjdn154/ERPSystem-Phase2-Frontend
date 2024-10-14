@@ -108,7 +108,7 @@ const AccountLedgerPage = () => {
             const data = response.data;
             setSearchData(data);
         } catch (error) {
-            notify('error', '조회 오류', '총계정원장 조회 중 오류가 발생했습니다.', 'top');
+            notify('error', '조회 오류', '계정별 원장 조회 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -180,6 +180,7 @@ const AccountLedgerPage = () => {
                                     </Grid>
                                     <Grid sx={{ marginTop: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleDateChange}
                                             style={{ width: '80%', marginRight: '10px' }}
                                             defaultValue={[

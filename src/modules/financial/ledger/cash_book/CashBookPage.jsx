@@ -80,6 +80,7 @@ const CashBookPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleDateChange}
                                             style={{ marginRight: '10px' }}
                                             defaultValue={[

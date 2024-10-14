@@ -65,6 +65,7 @@ const WorkerAssignmentPage = () => {
             {/* 날짜 범위 선택 */}
             <div style={{ marginBottom: '20px' }}>
                 <RangePicker
+                    disabledDate={(current) => current && current.year() !== 2024}
                     value={dateRange}
                     onChange={handleDateChange}
                     format="YYYY-MM-DD"

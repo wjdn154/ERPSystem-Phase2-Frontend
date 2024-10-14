@@ -174,9 +174,9 @@ const SalesPurchaseLedgerPage = () => {
                                                                     itemName: null,
                                                                     clientCode: null,
                                                                     clientName: null,
-                                                                    supplyAmount: cumulativeSummary.cumulativeSupplyAmount,
-                                                                    vatAmount: cumulativeSummary.cumulativeVatAmount,
-                                                                    sumAmount: cumulativeSummary.cumulativeSumAmount,
+                                                                    supplyAmount: cumulativeSummary.sumSupplyAmount,
+                                                                    vatAmount: cumulativeSummary.sumVatAmount,
+                                                                    sumAmount: cumulativeSummary.sumAmount,
                                                                     isSummary: true,
                                                                     isCumulativeTotal: true,
                                                                 });
@@ -338,9 +338,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'vatTypeName',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '0.7rem' }}>{text}</span>
+                                                    <span className="small-text">{text}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{text}</span>
+                                                    <span className="small-text">{text}</span>
                                                 ),
                                             },
                                             {
@@ -349,9 +349,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'voucherDate',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>{text}</span>
+                                                    <span className="medium-text">{text}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{new Date(text).toLocaleDateString()}</span>
+                                                    <span className="small-text">{new Date(text).toLocaleDateString()}</span>
                                                 ),
                                             },
                                             {
@@ -359,7 +359,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'itemName',
                                                 key: 'itemName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <span className="small-text">{text}</span> : '',
                                             },
                                             {
                                                 title: '공급가액',
@@ -367,9 +367,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'supplyAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -378,9 +378,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'vatAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -389,9 +389,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'sumAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -399,7 +399,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.clientName} </span> : '',
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.clientName} </span> : '',
                                             },
                                             {
                                                 title: '전자',
@@ -437,21 +437,21 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'journalEntryName',
                                                 key: 'journalEntryName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <span className="small-text">{text}</span> : '',
                                             },
                                             {
                                                 title: '계정과목',
                                                 dataIndex: 'accountSubjectCode',
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.accountSubjectName}</span> : '',
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.accountSubjectName}</span> : '',
                                             },
                                             {
                                                 title: '담당자',
                                                 dataIndex: 'voucherManagerCode',
                                                 key: 'voucherManagerCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.voucherManagerName}</span> : '',
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.voucherManagerName}</span> : '',
                                             },
                                             {
                                                 title: '담당부서',
