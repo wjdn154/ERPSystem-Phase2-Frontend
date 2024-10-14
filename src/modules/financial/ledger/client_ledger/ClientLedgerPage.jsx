@@ -98,13 +98,13 @@ const ClientLedgerPage = () => {
 
         // 입력값 검증
         if (!startDate || !endDate || !accountCode || !clientStartCode || !clientEndCode) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
         // 거래처 코드 순서 검증
         if (Number(clientStartCode) > Number(clientEndCode)) {
-            notify('warning', '입력 오류', '거래처 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomLeft');
+            notify('warning', '입력 오류', '거래처 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomRight');
             return;
         }
 

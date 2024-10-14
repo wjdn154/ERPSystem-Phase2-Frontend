@@ -93,13 +93,13 @@ const AccountLedgerPage = () => {
         const { startDate, endDate, startAccountCode, endAccountCode } = searchParams;
         // 입력값 검증
         if (!startDate || !endDate || !startAccountCode || !endAccountCode) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
         // 계정과목 코드 순서 검증
         if (Number(startAccountCode) > Number(endAccountCode)) {
-            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomLeft');
+            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomRight');
             return;
         }
 
@@ -229,7 +229,7 @@ const AccountLedgerPage = () => {
                                                     // API 호출 시 updatedParams 사용
                                                     const response = await apiClient.post(FINANCIAL_API.ACCOUNT_SUBJECT_LEDGER_DETAIL_API, { ...updatedParams });
                                                     setSearchDetailData(response.data);
-                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomLeft');
+                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
