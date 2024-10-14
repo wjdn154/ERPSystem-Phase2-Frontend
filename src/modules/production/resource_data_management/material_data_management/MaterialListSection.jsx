@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import {Grid,Paper,Typography}  from "@mui/material";
-import {Button, Table as AntTable, Modal, Input, Select, DatePicker} from "antd";
+import {Button, Table as AntTable, Modal as AntModal, Input, Select, DatePicker} from "antd";
 import {materialListColumn} from "./MaterialListColumn.jsx";
 const {Option} = Select;
 
@@ -41,7 +41,7 @@ const MaterialListSection = ({
                     style: {cursor: 'pointer'},           //커서 스타일 변경
                 })}
             />
-            <Modal
+            <AntModal
                 title="자재 상세 정보 등록"
                 open={isInsertModalVisible}
                 onOk={handleInsertOk}
@@ -141,7 +141,7 @@ const MaterialListSection = ({
                            style={{marginTop: '20px', flex: 1}}
                            onChange={(e) => handleInputChange(e, 'hazardousMaterialName')}/>
                 </div>
-            </Modal>
+            </AntModal>
 
             <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
                 <Button onClick={updateModal} type="primary"

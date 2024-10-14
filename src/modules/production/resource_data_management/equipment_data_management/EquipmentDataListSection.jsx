@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import {Grid,Paper,Typography}  from "@mui/material";
-import {Button, Table as AntTable, Modal, Input, Select, DatePicker} from "antd";
+import {Button, Table as AntTable, Modal as AntModal, Input, Select, DatePicker} from "antd";
 import moment from "moment";
 const {Option} = Select;
 
@@ -55,7 +55,7 @@ const EquipmentDataListSection = ({columns,
             />
 
 
-            <Modal
+            <AntModal
                 title="설비 상세 정보 등록"
                 open={isInsertModalVisible}
                 onOk={handleInsertOk}
@@ -170,7 +170,7 @@ const EquipmentDataListSection = ({columns,
                                onChange={(e) => handleInputChange(e, 'equipmentImg')}
                                ref={equipmentImgRef}/>
                     </div>
-            </Modal>
+            </AntModal>
         </Paper>
 )
 }

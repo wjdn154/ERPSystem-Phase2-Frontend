@@ -19,7 +19,6 @@ export const useWorkcenter = (initialData) => {
     const [isEditing, setIsEditing] = useState(false);
     const [activeRate, setActiveRate] = useState(null);
 
-
     const handleTabChange = (key) => {
         setActiveTabKey(key);
     };
@@ -39,17 +38,16 @@ export const useWorkcenter = (initialData) => {
     useEffect(() => {
         const loadWorkcenters = async () => {
             try {
-                if (!initialData || initialData.length === 0) {
-                    const fetchedData = await fetchWorkcenters();
-                    setData(fetchedData);
-                }
+                const fetchedData = await fetchWorkcenters();
+                setData(fetchedData); // 데이터를 state로 설정
             } catch (error) {
                 console.error("데이터 로드 중 오류 발생:", error);
             }
         };
 
         loadWorkcenters();
-    }, [initialData]);
+    }, []); // 빈 배열로 두어 컴포넌트가 마운트될 때 항상 데이터를 불러오도록 함
+
 
     // 특정 작업장 삭제 로직
     const handleDeleteWorkcenter = async (code) => {
@@ -100,23 +98,28 @@ export const useWorkcenter = (initialData) => {
         }
     };
 
+    // 작업장 유형 변경 핸들러
+    const handleWorkcenterTypeChange = (value) => {
+        setWorkcenter({
+            ...workcenter,
+            workcenterType: value,  // 한국어 값에서 변환된 영어 값을 그대로 저장
+        });
+    };
+
     // Input 수정
-    const handleInputChange = (e, key) => {
-        let value = e.target.value;
+    const handleInputChange = (value, key) => {
+        let newValue = value; // 기본적으로 Select에서 바로 전달된 value를 사용
+
         if (key === 'isActive') {
-            value = value.toLowerCase() === 'y';
-        } else if (value.toLowerCase() === 'n') {
-            value = false;
-        } else {
-            // 유효하지 않은 값이 입력된 경우, false로 처리 && 경고 표시
-            value = false; // TODO
+            newValue = value === '사용중';  // '사용중'이면 true, 아니면 false로 변환
         }
 
         setWorkcenter({
             ...workcenter,
-            [key]: value,
+            [key]: newValue,
         });
     };
+
 
     // handleSave
     const handleSave = async () => {
@@ -193,5 +196,6 @@ export const useWorkcenter = (initialData) => {
         setActiveRate,
         handleTabChange,
         activeTabKey,
+        handleWorkcenterTypeChange
     };
 };

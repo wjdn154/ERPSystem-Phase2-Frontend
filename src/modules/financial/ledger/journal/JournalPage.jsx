@@ -41,7 +41,7 @@ const JournalPage = () => {
         const { startDate, endDate } = searchParams;
         // 입력값 검증
         if (!startDate || !endDate) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 

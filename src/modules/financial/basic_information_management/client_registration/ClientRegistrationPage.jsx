@@ -219,8 +219,8 @@ const ClientRegistrationPage = ( {initialData} ) => {
                     });
                     setDisplayValues({});
                     type === 'update'
-                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomLeft')
-                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomLeft'), registrationForm.resetFields());
+                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomRight')
+                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomRight'), registrationForm.resetFields());
 
                 } catch (error) {
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -230,7 +230,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 notification.warning({
                     message: '저장 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
+                    placement: 'bottomRight',
                 });
             },
         });

@@ -87,14 +87,14 @@ const UserPermissionPage = ( ) => {
                     notification.success({
                         message: '성공',
                         description: '권한이 성공적으로 저장되었습니다.',
-                        placement: 'bottomLeft',
+                        placement: 'bottomRight',
                     });
 
                 } catch (error) {
                     notification.error({
                         message: '실패',
                         description: error.response ? error.response.data : error.message,
-                        placement: 'bottomLeft',
+                        placement: 'bottomRight',
                     });
                 }
             },
@@ -102,7 +102,7 @@ const UserPermissionPage = ( ) => {
                 notification.warning({
                     message: '저장 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
+                    placement: 'bottomRight',
                 });
             },
         });
