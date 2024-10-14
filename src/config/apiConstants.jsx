@@ -88,16 +88,15 @@ export const DEPARTMENT_API = {
 }
 // 물류관리
 export const LOGISTICS_API = {
-    PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/product-list`, // 품목 목록 조회 API
-    PRODUCT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/product-detail/${id}`, // 품목 상세 조회 API
-    PRODUCT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/update-product/${id}`,
-    PRODUCT_CREATE_API: `${API_BASE_URL}/api/logistics/save-product`,
+    PRODUCT_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/product-groups/`,
+    PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/products/`,   //품목 목록 조회 API
+    PRODUCT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/products/${id}`, // 품목 상세 조회 API
+    PRODUCT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/products/update/${id}`,
+    PRODUCT_CREATE_API: `${API_BASE_URL}/api/logistics/products/save`,
     WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse`, // 창고 목록 조회 API
     WAREHOUSE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/${id}`, // 창고 상세 조회 API
     WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics//warehouse/updateWarehouse/${id}`,
 
-    //품목
-    PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/products/`,   //품목 목록 조회 API
 };
 // 생산관리
 export const PRODUCTION_API = {

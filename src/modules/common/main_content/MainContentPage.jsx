@@ -128,7 +128,7 @@ import JobPostingManagementPage
     from "../../hr/recruitment_management/job_posting_management/JobPostingManagementPage.jsx";
 import PensionManagementPage from "../../hr/retirement_management/pension_management/PensionManagementPage.jsx";
 import CustomErrorPage from "../custom_error/CustomErrorPage.jsx";
-import ItemManagementPage from "../../logistics/basic_information_management/item_management/ItemManagementPage.jsx";
+import ProductManagementPage from "../../logistics/basic_information_management/product_management/ProductManagementPage.jsx";
 import ItemGroupManagementPage
     from "../../logistics/basic_information_management/item_group_management/ItemGroupManagementPage.jsx";
 import WarehouseRegistrationPage from "../../logistics/basic_information_management/warehouse_registration/WarehouseRegistrationPage.jsx";
@@ -221,7 +221,7 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     ApplicantManagementPage, ApplicationManagementPage, InterviewManagementPage, JobOfferManagementPage, SalarySettlementPage, DeductionManagementPage,
     PaymentItemManagementPage, SocialInsurancePage, PayStatementPage, RetirementBenefitEstimationPage, RetirementSettlementPage, PensionManagementPage,
     WithholdingTaxDeclarationPage, LocalIncomeTaxDeclarationPage, PaymentStatementIssuancePage, BusinessIncomeManagementPage, OtherIncomeManagementPage,
-    ItemManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShipmentPage,
+    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShipmentPage,
     PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
