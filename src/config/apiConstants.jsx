@@ -61,6 +61,9 @@ export const FINANCIAL_API = {
 
     // 매입매출장 관련 API
     PURCHASE_SALES_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/SalesAndPurchase/show`, // 매입매출장 목록 조회 API
+
+    // 전자세금계산서 관련 API
+    TAX_INVOICE_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/taxInvoice/show`, // 전자세금계산서 목록 조회 API
 };
 
 // 인사관리 - 사원

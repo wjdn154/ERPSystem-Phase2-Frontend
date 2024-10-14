@@ -176,14 +176,14 @@ const PendingVoucherInputPage = () => {
 
             // 데이터 저장
             await apiClient.post(FINANCIAL_API.SAVE_UNRESOLVED_VOUCHER_API, processedVouchers); // API 호출
-            notify('success', '저장 완료', '전표가 성공적으로 저장되었습니다.', 'bottomLeft');
+            notify('success', '저장 완료', '전표가 성공적으로 저장되었습니다.', 'bottomRight');
             fetchData(); // 목록 갱신
             setVoucher({}); // 저장 후 입력폼 초기화
             setDisplayValues({ accountSubjectCode: '', clientCode: '' });
             setVouchers([]); // 저장 후 배열 초기화
 
         } catch (err) {
-            notify('error', '저장 실패', err.message || '전표 저장 중 오류가 발생했습니다.', 'bottomLeft');
+            notify('error', '저장 실패', err.message || '전표 저장 중 오류가 발생했습니다.', 'bottomRight');
         }
     };
 
@@ -191,13 +191,13 @@ const PendingVoucherInputPage = () => {
 
         // 입금, 출금일 경우에는 행 추가를 허용하지 않음
         if (voucher.voucherType === 'Deposit' || voucher.voucherType === 'Withdrawal') {
-            notify('warning', '입력 오류', '입금 또는 출금일 경우 행을 추가할 수 없습니다.', 'bottomLeft');
+            notify('warning', '입력 오류', '입금 또는 출금일 경우 행을 추가할 수 없습니다.', 'bottomRight');
             return;
         }
 
         // 필수 입력값 모두 체크 (차변 또는 대변 금액이 0이어도 허용)
         if (!voucher.voucherType || !voucher.accountSubjectCode || !voucher.clientCode) {
-            notify('warning', '입력 오류', '모든 필수 필드를 입력해주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필수 필드를 입력해주세요.', 'bottomRight');
             return;
         }
 

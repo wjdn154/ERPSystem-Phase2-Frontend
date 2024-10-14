@@ -200,7 +200,7 @@ export const accountSubjectHook = (initialData) => {
                     notification.success({
                         message: '저장 성공',
                         description: '변경 사항이 성공적으로 저장되었습니다.',
-                        placement: 'bottomLeft',
+                        placement: 'bottomRight',
                     });
                 } catch (error) {
                     console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
@@ -217,7 +217,7 @@ export const accountSubjectHook = (initialData) => {
                 notification.warning({
                     message: '저장이 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
+                    placement: 'bottomRight',
                 });
             },
         });

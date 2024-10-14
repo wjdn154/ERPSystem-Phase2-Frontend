@@ -119,7 +119,7 @@ const RoutingManagementPage = () => {
                 notification.warning({
                     message: '저장 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
+                    placement: 'bottomRight',
                 });
             },
 
@@ -213,7 +213,7 @@ const RoutingManagementPage = () => {
     const handleAddProcessRouting = async () => {
         try {
             await apiClient.post(PRODUCTION_API.ROUTING_CREATE_API, newRouting);
-            notify('success', '조회 성공', '새 공정 경로가 성공적으로 추가되었습니다.', 'bottomLeft');
+            notify('success', '조회 성공', '새 공정 경로가 성공적으로 추가되었습니다.', 'bottomRight');
             setIsModalVisible(false);
             // 데이터 새로고침
             const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
@@ -251,7 +251,7 @@ const RoutingManagementPage = () => {
                 setIsLoading(true);
                 try {
                     await apiClient.post(PRODUCTION_API.ROUTING_DELETE_API(id));
-                    notify('success', '삭제 성공', '공정 경로가 성공적으로 삭제되었습니다.', 'bottomLeft');
+                    notify('success', '삭제 성공', '공정 경로가 성공적으로 삭제되었습니다.', 'bottomRight');
                     refreshProcessRoutings();
                 } catch (error) {
                     console.error('Error deleting process routing:', error);
@@ -268,7 +268,7 @@ const RoutingManagementPage = () => {
         try {
             const response = await apiClient.post(PRODUCTION_API.ROUTING_SEARCH_PROCESS_DETAILS_API, { keyword });
             setData(response.data);
-            notify('success', '조회 성공', '공정이 성공적으로 조회되었습니다.', 'bottomLeft');
+            notify('success', '조회 성공', '공정이 성공적으로 조회되었습니다.', 'bottomRight');
 
         } catch (error) {
             console.error('Error searching process details:', error);

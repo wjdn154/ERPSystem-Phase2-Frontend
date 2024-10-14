@@ -195,6 +195,18 @@ input.ant-input[readonly] {
 .summary-row {
   background-color: #F7F7F7;
 }
+.small-text {
+  font-size: 0.8rem;
+}
+
+.medium-text {
+  font-size: 0.9rem;
+}
+
+.large-text {
+  font-size: 1rem;
+}
+
 .ant-table-thead th {
 }
 
