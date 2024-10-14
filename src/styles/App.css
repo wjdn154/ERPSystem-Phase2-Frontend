@@ -193,7 +193,7 @@ input.ant-input[readonly] {
 
 /* 모든 테이블 제목에 적용 */
 .summary-row {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: #F7F7F7;
 }
 .ant-table-thead th {
 }
