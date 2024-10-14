@@ -193,6 +193,7 @@ const TaxInvoiceStatusPage = () => {
                                     <Row style={{ marginTop: '20px', marginBottom: '20px' }}>
                                     <Col>
                                             <RangePicker
+                                                disabledDate={(current) => current && current.year() !== 2024}
                                                 onChange={handleDateChange}
                                                 style={{ marginRight: '10px' }}
                                                 defaultValue={[

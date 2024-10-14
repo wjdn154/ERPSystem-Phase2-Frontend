@@ -74,13 +74,14 @@ const JournalPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={8} sx={{ minWidth: '1200px'}}>
+                    <Grid item xs={12} md={8} sx={{ minWidth: '1400px'}}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >분개장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleDateChange}
                                             style={{ marginRight: '10px' }}
                                             defaultValue={[
@@ -101,14 +102,14 @@ const JournalPage = () => {
                                                 dataIndex: 'voucherDate',
                                                 key: 'voucherDate',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
                                                 title: '전표번호',
                                                 dataIndex: 'voucherNumber',
                                                 key: 'voucherNumber',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
                                                 title: '구분',
@@ -147,7 +148,7 @@ const JournalPage = () => {
                                                 dataIndex: 'accountSubjectCode',
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span> : ''
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.accountSubjectName}</span> : ''
                                                 // render: (text, record) => { return <span><Tag style={{ marginLeft: '5px' }} color='gray'>{text}</Tag>{record.accountSubjectName}</span>; }
                                             },
                                             {
@@ -163,14 +164,14 @@ const JournalPage = () => {
                                                         dataIndex: 'debitAmount',
                                                         key: 'debitAmount',
                                                         align: 'center',
-                                                        render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''
+                                                        render: (text) => text ? <span className="small-text">{text.toLocaleString()}</span> : ''
                                                     },
                                                     {
                                                         title: '대변',
                                                         dataIndex: 'creditAmount',
                                                         key: 'creditAmount',
                                                         align: 'center',
-                                                        render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''
+                                                        render: (text) => text ? <span className="small-text">{text.toLocaleString()}</span> : ''
                                                     },
                                                 ],
                                                 colSpan: 2,
@@ -180,14 +181,14 @@ const JournalPage = () => {
                                                 dataIndex: 'transactionDescription',
                                                 key: 'transactionDescription',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
                                                 title: '거래처',
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>[{text.padStart(5, '0')}] {record.clientName}</span> : ''
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.clientName}</span> : ''
                                                 // render: (text, record) => { return <span><Tag style={{ marginLeft: '5px' }} color='gray'>{text.padStart(5, '0')}</Tag>{record.clientName}</span>; }
                                             },
                                             {
@@ -195,14 +196,14 @@ const JournalPage = () => {
                                                 dataIndex: 'clientRegisterNumber',
                                                 key: 'clientRegisterNumber',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text, record) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
                                                 title: '담당자',
                                                 dataIndex: 'voucherManagerName',
                                                 key: 'voucherManagerName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
                                                 title: '유형',
@@ -233,14 +234,15 @@ const JournalPage = () => {
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         // pagination={false}
                                         size={'small'}
+                                        bordered={true}
                                         summary={() => (
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA'}}>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>총 합계</Typography></Table.Summary.Cell>
+                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA'}}>
+                                                <Table.Summary.Cell><span className="medium-text">총 합계</span></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalVoucherCount}건</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalCredit.toLocaleString()}</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalDebit.toLocaleString()}</Typography></Table.Summary.Cell>
+                                                <Table.Summary.Cell><span className="medium-text">{journalData?.totalVoucherCount}건</span></Table.Summary.Cell>
+                                                <Table.Summary.Cell><span className="medium-text">{journalData?.totalCredit.toLocaleString()}</span></Table.Summary.Cell>
+                                                <Table.Summary.Cell><span className="medium-text">{journalData?.totalDebit.toLocaleString()}</span></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>
                                                 <Table.Summary.Cell></Table.Summary.Cell>

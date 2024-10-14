@@ -258,6 +258,7 @@ const PendingVoucherInputPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid item xs={12} md={3} sx={{ marginBottom: '20px' }}>
                                         <DatePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             value={selectedDate ? dayjs(selectedDate) : null}  // selectedDate가 null일 때를 처리
                                             onChange={(date) => {
                                                 if (date) {
