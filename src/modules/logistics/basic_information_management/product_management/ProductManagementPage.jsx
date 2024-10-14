@@ -18,11 +18,12 @@ const ProductManagementPage = ( {initialData} ) => {
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [productList, setProductList] = useState(initialData);
     const [form] = Form.useForm(); // 폼 인스턴스 생성
+    const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
-    const [editProduct, setEditProduct] = useState(false); // 거래처 등록 수정 탭 활성화 여부 상태
+    const [editProduct, setEditProduct] = useState(false); // 품목 등록 수정 탭 활성화 여부 상태
     const [detailProductData, setDetailProductData] = useState(false);
-    const [productParam, setProductParam] = useState(false); // 수정 할 거래처 정보 상태
+    const [productParam, setProductParam] = useState(false); // 수정 할 품목 정보 상태
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [currentField, setCurrentField] = useState(''); // 모달 분기 할 필드 상태
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
@@ -39,7 +40,7 @@ const ProductManagementPage = ( {initialData} ) => {
 
         setDisplayValues({
             productGroup: `[${detailProductData.productGroupCode}] ${detailProductData.productGroupName}`,
-            client: `[${detailProductData.clientCode}] ${detailProductData.clientName}`,
+            client: `[${detailProductData.clientId}] ${detailProductData.clientName}`,
             processRouting: `[${detailProductData.processRoutingCode}] ${detailProductData.processRoutingName}`
         });
 
@@ -66,7 +67,7 @@ const ProductManagementPage = ( {initialData} ) => {
 
         try {
             const response = await apiClient.post(apiPath);
-
+            console.log(response.data);
             // 데이터가 문자열이고 JSON 배열 형식일 경우 파싱, 아니면 그대로 배열로 처리
             let data = response.data;
             if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
@@ -107,7 +108,6 @@ const ProductManagementPage = ( {initialData} ) => {
                     ...prevParams,
                     client: {
                         id: record.id,
-                        code: String(record.id),
                         name: record.printClientName
                     },
                 }));
@@ -159,16 +159,8 @@ const ProductManagementPage = ( {initialData} ) => {
                 values.remarks = productParam.remarks;
 
                 values.productGroupId = productParam.productGroup.id;
-                values.productGroupCode = productParam.productGroup.code;
-                values.productGroupName = productParam.productGroup.name;
-
                 values.clientId = productParam.client.id;
-                values.clientCode = productParam.client.code;
-                values.clientName = productParam.client.name;
-
                 values.processRoutingId = productParam.processRoutingId;
-                values.processRoutingCode = productParam.processRoutingCode;
-                values.processRoutingName = productParam.processRoutingName;
 
                 // FormData 객체 생성
                 const formData = new FormData();
@@ -191,20 +183,15 @@ const ProductManagementPage = ( {initialData} ) => {
                             product.id === updatedData.id
                                 ? {
                                     ...product,
+                                    id: values.id,
+                                    image: values.image,
                                     code: values.code,
                                     name: values.name,
-                                    clientId: values.clientId,
-                                    clientName: values.clientName,
-                                    productGroupId: values.productGroupId,
                                     productGroupName: values.productGroupName,
-                                    processRoutingId: values.processRoutingId,
-                                    processRoutingName: values.processRoutingName,
                                     standard: values.standard,
-                                    unit: values.unit,
                                     purchasePrice: values.purchasePrice,
                                     salesPrice: values.salesPrice,
                                     productType: values.productType,
-                                    remarks: values.remarks,
                                 }
                                 : product
                         )
@@ -212,12 +199,13 @@ const ProductManagementPage = ( {initialData} ) => {
 
                     setEditProduct(false);
                     setDetailProductData(null);
-                    setProductParam({});
+                    setProductParam({
+                    });
                     setDisplayValues({});
 
                     type === 'update'
                         ? notify('success', '품목 수정', '품목 정보 수정 성공.', 'bottomLeft')
-                        : (notify('success', '품목 저장', '품목 정보 저장 성공.', 'bottomLeft'), form.resetFields());
+                        : (notify('success', '품목 저장', '품목 정보 저장 성공.', 'bottomLeft'), registrationForm.resetFields());
                 } catch (error) {
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
                 }
@@ -620,15 +608,240 @@ const ProductManagementPage = ( {initialData} ) => {
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>품목 등록</Typography>
+                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Form
+                                        layout="vertical"
+                                        onFinish={(values) => { handleFormSubmit(values, 'register') }}
+                                        form={registrationForm}
+                                    >
+                                        {/* 기초 정보 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>기초 정보</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name="code" rules={[{ required: true, message: '품목 코드를 입력하세요.' }]}>
+                                                    <Input addonBefore="품목 코드" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="name" rules={[{ required: true, message: '품목명을 입력하세요.' }]}>
+                                                    <Input addonBefore="품목명" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="standard" rules={[{ required: true, message: '규격을 입력하세요.' }]}>
+                                                    <Input addonBefore="규격" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="unit" rules={[{ required: true, message: '단위를 입력하세요.' }]}>
+                                                    <Input addonBefore="단위" />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name="purchasePrice" rules={[{ required: true, message: '입고단가를 입력하세요.' }]}>
+                                                    <Input addonBefore="입고 단가" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="salesPrice" rules={[{ required: true, message: '출고 단가를 입력하세요.' }]}>
+                                                    <Input addonBefore="출고 단가" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="품목 그룹"
+                                                        value={displayValues.productGroup}
+                                                        onClick={() => handleInputClick('productGroup')}
+                                                        onFocus={(e) => e.target.blur()}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="productType">
+                                                    <Space.Compact>
+                                                        <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="품목 구분" disabled />
+                                                        <Select
+                                                            style={{ width: '60%' }}
+                                                            value={productParam.productType}
+                                                            onChange={(value) => {
+                                                                setProductParam((prevState) => ({
+                                                                    ...prevState,
+                                                                    productType: value, // 선택된 값을 transactionType에 반영
+                                                                }));
+                                                            }}
+                                                        >
+                                                            <Option value="PRODUCTS">제품</Option>
+                                                            <Option value="SEMI_FINISHED_PRODUCT">반제품</Option>
+                                                            <Option value="GOODS">상품</Option>
+                                                            <Option value="INTANGIBLE_GOODS">무형상품</Option>
+                                                        </Select>
+                                                    </Space.Compact>
+
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+
+                                        {/* 추가 정보 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>추가 정보</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="거래처"
+                                                        value={displayValues.client}
+                                                        onClick={() => handleInputClick('client')}
+                                                        onFocus={(e) => e.target.blur()}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="생산 경로"
+                                                        value={displayValues.processRouting}
+                                                        onClick={() => handleInputClick('processRouting')}
+                                                        onFocus={(e) => e.target.blur()}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="remarks">
+                                                    <Input addonBefore="비고" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="isActive" valuePropName="checked">
+                                                    <Checkbox>품목 사용 여부</Checkbox>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        {/* 이미지 업로드 */}
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>이미지 업로드</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={12}>
+                                                <Form.Item name="imageFile" valuePropName="fileList" getValueFromEvent={(e) => e.fileList}>
+                                                    <Input type="file" onChange={(e) => setImageFile(e.target.files[0])} />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                            <Button type="primary" htmlType="submit">
+                                                저장
+                                            </Button>
+                                        </Box>
+
+                                        {/* 모달창 */}
+                                        <Modal
+                                            open={isModalVisible}
+                                            onCancel={handleModalCancel}
+                                            width="40vw"
+                                            footer={null}
+                                        >
+                                            {isLoading ? (
+                                                <Spin />  // 로딩 스피너
+                                            ) : (
+                                                <>
+                                                    {/* 품목 그룹 선택 모달 */}
+                                                    {currentField === 'productGroup' && (
+                                                        <>
+                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                품목 그룹 선택
+                                                            </Typography>
+                                                            {modalData && (
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                        { title: '그룹명', dataIndex: 'name', key: 'name', align: 'center' }
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        style: { cursor: 'pointer' },
+                                                                        onClick: () => handleModalSelect(record) // 선택 시 처리
+                                                                    })}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    {/* 거래처 선택 모달 */}
+                                                    {currentField === 'client' && (
+                                                        <>
+                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                거래처 선택
+                                                            </Typography>
+                                                            {modalData && (
+
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'id', key: 'id', align: 'center' },
+                                                                        { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        style: { cursor: 'pointer' },
+                                                                        onClick: () => handleModalSelect(record) // 선택 시 처리
+                                                                    })}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    {/* 생산 경로 선택 모달 */}
+                                                    {currentField === 'processRouting' && (
+                                                        <>
+                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                생산 경로 선택
+                                                            </Typography>
+                                                            {modalData && (
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                        { title: '이름', dataIndex: 'name', key: 'name', align: 'center' }
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        style: { cursor: 'pointer' },
+                                                                        onClick: () => handleModalSelect(record) // 선택 시 처리
+                                                                    })}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                        <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
+                                                            닫기
+                                                        </Button>
+                                                    </Box>
+                                                </>
+                                            )}
+                                        </Modal>
+                                    </Form>
+                                </Grid>
+                            </Paper>
                         </Grow>
                     </Grid>
                 </Grid>
             )}
+
+
 
         </Box>
     );
