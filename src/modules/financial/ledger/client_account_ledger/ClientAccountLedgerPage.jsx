@@ -121,19 +121,19 @@ const ClientAccountLedgerPage = () => {
         const { startDate, endDate, startAccountSubjectCode, endAccountSubjectCode, startClientCode, endClientCode } = searchParams;
         // 입력값 검증
         if (!startDate || !endDate || !startAccountSubjectCode || !endAccountSubjectCode || !startClientCode || !endClientCode) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
         // 계정과목 코드 순서 검증
         if (Number(startAccountSubjectCode) > Number(endAccountSubjectCode)) {
-            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomLeft');
+            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomRight');
             return;
         }
 
         // 거래처 코드 순서 검증
         if (Number(startClientCode) > Number(endClientCode)) {
-            notify('warning', '입력 오류', '거래처 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomLeft');
+            notify('warning', '입력 오류', '거래처 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomRight');
             return;
         }
 
@@ -148,9 +148,9 @@ const ClientAccountLedgerPage = () => {
     };
 
     const ClientAndAccountSubjectLedgerColumns = [
-        { title: '거래처', dataIndex: 'clientCode', key: 'clientCode', align: 'center', render: (text, record) => <span style={{ fontSize: '0.7rem' }}>[{text.padStart(5, '0')}] {record.clientName} </span> },
-        { title: '등록번호', dataIndex: 'clientRegisterNumber', key: 'clientRegisterNumber', align: 'center', render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span> },
-        { title: '대표자명', dataIndex: 'ownerName', key: 'ownerName', align: 'center', render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span> },
+        { title: '거래처', dataIndex: 'clientCode', key: 'clientCode', align: 'center', render: (text, record) => <span className="small-text">[{text.padStart(5, '0')}] {record.clientName} </span> },
+        { title: '등록번호', dataIndex: 'clientRegisterNumber', key: 'clientRegisterNumber', align: 'center', render: (text) => <span className="small-text">{text}</span> },
+        { title: '대표자명', dataIndex: 'ownerName', key: 'ownerName', align: 'center', render: (text) => <span className="small-text">{text}</span> },
     ];
 
     return (
@@ -229,6 +229,7 @@ const ClientAccountLedgerPage = () => {
                                     </Grid>
                                     <Grid sx={{ marginTop: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleDateChange}
                                             style={{ width: '80%', marginRight: '10px' }}
                                             defaultValue={[
@@ -271,7 +272,7 @@ const ClientAccountLedgerPage = () => {
                                                     // API 호출 시 updatedParams 사용
                                                     const response = await apiClient.post(FINANCIAL_API.CLIENT_AND_ACCOUNT_SUBJECT_LEDGER_DETAIL_API, { ...updatedParams });
                                                     setClientAndAccountLedgerDetailData(response.data);
-                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomLeft');
+                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -293,35 +294,35 @@ const ClientAccountLedgerPage = () => {
                                             columns={[
                                                 {
                                                     title: '계정과목', dataIndex: 'accountSubjectCode', key: 'accountSubjectCode', align: 'center',
-                                                    render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span> : ''
+                                                    render: (text, record) => text ? <span className="small-text">[{text}] {record.accountSubjectName}</span> : ''
                                                 },
                                                 {
                                                     title: '전기이월', dataIndex: 'previousTotalCash', key: 'previousTotalCash', align: 'center',
-                                                    render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : ''
                                                 },
                                                 {
                                                     title: '차변', dataIndex: 'totalDebitAmount', key: 'totalDebitAmount', align: 'center',
-                                                    render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : ''
                                                 },
                                                 {
                                                     title: '대변', dataIndex: 'totalCreditAmount', key: 'totalCreditAmount', align: 'center',
-                                                    render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : ''
                                                 },
                                                 {
                                                     title: '잔액', dataIndex: 'totalCashAmount', key: 'totalCashAmount', align: 'center',
-                                                    render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{Number(text).toLocaleString()}</span> : <span style={{ fontSize: '0.7rem' }}>0</span>
+                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : <span className="small-text">0</span>
                                                 },
                                             ]}
                                             pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                             rowKey="accountSubjectCode"
                                             size={'small'}
                                             summary={() => (
-                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                    <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>합계</Typography></Table.Summary.Cell>
-                                                    <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>{Number(clientAndAccountLedgerDetailData?.totalSumPreviousCash).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                    <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>{Number(clientAndAccountLedgerDetailData?.totalSumDebitAmount).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                    <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>{Number(clientAndAccountLedgerDetailData?.totalSumCreditAmount).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                    <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>{Number(clientAndAccountLedgerDetailData?.totalSumCashAmount).toLocaleString()}</Typography></Table.Summary.Cell>
+                                                <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell><span className="medium-text">합계</span></Table.Summary.Cell>
+                                                    <Table.Summary.Cell><span className="medium-text">{Number(clientAndAccountLedgerDetailData?.totalSumPreviousCash).toLocaleString()}</span></Table.Summary.Cell>
+                                                    <Table.Summary.Cell><span className="medium-text">{Number(clientAndAccountLedgerDetailData?.totalSumDebitAmount).toLocaleString()}</span></Table.Summary.Cell>
+                                                    <Table.Summary.Cell><span className="medium-text">{Number(clientAndAccountLedgerDetailData?.totalSumCreditAmount).toLocaleString()}</span></Table.Summary.Cell>
+                                                    <Table.Summary.Cell><span className="medium-text">{Number(clientAndAccountLedgerDetailData?.totalSumCashAmount).toLocaleString()}</span></Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             )}
                                         />

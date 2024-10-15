@@ -74,7 +74,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 const { startDate, endDate } = searchParams;
                                                 // 입력값 검증
                                                 if (!startDate || !endDate) {
-                                                    notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+                                                    notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
                                                     return;
                                                 }
 
@@ -97,164 +97,135 @@ const SalesPurchaseLedgerPage = () => {
                                                 ? (() => {
                                                     const resultList = [];
 
-                                                    let previousDate = null; // 이전 날짜를 저장하는 변수
-                                                    let previousMonth = null; // 이전 월을 저장하는 변수
-                                                    let previousQuarter = null; // 이전 분기를 저장하는 변수
-                                                    let previousHalfYear = null; // 이전 반기를 저장하는 변수
+                                                    // 일계, 월계, 분기계, 반기계 데이터의 인덱스 변수들
+                                                    let dailySummaryIndex = 0;
+                                                    let monthlySummaryIndex = 0;
+                                                    let quarterlySummaryIndex = 0;
+                                                    let halfYearlySummaryIndex = 0;
 
-                                                    // 일계에 대한 누적 값들을 저장하는 변수들
-                                                    let dailyVoucherCount = 0;
-                                                    let dailySupplyAmount = 0;
-                                                    let dailyVatAmount = 0;
-                                                    let dailySumAmount = 0;
+                                                    const dailySummaries = searchData.dailySummaries;
+                                                    const monthlySummaries = searchData.monthlySummaries;
+                                                    const cumulativeSummaries = searchData.cumulativeSummaries;
+                                                    const quarterlySummaries = searchData.quarterlySummaries;
+                                                    const halfYearlySummaries = searchData.halfYearlySummaries;
 
-                                                    // 월계에 대한 누적 값들을 저장하는 변수들
-                                                    let monthlyVoucherCount = 0;
-                                                    let monthlySupplyAmount = 0;
-                                                    let monthlyVatAmount = 0;
-                                                    let monthlySumAmount = 0;
+                                                    const entries = searchData.salesAndPurChaseLedgerShowList;
 
-                                                    // 누계에 대한 누적 값들을 저장하는 변수들
-                                                    let cumulativeVoucherCount = 0;
-                                                    let cumulativeSupplyAmount = 0;
-                                                    let cumulativeVatAmount = 0;
-                                                    let cumulativeSumAmount = 0;
+                                                    let previousDate = null;
+                                                    let previousMonth = null;
+                                                    let previousQuarter = null;
+                                                    let previousHalfYear = null;
 
-                                                    // 분기에 대한 누적 값들을 저장하는 변수들
-                                                    let quarterlyVoucherCount = 0;
-                                                    let quarterlySupplyAmount = 0;
-                                                    let quarterlyVatAmount = 0;
-                                                    let quarterlySumAmount = 0;
-
-                                                    // 반기에 대한 누적 값들을 저장하는 변수들
-                                                    let halfYearlyVoucherCount = 0;
-                                                    let halfYearlySupplyAmount = 0;
-                                                    let halfYearlyVatAmount = 0;
-                                                    let halfYearlySumAmount = 0;
-
-                                                    const entries = searchData.salesAndPurChaseLedgerShowList; // 처리할 거래 목록
-
-                                                    // 거래 목록을 순회하며 처리
                                                     entries.forEach((entry, index) => {
-                                                        const currentDate = entry.voucherDate; // 현재 거래의 날짜
-                                                        const currentMonth = currentDate.slice(0, 7); // 현재 거래의 월 정보 (YYYY-MM)
-                                                        const monthNumber = parseInt(currentDate.slice(5, 7), 10); // 현재 거래의 월 숫자 (1 ~ 12)
-                                                        const currentQuarter = Math.floor((monthNumber - 1) / 3) + 1; // 현재 분기 계산
-                                                        const currentHalfYear = monthNumber <= 6 ? 1 : 2; // 현재 반기 계산
+                                                        const currentDate = entry.voucherDate;
+                                                        const currentMonth = currentDate.slice(0, 7); // 월 정보 (YYYY-MM)
+                                                        const monthNumber = parseInt(currentDate.slice(5, 7), 10); // 월 숫자 (1 ~ 12)
+                                                        const currentQuarter = Math.floor((monthNumber - 1) / 3) + 1; // 분기 계산
+                                                        const currentHalfYear = monthNumber <= 6 ? 1 : 2; // 반기 계산
 
-                                                        // 날짜가 변경되었을 경우, 일계 데이터를 추가
+                                                        // 1. 날짜가 변경된 경우 일계 요약 추가
                                                         if (previousDate && currentDate !== previousDate) {
-                                                            const dailyTotal = {
-                                                                key: `dailyTotal-${index}`,
-                                                                vatTypeName: dailyVoucherCount + '건', // 일계의 거래 건수
-                                                                voucherDate: '[일 계]', // 일계를 나타내는 특수 표기
-                                                                itemName: null,
-                                                                clientCode: null,
-                                                                clientName: null,
-                                                                supplyAmount: dailySupplyAmount, // 공급가액 합계
-                                                                vatAmount: dailyVatAmount, // 세액 합계
-                                                                sumAmount: dailySumAmount, // 총액 합계
-                                                                isSummary: true, // 요약 데이터임을 나타냄
-                                                                isDailyTotal: true, // 일계임을 나타냄
-                                                            };
-                                                            resultList.push(dailyTotal);
-
-                                                            // 일계의 누적 값을 초기화
-                                                            dailyVoucherCount = 0;
-                                                            dailySupplyAmount = 0;
-                                                            dailyVatAmount = 0;
-                                                            dailySumAmount = 0;
+                                                            if (dailySummaryIndex < dailySummaries.length) {
+                                                                const dailySummary = dailySummaries[dailySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `dailyTotal-${index}`,
+                                                                    vatTypeName: dailySummary.voucherCount + '건',
+                                                                    voucherDate: '[일 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: dailySummary.sumSupplyAmount,
+                                                                    vatAmount: dailySummary.sumVatAmount,
+                                                                    sumAmount: dailySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isDailyTotal: true,
+                                                                });
+                                                                dailySummaryIndex++; // 다음 일계로 이동
+                                                            }
                                                         }
 
-                                                        // 월이 변경되었을 경우, 월계와 누계 데이터를 추가
+                                                        // 2. 월이 변경된 경우 월계와 누계 요약 추가
                                                         if (previousMonth && currentMonth !== previousMonth) {
-                                                            const monthlyTotal = {
-                                                                key: `monthlyTotal-${index}`,
-                                                                vatTypeName: monthlyVoucherCount + '건', // 월계의 거래 건수
-                                                                voucherDate: '[월 계]', // 월계를 나타내는 특수 표기
-                                                                itemName: null,
-                                                                clientCode: null,
-                                                                clientName: null,
-                                                                supplyAmount: monthlySupplyAmount, // 월계 공급가액 합계
-                                                                vatAmount: monthlyVatAmount, // 월계 세액 합계
-                                                                sumAmount: monthlySumAmount, // 월계 총액 합계
-                                                                isSummary: true,
-                                                                isMonthlyTotal: true,
-                                                            };
-                                                            resultList.push(monthlyTotal);
+                                                            if (monthlySummaryIndex < monthlySummaries.length) {
+                                                                const monthlySummary = monthlySummaries[monthlySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `monthlyTotal-${index}`,
+                                                                    vatTypeName: monthlySummary.voucherCount + '건',
+                                                                    voucherDate: '[월 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: monthlySummary.sumSupplyAmount,
+                                                                    vatAmount: monthlySummary.sumVatAmount,
+                                                                    sumAmount: monthlySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isMonthlyTotal: true,
+                                                                });
+                                                                monthlySummaryIndex++; // 다음 월계로 이동
+                                                            }
 
-                                                            // 누계 데이터를 추가
-                                                            const cumulativeTotal = {
-                                                                key: `cumulativeTotal-${index}`,
-                                                                vatTypeName: cumulativeVoucherCount + '건', // 누계의 거래 건수
-                                                                voucherDate: '[누 계]', // 누계를 나타내는 특수 표기
-                                                                itemName: null,
-                                                                clientCode: null,
-                                                                clientName: null,
-                                                                supplyAmount: cumulativeSupplyAmount, // 누계 공급가액 합계
-                                                                vatAmount: cumulativeVatAmount, // 누계 세액 합계
-                                                                sumAmount: cumulativeSumAmount, // 누계 총액 합계
-                                                                isSummary: true,
-                                                                isCumulativeTotal: true,
-                                                            };
-                                                            resultList.push(cumulativeTotal);
-
-                                                            // 월계의 누적 값을 초기화
-                                                            monthlyVoucherCount = 0;
-                                                            monthlySupplyAmount = 0;
-                                                            monthlyVatAmount = 0;
-                                                            monthlySumAmount = 0;
+                                                            // 누계 요약 추가
+                                                            if (monthlySummaryIndex < cumulativeSummaries.length) {
+                                                                const cumulativeSummary = cumulativeSummaries[monthlySummaryIndex - 1]; // 해당 월 이후의 누계를 가져옴
+                                                                resultList.push({
+                                                                    key: `cumulativeTotal-${index}`,
+                                                                    vatTypeName: cumulativeSummary.voucherCount + '건',
+                                                                    voucherDate: '[누 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: cumulativeSummary.sumSupplyAmount,
+                                                                    vatAmount: cumulativeSummary.sumVatAmount,
+                                                                    sumAmount: cumulativeSummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isCumulativeTotal: true,
+                                                                });
+                                                            }
                                                         }
 
-                                                        // 분기가 변경되었을 경우, 분기 데이터를 추가
+                                                        // 3. 분기가 변경된 경우 분기 요약 추가
                                                         if (previousQuarter && currentQuarter !== previousQuarter) {
-                                                            const quarterlyTotal = {
-                                                                key: `quarterlyTotal-${index}`,
-                                                                vatTypeName: quarterlyVoucherCount + '건', // 분기의 거래 건수
-                                                                voucherDate: '[분기 계]', // 분기를 나타내는 특수 표기
-                                                                itemName: null,
-                                                                clientCode: null,
-                                                                clientName: null,
-                                                                supplyAmount: quarterlySupplyAmount, // 분기 공급가액 합계
-                                                                vatAmount: quarterlyVatAmount, // 분기 세액 합계
-                                                                sumAmount: quarterlySumAmount, // 분기 총액 합계
-                                                                isSummary: true,
-                                                                isQuarterlyTotal: true,
-                                                            };
-                                                            resultList.push(quarterlyTotal);
-
-                                                            // 분기의 누적 값을 초기화
-                                                            quarterlyVoucherCount = 0;
-                                                            quarterlySupplyAmount = 0;
-                                                            quarterlyVatAmount = 0;
-                                                            quarterlySumAmount = 0;
+                                                            if (quarterlySummaryIndex < quarterlySummaries.length) {
+                                                                const quarterlySummary = quarterlySummaries[quarterlySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `quarterlyTotal-${index}`,
+                                                                    vatTypeName: quarterlySummary.voucherCount + '건',
+                                                                    voucherDate: '[분기 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: quarterlySummary.sumSupplyAmount,
+                                                                    vatAmount: quarterlySummary.sumVatAmount,
+                                                                    sumAmount: quarterlySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isQuarterlyTotal: true,
+                                                                });
+                                                                quarterlySummaryIndex++; // 다음 분기로 이동
+                                                            }
                                                         }
 
-                                                        // 반기가 변경되었을 경우, 반기 데이터를 추가
+                                                        // 4. 반기가 변경된 경우 반기 요약 추가
                                                         if (previousHalfYear && currentHalfYear !== previousHalfYear) {
-                                                            const halfYearlyTotal = {
-                                                                key: `halfYearlyTotal-${index}`,
-                                                                vatTypeName: halfYearlyVoucherCount + '건', // 반기의 거래 건수
-                                                                voucherDate: '[반기 계]', // 반기를 나타내는 특수 표기
-                                                                itemName: null,
-                                                                clientCode: null,
-                                                                clientName: null,
-                                                                supplyAmount: halfYearlySupplyAmount, // 반기 공급가액 합계
-                                                                vatAmount: halfYearlyVatAmount, // 반기 세액 합계
-                                                                sumAmount: halfYearlySumAmount, // 반기 총액 합계
-                                                                isSummary: true,
-                                                                isHalfYearlyTotal: true,
-                                                            };
-                                                            resultList.push(halfYearlyTotal);
-
-                                                            // 반기의 누적 값을 초기화
-                                                            halfYearlyVoucherCount = 0;
-                                                            halfYearlySupplyAmount = 0;
-                                                            halfYearlyVatAmount = 0;
-                                                            halfYearlySumAmount = 0;
+                                                            if (halfYearlySummaryIndex < halfYearlySummaries.length) {
+                                                                const halfYearlySummary = halfYearlySummaries[halfYearlySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `halfYearlyTotal-${index}`,
+                                                                    vatTypeName: halfYearlySummary.voucherCount + '건',
+                                                                    voucherDate: '[반기 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: halfYearlySummary.sumSupplyAmount,
+                                                                    vatAmount: halfYearlySummary.sumVatAmount,
+                                                                    sumAmount: halfYearlySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isHalfYearlyTotal: true,
+                                                                });
+                                                                halfYearlySummaryIndex++; // 다음 반기로 이동
+                                                            }
                                                         }
 
-                                                        // 현재 거래 데이터를 resultList에 추가
+                                                        // 현재 거래 데이터를 추가
                                                         const dayEntry = {
                                                             ...entry,
                                                             key: `voucher-${entry.voucherId}`,
@@ -263,32 +234,6 @@ const SalesPurchaseLedgerPage = () => {
                                                         };
                                                         resultList.push(dayEntry);
 
-                                                        // 누적 값을 업데이트
-                                                        dailyVoucherCount += 1;
-                                                        dailySupplyAmount += entry.supplyAmount;
-                                                        dailyVatAmount += entry.vatAmount;
-                                                        dailySumAmount += entry.sumAmount;
-
-                                                        monthlyVoucherCount += 1;
-                                                        monthlySupplyAmount += entry.supplyAmount;
-                                                        monthlyVatAmount += entry.vatAmount;
-                                                        monthlySumAmount += entry.sumAmount;
-
-                                                        cumulativeVoucherCount += 1;
-                                                        cumulativeSupplyAmount += entry.supplyAmount;
-                                                        cumulativeVatAmount += entry.vatAmount;
-                                                        cumulativeSumAmount += entry.sumAmount;
-
-                                                        quarterlyVoucherCount += 1;
-                                                        quarterlySupplyAmount += entry.supplyAmount;
-                                                        quarterlyVatAmount += entry.vatAmount;
-                                                        quarterlySumAmount += entry.sumAmount;
-
-                                                        halfYearlyVoucherCount += 1;
-                                                        halfYearlySupplyAmount += entry.supplyAmount;
-                                                        halfYearlyVatAmount += entry.vatAmount;
-                                                        halfYearlySumAmount += entry.sumAmount;
-
                                                         // 이전 날짜, 월, 분기, 반기를 업데이트
                                                         previousDate = currentDate;
                                                         previousMonth = currentMonth;
@@ -296,91 +241,90 @@ const SalesPurchaseLedgerPage = () => {
                                                         previousHalfYear = currentHalfYear;
                                                     });
 
-                                                    // 마지막 날짜에 대한 일계 데이터 추가
-                                                    if (dailyVoucherCount > 0) {
-                                                        const dailyTotal = {
+                                                    // 마지막 일계, 월계, 분기계, 반기계를 추가하는 로직
+                                                    if (dailySummaryIndex < dailySummaries.length) {
+                                                        const dailySummary = dailySummaries[dailySummaryIndex];
+                                                        resultList.push({
                                                             key: `dailyTotal-final`,
-                                                            vatTypeName: dailyVoucherCount + '건',
+                                                            vatTypeName: dailySummary.voucherCount + '건',
                                                             voucherDate: '[일 계]',
                                                             itemName: null,
                                                             clientCode: null,
                                                             clientName: null,
-                                                            supplyAmount: dailySupplyAmount,
-                                                            vatAmount: dailyVatAmount,
-                                                            sumAmount: dailySumAmount,
+                                                            supplyAmount: dailySummary.sumSupplyAmount,
+                                                            vatAmount: dailySummary.sumVatAmount,
+                                                            sumAmount: dailySummary.sumAmount,
                                                             isSummary: true,
                                                             isDailyTotal: true,
-                                                        };
-                                                        resultList.push(dailyTotal);
+                                                        });
                                                     }
 
-                                                    // 마지막 월에 대한 월계 데이터 추가
-                                                    if (monthlyVoucherCount > 0) {
-                                                        const monthlyTotal = {
+                                                    if (monthlySummaryIndex < monthlySummaries.length) {
+                                                        const monthlySummary = monthlySummaries[monthlySummaryIndex];
+                                                        resultList.push({
                                                             key: `monthlyTotal-final`,
-                                                            vatTypeName: monthlyVoucherCount + '건',
+                                                            vatTypeName: monthlySummary.voucherCount + '건',
                                                             voucherDate: '[월 계]',
                                                             itemName: null,
                                                             clientCode: null,
                                                             clientName: null,
-                                                            supplyAmount: monthlySupplyAmount,
-                                                            vatAmount: monthlyVatAmount,
-                                                            sumAmount: monthlySumAmount,
+                                                            supplyAmount: monthlySummary.sumSupplyAmount,
+                                                            vatAmount: monthlySummary.sumVatAmount,
+                                                            sumAmount: monthlySummary.sumAmount,
                                                             isSummary: true,
                                                             isMonthlyTotal: true,
-                                                        };
-                                                        resultList.push(monthlyTotal);
+                                                        });
+                                                    }
 
-                                                        const cumulativeTotal = {
+                                                    if (monthlySummaryIndex < cumulativeSummaries.length) {
+                                                        const cumulativeSummary = cumulativeSummaries[monthlySummaryIndex]; // 해당 월 이후의 누계를 가져옴
+                                                        resultList.push({
                                                             key: `cumulativeTotal-final`,
-                                                            vatTypeName: cumulativeVoucherCount + '건',
+                                                            vatTypeName: cumulativeSummary.voucherCount + '건',
                                                             voucherDate: '[누 계]',
                                                             itemName: null,
                                                             clientCode: null,
                                                             clientName: null,
-                                                            supplyAmount: cumulativeSupplyAmount,
-                                                            vatAmount: cumulativeVatAmount,
-                                                            sumAmount: cumulativeSumAmount,
+                                                            supplyAmount: cumulativeSummary.sumSupplyAmount,
+                                                            vatAmount: cumulativeSummary.sumVatAmount,
+                                                            sumAmount: cumulativeSummary.sumAmount,
                                                             isSummary: true,
                                                             isCumulativeTotal: true,
-                                                        };
-                                                        resultList.push(cumulativeTotal);
+                                                        });
                                                     }
 
-                                                    // 마지막 분기에 대한 분기 데이터 추가
-                                                    if (quarterlyVoucherCount > 0) {
-                                                        const quarterlyTotal = {
+                                                    if (quarterlySummaryIndex < quarterlySummaries.length) {
+                                                        const quarterlySummary = quarterlySummaries[quarterlySummaryIndex];
+                                                        resultList.push({
                                                             key: `quarterlyTotal-final`,
-                                                            vatTypeName: quarterlyVoucherCount + '건',
+                                                            vatTypeName: quarterlySummary.voucherCount + '건',
                                                             voucherDate: '[분기 계]',
                                                             itemName: null,
                                                             clientCode: null,
                                                             clientName: null,
-                                                            supplyAmount: quarterlySupplyAmount,
-                                                            vatAmount: quarterlyVatAmount,
-                                                            sumAmount: quarterlySumAmount,
+                                                            supplyAmount: quarterlySummary.sumSupplyAmount,
+                                                            vatAmount: quarterlySummary.sumVatAmount,
+                                                            sumAmount: quarterlySummary.sumAmount,
                                                             isSummary: true,
                                                             isQuarterlyTotal: true,
-                                                        };
-                                                        resultList.push(quarterlyTotal);
+                                                        });
                                                     }
 
-                                                    // 마지막 반기에 대한 반기 데이터 추가
-                                                    if (halfYearlyVoucherCount > 0) {
-                                                        const halfYearlyTotal = {
+                                                    if (halfYearlySummaryIndex < halfYearlySummaries.length) {
+                                                        const halfYearlySummary = halfYearlySummaries[halfYearlySummaryIndex];
+                                                        resultList.push({
                                                             key: `halfYearlyTotal-final`,
-                                                            vatTypeName: halfYearlyVoucherCount + '건',
+                                                            vatTypeName: halfYearlySummary.voucherCount + '건',
                                                             voucherDate: '[반기 계]',
                                                             itemName: null,
                                                             clientCode: null,
                                                             clientName: null,
-                                                            supplyAmount: halfYearlySupplyAmount,
-                                                            vatAmount: halfYearlyVatAmount,
-                                                            sumAmount: halfYearlySumAmount,
+                                                            supplyAmount: halfYearlySummary.sumSupplyAmount,
+                                                            vatAmount: halfYearlySummary.sumVatAmount,
+                                                            sumAmount: halfYearlySummary.sumAmount,
                                                             isSummary: true,
                                                             isHalfYearlyTotal: true,
-                                                        };
-                                                        resultList.push(halfYearlyTotal);
+                                                        });
                                                     }
 
                                                     return resultList;
@@ -394,9 +338,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'vatTypeName',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '0.7rem' }}>{text}</span>
+                                                    <span className="small-text">{text}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{text}</span>
+                                                    <span className="small-text">{text}</span>
                                                 ),
                                             },
                                             {
@@ -405,9 +349,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'voucherDate',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>{text}</span>
+                                                    <span className="medium-text">{text}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{new Date(text).toLocaleDateString()}</span>
+                                                    <span className="small-text">{new Date(text).toLocaleDateString()}</span>
                                                 ),
                                             },
                                             {
@@ -415,7 +359,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'itemName',
                                                 key: 'itemName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <span className="small-text">{text}</span> : '',
                                             },
                                             {
                                                 title: '공급가액',
@@ -423,9 +367,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'supplyAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -434,9 +378,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'vatAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -445,9 +389,9 @@ const SalesPurchaseLedgerPage = () => {
                                                 key: 'sumAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
                                                 ),
                                             },
                                             {
@@ -455,7 +399,7 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.clientName} </span> : '',
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.clientName} </span> : '',
                                             },
                                             {
                                                 title: '전자',
@@ -493,21 +437,21 @@ const SalesPurchaseLedgerPage = () => {
                                                 dataIndex: 'journalEntryName',
                                                 key: 'journalEntryName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <span className="small-text">{text}</span> : '',
                                             },
                                             {
                                                 title: '계정과목',
                                                 dataIndex: 'accountSubjectCode',
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.accountSubjectName}</span> : '',
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.accountSubjectName}</span> : '',
                                             },
                                             {
                                                 title: '담당자',
                                                 dataIndex: 'voucherManagerCode',
                                                 key: 'voucherManagerCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.voucherManagerName}</span> : '',
+                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.voucherManagerName}</span> : '',
                                             },
                                             {
                                                 title: '담당부서',

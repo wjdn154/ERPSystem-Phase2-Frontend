@@ -61,13 +61,13 @@ const DailyMonthlyReportPage = () => {
 
     const handleRenderName = (level, text) => {
         if (level === 'Medium_category') {
-            return <Typography style={{ fontWeight: 500 }}>{text}</Typography>;
+            return <span className="medium-text">{text}</span>;
         } else if (level === 'Small_category') {
-            return <Typography style={{ fontWeight: 500 }}>[{text}]</Typography>;
+            return <span className="medium-text">[{text}]</span>;
         } else if (level === 'Account_name') {
-            return <Typography>{text}</Typography>;
+            return <span className="medium-text">{text}</span>;
         } else if (level === null) {
-            return <Typography>{text}</Typography>;
+            return <span className="medium-text">{text}</span>;
         }
     };
 
@@ -97,7 +97,7 @@ const DailyMonthlyReportPage = () => {
 
         // 입력값 검증
         if (!startDate || !endDate || !journalType) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
@@ -149,6 +149,7 @@ const DailyMonthlyReportPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleDailyDateChange}
                                             style={{ marginRight: '10px' }}
                                             defaultValue={[
@@ -196,10 +197,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'cashTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="medium-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="medium-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '대체',
@@ -207,10 +208,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'subTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="medium-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="medium-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '합계',
@@ -218,10 +219,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'sumTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="medium-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="medium-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                 ],
                                             },
@@ -245,10 +246,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'cashTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="medium-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="medium-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '대체',
@@ -256,10 +257,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'subTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="medium-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="medium-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '합계',
@@ -267,10 +268,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'sumTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="medium-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.9rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="medium-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                 ],
                                             }
@@ -278,6 +279,7 @@ const DailyMonthlyReportPage = () => {
                                         rowKey="key"
                                         // pagination={{ pageSize: 30, position: ['bottomCenter'], showSizeChanger: false }}
                                         pagination={ false }
+                                        bordered={true}
                                         size={'small'}
                                         rowClassName={(record) => {
                                             return record.level !== 'Account_name' ? 'summary-row' : '';
@@ -299,6 +301,7 @@ const DailyMonthlyReportPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleMonthlyDateChange}
                                             style={{ marginRight: '10px' }}
                                             picker="month"  // 월 단위로 설정
@@ -347,10 +350,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'cashTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="small-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '대체',
@@ -358,10 +361,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'subTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="small-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '합계',
@@ -369,10 +372,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'sumTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="small-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                 ],
                                             },
@@ -396,10 +399,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'cashTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="small-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '대체',
@@ -407,10 +410,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'subTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="small-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                     {
                                                         title: '합계',
@@ -418,10 +421,10 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'sumTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <span className="small-text">{text.toLocaleString()}</span>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : '')
+                                                                : (text !== null ? <span className="small-text">{text.toLocaleString()}</span> : ''),
                                                     },
                                                 ],
                                             }
