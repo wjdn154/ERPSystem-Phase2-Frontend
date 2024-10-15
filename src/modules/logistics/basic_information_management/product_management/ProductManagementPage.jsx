@@ -3,7 +3,8 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './ProductManagementUtil.jsx';
 import {Typography} from '@mui/material';
-import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification, Upload } from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {FINANCIAL_API, LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
@@ -29,7 +30,7 @@ const ProductManagementPage = ( {initialData} ) => {
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
     const [displayValues, setDisplayValues] = useState({});
-
+    const [selectedFile, setSelectedFile] = useState(null);
 
     // 품목 조회 데이터가 있을 경우 폼에 데이터 셋팅
     useEffect(() => {
@@ -130,7 +131,6 @@ const ProductManagementPage = ( {initialData} ) => {
                     processRouting: `[${record.code}] ${record.name}`,
                 }));
                 break;
-
         }
 
         // 모달창 닫기
@@ -146,30 +146,51 @@ const ProductManagementPage = ( {initialData} ) => {
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
-                console.log(detailProductData);
                 console.log(productParam);
-                // productParam의 데이터로 values 객체 업데이트
-                values.id = productParam.id;
-                values.code = detailProductData ? detailProductData.code : null;
-                values.standard = productParam.standard;
-                values.unit = productParam.unit;
-                values.purchasePrice = productParam.purchasePrice;
-                values.salesPrice = productParam.salesPrice;
-                values.productType = productParam.productType;
-                values.remarks = productParam.remarks;
+                // // productParam의 데이터로 values 객체 업데이트
+                // values.id = productParam.id;
+                // values.name = productParam.name;
+                // values.code = productParam.code;
+                // values.standard = productParam.standard;
+                // values.unit = productParam.unit;
+                // values.purchasePrice = productParam.purchasePrice;
+                // values.salesPrice = productParam.salesPrice;
+                // values.productType = productParam.productType;
+                // values.remarks = productParam.remarks;
+                //
+                // values.productGroupId = productParam.productGroup.id;
+                // values.clientId = productParam.client.id;
+                // values.processRoutingId = productParam.processRoutingId;
 
-                values.productGroupId = productParam.productGroup.id;
-                values.clientId = productParam.client.id;
-                values.processRoutingId = productParam.processRoutingId;
+                // 필요한 필드들을 `productData` 객체로 생성하고 `imageFile`은 제외
+                const productData = {
+                    id: values.id,
+                    code: values.code,
+                    name: values.name,
+                    standard: values.standard,
+                    unit: values.unit,
+                    purchasePrice: values.purchasePrice,
+                    salesPrice: values.salesPrice,
+                    productType: productParam.productType,
+                    remarks: values.remarks,
+                    productGroupId: productParam.productGroup?.id,
+                    clientId: productParam.client?.id,
+                    processRoutingId: productParam.processRouting?.id,
+                };
 
                 // FormData 객체 생성
                 const formData = new FormData();
-                formData.append("productData", JSON.stringify(values));
-                formData.append("imageFile", detailProductData.imagePath); // selectedFile은 선택한 파일 객체입니다.
+                formData.append("productData", JSON.stringify(productData));  // JSON으로 변환 후 추가
+                if (selectedFile) {  // 파일이 존재할 때만 추가
+                    formData.append("imageFile", selectedFile);
+                }
 
+                console.log("폼 데이터:", formData.get("productData")); // 확인용 로그
+                console.log("이미지 파일:", formData.get("imageFile"));  // 확인용 로그
                 try {
                     const API_PATH = type === 'update' ? LOGISTICS_API.PRODUCT_UPDATE_API(id) : LOGISTICS_API.PRODUCT_CREATE_API;
-                    const response = await apiClient.put(API_PATH, formData, {
+                    const method = type === 'update' ? 'put' : 'post';
+                    const response = await apiClient[method](API_PATH, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data'
                         }
@@ -223,6 +244,17 @@ const ProductManagementPage = ( {initialData} ) => {
 
 
     const handleTabChange = (key) => {
+        setEditProduct(false);
+        setDetailProductData(null);
+        setProductParam({
+            productType: 'GOODS',
+        });
+        setDisplayValues({});
+
+        form.resetFields(); // 1탭 폼 초기화
+        registrationForm.resetFields(); // 2탭 폼 초기화
+        registrationForm.setFieldValue('isActive', true);
+
         setActiveTabKey(key);
     };
 
@@ -259,10 +291,16 @@ const ProductManagementPage = ( {initialData} ) => {
                                         columns={[
                                             {
                                                 title: <span style={{ fontSize: '0.8rem' }}>이미지</span>,
-                                                dataIndex: 'image',
-                                                key: 'image',
+                                                dataIndex: 'imagePath',
+                                                key: 'imagePath',
                                                 align: 'center',
-                                                render: (src) => <img src={src} alt="이미지" style={{ width: '30px', height: '30px', objectFit: 'cover' }} />,
+                                                render: (imagePath) => (
+                                                    <img
+                                                        src={imagePath ? `http://localhost:8080${imagePath}` : ''} // 서버 URL을 추가하여 전체 URL로 사용
+                                                        alt="이미지"
+                                                        style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                                                    />
+                                                ),
                                                 width: '10%'
                                             },
                                             {
@@ -595,7 +633,6 @@ const ProductManagementPage = ( {initialData} ) => {
                                                     </>
                                                 )}
                                             </Modal>
-
                                         </Form>
                                     </Grid>
                                 </Paper>
@@ -717,18 +754,23 @@ const ProductManagementPage = ( {initialData} ) => {
                                                     <Input addonBefore="비고" />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
-                                                <Form.Item name="isActive" valuePropName="checked">
-                                                    <Checkbox>품목 사용 여부</Checkbox>
-                                                </Form.Item>
-                                            </Col>
                                         </Row>
                                         {/* 이미지 업로드 */}
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>이미지 업로드</Divider>
                                         <Row gutter={16}>
                                             <Col span={12}>
-                                                <Form.Item name="imageFile" valuePropName="fileList" getValueFromEvent={(e) => e.fileList}>
-                                                    <Input type="file" onChange={(e) => setImageFile(e.target.files[0])} />
+                                                <Form.Item name="imageFile">
+                                                    <Upload
+                                                        beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
+                                                        onChange={(info) => {
+                                                            const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
+                                                            setSelectedFile(file); // 선택된 파일을 상태로 설정
+                                                            console.log("Selected File:", file);
+                                                        }}
+                                                        fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []} // 파일 리스트 설정
+                                                    >
+                                                        <Button icon={<CloudUploadIcon />}>파일 선택</Button>
+                                                    </Upload>
                                                 </Form.Item>
                                             </Col>
                                         </Row>
