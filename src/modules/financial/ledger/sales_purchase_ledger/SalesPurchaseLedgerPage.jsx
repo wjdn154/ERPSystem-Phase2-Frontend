@@ -333,76 +333,76 @@ const SalesPurchaseLedgerPage = () => {
                                         }
                                         columns={[
                                             {
-                                                title: '과세유형',
+                                                title: <div className="title-text">과세유형</div>,
                                                 dataIndex: 'vatTypeName',
                                                 key: 'vatTypeName',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span className="small-text">{text}</span>
+                                                    <div className="small-text">{text}</div>
                                                 ) : (
-                                                    <span className="small-text">{text}</span>
+                                                    <div className="small-text">{text}</div>
                                                 ),
                                             },
                                             {
-                                                title: '일자',
+                                                title: <div className="title-text">일자</div>,
                                                 dataIndex: 'voucherDate',
                                                 key: 'voucherDate',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span className="medium-text">{text}</span>
+                                                    <div className="medium-text">{text}</div>
                                                 ) : (
-                                                    <span className="small-text">{new Date(text).toLocaleDateString()}</span>
+                                                    <div className="small-text">{new Date(text).toLocaleDateString()}</div>
                                                 ),
                                             },
                                             {
-                                                title: '품목',
+                                                title: <div className="title-text">품목</div>,
                                                 dataIndex: 'itemName',
                                                 key: 'itemName',
                                                 align: 'center',
-                                                render: (text) => text ? <span className="small-text">{text}</span> : '',
+                                                render: (text) => text ? <div className="small-text">{text}</div> : '',
                                             },
                                             {
-                                                title: '공급가액',
+                                                title: <div className="title-text">공급가액</div>,
                                                 dataIndex: 'supplyAmount',
                                                 key: 'supplyAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ) : (
-                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ),
                                             },
                                             {
-                                                title: '부가세',
+                                                title: <div className="title-text">부가세</div>,
                                                 dataIndex: 'vatAmount',
                                                 key: 'vatAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ) : (
-                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ),
                                             },
                                             {
-                                                title: '합계',
+                                                title: <div className="title-text">합계</div>,
                                                 dataIndex: 'sumAmount',
                                                 key: 'sumAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span className="medium-text">{Number(text).toLocaleString()}</span>
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ) : (
-                                                    <span className="small-text">{Number(text).toLocaleString()}</span>
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ),
                                             },
                                             {
-                                                title: '거래처',
+                                                title: <div className="title-text">거래처</div>,
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.clientName} </span> : '',
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.clientName} </div> : '',
                                             },
                                             {
-                                                title: '전자',
+                                                title: <div className="title-text">전자</div>,
                                                 dataIndex: 'electronicTaxInvoiceStatus',
                                                 key: 'electronicTaxInvoiceStatus',
                                                 align: 'center',
@@ -433,28 +433,28 @@ const SalesPurchaseLedgerPage = () => {
                                                 }
                                             },
                                             {
-                                                title: '분개유형',
+                                                title: <div className="title-text">분개유형</div>,
                                                 dataIndex: 'journalEntryName',
                                                 key: 'journalEntryName',
                                                 align: 'center',
-                                                render: (text) => text ? <span className="small-text">{text}</span> : '',
+                                                render: (text) => text ? <div className="small-text">{text}</div> : '',
                                             },
                                             {
-                                                title: '계정과목',
+                                                title: <div className="title-text">계정과목</div>,
                                                 dataIndex: 'accountSubjectCode',
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.accountSubjectName}</span> : '',
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.accountSubjectName}</div> : '',
                                             },
                                             {
-                                                title: '담당자',
+                                                title: <div className="title-text">담당자</div>,
                                                 dataIndex: 'voucherManagerCode',
                                                 key: 'voucherManagerCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span className="small-text">[{text}] {record.voucherManagerName}</span> : '',
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.voucherManagerName}</div> : '',
                                             },
                                             {
-                                                title: '담당부서',
+                                                title: <div className="title-text">담당부서</div>,
                                                 dataIndex: 'voucherManagerDepartmentName',
                                                 key: 'voucherManagerDepartmentName',
                                                 align: 'center',
