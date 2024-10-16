@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Pagination, Radio, Space } from 'antd';
-import { warehouseColumn } from './warehouseColumn'; // 컬럼 정의 import
+import { warehouseColumn } from './WarehouseColumn'; // 컬럼 정의 import
 
 const WarehouseListSection = ({ warehouseList, onSelect, selectedWarehouseId }) => {
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 관리
