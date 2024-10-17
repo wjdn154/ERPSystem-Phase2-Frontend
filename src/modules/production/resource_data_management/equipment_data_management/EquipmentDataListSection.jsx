@@ -126,6 +126,7 @@ const EquipmentDataListSection = ({columns,
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <DatePicker
+                        disabledDate={(current) => current && current.year() !== 2024}
                         value={equipmentDataDetail?.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
                         style={{marginRight: '30px', marginTop: '20px', flex: 1}}
                         onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'purchaseDate')}
@@ -134,6 +135,7 @@ const EquipmentDataListSection = ({columns,
                            style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
                            readOnly/>
                     <DatePicker
+                        disabledDate={(current) => current && current.year() !== 2024}
                         value={equipmentDataDetail?.installDate ? moment(equipmentDataDetail.installDate, 'YYYY-MM-DD') : null}
                         onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'installDate')}
                         style={{width: '100%', marginTop: '20px', flex: 1}}

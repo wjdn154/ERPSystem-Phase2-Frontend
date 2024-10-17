@@ -1,60 +1,146 @@
-import React, {useMemo, useState} from 'react';
-import { Box, Grid, Grow } from '@mui/material';
-import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './WarehouseUtil.jsx';
-import {Typography} from '@mui/material';
-import {Button} from 'antd';
-import TemporarySection from "../../../../components/TemporarySection.jsx";
+import React, { useState, useEffect } from 'react';
+import { Box, Grid, Card, Tabs, Tab, Button } from '@mui/material';
+import WarehouseListSection from './WarehouseListSection';
+import WarehouseDetailSection from './WarehouseDetailSection';
+import { useWarehouse } from './WarehouseHook';
+import { useHierarchyGroups } from '../hierarchy_group_management/HierarchyGroupHook.jsx';
+import HierarchyGroupListSection from '../hierarchy_group_management/HierarchyGroupListSection.jsx';
+import { Table } from 'antd';
+import { hierarchyWarehouseColumn } from '../hierarchy_group_management/HierarchyGroupWarehouseColumn.jsx';
 
 const WarehouseRegistrationPage = () => {
-    const [activeTabKey, setActiveTabKey] = useState('1');
+    const {
+        warehouseList,
+        warehouseDetail,
+        selectedWarehouseId,
+        setSelectedWarehouseId,
+        isCreating,
+        setIsCreating,
+        handleRegisterWarehouse,
+        handleUpdateWarehouse,
+        handleDeleteWarehouse,
+    } = useWarehouse();
 
-    const handleTabChange = (key) => {
-        setActiveTabKey(key);
+    const {
+        selectedGroupId,
+        setSelectedGroupId,
+        fetchWarehousesByGroup,
+    } = useHierarchyGroups();
+
+    const [activeTab, setActiveTab] = useState(0);
+    const [groupWarehouses, setGroupWarehouses] = useState([]);
+
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+        setSelectedWarehouseId(null);
+        setSelectedGroupId(null);
     };
+
+    useEffect(() => {
+        if (activeTab === 1 && selectedGroupId) {
+            fetchWarehousesByGroup(selectedGroupId).then(setGroupWarehouses);
+        }
+    }, [activeTab, selectedGroupId, fetchWarehousesByGroup]);
 
     return (
         <Box sx={{ margin: '20px' }}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={12}>
-                    <WelcomeSection
-                        title="창고 등록"
-                        description={(
-                            <Typography>
-                                창고 등록 페이지는 <span>회사의 창고 정보를 관리</span>하는 페이지로, 창고를 <span>추가, 수정, 삭제</span>할 수 있음. 창고는 각기 다른 위치에 있을 수 있으며, <span>창고의 주소, 담당자 정보, 창고 용량</span> 등의 상세 정보를 입력하여 등록할 수 있음. 창고별로 <span>재고 현황</span>을 관리하는 데 중요한 역할을 하며, 물류의 흐름을 효율적으로 관리하기 위해 필수적인 정보들을 포함함.
-                            </Typography>
+            <Tabs value={activeTab} onChange={handleTabChange} aria-label="Warehouse Management Tabs">
+                <Tab label="창고 목록" />
+                <Tab label="계층 그룹" />
+            </Tabs>
+
+            {activeTab === 0 && (
+                <Grid
+                    container
+                    spacing={2}
+                    sx={{ padding: '20px', alignItems: 'stretch', height: 'calc(100vh - 160px)' }}
+                >
+                    {/* 창고 목록 */}
+                    <Grid item xs={12} md={6}>
+                        <Card
+                            sx={{
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                overflow: 'auto'
+                            }}
+                        >
+                            <WarehouseListSection
+                                warehouseList={warehouseList}
+                                onSelect={(id) => {
+                                    setSelectedWarehouseId(id);
+                                    setIsCreating(false);
+                                }}
+                                selectedWarehouseId={selectedWarehouseId}
+                            />
+                            <Box display="flex" justifyContent="flex-end" sx={{ padding: '10px' }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => {
+                                        setIsCreating(true);
+                                        setSelectedWarehouseId(null);
+                                    }}
+                                >
+                                    신규 창고
+                                </Button>
+                            </Box>
+                        </Card>
+                    </Grid>
+
+                    {/* 상세 정보 */}
+                    <Grid item xs={12} md={6}>
+                        {(isCreating || selectedWarehouseId) && (
+                            <Card
+                                sx={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    overflow: 'auto'
+                                }}
+                            >
+                                <WarehouseDetailSection
+                                    warehouseDetail={isCreating ? {} : warehouseDetail}
+                                    isCreating={isCreating}
+                                    handleUpdateWarehouse={handleUpdateWarehouse}
+                                    handleRegisterWarehouse={handleRegisterWarehouse}
+                                    handleDeleteWarehouse={handleDeleteWarehouse}
+                                    onCancel={() => {
+                                        setIsCreating(false);
+                                        setSelectedWarehouseId(null);
+                                    }}
+                                />
+                            </Card>
                         )}
-                        tabItems={tabItems()}
-                        activeTabKey={activeTabKey}
-                        handleTabChange={handleTabChange}
-                    />
-                </Grid>
-            </Grid>
-
-            {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
-                        <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
-                        </Grow>
                     </Grid>
                 </Grid>
             )}
 
-            {activeTabKey === '2' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
-                        <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
-                        </Grow>
+            {activeTab === 1 && (
+                <Grid container spacing={2} sx={{ padding: '20px' }}>
+                    <Grid item xs={12} md={4}>
+                        <Card sx={{ maxHeight: '400px', overflowY: 'auto', padding: '16px' }}>
+                            <HierarchyGroupListSection
+                                onSelectGroup={(groupId) => setSelectedGroupId(groupId)}
+                            />
+                        </Card>
+                    </Grid>
+
+                    <Grid item xs={12} md={8}>
+                        <Card>
+                            <Table
+                                columns={hierarchyWarehouseColumn}
+                                dataSource={groupWarehouses}
+                                rowKey="id"
+                                pagination={{
+                                    pageSize: 5,
+                                    position: ['bottomCenter'],
+                                }}
+                            />
+                        </Card>
                     </Grid>
                 </Grid>
             )}
-
         </Box>
     );
 };
