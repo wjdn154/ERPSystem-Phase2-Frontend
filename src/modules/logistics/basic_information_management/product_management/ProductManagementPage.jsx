@@ -11,6 +11,7 @@ import {FINANCIAL_API, LOGISTICS_API, PRODUCTION_API} from "../../../../config/a
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
+import image from "../../../../assets/img/uploads/e72ad544e3f940809a389fedec62720c원목책상사진.png"
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -35,7 +36,7 @@ const ProductManagementPage = ( {initialData} ) => {
     // 품목 조회 데이터가 있을 경우 폼에 데이터 셋팅
     useEffect(() => {
         if(!detailProductData) return;
-
+        console.log(productList)
         form.setFieldsValue(detailProductData);
         setProductParam(detailProductData);
 
@@ -139,28 +140,13 @@ const ProductManagementPage = ( {initialData} ) => {
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
-        const id = productParam.id;
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
-                console.log(productParam);
-                // // productParam의 데이터로 values 객체 업데이트
-                // values.id = productParam.id;
-                // values.name = productParam.name;
-                // values.code = productParam.code;
-                // values.standard = productParam.standard;
-                // values.unit = productParam.unit;
-                // values.purchasePrice = productParam.purchasePrice;
-                // values.salesPrice = productParam.salesPrice;
-                // values.productType = productParam.productType;
-                // values.remarks = productParam.remarks;
-                //
-                // values.productGroupId = productParam.productGroup.id;
-                // values.clientId = productParam.client.id;
-                // values.processRoutingId = productParam.processRoutingId;
+                console.log("productParam: " + productParam);
 
                 // 필요한 필드들을 `productData` 객체로 생성하고 `imageFile`은 제외
                 const productData = {
@@ -175,7 +161,7 @@ const ProductManagementPage = ( {initialData} ) => {
                     remarks: values.remarks,
                     productGroupId: productParam.productGroup?.id,
                     clientId: productParam.client?.id,
-                    processRoutingId: productParam.processRouting?.id,
+                    processRoutingId: productParam.processRouting ? productParam.processRouting.id : null,
                 };
 
                 // FormData 객체 생성
@@ -188,7 +174,7 @@ const ProductManagementPage = ( {initialData} ) => {
                 console.log("폼 데이터:", formData.get("productData")); // 확인용 로그
                 console.log("이미지 파일:", formData.get("imageFile"));  // 확인용 로그
                 try {
-                    const API_PATH = type === 'update' ? LOGISTICS_API.PRODUCT_UPDATE_API(id) : LOGISTICS_API.PRODUCT_CREATE_API;
+                    const API_PATH = type === 'update' ? LOGISTICS_API.PRODUCT_UPDATE_API(productParam.id) : LOGISTICS_API.PRODUCT_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
                     const response = await apiClient[method](API_PATH, formData, {
                         headers: {
@@ -199,24 +185,14 @@ const ProductManagementPage = ( {initialData} ) => {
                     const updatedData = response.data;
                     console.log("updatedData: ", updatedData);
 
-                    setProductList((prevProductList) =>
-                        prevProductList.map((product) =>
-                            product.id === updatedData.id
-                                ? {
-                                    ...product,
-                                    id: values.id,
-                                    image: values.image,
-                                    code: values.code,
-                                    name: values.name,
-                                    productGroupName: values.productGroupName,
-                                    standard: values.standard,
-                                    purchasePrice: values.purchasePrice,
-                                    salesPrice: values.salesPrice,
-                                    productType: values.productType,
-                                }
-                                : product
-                        )
-                    );
+                    if (type === 'update') {
+                        setProductList((prevList) =>
+                            prevList.map((product) => product.id === updatedData.id ? updatedData : product)
+                        );
+                    } else {
+                        setProductList((prevList) => [updatedData, ...prevList]);
+                        registrationForm.resetFields();
+                    }
 
                     setEditProduct(false);
                     setDetailProductData(null);
@@ -294,11 +270,14 @@ const ProductManagementPage = ( {initialData} ) => {
                                                 dataIndex: 'imagePath',
                                                 key: 'imagePath',
                                                 align: 'center',
-                                                render: (imagePath) => (
+                                                render: (text, record) => (
                                                     <img
-                                                        src={imagePath ? `http://localhost:8080${imagePath}` : ''} // 서버 URL을 추가하여 전체 URL로 사용
+                                                        src={record.imagePath
+                                                            ? `/src/assets/img/uploads/${record.imagePath}`
+                                                            // ? `/src/assets/img/uploads/${record.imagePath}`
+                                                            : `/src/assets/img/uploads/defaultImage.png`}
                                                         alt="이미지"
-                                                        style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                                                     />
                                                 ),
                                                 width: '10%'
