@@ -44,7 +44,7 @@ const WorkerPage = ({initialData}) => {
            {/*       justifyContent="center"  // 수평 중앙 정렬*/}
            {/*       alignItems="center"      // 수직 중앙 정렬*/}
            {/*>*/}
-                    <Grid item xs={12}>
+                    <Grid item xs={12} md={12}>
                         <WelcomeSection
                             title="작업자 관리"
                             description={(
@@ -62,39 +62,33 @@ const WorkerPage = ({initialData}) => {
 
                 {/* 작업자 목록 및 상세내용 영역 */}
                 {activeTabKey === '1' && (
-                // <Grid container spacing={2}
-                //       justifyContent="center"  // 수평 중앙 정렬
-                //       alignItems="center"      // 수직 중앙 정렬
-                // >
-                <Grid item xs={12} md={10}>
-                    <Grow in={true} timeout={200}>
-                        <div>
-                            <WorkerListSection
-                                columns={workerListColumn}
-                                data={data}
-                                workerDetail={workerDetail}
-                                setWorkerDetail={setWorkerDetail}
-                                handleRowSelection={handleRowSelection}
-                                handleSelectedRow={handleSelectedRow}
-                                handleUpdateOk={handleUpdateOk}
-                                handleUpdateCancel={handleUpdateCancel}
-                                isUpdateModalVisible={isUpdateModalVisible}
-                                handleInputChange={handleInputChange}
-                                showUpdateModal={showUpdateModal}
-                            />
-                        </div>
-                    </Grow>
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={10} md={10}>
+                        <Grow in={true} timeout={200}>
+                            <div>
+                                <WorkerListSection
+                                    columns={workerListColumn}
+                                    data={data}
+                                    workerDetail={workerDetail}
+                                    setWorkerDetail={setWorkerDetail}
+                                    handleRowSelection={handleRowSelection}
+                                    handleSelectedRow={handleSelectedRow}
+                                    handleUpdateOk={handleUpdateOk}
+                                    handleUpdateCancel={handleUpdateCancel}
+                                    isUpdateModalVisible={isUpdateModalVisible}
+                                    handleInputChange={handleInputChange}
+                                    showUpdateModal={showUpdateModal}
+                                />
+                            </div>
+                        </Grow>
+                    </Grid>
                 </Grid>
-            // </Grid>
             )}
 
             {/* 작업자 작업배치 및 근태목록 영역 */}
             {activeTabKey === '2' && (
-                // <Grid container spacing={2}
-                //       justifyContent="center"  // 수평 중앙 정렬
-                //       alignItems="center"      // 수직 중앙 정렬
-                // >
-                    <Grid item xs={12}>
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={10}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <WorkerAttendanceListSection
@@ -116,7 +110,7 @@ const WorkerPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                // </Grid>
+                </Grid>
             )}
         </Box>
     )
