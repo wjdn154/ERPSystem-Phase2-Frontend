@@ -1,4 +1,8 @@
-import {Typography} from "antd";
+import {Typography} from "@mui/material";
+
+export const getRowClassName = (record) => {
+    return record.modificationType === false ? 'red-text' : '';
+};
 
 export const tabItems = () => {
     return [
@@ -13,10 +17,10 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '창고 등록',
+            label: '계층 그룹',
             children: (
                 <Typography>
-                    새로운 창고를 등록하는 탭으로, 창고 이름, 위치, 담당자 정보 등을 입력할 수 있음.
+                    계층 그룹을 관리할 수 있음. 계층 그룹별로 창고들을 조회할 수 있음.
                 </Typography>
             ),
         },

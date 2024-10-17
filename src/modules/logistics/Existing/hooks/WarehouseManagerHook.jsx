@@ -4,7 +4,6 @@ import { fetchWarehouseList } from '../services/WarehouseApi'; // API 호출 함
 const WarehouseManagerHook = () => {
     const [data, setData] = useState([]); // 창고 목록 데이터
     const [loading, setLoading] = useState(true); // 로딩 상태 관리
-    const [isModalVisible, setIsModalVisible] = useState(false); // 모달 보이기 상태
     const [isSubmitting, setIsSubmitting] = useState(false); // 제출 로딩 상태
     const [selectedWarehouse, setSelectedWarehouse] = useState(null); // 선택한 창고
     const [error, setError] = useState(null); // 에러 상태 관리
@@ -30,7 +29,6 @@ const WarehouseManagerHook = () => {
     return {
         data,
         loading,
-        isModalVisible,
         isSubmitting,
         selectedWarehouse,
         error,
