@@ -64,7 +64,6 @@ const SelectedWorkcenterSection = ({
                         <Input
                             value={workcenter.code}
                             onChange={(e) => handleInputChange(e, 'code')}
-                            disabled
                         />
                       </Form.Item>
 
