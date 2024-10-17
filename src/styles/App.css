@@ -131,6 +131,13 @@
 
 /* Form 영역 시작 */
 
+.search-input {
+  font-size: 0.8rem;
+}
+
+.search-input:hover {
+  border-left: 1px solid #4096FF !important;
+}
 
 input.ant-input[readonly] {
   background-color: #FAFAFA !important;
@@ -193,8 +200,29 @@ input.ant-input[readonly] {
 
 /* 모든 테이블 제목에 적용 */
 .summary-row {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: #F7F7F7;
 }
+
+
+.title-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.small-text {
+  font-size: 0.8rem;
+}
+
+.medium-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.large-text {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 .ant-table-thead th {
 }
 

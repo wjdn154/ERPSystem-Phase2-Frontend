@@ -1,49 +1,113 @@
-import {Typography} from "antd";
+import {Input, Tag, Typography} from "antd";
+import React from "react";
 
-export const processRoutingColumns = [
+export const processRoutingColumns = (activeColumn, searchText, setActiveColumn, handleFilter) => [
     {
-        title: '경로 코드',
-        dataIndex: 'code',  // DTO의 code 필드에 매핑
+        title: activeColumn === 'code' ? (
+            <Input
+                autoFocus
+                placeholder="검색"
+                value={searchText}
+                onChange={(e) => handleFilter(e.target.value, 'code')}
+                onBlur={() => setActiveColumn(null)} // 포커스를 잃으면 다시 원래 컬럼명으로
+                onPressEnter={() => setActiveColumn(null)} // 엔터키 입력 시 검색 종료
+            />
+        ) : (
+            <span onClick={() => setActiveColumn('code')} style={{ cursor: 'pointer' }}>
+                    경로 코드
+                </span>
+        ),
+        dataIndex: 'code',
         key: 'code',
-        width: '20%',
+        // width: '10%',
+        align: 'center',
     },
     {
-        title: '경로 이름',
-        dataIndex: 'name',  // DTO의 name 필드에 매핑
+        title: activeColumn === 'name' ? (
+            <Input
+                autoFocus
+                placeholder="검색"
+                value={searchText}
+                onChange={(e) => handleFilter(e.target.value, 'name')}
+                onBlur={() => setActiveColumn(null)}
+                onPressEnter={() => setActiveColumn(null)}
+            />
+        ) : (
+            <span onClick={() => setActiveColumn('name')} style={{ cursor: 'pointer' }}>
+                    경로 이름
+                </span>
+        ),
+        dataIndex: 'name',
         key: 'name',
-        width: '20%',
+        // width: '20%',
+        align: 'center',
+
     },
     {
-        title: '경로 설명',
-        dataIndex: 'description',  // DTO의 description 필드에 매핑
+        title: activeColumn === 'description' ? (
+            <Input
+                autoFocus
+                placeholder="검색"
+                value={searchText}
+                onChange={(e) => handleFilter(e.target.value, 'description')}
+                onBlur={() => setActiveColumn(null)}
+                onPressEnter={() => setActiveColumn(null)}
+            />
+        ) : (
+            <span onClick={() => setActiveColumn('description')} style={{ cursor: 'pointer' }}>
+                    경로 설명
+                </span>
+        ),
+        dataIndex: 'description',
         key: 'description',
-        width: '30%',
+        // width: '30%',
+        align: 'center',
+
     },
     {
         title: '표준 여부',
-        dataIndex: 'isStandard',  // DTO의 isStandard 필드에 매핑
+        dataIndex: 'isStandard',
         key: 'isStandard',
-        render: (text) => (text ? '예' : '아니요'), // 표준 여부를 예/아니요로 표시
-        width: '10%',
+        render: (text) => {
+            let color;
+            switch (text) {
+                case 'true':
+                    color = 'red';
+                    break;
+                case 'false':
+                    color = 'blue';
+                    break;
+                default:
+                    color = 'gray'; // 기본 색상
+            }
+            return <Tag style={{marginLeft: '5px'}} color={color}>{text}</Tag>;
+        },
+        // width: '10%',
+        align: 'center',
+
     },
     {
         title: '사용 여부',
-        dataIndex: 'isActive',  // DTO의 isActive 필드에 매핑
+        dataIndex: 'isActive',
         key: 'isActive',
-        render: (text) => (text ? '사용 중' : '미사용'), // 사용 여부를 사용 중/미사용으로 표시
-        width: '10%',
+        render: (text) => {
+            let color;
+            switch (text) {
+                case 'true':
+                    color = 'red';
+                    break;
+                case 'false':
+                    color = 'blue';
+                    break;
+                default:
+                    color = 'gray'; // 기본 색상
+            }
+            return <Tag style={{marginLeft: '5px'}} color={color}>{text}</Tag>;
+        },
+        // width: '10%',
+        align: 'center',
+
     },
-    // {
-    //     title: '동작',
-    //     key: 'action',
-    //     render: (text, record) => (
-    //         <span>
-    //             <a onClick={() => record.onEdit(record)}>수정</a>
-    //             <a style={{ marginLeft: 8 }} onClick={() => record.onDelete(record.id)}>삭제</a>
-    //         </span>
-    //     ),  // 수정 및 삭제 버튼 추가
-    //     width: '20%',
-    // },
 ];
 
 

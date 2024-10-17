@@ -61,13 +61,13 @@ const DailyMonthlyReportPage = () => {
 
     const handleRenderName = (level, text) => {
         if (level === 'Medium_category') {
-            return <Typography style={{ fontSize: '0.9rem', fontWeight: 500 }}>{text}</Typography>;
+            return <div className="medium-text">{text}</div>;
         } else if (level === 'Small_category') {
-            return <Typography style={{ fontSize: '0.9rem', fontWeight: 500 }}>[{text}]</Typography>;
+            return <div className="medium-text">[{text}]</div>;
         } else if (level === 'Account_name') {
-            return <Typography style={{ fontSize: '0.9rem' }}>{text}</Typography>;
+            return <div className="medium-text">{text}</div>;
         } else if (level === null) {
-            return <Typography style={{ fontSize: '0.9rem' }}>{text}</Typography>;
+            return <div className="medium-text">{text}</div>;
         }
     };
 
@@ -97,7 +97,7 @@ const DailyMonthlyReportPage = () => {
 
         // 입력값 검증
         if (!startDate || !endDate || !journalType) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
@@ -149,6 +149,7 @@ const DailyMonthlyReportPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleDailyDateChange}
                                             style={{ marginRight: '10px' }}
                                             defaultValue={[
@@ -188,89 +189,89 @@ const DailyMonthlyReportPage = () => {
                                         })) : []}
                                         columns={[
                                             {
-                                                title: '차변',
+                                                title: <div className="title-text">차변</div>,
                                                 children: [
                                                     {
-                                                        title: '현금',
+                                                        title: <div className="title-text">현금</div>,
                                                         dataIndex: 'cashTotalDebit',
                                                         key: 'cashTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '대체',
+                                                        title: <div className="title-text">대체</div>,
                                                         dataIndex: 'subTotalDebit',
                                                         key: 'subTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '합계',
+                                                        title: <div className="title-text">합계</div>,
                                                         dataIndex: 'sumTotalDebit',
                                                         key: 'sumTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                 ],
                                             },
                                             {
-                                                title: '계정과목',
+                                                title: <div className="title-text">계정과목</div>,
                                                 dataIndex: 'name',
                                                 key: 'name',
                                                 align: 'center',
                                                 width: '15%',
                                                 onCell: () => ({
-                                                    style: { backgroundColor: '#FAFAFA' },
+                                                    style: { backgroundColor: '#F7F7F7' },
                                                 }),
                                                 render: (text, record) => handleRenderName(record.level, text),
                                             },
                                             {
-                                                title: '대변',
+                                                title: <div className="title-text">대변</div>,
                                                 children: [
                                                     {
-                                                        title: '현금',
+                                                        title: <div className="title-text">현금</div>,
                                                         dataIndex: 'cashTotalCredit',
                                                         key: 'cashTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '대체',
+                                                        title: <div className="title-text">대체</div>,
                                                         dataIndex: 'subTotalCredit',
                                                         key: 'subTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '합계',
+                                                        title: <div className="title-text">합계</div>,
                                                         dataIndex: 'sumTotalCredit',
                                                         key: 'sumTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                 ],
                                             }
@@ -278,6 +279,7 @@ const DailyMonthlyReportPage = () => {
                                         rowKey="key"
                                         // pagination={{ pageSize: 30, position: ['bottomCenter'], showSizeChanger: false }}
                                         pagination={ false }
+                                        bordered={true}
                                         size={'small'}
                                         rowClassName={(record) => {
                                             return record.level !== 'Account_name' ? 'summary-row' : '';
@@ -299,6 +301,7 @@ const DailyMonthlyReportPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <RangePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             onChange={handleMonthlyDateChange}
                                             style={{ marginRight: '10px' }}
                                             picker="month"  // 월 단위로 설정
@@ -339,56 +342,56 @@ const DailyMonthlyReportPage = () => {
                                         })) : []}
                                         columns={[
                                             {
-                                                title: '차변',
+                                                title: <div className="title-text">차변</div>,
                                                 children: [
                                                     {
-                                                        title: '현금',
+                                                        title: <div className="title-text">현금</div>,
                                                         dataIndex: 'cashTotalDebit',
                                                         key: 'cashTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '대체',
+                                                        title: <div className="title-text">대체</div>,
                                                         dataIndex: 'subTotalDebit',
                                                         key: 'subTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '합계',
+                                                        title: <div className="title-text">합계</div>,
                                                         dataIndex: 'sumTotalDebit',
                                                         key: 'sumTotalDebit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                 ],
                                             },
                                             {
-                                                title: '계정과목',
+                                                title: <div className="title-text">계정과목</div>,
                                                 dataIndex: 'name',
                                                 key: 'name',
                                                 align: 'center',
                                                 width: '15%',
                                                 onCell: () => ({
-                                                    style: { backgroundColor: '#FAFAFA' },
+                                                    style: { backgroundColor: '#F7F7F7' },
                                                 }),
                                                 render: (text, record) => handleRenderName(record.level, text),
                                             },
                                             {
-                                                title: '대변',
+                                                title: <div className="title-text">대변</div>,
                                                 children: [
                                                     {
                                                         title: '현금',
@@ -396,32 +399,32 @@ const DailyMonthlyReportPage = () => {
                                                         key: 'cashTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '대체',
+                                                        title: <div className="title-text">대체</div>,
                                                         dataIndex: 'subTotalCredit',
                                                         key: 'subTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                     {
-                                                        title: '합계',
+                                                        title: <div className="title-text">합계</div>,
                                                         dataIndex: 'sumTotalCredit',
                                                         key: 'sumTotalCredit',
                                                         align: 'center',
                                                         render: (text, record) => record.level === null ?
-                                                            <Typography style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</Typography>
+                                                            <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>
                                                             : record.level !== 'Account_name' ?
-                                                                (text !== null ? <span style={{ fontSize: '0.8rem' }}>{text.toLocaleString()}</span> : '')
-                                                                : (text !== null ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''),
+                                                                (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : '')
+                                                                : (text !== null ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''),
                                                     },
                                                 ],
                                             }
