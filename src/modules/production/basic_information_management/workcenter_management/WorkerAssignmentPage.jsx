@@ -59,9 +59,9 @@ const WorkerAssignmentPage = () => {
     };
 
     return (
-        <div>
-            <h2>작업장별 작업자 배정 명단</h2>
 
+
+        <div>
             {/* 날짜 범위 선택 */}
             <div style={{ marginBottom: '20px' }}>
                 <RangePicker
