@@ -3,12 +3,13 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './CashBookUtil.jsx';
 import {Typography} from '@mui/material';
-import { Table, Button, DatePicker } from 'antd';
+import {Table, Button, DatePicker, Form, Space, Input, Row, Col} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import dayjs from "dayjs";
+import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const CashBookPage = () => {
@@ -48,6 +49,7 @@ const CashBookPage = () => {
             const response = await apiClient.post(FINANCIAL_API.CASH_JOURNAL_LEDGER_API, searchParams);
             const data = response.data;
             setCashJournalData(data);
+            notify('success', '조회 성공', '현금출납장 조회 성공.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '현금출납장 조회 중 오류가 발생했습니다.', 'top');
         }
@@ -78,21 +80,41 @@ const CashBookPage = () => {
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >현금출납장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                    <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        <RangePicker
-                                            disabledDate={(current) => current && current.year() !== 2024}
-                                            onChange={handleDateChange}
-                                            style={{ marginRight: '10px' }}
-                                            defaultValue={[
-                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                            ]}
-                                            format="YYYY-MM-DD"
-                                        />
-                                        <Button type="primary" onClick={handleSearch} >
-                                            검색
-                                        </Button>
-                                    </Grid>
+                                    <Form layout="vertical">
+                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                            <Col>
+                                                <Form.Item
+                                                    label="조회 기간"
+                                                    required
+                                                    tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                >
+                                                    <RangePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
+                                                        onChange={handleDateChange}
+                                                        defaultValue={[
+                                                            searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                            searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                        ]}
+                                                        format="YYYY-MM-DD"
+                                                        style={{ width: '250px' }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col>
+                                                <Form.Item>
+                                                    <Button
+                                                        style={{ width: '100px' }}
+                                                        type="primary"
+                                                        onClick={handleSearch}
+                                                        icon={<SearchOutlined />}
+                                                        block
+                                                    >
+                                                        검색
+                                                    </Button>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                    </Form>
                                     <Table
                                         dataSource={cashJournalData ? [
                                             {
@@ -140,56 +162,59 @@ const CashBookPage = () => {
                                         ] : null}
                                         columns={[
                                             {
-                                                title: '전표일자',
+                                                title: <div className="title-text">전표일자</div>,
                                                 dataIndex: 'voucherDate',
                                                 key: 'voucherDate',
                                                 align: 'center',
                                                 render: (text, record) => {
-                                                    return (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ?  <span className="medium-text">{text}</span> : <span className="small-text">{text}</span>;
+                                                    return (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ?  <div className="medium-text">{text}</div> : <div className="small-text">{text}</div>;
                                                 },
                                             },
                                             {
-                                                title: '적요',
+                                                title: <div className="title-text">적요</div>
+                                                ,
                                                 dataIndex: 'transactionDescription',
                                                 key: 'transactionDescription',
                                                 align: 'center',
                                                 render: (text, record) => {
-                                                    return text ? <span className="small-text">{text}</span> : '';
+                                                    return text ? <div className="small-text">{text}</div> : '';
                                                 },
                                             },
                                             {
-                                                title: '거래처',
+                                                title: <div className="title-text">거래처</div>,
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
                                                 render: (text, record) => {
                                                     if (record.isSummary || record.isPreviousBalance) return ''; // 월계 및 누계는 거래처 코드 공백
-                                                    return text ? <span className="small-text">[{text}] {record.clientName}</span> : '';
+                                                    return text ? <div className="small-text">[{text.padStart(5, '0')}] {record.clientName}</div> : '';
                                                 },
                                             },
                                             {
-                                                title: '입금',
+                                                title: <div className="title-text">입금</div>,
                                                 dataIndex: 'depositAmount',
                                                 key: 'depositAmount',
                                                 align: 'center',
-                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span className="medium-text">{text.toLocaleString()}</span> :
-                                                    <span className="small-text">{text.toLocaleString()}</span>,
+                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ?
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> :
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>,
                                             },
                                             {
-                                                title: '출금',
+                                                title: <div className="title-text">출금</div>,
                                                 dataIndex: 'withdrawalAmount',
                                                 key: 'withdrawalAmount',
                                                 align: 'center',
-                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span className="medium-text">{text.toLocaleString()}</span> :
-                                                    <span className="small-text">{text.toLocaleString()}</span>,
+                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ?
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> :
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>,
                                             },
                                             {
-                                                title: '잔액',
+                                                title: <div className="title-text">잔액</div>,
                                                 dataIndex: 'cashAmount',
                                                 key: 'cashAmount',
                                                 align: 'center',
-                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <span className="medium-text">{text.toLocaleString()}</span> :
-                                                    <span className="small-text">{text.toLocaleString()}</span>,
+                                                render: (text, record) => (record.isPreviousBalance || record.isMonthlyTotal || record.isCumulativeTotal) ? <div className="medium-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> :
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div>,
                                             },
                                         ]}
                                         rowKey="key"

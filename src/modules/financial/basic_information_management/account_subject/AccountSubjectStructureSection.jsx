@@ -13,13 +13,13 @@ const AccountSubjectStructureSection = ({ data }) => {
             title: '체계명',
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <span style={{ fontSize: '0.8rem' }}>{text}</span>,
+            render: (text) => <span className="small-text">{text}</span>,
         },
         {
             title: '체계범위',
             dataIndex: 'range',
             key: 'range',
-            render: (text) => <span style={{ fontSize: '0.8rem' }}>{text}</span>,
+            render: (text) => <span className="small-text">{text}</span>,
         },
     ];
 
