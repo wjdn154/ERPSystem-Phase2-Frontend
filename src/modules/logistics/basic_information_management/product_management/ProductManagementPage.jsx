@@ -49,7 +49,9 @@ const ProductManagementPage = ( {initialData} ) => {
         setDisplayValues({
             productGroup: `[${detailProductData.productGroupCode}] ${detailProductData.productGroupName}`,
             client: `[${detailProductData.clientId}] ${detailProductData.clientName}`,
-            processRouting: `[${detailProductData.processRoutingCode}] ${detailProductData.processRoutingName}`
+            processRouting: detailProductData.processRoutingCode
+                ? `[${detailProductData.processRoutingCode}] ${detailProductData.processRoutingName}`
+                : '선택안함'
         });
 
     }, [detailProductData, form]);
@@ -137,7 +139,7 @@ const ProductManagementPage = ( {initialData} ) => {
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    processRouting: `[${record.code}] ${record.name}`,
+                    processRouting : `[${record.code}] ${record.name}`,
                 }));
                 break;
         }
@@ -162,8 +164,8 @@ const ProductManagementPage = ( {initialData} ) => {
                     name: values.name,
                     standard: values.standard,
                     unit: values.unit,
-                    purchasePrice: values.purchasePrice,
-                    salesPrice: values.salesPrice,
+                    purchasePrice: removeComma(values.purchasePrice),
+                    salesPrice: removeComma(values.salesPrice),
                     productType: productParam.productType,
                     remarks: values.remarks,
                     productGroupId: productParam.productGroup ? productParam.productGroup.id : detailProductData.productGroupId,
@@ -248,6 +250,11 @@ const ProductManagementPage = ( {initialData} ) => {
         // value가 숫자인 경우 문자열로 변환
         const stringValue = String(value);
         return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+    };
+
+    // 콤마 제거 함수
+    const removeComma = (value) => {
+        return value ? value.toString().replace(/,/g, '') : value;
     };
 
     return (
@@ -474,7 +481,16 @@ const ProductManagementPage = ( {initialData} ) => {
                                                 </Col>
                                                 <Col span={6}>
                                                     <Form.Item name="salesPrice" rules={[{ required: true, message: '출고 단가를 입력하세요.' }]}>
-                                                        <Input addonBefore="출고 단가" />
+                                                        <Input
+                                                            addonBefore="출고 단가"
+                                                            value={form.getFieldValue('salesPrice') ? formatNumberWithComma(form.getFieldValue('salesPrice')) : ''}
+                                                            onChange={(e) => {
+                                                                const valueWithoutComma = e.target.value.replace(/,/g, ''); // 콤마 제거
+                                                                if (!isNaN(valueWithoutComma)) {
+                                                                    form.setFieldValue('salesPrice', formatNumberWithComma(valueWithoutComma)); // 콤마 포함된 값으로 저장
+                                                                }
+                                                            }}
+                                                        />
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
@@ -530,7 +546,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                                     <Form.Item>
                                                         <Input
                                                             addonBefore="생산 경로"
-                                                            value={productParam.processRouting ? displayValues.processRouting : '선택 안함'}
+                                                            value={displayValues.processRouting}
                                                             onClick={() => handleInputClick('processRouting')}
                                                             onFocus={(e) => e.target.blur()}
                                                         />
@@ -556,9 +572,11 @@ const ProductManagementPage = ( {initialData} ) => {
                                                         {/* 이미지 미리보기 */}
                                                         <div style={{ marginBottom: '20px' }}>
                                                             <img
-                                                                src={detailProductData?.imagePath
-                                                                    ? `/src/assets/img/uploads/${detailProductData?.imagePath}`
-                                                                    : `/src/assets/img/uploads/defaultImage.png`}
+                                                                src={selectedFile
+                                                                    ? URL.createObjectURL(selectedFile) // 선택된 파일이 있으면 미리보기로 보여줌
+                                                                    : detailProductData?.imagePath
+                                                                        ? `/src/assets/img/uploads/${detailProductData?.imagePath}` // 기존 이미지
+                                                                        : `/src/assets/img/uploads/defaultImage.png`} // 기본 이미지
                                                                 alt="미리보기 이미지"
                                                                 style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                                             />
@@ -777,7 +795,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                         </Row>
                                         <Row gutter={16}>
                                             <Col span={6}>
-                                                <Form.Item name="purchasePrice" rules={[{ required: true, message: '입고단가를 입력하세요.' }]}>
+                                                <Form.Item name="purchasePrice" rules={[{ required: true, message: '입고 단가를 입력하세요.' }]}>
                                                     <Input addonBefore="입고 단가" />
                                                 </Form.Item>
                                             </Col>
@@ -900,6 +918,25 @@ const ProductManagementPage = ( {initialData} ) => {
                                                             <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                                 품목 그룹 선택
                                                             </Typography>
+                                                            <Input
+                                                                placeholder="검색"
+                                                                prefix={<SearchOutlined />}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                    if (!value) {
+                                                                        setModalData(initialModalData);
+                                                                    } else {
+                                                                        const filtered = initialModalData.filter((item) => {
+                                                                            return (
+                                                                                (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                                (item.name && item.name.toLowerCase().includes(value))
+                                                                            );
+                                                                        });
+                                                                        setModalData(filtered);
+                                                                    }
+                                                                }}
+                                                                style={{ marginBottom: 16 }}
+                                                            />
                                                             {modalData && (
                                                                 <Table
                                                                     columns={[
@@ -909,7 +946,12 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                     dataSource={modalData}
                                                                     rowKey="id"
                                                                     size="small"
-                                                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                    pagination={{
+                                                                        pageSize: 15,
+                                                                        position: ['bottomCenter'],
+                                                                        showSizeChanger: false,
+                                                                        showTotal: (total) => `총 ${total}개`,
+                                                                    }}
                                                                     onRow={(record) => ({
                                                                         style: { cursor: 'pointer' },
                                                                         onClick: () => handleModalSelect(record) // 선택 시 처리
@@ -925,6 +967,25 @@ const ProductManagementPage = ( {initialData} ) => {
                                                             <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                                 거래처 선택
                                                             </Typography>
+                                                            <Input
+                                                                placeholder="검색"
+                                                                prefix={<SearchOutlined />}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                    if (!value) {
+                                                                        setModalData(initialModalData);
+                                                                    } else {
+                                                                        const filtered = initialModalData.filter((item) => {
+                                                                            return (
+                                                                                (item.id && item.id.toString().toLowerCase().includes(value)) ||
+                                                                                (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                                            );
+                                                                        });
+                                                                        setModalData(filtered);
+                                                                    }
+                                                                }}
+                                                                style={{ marginBottom: 16 }}
+                                                            />
                                                             {modalData && (
 
                                                                 <Table
@@ -935,7 +996,12 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                     dataSource={modalData}
                                                                     rowKey="id"
                                                                     size="small"
-                                                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                    pagination={{
+                                                                        pageSize: 15,
+                                                                        position: ['bottomCenter'],
+                                                                        showSizeChanger: false,
+                                                                        showTotal: (total) => `총 ${total}개`,
+                                                                    }}
                                                                     onRow={(record) => ({
                                                                         style: { cursor: 'pointer' },
                                                                         onClick: () => handleModalSelect(record) // 선택 시 처리
