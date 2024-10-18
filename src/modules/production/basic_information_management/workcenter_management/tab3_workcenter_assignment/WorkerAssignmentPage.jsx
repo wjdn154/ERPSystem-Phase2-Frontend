@@ -4,8 +4,8 @@ import { workerAssignmentColumns } from './WorkerAssignmentColumns.jsx'; // ь╗мы
 import { DatePicker, Button } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
-import apiClient from "../../../../config/apiClient.jsx";
-import { PRODUCTION_API } from "../../../../config/apiConstants.jsx"
+import apiClient from "../../../../../config/apiClient.jsx";
+import { PRODUCTION_API } from "../../../../../config/apiConstants.jsx"
 
 const { RangePicker } = DatePicker;
 

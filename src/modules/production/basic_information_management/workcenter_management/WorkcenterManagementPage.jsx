@@ -2,18 +2,16 @@ import React, {useMemo, useState} from 'react';
 import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './WorkcenterUtil.jsx';
-// import { tabItems } from './WorkcenterManagementUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button, Col, Divider, Modal, Row} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
-import WorkcenterDashboard from "./WorkcenterDashboard.jsx";
 import SearchBar from "../../common/SearchBar.jsx";
-import WorkcenterListSection from "./WorkcenterListSection.jsx";
+import WorkcenterListSection from "./tab1_workcenter_list/WorkcenterListSection.jsx";
 import {workcenterColumns} from "./WorkcenterColumn.jsx";
 import {getRowClassName} from "./WorkcenterUtil.jsx";
-import SelectedWorkcenterSection from "./SelectedWorkcenterSection.jsx";
-import FactorySelectSection from "./FactorySelectSection.jsx";
-import WorkerAssignmentPage from "./WorkerAssignmentPage.jsx";
+import SelectedWorkcenterSection from "./tab1_workcenter_list/SelectedWorkcenterSection.jsx";
+import FactorySelectSection from "./tab3_workcenter_assignment/FactorySelectSection.jsx";
+import WorkerAssignmentPage from "./tab3_workcenter_assignment/WorkerAssignmentPage.jsx";
 import {useWorkcenter} from "./WorkcenterHook.jsx";
 
 const WorkcenterManagementPage = ({ initialData }) => {

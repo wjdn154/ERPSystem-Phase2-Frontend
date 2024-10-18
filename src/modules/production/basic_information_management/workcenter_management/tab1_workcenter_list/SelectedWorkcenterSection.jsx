@@ -1,6 +1,6 @@
 import React from 'react';
-import { ActionButtons, showDeleteConfirm } from '../../common/commonActions.jsx';  // 공통 버튼 및 다이얼로그
-import { isTrueOptions, workcenterTypeOptions } from '../../common/dropdownOptions.jsx';
+import { ActionButtons, showDeleteConfirm } from '../../../common/commonActions.jsx';  // 공통 버튼 및 다이얼로그
+import { isTrueOptions, workcenterTypeOptions } from '../../../common/dropdownOptions.jsx';
 import {Box, Grid, Grow, Paper} from '@mui/material';
 import { Typography } from '@mui/material';
 import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
