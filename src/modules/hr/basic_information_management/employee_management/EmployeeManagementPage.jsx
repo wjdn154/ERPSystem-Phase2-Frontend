@@ -8,6 +8,7 @@ import { EMPLOYEE_API } from '../../../../config/apiConstants.jsx';
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
+import {SearchOutlined} from "@ant-design/icons";
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -20,10 +21,13 @@ const EmployeeManagementPage = ({ initialData }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
     const [editEmployee, setEditEmployee] = useState(false); // 사원 수정 탭 활성화 여부 상태
     const [detailEmployeeData, setDetailEmployeeData] = useState(false);
+    //const [fetchEmployeeData, setFetchEmployeeData] = useState(false); // 사원 조회한 정보 상태
     const [employeeParam, setEmployeeParam] = useState(false); // 수정 할 사원 정보 상태
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [currentField, setCurrentField] = useState(''); // 모달 분기 할 필드 상태
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
+    const [initialModalData, setInitialModalData] = useState(null);
+
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
     const [displayValues, setDisplayValues] = useState({
     });
@@ -40,6 +44,7 @@ const EmployeeManagementPage = ({ initialData }) => {
             ...selectedEmployee,
             employeeName: `${selectedEmployee.lastName}${selectedEmployee.firstName}`
         });
+        setEmployeeParam(selectedEmployee);
 
         setDisplayValues({
             department: `[${selectedEmployee.departmentCode}] ${selectedEmployee.departmentName}`,
@@ -56,6 +61,7 @@ const EmployeeManagementPage = ({ initialData }) => {
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
         setModalData(null); // 모달 열기 전에 데이터를 초기화
+        setInitialModalData(null); // 모달 열기 전에 데이터를 초기화
         fetchModalData(fieldName); // 모달 데이터 가져오기 호출
         setIsModalVisible(true); // 모달창 열기
     };
@@ -74,6 +80,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                 {id: 3, employmentStatus: 'RESIGNED', label: '퇴직'}
             ];
             setModalData(enumData);
+            setInitialModalData(enumData);
             setIsLoading(false);
             return;
         }
@@ -93,6 +100,7 @@ const EmployeeManagementPage = ({ initialData }) => {
 
             const modalData = Array.isArray(data) ? data : [data];
             setModalData(modalData);
+            setInitialModalData(modalData);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -123,7 +131,6 @@ const EmployeeManagementPage = ({ initialData }) => {
                     ...prevEmployee,
                     employmentStatus: record.employmentStatus,
                 }));
-                console.log("Updated displayValues.department:", `[${record.departmentCode}] ${record.departmentName}`);
 
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
@@ -266,7 +273,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                         title="사원 관리"
                         description={
                             <Typography>
-                                사원 관리 페이지는 <span>기업의 모든 사원 정보를 체계적으로 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>사원의 인적 사항, 근무 이력, 직책, 부서 등</span>의 정보를 등록하고 조회할 수 있으며, <span>사원별로 세부 정보를 업데이트</span>할 수 있음. 또한 사원의 <span>변경 사항을 기록</span>하고, <span>현재 인사 상태</span>를 정확히 파악할 수 있음.
+                                사원 관리 페이지는 <span>기업의 모든 사원 정보를 체계적으로 관리</span>하는 기능을 제공함. 이 페이지에서는 <div>사원의 인적 사항, 근무 이력, 직책, 부서 등</div>의 정보를 등록하고 조회할 수 있으며, <span>사원별로 세부 정보를 업데이트</span>할 수 있음. 또한 사원의 <span>변경 사항을 기록</span>하고, <span>현재 인사 상태</span>를 정확히 파악할 수 있음.
                             </Typography>
                         }
                         tabItems={tabItems()}
@@ -287,87 +294,87 @@ const EmployeeManagementPage = ({ initialData }) => {
                                         dataSource={employeeList}
                                         columns={[
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>입사일자</span>,
+                                                title: <div className="title-text">입사일자</div>,
                                                 dataIndex: 'hireDate',
                                                 key: 'hireDate',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>사원번호</span>,
+                                                title: <div className="small-text">사원번호</div>,
                                                 dataIndex: 'employeeNumber',
                                                 key: 'employeeNumber',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>사원 이름</span>,
+                                                title: <div className="small-text">사원 이름</div>,
                                                 dataIndex: 'fullName',
                                                 key: 'fullName',
                                                 align: 'center',
                                                 render: (text, record) => (
-                                                    <span style={{ fontSize: '0.7rem' }}>
-                            {record.lastName}{record.firstName}
-                          </span>
+                                                    <div className="small-text">
+                                                        {record.lastName}{record.firstName}
+                                                    </div>
                                                 ),
                                                 width: '15%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>부서번호</span>,
+                                                title: <div className="small-text">부서번호</div>,
                                                 dataIndex: 'departmentCode',
                                                 key: 'departmentCode',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>부서명</span>,
+                                                title: <div className="small-text">부서명</div>,
                                                 dataIndex: 'departmentName',
                                                 key: 'departmentName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '15%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>고용 상태</span>,
+                                                title: <div className="small-text">고용 상태</div>,
                                                 dataIndex: 'employmentStatus',
                                                 key: 'employmentStatus',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>고용 유형</span>,
+                                                title: <div className="small-text">고용 유형</div>,
                                                 dataIndex: 'employmentType',
                                                 key: 'employmentType',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>직위</span>,
+                                                title: <div className="small-text">직위</div>,
                                                 dataIndex: 'positionName',
                                                 key: 'positionName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '15%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>직책</span>,
+                                                title: <div className="small-text">직책</div>,
                                                 dataIndex: 'jobTitleName',
                                                 key: 'jobTitleName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '15%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>이메일</span>,
+                                                title: <div className="small-text">이메일</div>,
                                                 dataIndex: 'email',
                                                 key: 'email',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '20%'
                                             }
                                         ]}
@@ -585,6 +592,27 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                             <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                                 고용 상태 선택
                                                             </Typography>
+                                                            <Input
+                                                                placeholder="검색"
+                                                                prefix={<SearchOutlined />}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                    console.log(value)
+                                                                    if (!value) {
+                                                                        setModalData(initialModalData);
+                                                                    } else {
+                                                                        console.log(initialModalData)
+                                                                        const filtered = initialModalData.filter((item) => {
+                                                                            console.log(item)
+                                                                            return (
+                                                                                (item.label && item.label.toLowerCase().includes(value))
+                                                                            );
+                                                                        });
+                                                                        setModalData(filtered);
+                                                                    }
+                                                                }}
+                                                                style={{ marginBottom: 16 }}
+                                                            />
                                                             {modalData && (
                                                                 <Table
                                                                     columns={[
@@ -594,7 +622,12 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     dataSource={modalData}
                                                                     rowKey="id"
                                                                     size={'small'}
-                                                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                    pagination={{
+                                                                        pageSize: 15,
+                                                                        position: ['bottomCenter'],
+                                                                        showSizeChanger: false,
+                                                                        //showTotal: (total) => `총 ${total}개`,
+                                                                    }}
                                                                     onRow={(record) => ({
                                                                         style: { cursor: 'pointer' },
                                                                         onClick: () => handleModalSelect(record), // 선택 시 처리
