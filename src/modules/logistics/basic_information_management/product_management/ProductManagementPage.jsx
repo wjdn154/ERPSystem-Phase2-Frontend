@@ -11,7 +11,8 @@ import {FINANCIAL_API, LOGISTICS_API, PRODUCTION_API} from "../../../../config/a
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
-import image from "../../../../assets/img/uploads/e72ad544e3f940809a389fedec62720c원목책상사진.png"
+import image from "../../../../assets/img/uploads/원목책상사진.png"
+import {SearchOutlined} from "@ant-design/icons";
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -29,6 +30,7 @@ const ProductManagementPage = ( {initialData} ) => {
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [currentField, setCurrentField] = useState(''); // 모달 분기 할 필드 상태
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
+    const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
     const [displayValues, setDisplayValues] = useState({});
     const [selectedFile, setSelectedFile] = useState(null);
@@ -36,8 +38,12 @@ const ProductManagementPage = ( {initialData} ) => {
     // 품목 조회 데이터가 있을 경우 폼에 데이터 셋팅
     useEffect(() => {
         if(!detailProductData) return;
-        console.log(productList)
-        form.setFieldsValue(detailProductData);
+
+        form.setFieldsValue({
+            ...detailProductData,
+            purchasePrice: formatNumberWithComma(detailProductData.purchasePrice),
+            salesPrice: formatNumberWithComma(detailProductData.salesPrice),
+        });
         setProductParam(detailProductData);
 
         setDisplayValues({
@@ -52,6 +58,7 @@ const ProductManagementPage = ( {initialData} ) => {
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
         setModalData(null); // 모달 열기 전에 데이터를 초기화
+        setInitialModalData(null); // 모달 열기 전에 데이터를 초기화
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
         setIsModalVisible(true);  // 모달창 열기
     };
@@ -69,7 +76,7 @@ const ProductManagementPage = ( {initialData} ) => {
 
         try {
             const response = await apiClient.post(apiPath);
-            console.log(response.data);
+
             // 데이터가 문자열이고 JSON 배열 형식일 경우 파싱, 아니면 그대로 배열로 처리
             let data = response.data;
             if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
@@ -79,6 +86,7 @@ const ProductManagementPage = ( {initialData} ) => {
             const modalData = Array.isArray(data) ? data : [data];
 
             setModalData(modalData);
+            setInitialModalData(modalData);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -140,14 +148,13 @@ const ProductManagementPage = ( {initialData} ) => {
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
+
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
-                console.log("productParam: " + productParam);
-
                 // 필요한 필드들을 `productData` 객체로 생성하고 `imageFile`은 제외
                 const productData = {
                     id: values.id,
@@ -159,10 +166,16 @@ const ProductManagementPage = ( {initialData} ) => {
                     salesPrice: values.salesPrice,
                     productType: productParam.productType,
                     remarks: values.remarks,
-                    productGroupId: productParam.productGroup?.id,
-                    clientId: productParam.client?.id,
-                    processRoutingId: productParam.processRouting ? productParam.processRouting.id : null,
+                    productGroupId: productParam.productGroup ? productParam.productGroup.id : detailProductData.productGroupId,
+                    clientId: productParam.client ? productParam.client.id : detailProductData.clientId,
+                    processRoutingId: productParam.processRouting
+                        ? productParam.processRouting.id
+                        : detailProductData
+                            ? detailProductData.processRoutingId
+                            : null
+                    ,
                 };
+
 
                 // FormData 객체 생성
                 const formData = new FormData();
@@ -171,8 +184,7 @@ const ProductManagementPage = ( {initialData} ) => {
                     formData.append("imageFile", selectedFile);
                 }
 
-                console.log("폼 데이터:", formData.get("productData")); // 확인용 로그
-                console.log("이미지 파일:", formData.get("imageFile"));  // 확인용 로그
+
                 try {
                     const API_PATH = type === 'update' ? LOGISTICS_API.PRODUCT_UPDATE_API(productParam.id) : LOGISTICS_API.PRODUCT_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
@@ -183,21 +195,20 @@ const ProductManagementPage = ( {initialData} ) => {
                     });
 
                     const updatedData = response.data;
-                    console.log("updatedData: ", updatedData);
 
                     if (type === 'update') {
                         setProductList((prevList) =>
                             prevList.map((product) => product.id === updatedData.id ? updatedData : product)
                         );
                     } else {
-                        setProductList((prevList) => [updatedData, ...prevList]);
+                        setProductList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
                     }
 
                     setEditProduct(false);
                     setDetailProductData(null);
-                    setProductParam({
-                    });
+                    setProductParam({});
+                    setSelectedFile(null);
                     setDisplayValues({});
 
                     type === 'update'
@@ -217,8 +228,6 @@ const ProductManagementPage = ( {initialData} ) => {
         });
     };
 
-
-
     const handleTabChange = (key) => {
         setEditProduct(false);
         setDetailProductData(null);
@@ -232,6 +241,13 @@ const ProductManagementPage = ( {initialData} ) => {
         registrationForm.setFieldValue('isActive', true);
 
         setActiveTabKey(key);
+    };
+
+    // 단가 콤마 적용
+    const formatNumberWithComma = (value) => {
+        // value가 숫자인 경우 문자열로 변환
+        const stringValue = String(value);
+        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
     };
 
     return (
@@ -266,72 +282,83 @@ const ProductManagementPage = ( {initialData} ) => {
                                         dataSource={productList}
                                         columns={[
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>이미지</span>,
+                                                title: <div className="title-text">이미지</div>,
                                                 dataIndex: 'imagePath',
                                                 key: 'imagePath',
                                                 align: 'center',
                                                 render: (text, record) => (
-                                                    <img
-                                                        src={record.imagePath
-                                                            ? `/src/assets/img/uploads/${record.imagePath}`
-                                                            // ? `/src/assets/img/uploads/${record.imagePath}`
-                                                            : `/src/assets/img/uploads/defaultImage.png`}
-                                                        alt="이미지"
-                                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                                    />
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        height: '100%', // 모든 행의 높이를 동일하게 고정
+                                                    }}>
+                                                        <img
+                                                            src={record.imagePath
+                                                                ? `/src/assets/img/uploads/${record.imagePath}`
+                                                                : `/src/assets/img/uploads/defaultImage.png`}
+                                                            alt="이미지"
+                                                            style={{
+                                                                width: '60px',
+                                                                height: '60px',
+                                                                objectFit: 'cover', // 고정 크기 내에서 잘라내기
+                                                                borderRadius: '5px' // 선택사항: 이미지 모서리를 둥글게 처리
+                                                            }}
+                                                        />
+                                                    </div>
                                                 ),
-                                                width: '10%'
+                                                width: '15%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>품목코드</span>,
+                                                title: <div className="title-text">품목코드</div>,
                                                 dataIndex: 'code',
                                                 key: 'code',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>품목명</span>,
+                                                title: <div className="title-text">품목명</div>,
                                                 dataIndex: 'name',
                                                 key: 'name',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
-                                                width: '15%'
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                                width: '20%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>그룹명</span>,
+                                                title: <div className="title-text">그룹명</div>,
                                                 dataIndex: 'productGroupName',
                                                 key: 'productGroupName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
-                                                width: '10%'
-                                            },
-                                            {
-                                                title: <span style={{ fontSize: '0.8rem' }}>규격</span>,
-                                                dataIndex: 'standard',
-                                                key: 'standard',
-                                                align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '15%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>입고단가</span>,
+                                                title: <div className="title-text">규격</div>,
+                                                dataIndex: 'standard',
+                                                key: 'standard',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                                width: '10%'
+                                            },
+                                            {
+                                                title: <div className="title-text">입고단가</div>,
                                                 dataIndex: 'purchasePrice',
                                                 key: 'purchasePrice',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>출고단가</span>,
+                                                title: <div className="title-text" >출고단가</div>,
                                                 dataIndex: 'salesPrice',
                                                 key: 'salesPrice',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>품목구분</span>,
+                                                title: <div className="title-text">품목구분</div>,
                                                 dataIndex: 'productType',
                                                 key: 'productType',
                                                 align: 'center',
@@ -358,9 +385,9 @@ const ProductManagementPage = ( {initialData} ) => {
                                                         default:
                                                             color = 'gray'; // 기본 색상
                                                     }
-                                                    return <Tag style={{ marginLeft: '5px' }} color={color}>{text}</Tag>;
+                                                    return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
                                                 },
-                                                width: '10%'
+                                                width: '15%'
                                             }
                                         ]}
                                         rowKey={(record) => record.id}
@@ -432,7 +459,17 @@ const ProductManagementPage = ( {initialData} ) => {
                                             <Row gutter={16}>
                                                 <Col span={6}>
                                                     <Form.Item name="purchasePrice" rules={[{ required: true, message: '입고단가를 입력하세요.' }]}>
-                                                        <Input addonBefore="입고 단가" />
+                                                        <Input
+                                                            addonBefore="입고 단가"
+                                                            value={form.getFieldValue('purchasePrice') ? formatNumberWithComma(form.getFieldValue('purchasePrice')) : ''}
+                                                            onChange={(e) => {
+                                                                const valueWithoutComma = e.target.value.replace(/,/g, ''); // 콤마 제거
+                                                                if (!isNaN(valueWithoutComma)) {
+                                                                    form.setFieldValue('purchasePrice', formatNumberWithComma(valueWithoutComma)); // 콤마 포함된 값으로 저장
+                                                                }
+                                                            }}
+                                                        />
+
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
@@ -493,7 +530,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                                     <Form.Item>
                                                         <Input
                                                             addonBefore="생산 경로"
-                                                            value={displayValues.processRouting}
+                                                            value={productParam.processRouting ? displayValues.processRouting : '선택 안함'}
                                                             onClick={() => handleInputClick('processRouting')}
                                                             onFocus={(e) => e.target.blur()}
                                                         />
@@ -510,7 +547,39 @@ const ProductManagementPage = ( {initialData} ) => {
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
+
+                                            {/* 이미지 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>이미지</Divider>
+                                            <Row gutter={16}>
+                                                <Col span={12}>
+                                                    <Form.Item name="imageFile">
+                                                        {/* 이미지 미리보기 */}
+                                                        <div style={{ marginBottom: '20px' }}>
+                                                            <img
+                                                                src={detailProductData?.imagePath
+                                                                    ? `/src/assets/img/uploads/${detailProductData?.imagePath}`
+                                                                    : `/src/assets/img/uploads/defaultImage.png`}
+                                                                alt="미리보기 이미지"
+                                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                            />
+                                                        </div>
+
+                                                        <Upload
+                                                            beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
+                                                            onChange={(info) => {
+                                                                const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
+                                                                setSelectedFile(file); // 선택된 파일을 상태로 설정
+                                                            }}
+                                                            fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []} // 파일 리스트 설정
+                                                        >
+                                                            <Button icon={<CloudUploadIcon />}>파일 선택</Button>
+                                                        </Upload>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
                                             <Divider />
+
+
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                                 <Button type="primary" htmlType="submit">
                                                     저장
@@ -534,6 +603,25 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                                     품목 그룹 선택
                                                                 </Typography>
+                                                                <Input
+                                                                    placeholder="검색"
+                                                                    prefix={<SearchOutlined />}
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                        if (!value) {
+                                                                            setModalData(initialModalData);
+                                                                        } else {
+                                                                            const filtered = initialModalData.filter((item) => {
+                                                                                return (
+                                                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                                    (item.name && item.name.toLowerCase().includes(value))
+                                                                                );
+                                                                            });
+                                                                            setModalData(filtered);
+                                                                        }
+                                                                    }}
+                                                                    style={{ marginBottom: 16 }}
+                                                                />
                                                                 {modalData && (
                                                                     <Table
                                                                         columns={[
@@ -543,7 +631,12 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                         dataSource={modalData}
                                                                         rowKey="id"
                                                                         size="small"
-                                                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                        pagination={{
+                                                                            pageSize: 15,
+                                                                            position: ['bottomCenter'],
+                                                                            showSizeChanger: false,
+                                                                            showTotal: (total) => `총 ${total}개`,
+                                                                        }}
                                                                         onRow={(record) => ({
                                                                             style: { cursor: 'pointer' },
                                                                             onClick: () => handleModalSelect(record) // 선택 시 처리
@@ -559,6 +652,25 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                                     거래처 선택
                                                                 </Typography>
+                                                                <Input
+                                                                    placeholder="검색"
+                                                                    prefix={<SearchOutlined />}
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                        if (!value) {
+                                                                            setModalData(initialModalData);
+                                                                        } else {
+                                                                            const filtered = initialModalData.filter((item) => {
+                                                                                return (
+                                                                                    (item.id && item.id.toString().toLowerCase().includes(value)) ||
+                                                                                    (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                                                );
+                                                                            });
+                                                                            setModalData(filtered);
+                                                                        }
+                                                                    }}
+                                                                    style={{ marginBottom: 16 }}
+                                                                />
                                                                 {modalData && (
 
                                                                     <Table
@@ -569,7 +681,12 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                         dataSource={modalData}
                                                                         rowKey="id"
                                                                         size="small"
-                                                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                        pagination={{
+                                                                            pageSize: 15,
+                                                                            position: ['bottomCenter'],
+                                                                            showSizeChanger: false,
+                                                                            showTotal: (total) => `총 ${total}개`,
+                                                                        }}
                                                                         onRow={(record) => ({
                                                                             style: { cursor: 'pointer' },
                                                                             onClick: () => handleModalSelect(record) // 선택 시 처리
@@ -739,12 +856,19 @@ const ProductManagementPage = ( {initialData} ) => {
                                         <Row gutter={16}>
                                             <Col span={12}>
                                                 <Form.Item name="imageFile">
+                                                    {/* 이미지 미리보기 */}
+                                                    <div style={{ marginBottom: '20px' }}>
+                                                        <img
+                                                            src={selectedFile ? URL.createObjectURL(selectedFile) : `/src/assets/img/uploads/defaultImage.png`}
+                                                            alt="미리보기 이미지"
+                                                            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                        />
+                                                    </div>
                                                     <Upload
                                                         beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
                                                         onChange={(info) => {
                                                             const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
                                                             setSelectedFile(file); // 선택된 파일을 상태로 설정
-                                                            console.log("Selected File:", file);
                                                         }}
                                                         fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []} // 파일 리스트 설정
                                                     >
