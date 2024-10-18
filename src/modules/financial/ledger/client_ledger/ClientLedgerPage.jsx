@@ -353,7 +353,7 @@ const ClientLedgerPage = () => {
                                             </Col>
                                             <Col>
                                                 <Form.Item>
-                                                    <Button style={{ width: '100px' }} type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
+                                                    <Button style={{ width: '100px' }} type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>e
                                                         검색
                                                     </Button>
                                                 </Form.Item>

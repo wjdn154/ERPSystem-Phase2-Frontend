@@ -1,7 +1,27 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material'
-import { DeleteOutlined, PlusOutlined, SaveOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import { Space, Table, Button, Input, Select, DatePicker, InputNumber, message, Spin, AutoComplete, Modal, Tag} from 'antd'
+import {
+    DeleteOutlined,
+    PlusOutlined,
+    SaveOutlined,
+    ExclamationCircleOutlined,
+    InfoCircleOutlined, SearchOutlined
+} from '@ant-design/icons'
+import {
+    Space,
+    Table,
+    Button,
+    Input,
+    Select,
+    DatePicker,
+    InputNumber,
+    message,
+    Spin,
+    AutoComplete,
+    Modal,
+    Tag,
+    Col, Row, Form, Tooltip
+} from 'antd'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import dayjs from "dayjs"
@@ -27,6 +47,7 @@ const PendingVoucherInputPage = () => {
     const [vouchers, setVouchers] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [modalData, setModalData] = useState(null);
+    const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentField, setCurrentField] = useState('');
     const [displayValues, setDisplayValues] = useState({
@@ -43,12 +64,12 @@ const PendingVoucherInputPage = () => {
             let updatedVoucher = { ...prevVoucher, voucherType: value };
 
             // 구분이 'Credit' 또는 'Withdrawal'일 경우 차변 값 0으로 설정
-            if (value === 'Credit' || value === 'Withdrawal') {
+            if (value === 'Debit' || value === 'Withdrawal') {
                 updatedVoucher.creditAmount = null;
             }
 
             // 구분이 'Debit' 또는 'Deposit'일 경우 대변 값 0으로 설정
-            if (value === 'Debit' || value === 'Deposit') {
+            if (value === 'Credit' || value === 'Deposit') {
                 updatedVoucher.debitAmount = null;
             }
 
@@ -87,6 +108,7 @@ const PendingVoucherInputPage = () => {
             const searchText = null;
             const response = await apiClient.post(apiPath, { searchText });
             setModalData(response.data);
+            setInitialModalData(response.data);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -98,29 +120,27 @@ const PendingVoucherInputPage = () => {
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
         setModalData(null); // 모달 열기 전에 데이터를 초기화
+        setInitialModalData(null); // 모달 열기 전에 데이터를 초기화
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
         setIsModalVisible(true);  // 모달창 열기
     };
 
 
-    const fetchData = useCallback(async () => {
+    const handleSearch = async () => {
         try {
             const response = await apiClient.post(FINANCIAL_API.UNRESOLVED_VOUCHER_SEARCH_API, {
                 searchDate: formattedDate,
             });
 
             setSearchData(response.data); // API로 받은 데이터를 바로 상태로 설정
+            console.log(response.data);
+            notify('success', '조회 성공', '전표 목록 데이터 조회 성공.', 'bottomRight');
 
         } catch (err) {
             console.error('데이터를 불러오는 중 오류 발생:', err);
-            notify('error', '오류', '데이터를 불러오는 중 오류가 발생했습니다.', 'top');
+            notify('error', '조회 오류', '데이터를 불러오는 중 오류가 발생했습니다.', 'top');
         }
-    }, [selectedDate]);
-
-    // selectedDate 변경 시 fetchData 호출
-    useEffect(() => {
-        fetchData();
-    }, [selectedDate, fetchData]);
+    };
 
     const formattedDate = useMemo(() => {
         return format(selectedDate, 'yyyy-MM-dd', { locale: ko });
@@ -172,12 +192,12 @@ const PendingVoucherInputPage = () => {
                 };
             });
 
-            console.log("Processed Vouchers:", processedVouchers);
+            console.log(processedVouchers);
 
             // 데이터 저장
             await apiClient.post(FINANCIAL_API.SAVE_UNRESOLVED_VOUCHER_API, processedVouchers); // API 호출
+            handleSearch(); // 저장 후 조회
             notify('success', '저장 완료', '전표가 성공적으로 저장되었습니다.', 'bottomRight');
-            fetchData(); // 목록 갱신
             setVoucher({}); // 저장 후 입력폼 초기화
             setDisplayValues({ accountSubjectCode: '', clientCode: '' });
             setVouchers([]); // 저장 후 배열 초기화
@@ -250,27 +270,44 @@ const PendingVoucherInputPage = () => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '1400px !important' }} container spacing={3}>
                     <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }} >전표 목록</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >미결 전표 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                    <Grid item xs={12} md={3} sx={{ marginBottom: '20px' }}>
-                                        <DatePicker
-                                            disabledDate={(current) => current && current.year() !== 2024}
-                                            value={selectedDate ? dayjs(selectedDate) : null}  // selectedDate가 null일 때를 처리
-                                            onChange={(date) => {
-                                                if (date) {
-                                                    setSelectedDate(date.toDate());  // 날짜가 선택된 경우
-                                                } else {
-                                                    setSelectedDate(null);  // 날짜가 삭제된 경우 (X 버튼 클릭)
-                                                }
-                                            }}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sx={{ marginBottom: '20px' }}>
+                                    <Form layout="vertical">
+                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                            <Col>
+                                                <Form.Item
+                                                    label="조회 기간"
+                                                    required
+                                                    tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                >
+                                                    <DatePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
+                                                        value={selectedDate ? dayjs(selectedDate) : null}  // selectedDate가 null일 때를 처리
+                                                        onChange={(date) => {
+                                                            if (date) {
+                                                                setSelectedDate(date.toDate());  // 날짜가 선택된 경우
+                                                            } else {
+                                                                setSelectedDate(null);  // 날짜가 삭제된 경우 (X 버튼 클릭)
+                                                            }
+                                                        }}
+                                                        style={{ width: '100%' }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col>
+                                                <Form.Item>
+                                                    <Button style={{ width: '100px' }} type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
+                                                        검색
+                                                    </Button>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                    <Grid item xs={12} sx={{ padding: '0 !important', marginBottom: '20px' }}>
                                         <Table
                                             dataSource={searchData?.voucherDtoList}
                                             columns={[
@@ -390,119 +427,127 @@ const PendingVoucherInputPage = () => {
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>전표 입력</Typography>
-                                <Box sx={{ margin: '20px' }}>
-                                    {/* 입력 폼 */}
-                                    <Grid container spacing={2} alignItems="center" justifyContent="space-between" sx={{ padding: '0px 20px 0px 20px' }}>
-                                        {/* 구분 입력 */}
-                                        <Grid item xs={2}>
-                                            <Select
-                                                placeholder="구분"
-                                                style={{ width: '100%' }}
-                                                value={voucher.voucherType}
-                                                onChange={handleVoucherTypeChange}
-                                                dropdownRender={menu => (
-                                                    <>
-                                                        <div style={{ padding: '8px', cursor: 'pointer' }}>
-                                                            <Typography>구분 선택</Typography>
-                                                        </div>
-                                                        {menu}
-                                                    </>
-                                                )}
-                                            >
-                                                <Option value="Deposit">입금</Option>
-                                                <Option value="Withdrawal">출금</Option>
-                                                <Option value="Debit">차변</Option>
-                                                <Option value="Credit">대변</Option>
-                                            </Select>
-                                        </Grid>
+                                <Grid sx={{ padding: '0px 20px 20px 20px' }}>
+                                    <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
+                                        <Form layout="vertical">
+                                            <Row gutter={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                {/* 구분 입력 */}
+                                                <Col span={3}>
+                                                    <Form.Item
+                                                        label="구분"
+                                                        tooltip="등록할 전표의 구분(입금, 출금, 차변, 대변)을 선택하세요"
+                                                        required
+                                                    >
+                                                        <Select
+                                                            placeholder="구분"
+                                                            style={{ width: '100%' }}
+                                                            value={voucher.voucherType}
+                                                            onChange={handleVoucherTypeChange}
+                                                        >
+                                                            <Option value="Deposit">입금</Option>
+                                                            <Option value="Withdrawal">출금</Option>
+                                                            <Option value="Debit">차변</Option>
+                                                            <Option value="Credit">대변</Option>
+                                                        </Select>
+                                                    </Form.Item>
+                                                </Col>
 
-                                        {/* 계정과목 입력 */}
-                                        <Grid item xs={2}>
-                                            <Input
-                                                addonBefore="계정과목"
-                                                name="accountCode"
-                                                placeholder="계정과목"
-                                                value={displayValues.accountSubjectCode}
-                                                onClick={() => handleInputClick('accountSubjectCode')}
-                                                style={{
-                                                    caretColor: 'transparent',
-                                                }}
-                                            />
-                                        </Grid>
+                                                {/* 계정과목 입력 */}
+                                                <Col span={3}>
+                                                    <Form.Item
+                                                        label="계정과목"
+                                                        tooltip="등록할 전표의 계정과목를 선택하세요"
+                                                        required
+                                                    >
+                                                        <Input
+                                                            name="accountCode"
+                                                            placeholder="계정과목"
+                                                            value={displayValues.accountSubjectCode}
+                                                            onClick={() => handleInputClick('accountSubjectCode')}
+                                                            style={{ caretColor: 'transparent' }}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
 
-                                        {/* 거래처명 입력 */}
-                                        <Grid item xs={2}>
-                                            <Input
-                                                addonBefore="거래처"
-                                                name="clientCode"
-                                                placeholder="거래처"
-                                                value={displayValues.clientCode}
-                                                onClick={() => handleInputClick('clientCode')}
-                                                style={{
-                                                    cursor: 'pointer',
-                                                    caretColor: 'transparent',
-                                                }}
-                                            />
-                                        </Grid>
+                                                {/* 거래처명 입력 */}
+                                                <Col span={3}>
+                                                    <Form.Item
+                                                        label="거래처명"
+                                                        tooltip="등록할 전표의 거래처명을 선택하세요"
+                                                        required
+                                                    >
+                                                        <Input
+                                                            name="clientCode"
+                                                            placeholder="거래처"
+                                                            value={displayValues.clientCode}
+                                                            onClick={() => handleInputClick('clientCode')}
+                                                            style={{ cursor: 'pointer', caretColor: 'transparent' }}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
 
-                                        {/* 적요 입력 */}
-                                        <Grid item xs={2}>
-                                            <Space.Compact>
-                                                <Input
-                                                    style={{ width: '30%', color: '#000', backgroundColor: '#FAFAFA' }}
-                                                    value="적요"
-                                                    disabled
-                                                />
-                                                <AutoComplete
-                                                    style={{ width: '70%' }}
-                                                    placeholder="적요"
-                                                    value={voucher.transactionDescription}
-                                                    onChange={(value) => setVoucher({ ...voucher, transactionDescription: value })}
-                                                    showSearch
-                                                    defaultActiveFirstOption
-                                                />
-                                            </Space.Compact>
-                                        </Grid>
+                                                {/* 적요 입력 */}
+                                                <Col span={4}>
+                                                    <Form.Item
+                                                        label="적요"
+                                                        tooltip="등록할 전표의 거래 적요를 입력하세요"
+                                                    >
+                                                        <Input
+                                                            placeholder="적요"
+                                                            value={voucher.transactionDescription}
+                                                            onChange={(e) => setVoucher({ ...voucher, transactionDescription: e.target.value })}
+                                                            style={{ width: '100%' }}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
 
-                                        {/* 차변 금액 입력 */}
-                                        <Grid item xs={2}>
-                                            <InputNumber
-                                                addonBefore="차변"
-                                                style={{ width: '100%' }}
-                                                placeholder="차변"
-                                                value={voucher.debitAmount}
-                                                onChange={(value) => setVoucher({ ...voucher, debitAmount: value })}
-                                                disabled={voucher.voucherType === 'Credit' || voucher.voucherType === 'Deposit'} // 출금일 경우 차변 비활성화
-                                            />
-                                        </Grid>
+                                                {/* 차변 금액 입력 */}
+                                                <Col span={3}>
+                                                    <Form.Item
+                                                        label="차변 금액"
+                                                        tooltip="차변 금액을 입력하세요"
+                                                        required
+                                                    >
+                                                        <InputNumber
+                                                            style={{ width: '100%' }}
+                                                            placeholder="차변"
+                                                            value={voucher.debitAmount}
+                                                            onChange={(value) => setVoucher({ ...voucher, debitAmount: value })}
+                                                            disabled={voucher.voucherType === 'Credit' || voucher.voucherType === 'Deposit'}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
 
-                                        {/* 대변 금액 입력 */}
-                                        <Grid item xs={2}>
-                                            <InputNumber
-                                                addonBefore="대변"
-                                                style={{ width: '100%' }}
-                                                placeholder="대변"
-                                                value={voucher.creditAmount}
-                                                onChange={(value) => setVoucher({ ...voucher, creditAmount: value })}
-                                                disabled={voucher.voucherType === 'Debit' || voucher.voucherType === 'Withdrawal'} // 입금일 경우 대변 비활성화
-                                            />
-                                        </Grid>
-                                    </Grid>
+                                                {/* 대변 금액 입력 */}
+                                                <Col span={3}>
+                                                    <Form.Item
+                                                        label="대변 금액"
+                                                        tooltip="대변 금액을 입력하세요"
+                                                        required
+                                                    >
+                                                        <InputNumber
+                                                            style={{ width: '100%' }}
+                                                            placeholder="대변"
+                                                            value={voucher.creditAmount}
+                                                            onChange={(value) => setVoucher({ ...voucher, creditAmount: value })}
+                                                            disabled={voucher.voucherType === 'Debit' || voucher.voucherType === 'Withdrawal'}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
 
-                                    {/* 저장 버튼 및 행 추가 버튼 */}
-                                    <Grid container justifyContent="flex-end" sx={{ padding: '20px' }}>
-                                        <Grid item>
-                                            <Button
-                                                type="primary"
-                                                icon={<PlusOutlined />}
-                                                onClick={handleAddRow}
-                                            >
-                                                행 추가
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
+                                                <Col span={2}>
+                                                    <Button
+                                                        type="primary"
+                                                        icon={<PlusOutlined />}
+                                                        onClick={handleAddRow}
+                                                        style={{ width: '100%' }}
+                                                    >
+                                                        행 추가
+                                                    </Button>
+                                                </Col>
+                                            </Row>
+                                        </Form>
 
-                                    {/* 저장된 행을 출력하는 테이블 */}
                                     <Table
                                         dataSource={vouchers}
                                         columns={[
@@ -615,7 +660,8 @@ const PendingVoucherInputPage = () => {
                                         <Button type="danger" onClick={handleDeleteRow} style={{ marginRight: '20px' }}>삭제</Button>
                                         <Button type="primary" onClick={handleSubmit}>저장</Button>
                                     </Box>
-                                </Box>
+                                    </Grid>
+                                </Grid>
                             </Paper>
                         </Grow>
                     </Grid>
@@ -645,6 +691,25 @@ const PendingVoucherInputPage = () => {
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     계정과목 선택
                                 </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.name && item.name.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
                                 {modalData && (
                                     <Table
                                         columns={[
@@ -666,7 +731,12 @@ const PendingVoucherInputPage = () => {
                                         dataSource={modalData}
                                         rowKey="id"
                                         size={'small'}
-                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
                                             onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -681,6 +751,25 @@ const PendingVoucherInputPage = () => {
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     거래처 선택
                                 </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
                                 {modalData && (
                                     <Table
                                         columns={[
@@ -702,7 +791,12 @@ const PendingVoucherInputPage = () => {
                                         dataSource={modalData}
                                         rowKey="code"
                                         size={'small'}
-                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
                                             onClick: () => handleModalSelect(record), // 선택 시 처리
