@@ -26,7 +26,6 @@ const EmployeeManagementPage = ({ initialData }) => {
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
     const [displayValues, setDisplayValues] = useState({
-        department: '',
     });
 
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
@@ -44,6 +43,8 @@ const EmployeeManagementPage = ({ initialData }) => {
 
         setDisplayValues({
             department: `[${selectedEmployee.departmentCode}] ${selectedEmployee.departmentName}`,
+            employee:  selectedEmployee.employmentStatus === 'ACTIVE' ? '재직 중' :
+                selectedEmployee.employmentStatus === 'ON_LEAVE' ? '휴직 중' : '퇴직',
         });
 
 
@@ -65,11 +66,23 @@ const EmployeeManagementPage = ({ initialData }) => {
     // 모달창 데이터 가져오기 함수
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
+
+        if(fieldName === 'employee') {
+            const enumData = [
+                {id: 1, employmentStatus: 'ACTIVE', label: '재직 중'},
+                {id: 2, employmentStatus: 'ON_LEAVE', label: '휴직 중'},
+                {id: 3, employmentStatus: 'RESIGNED', label: '퇴직'}
+            ];
+            setModalData(enumData);
+            setIsLoading(false);
+            return;
+        }
         let apiPath;
         if(fieldName === 'bank') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'department') apiPath = EMPLOYEE_API.DEPARTMENT_DATA_API;
         if(fieldName === 'position') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'jobTitle') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
+        if(fieldName === 'employee') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
 
         try {
             const response = await apiClient.post(apiPath);
@@ -79,7 +92,6 @@ const EmployeeManagementPage = ({ initialData }) => {
             }
 
             const modalData = Array.isArray(data) ? data : [data];
-
             setModalData(modalData);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -92,7 +104,7 @@ const EmployeeManagementPage = ({ initialData }) => {
     const handleModalSelect = (record) => {
         switch (currentField) {
             case 'department':
-                console.log(currentField)
+                console.log("Selected department: ", record)
                 setEmployeeParam((prevEmployee) => ({
                     ...prevEmployee,
                     department: {
@@ -105,64 +117,23 @@ const EmployeeManagementPage = ({ initialData }) => {
                     ...prevValues,
                     department: `[${record.departmentCode}] ${record.departmentName}`,
                 }));
-                console.log(displayValues)
+                break;
+            case 'employee':
+                setEmployeeParam((prevEmployee) => ({
+                    ...prevEmployee,
+                    employmentStatus: record.employmentStatus,
+                }));
+                console.log("Updated displayValues.department:", `[${record.departmentCode}] ${record.departmentName}`);
+
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    employmentStatus: record.label, // 단순히 label을 설정
+                }));
                 break;
         }
         // 모달창 닫기
         setIsModalVisible(false);
     };
-
-    // 폼 제출 핸들러
-    // const handleFormSubmit = async (values, type) => {
-    //     const id = employeeParam.id;
-    //     Modal.confirm({
-    //         title: '저장 확인',
-    //         content: '정말로 저장하시겠습니까?',
-    //         okText: '확인',
-    //         cancelText: '취소',
-    //         onOk: async () => {
-    //             console.log(detailEmployeeData);
-    //             console.log(employeeParam);
-    //             values.id = employeeParam.id;
-    //             values.hireDate = dayjs(values.hireDate).format('YYYY-MM-DD');
-    //             values.dateOfBirth = dayjs(values.dateOfBirth).format('YYYY-MM-DD');
-    //
-    //             try {
-    //                 const API_PATH =
-    //                     type === 'update'
-    //                         ? EMPLOYEE_API.UPDATE_EMPLOYEE_DATA_API(id)
-    //                         : EMPLOYEE_API.SAVE_EMPLOYEE_DATA_API;
-    //
-    //                 const response = await apiClient.post(API_PATH, values);
-    //                 const updatedData = response.data;
-    //
-    //                 setEmployeeList((prevEmployeeList) =>
-    //                     prevEmployeeList.map((employee) =>
-    //                         employee.id === updatedData.id ? { ...employee, ...values } : employee
-    //                     )
-    //                 );
-    //
-    //                 setEditEmployee(false);
-    //                 setSelectedEmployee(null);
-    //                 setDisplayValues({});
-    //
-    //                 type === 'update'
-    //                     ? notify('success', '사원 수정', '사원 정보 수정 성공.', 'bottomLeft')
-    //                     : notify('success', '사원 저장', '사원 정보 저장 성공.', 'bottomLeft');
-    //                 form.resetFields();
-    //             } catch (error) {
-    //                 notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
-    //             }
-    //         },
-    //         onCancel() {
-    //             notification.warning({
-    //                 message: '저장 취소',
-    //                 description: '저장이 취소되었습니다.',
-    //                 placement: 'bottomLeft',
-    //             });
-    //         },
-    //     });
-    // };
     const handleFormSubmit = async (values, type) => {
         const id = employeeParam.id;
         confirm({
@@ -269,6 +240,15 @@ const EmployeeManagementPage = ({ initialData }) => {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         }
     };
+    useEffect(() => {
+        if (employeeParam) {
+            setDisplayValues({
+                department: `[${employeeParam.departmentCode}] ${employeeParam.departmentName}`,
+                employmentStatus: employeeParam.employmentStatus === 'ACTIVE' ? '재직 중' :
+                    employeeParam.employmentStatus === 'ON_LEAVE' ? '휴직 중' : '퇴직',
+            });
+        }
+    }, [employeeParam]);
 
     const handleTabChange = (key) => {
         setEditEmployee(false);
@@ -477,11 +457,13 @@ const EmployeeManagementPage = ({ initialData }) => {
                                             </Divider>
                                             <Row gutter={16}>
                                                 <Col span={12}>
+                                                    <Form.Item>
                                                     <Input addonBefore="부서명"
                                                            value={displayValues.department}
                                                            onClick={() => handleInputClick('department')}
                                                            onFocus={(e) => e.target.blur()}
                                                     />
+                                                    </Form.Item>
                                                 </Col>
                                                 <Col span={12}>
                                                     <Form.Item name="positionName" rules={[{ required: true, message: '직위를 입력하세요.' }]}>
@@ -496,8 +478,11 @@ const EmployeeManagementPage = ({ initialData }) => {
                                             </Row>
                                             <Row gutter={16}>
                                                 <Col span={12}>
-                                                    <Form.Item name="employmentStatus" rules={[{ required: true, message: '고용 상태를 입력하세요.' }]}>
-                                                        <Input addonBefore="고용 상태" />
+                                                    <Form.Item>
+                                                        <Input addonBefore="고용 상태"
+                                                               value={displayValues.employmentStatus}
+                                                               onClick={() => handleInputClick('employee')}
+                                                               onFocus={(e) => e.target.blur()}/>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={12}>
@@ -581,6 +566,29 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     columns={[
                                                                         { title: '부서코드', dataIndex: 'departmentCode', key: 'departmentCode', align: 'center'},
                                                                         { title: '부서명', dataIndex: 'departmentName', key: 'departmentName', align: 'center',},
+
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size={'small'}
+                                                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        style: { cursor: 'pointer' },
+                                                                        onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                    })}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
+                                                    {currentField === 'employee' && (
+                                                        <>
+                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                고용 상태 선택
+                                                            </Typography>
+                                                            {modalData && (
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '고용 상태', dataIndex: 'label', key: 'label', align: 'center',},
 
                                                                     ]}
                                                                     dataSource={modalData}
