@@ -149,7 +149,7 @@ const MaterialListSection = ({
                 <Button onClick={handleDelete} type="danger">삭제</Button>
             </div>
 
-            <Modal
+            <AntModal
                 title="자재 상세 정보 수정"
                 open={isUpdateModalVisible}
                 onOk={handleUpdateOk}
@@ -226,7 +226,7 @@ const MaterialListSection = ({
                        style={{marginTop: '20px', flex: 1}}
                        readOnly/>
             </div>
-            </Modal>
+            </AntModal>
 
         </Paper>
     )

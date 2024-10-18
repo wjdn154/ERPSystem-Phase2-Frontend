@@ -104,7 +104,7 @@ const SecondMaterialListSection = ({
                                            readOnly/>
                                     <Input value={materialDataDetail.product?.productCode || ''}
                                            style={{marginRight: '30px', flex: 1}}
-                                           onClick={handleProductCodeClick}
+                                           //onClick={handleProductCodeClick}
                                            readOnly/>
 
                                     <Input value={"품목 명"}
@@ -114,29 +114,29 @@ const SecondMaterialListSection = ({
                                            onChange={(e) => handleInputChange(e, 'productName')}/>
                                 </div>
 
-                                <AntModal
-                                    title={"품목 코드 선택"}
-                                    open={isProductCodeModalVisible}
-                                    onOk={handleProductCodeSelectOk}
-                                    onCancel={handleProductCodeModalCancel}
-                                    width={600}
-                                >
-                                    <AntTable
-                                        style={{padding: '20px'}}
-                                        columns={productCodeColumn}
-                                        dataSource={productCodeData}
-                                        pagination={{pageSize: 5, position: ['bottomCenter'], showSizeChanger: false}}
-                                        rowSelection={handleProductRowSelection}
-                                        size="small"
-                                        rowKey="id"
-                                        onRow={(record) => ({
-                                            onClick: () => onProductCodeRowClick(record),
-                                            style: {cursor: 'pointer'},
-                                        })}
-                                    >
+                                {/*<AntModal*/}
+                                {/*    title={"품목 코드 선택"}*/}
+                                {/*    open={isProductCodeModalVisible}*/}
+                                {/*    onOk={handleProductCodeSelectOk}*/}
+                                {/*    onCancel={handleProductCodeModalCancel}*/}
+                                {/*    width={600}*/}
+                                {/*>*/}
+                                {/*    <AntTable*/}
+                                {/*        style={{padding: '20px'}}*/}
+                                {/*        columns={productCodeColumn}*/}
+                                {/*        dataSource={productCodeData}*/}
+                                {/*        pagination={{pageSize: 5, position: ['bottomCenter'], showSizeChanger: false}}*/}
+                                {/*        rowSelection={handleProductRowSelection}*/}
+                                {/*        size="small"*/}
+                                {/*        rowKey="id"*/}
+                                {/*        onRow={(record) => ({*/}
+                                {/*            onClick: () => onProductCodeRowClick(record),*/}
+                                {/*            style: {cursor: 'pointer'},*/}
+                                {/*        })}*/}
+                                {/*    >*/}
 
-                                    </AntTable>
-                                </AntModal>
+                                {/*    </AntTable>*/}
+                                {/*</AntModal>*/}
                             </AntModal>
                         </Paper>
                     </Grid>
