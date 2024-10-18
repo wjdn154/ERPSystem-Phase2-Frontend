@@ -6,7 +6,9 @@ import {workerListColumn} from "./WorkerListColumn.jsx"
 import WelcomeSection from "../../../../components/WelcomeSection.jsx";
 import {workerTabItems} from "./WorkerUtil.jsx";
 import WorkerAttendanceListSection from "./WorkerAttendanceListSection.jsx";
-import {workerAttendanceListColumn} from "./WorkerAttendanceListColumn.jsx"
+import {workerAttendanceListColumn} from "./WorkerAttendanceListColumn.jsx";
+import {workerListSecondColumn} from "./WorkerListSecondColumn.jsx";
+import WorkerDetailSection from "./WorkerDetailSection.jsx";
 
 
 const WorkerPage = ({initialData}) => {
@@ -32,7 +34,8 @@ const WorkerPage = ({initialData}) => {
         handleTabChange,
         handleSelectedAttendanceRow,
         setWorkerAttendanceDetail,
-        workerAttendanceDetail
+        workerAttendanceDetail,
+        handleUpdate,
 
     } = workerHook(initialData);
 
@@ -63,7 +66,7 @@ const WorkerPage = ({initialData}) => {
                 {/* 작업자 목록 및 상세내용 영역 */}
                 {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={10} md={10}>
+                    <Grid item xs={9} md={9}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <WorkerListSection
@@ -82,7 +85,28 @@ const WorkerPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
+                    <Grid item xs={9} md={9}>
+                        <Grow in={true} timeout={200}>
+                            <div>
+                                <WorkerDetailSection
+                                    columns={workerListColumn}
+                                    data={data}
+                                    workerDetail={workerDetail}
+                                    setWorkerDetail={setWorkerDetail}
+                                    handleRowSelection={handleRowSelection}
+                                    handleSelectedRow={handleSelectedRow}
+                                    handleUpdateOk={handleUpdateOk}
+                                    handleUpdateCancel={handleUpdateCancel}
+                                    isUpdateModalVisible={isUpdateModalVisible}
+                                    handleInputChange={handleInputChange}
+                                    showUpdateModal={showUpdateModal}
+                                    handleUpdate={handleUpdate}
+                                />
+                            </div>
+                        </Grow>
+                    </Grid>
                 </Grid>
+
             )}
 
             {/* 작업자 작업배치 및 근태목록 영역 */}
@@ -92,7 +116,7 @@ const WorkerPage = ({initialData}) => {
                         <Grow in={true} timeout={200}>
                             <div>
                                 <WorkerAttendanceListSection
-                                    columns={workerListColumn}
+                                    columns={workerListSecondColumn}
                                     workerAttendanceListColumn={workerAttendanceListColumn}
                                     data={data}
                                     workerDetail={workerDetail}

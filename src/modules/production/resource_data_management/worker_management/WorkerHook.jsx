@@ -6,6 +6,7 @@ import {
     updateWorkerDetail,
     fetchWorkerAttendanceAssignmentList
 } from "./WorkerApi.jsx";
+import {notification, Popconfirm} from "antd";
 
 export const workerHook = (initialData) => {
 
@@ -128,18 +129,19 @@ export const workerHook = (initialData) => {
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
-            const confirmSave = window.confirm("수정하시겠습니까?");
             console.log("수정버튼 클릭 시 workerDetail : ",workerDetail);
 
             await updateWorkerDetail(workerDetail.id, workerDetail);
             const updatedData = await fetchWorkerList();
-            window.alert("수정완료되었습니다.");
-            setIsUpdateModalVisible(false);
+            notification.success({message:'수정되었습니다.'});
             setData(updatedData);
         } catch (error) {
-            console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
+            notification.error({
+                message: '수정 실패',
+                description: '수정 중 오류가 발생했습니다.',
+            });
         }
-    }
+    };
 
 
     return {
@@ -159,7 +161,8 @@ export const workerHook = (initialData) => {
         handleTabChange,
         handleSelectedAttendanceRow,
         setWorkerAttendanceDetail,
-        workerAttendanceDetail
+        workerAttendanceDetail,
+        handleUpdate,
 
     };
 

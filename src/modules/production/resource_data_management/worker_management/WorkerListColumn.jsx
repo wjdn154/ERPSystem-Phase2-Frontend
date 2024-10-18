@@ -26,6 +26,7 @@ export const
         key:'employeeNumber',
         width: '15%',  // 컬럼 너비 설정
         align: 'center',
+        //render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
     },
         {
             title: <span>성명</span>, // 컬럼 제목
@@ -33,7 +34,8 @@ export const
             key: 'fullName',
             width: '11%', // 컬럼 너비 설정
             align: 'center',
-            render: (text, record) => `${record.employeeLastName}${record.employeeFirstName}`, // 성과 이름을 합침
+            render: (text, record) => `${record.employeeLastName}${record.employeeFirstName}` , // 성과 이름을 합침
+
         },
     {
         title: <span>부서 명</span>,  // 컬럼 제목
@@ -41,6 +43,7 @@ export const
         key:'departmentName',
         width: '11%',  // 컬럼 너비 설정
         align: 'center',
+        //render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
     },
     {
         title: <span>직위</span>,  // 컬럼 제목
@@ -48,6 +51,7 @@ export const
         key:'positionName',
         width: '11%',  // 컬럼 너비 설정
         align: 'center',
+       // render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
     },
     {
         title: <span>직책</span>,  // 컬럼 제목
@@ -55,6 +59,7 @@ export const
         key:'jobTitleName',
         width: '15%',  // 컬럼 너비 설정
         align: 'center',
+        //render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
     },
     {
         title: <span>고용상태</span>,  // 컬럼 제목
@@ -84,10 +89,10 @@ export const
         align: 'center',
         render: (text) => {
             return (
-                <span style={{ color: text === 'true' ? 'blue' : 'red' }}>
+            <Tag color={text === 'true' ? 'blue' : 'red'}>
                 {text === 'true' ? '이수' : '미 이수'}
-            </span>
-            );
+            </Tag>
+            )
         }
 
     },
