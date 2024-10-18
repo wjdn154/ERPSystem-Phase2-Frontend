@@ -185,6 +185,7 @@ const GeneralLedgerPage = () => {
                                 </Grid>
                                 <Grid sx={{ marginTop: '20px' }}>
                                     <RangePicker
+                                        disabledDate={(current) => current && current.year() !== 2024}
                                         onChange={handleDateChange}
                                         style={{ width: '80%', marginRight: '10px' }}
                                         defaultValue={[
@@ -204,11 +205,11 @@ const GeneralLedgerPage = () => {
                                     dataSource={searchData}
                                     columns={[
                                         {
-                                            title: '계정과목',
+                                            title: <div className="title-text">계정과목</div>,
                                             dataIndex: 'accountCode',
                                             key: 'accountId',
                                             align: 'center',
-                                            render: (text, record) => <span style={{ fontSize: '0.8rem' }}>[{text}] {record.accountName}</span>,
+                                            render: (text, record) => <div style={{ fontSize: '0.8rem' }}>[{text.padStart(5, '0')}] {record.accountName}</div>,
                                         },
                                     ]}
                                     rowKey="accountId"
@@ -268,54 +269,48 @@ const GeneralLedgerPage = () => {
                                         ]}
                                         columns={[
                                             {
-                                                title: '월',
+                                                title: <div className="title-text">월</div>,
                                                 dataIndex: 'month',
                                                 key: 'month',
                                                 align: 'center',
                                                 render: (text, record) => record.isPrevious ?
-                                                    <Typography style={{fontSize: '0.9rem'}}>{text}</Typography> :
-                                                    <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    <div className="medium-text">{text}</div> :
+                                                    <div className="small-text">{text}</div>
                                             },
                                             {
-                                                title: '차변',
+                                                title: <div className="title-text">차변</div>,
                                                 dataIndex: 'totalDebit',
                                                 key: 'totalDebit',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : ''
                                             },
                                             {
-                                                title: '대변',
+                                                title: <div className="title-text">대변</div>,
                                                 dataIndex: 'totalCredit',
                                                 key: 'totalCredit',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.8rem' }}>{Number(text).toLocaleString()}</span> : ''
+                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : ''
                                             },
                                             {
-                                                title: '잔액',
+                                                title: <div className="title-text">잔액</div>,
                                                 dataIndex: 'totalCash',
                                                 key: 'totalCash',
                                                 align: 'center',
 
                                                 render: (text, record) => record.isPrevious ?
-                                                    <Typography style={{fontSize: '0.9rem'}}>{Number(text).toLocaleString()}</Typography> :
-                                                    <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> :
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                             }
                                         ]}
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         rowKey={(record) => record.month}  // 전기이월과 월을 기준으로 키 설정
                                         size={'small'}
                                         summary={() => (
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>합계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                                                    {searchDetailData.totalDebitAmount.toLocaleString()}
-                                                </Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                                                    {searchDetailData.totalCreditAmount.toLocaleString()}
-                                                </Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                                                    {searchDetailData.totalCashAmount.toLocaleString()}
-                                                </Typography></Table.Summary.Cell>
+                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                <Table.Summary.Cell index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={1}><div className="medium-text" style={{ textAlign: 'right' }}>{searchDetailData.totalDebitAmount.toLocaleString()}</div></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={2}><div className="medium-text" style={{ textAlign: 'right' }}>{searchDetailData.totalCreditAmount.toLocaleString()}</div></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={3}><div className="medium-text" style={{ textAlign: 'right' }}>{searchDetailData.totalCashAmount.toLocaleString()}</div></Table.Summary.Cell>
                                             </Table.Summary.Row>
                                         )}
                                         rowClassName={(record) => {
@@ -349,8 +344,20 @@ const GeneralLedgerPage = () => {
                                 </Typography>
                                 <Table
                                     columns={[
-                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                        { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                        {
+                                            title: <div className="title-text">코드</div>,
+                                            dataIndex: 'code',
+                                            key: 'code',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>
+                                        },
+                                        {
+                                            title: <div className="title-text">이름</div>,
+                                            dataIndex: 'name',
+                                            key: 'name',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>
+                                        },
                                     ]}
                                     dataSource={modalData}
                                     rowKey="id"
@@ -370,8 +377,18 @@ const GeneralLedgerPage = () => {
                                 </Typography>
                                 <Table
                                     columns={[
-                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                        { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                        {
+                                            title: <div className="title-text">코드</div>,
+                                            dataIndex: 'code',
+                                            key: 'code',
+                                            align: 'center'
+                                        },
+                                        {
+                                            title: <div className="title-text">이름</div>,
+                                            dataIndex: 'name',
+                                            key: 'name',
+                                            align: 'center'
+                                        },
                                     ]}
                                     dataSource={modalData}
                                     rowKey="id"
@@ -385,52 +402,8 @@ const GeneralLedgerPage = () => {
                             </>
                         )}
 
-                        {currentField === 'startClientCode' && (
-                            <>
-                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                    거래처 시작 코드 선택
-                                </Typography>
-                                <Table
-                                    columns={[
-                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                        { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' },
-                                    ]}
-                                    dataSource={modalData}
-                                    rowKey="code"
-                                    size={'small'}
-                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                    onRow={(record) => ({
-                                        style: { cursor: 'pointer' },
-                                        onClick: () => handleModalSelect(record), // 선택 시 처리
-                                    })}
-                                />
-                            </>
-                        )}
-
-                        {currentField === 'endClientCode' && (
-                            <>
-                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                    거래처 끝 코드 선택
-                                </Typography>
-                                <Table
-                                    columns={[
-                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                        { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' },
-                                    ]}
-                                    dataSource={modalData}
-                                    rowKey="code"
-                                    size={'small'}
-                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                    onRow={(record) => ({
-                                        style: { cursor: 'pointer' },
-                                        onClick: () => handleModalSelect(record), // 선택 시 처리
-                                    })}
-                                />
-                            </>
-                        )}
-
                         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
+                            <Button onClick={handleModalCancel} variant="contained" danger sx={{ mr: 1 }}>
                                 닫기
                             </Button>
                         </Box>

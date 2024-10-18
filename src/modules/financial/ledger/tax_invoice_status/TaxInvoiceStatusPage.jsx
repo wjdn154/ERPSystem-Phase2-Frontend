@@ -193,6 +193,7 @@ const TaxInvoiceStatusPage = () => {
                                     <Row style={{ marginTop: '20px', marginBottom: '20px' }}>
                                     <Col>
                                             <RangePicker
+                                                disabledDate={(current) => current && current.year() !== 2024}
                                                 onChange={handleDateChange}
                                                 style={{ marginRight: '10px' }}
                                                 defaultValue={[
@@ -212,49 +213,49 @@ const TaxInvoiceStatusPage = () => {
                                         dataSource={searchData}  // 제공된 데이터
                                         columns={[
                                             {
-                                                title: '거래처 코드',
+                                                title: <div className="title-text">거래처 코드</div>,
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
                                                 render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
-                                                title: '거래처 이름',
+                                                title: <div className="title-text">거래처 이름</div>,
                                                 dataIndex: 'clientName',
                                                 key: 'clientName',
                                                 align: 'center',
                                                 render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
-                                                title: '등록번호',
+                                                title: <div className="title-text">등록번호</div>,
                                                 dataIndex: 'clientNumber',
                                                 key: 'clientNumber',
                                                 align: 'center',
                                                 render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
-                                                title: '월',
+                                                title: <div className="title-text">월</div>,
                                                 dataIndex: 'month',
                                                 key: 'month',
                                                 align: 'center',
                                                 render: (text) => text ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
-                                                title: '전표 건수',
+                                                title: <div className="title-text">전표 건수</div>,
                                                 dataIndex: 'voucherCount',
                                                 key: 'voucherCount',
                                                 align: 'center',
                                                 render: (text) => text !== undefined ? <span className="small-text">{text}</span> : ''
                                             },
                                             {
-                                                title: '공급 가액',
+                                                title: <div className="title-text">공급 가액</div>,
                                                 dataIndex: 'supplyAmount',
                                                 key: 'supplyAmount',
                                                 align: 'center',
                                                 render: (text) => text !== undefined ? <span className="small-text">{text.toLocaleString()}</span> : ''
                                             },
                                             {
-                                                title: '부가세',
+                                                title: <div className="title-text">부가세</div>,
                                                 dataIndex: 'vatAmount',
                                                 key: 'vatAmount',
                                                 align: 'center',
@@ -310,8 +311,21 @@ const TaxInvoiceStatusPage = () => {
                                 {modalData && (
                                     <Table
                                         columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' },
+                                            {
+                                                title: <div className="title-text">코드</div>,
+                                                dataIndex: 'code',
+                                                key: 'code',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">거래처명</div>,
+                                                dataIndex: 'printClientName',
+                                                key: 'printClientName',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+
+                                            },
                                         ]}
                                         dataSource={modalData}
                                         rowKey="code"
@@ -334,8 +348,20 @@ const TaxInvoiceStatusPage = () => {
                                 {modalData && (
                                     <Table
                                         columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' },
+                                            {
+                                                title: <div className="title-text">코드</div>,
+                                                dataIndex: 'code',
+                                                key: 'code',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">거래처명</div>,
+                                                dataIndex: 'printClientName',
+                                                key: 'printClientName',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+                                            },
                                         ]}
                                         dataSource={modalData}
                                         rowKey="code"

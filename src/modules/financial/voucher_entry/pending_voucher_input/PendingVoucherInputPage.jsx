@@ -258,6 +258,7 @@ const PendingVoucherInputPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid item xs={12} md={3} sx={{ marginBottom: '20px' }}>
                                         <DatePicker
+                                            disabledDate={(current) => current && current.year() !== 2024}
                                             value={selectedDate ? dayjs(selectedDate) : null}  // selectedDate가 null일 때를 처리
                                             onChange={(date) => {
                                                 if (date) {
@@ -274,23 +275,23 @@ const PendingVoucherInputPage = () => {
                                             dataSource={searchData?.voucherDtoList}
                                             columns={[
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>날짜</span>,
+                                                    title: <div className="title-text">날짜</div>,
                                                     dataIndex: 'voucherDate',
                                                     key: 'voucherDate',
                                                     width: '10%',
                                                     align: 'center',
-                                                    render: (text, record) => <span style={{ fontSize: '0.7rem' }}>{text || formattedDate}</span>
+                                                    render: (text, record) => <span className="small-text">{text || formattedDate}</span>
                                                 },
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>전표번호</span>,
+                                                    title: <div className="title-text">전표번호</div>,
                                                     dataIndex: 'voucherNumber',
                                                     key: 'voucherNumber',
                                                     width: '5%',
                                                     align: 'center',
-                                                    render: (text, record) => record.total ? null : <span style={{ fontSize: '0.7rem' }}>{text}</span>
+                                                    render: (text, record) => record.total ? null : <span className="small-text">{text}</span>
                                                 },
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>구분</span>,
+                                                    title: <div className="title-text">구분</div>,
                                                     dataIndex: 'voucherType',
                                                     key: 'voucherType',
                                                     width: '10%',
@@ -323,44 +324,44 @@ const PendingVoucherInputPage = () => {
                                                     }
                                                 },
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>계정과목</span>,
+                                                    title: <div className="title-text">계정과목</div>,
                                                     dataIndex: 'accountSubjectCode',
                                                     key: 'accountSubjectCode',
                                                     width: '10%',
                                                     align: 'center',
-                                                    render: (text, record) => <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span>
+                                                    render: (text, record) => <span className="small-text">[{text.padStart(5, '0')}] {record.accountSubjectName}</span>
                                                 },
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>거래처</span>,
+                                                    title: <div className="title-text">거래처</div>,
                                                     dataIndex: 'clientCode',
                                                     key: 'clientCode',
                                                     width: '10%',
                                                     align: 'center',
-                                                    render: (text, record) => <span style={{ fontSize: '0.7rem' }}>[{text}] {record.clientName}</span>
+                                                    render: (text, record) => <span className="small-text">[{text.padStart(5, '0')}] {record.clientName}</span>
                                                 },
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>적요</span>,
+                                                    title: <div className="title-text">적요</div>,
                                                     dataIndex: 'transactionDescription',
                                                     key: 'transactionDescription',
                                                     width: '20%',
                                                     align: 'center',
-                                                    render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>
+                                                    render: (text) => <span className="small-text">{text}</span>
                                                 },
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>차변</span>,
+                                                    title: <div className="title-text" style={{ textAlign: 'center' }}>차변</div>,
                                                     dataIndex: 'debitAmount',
                                                     key: 'debitAmount',
                                                     width: '10%',
                                                     align: 'right',
-                                                    render: (text) => <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>
+                                                    render: (text) => <span className="small-text">{text.toLocaleString()}</span>
                                                 },
                                                 {
-                                                    title: <span style={{ fontSize: '0.8rem' }}>대변</span>,
+                                                    title: <div className="title-text" style={{ textAlign: 'center' }}>대변</div>,
                                                     dataIndex: 'creditAmount',
                                                     key: 'creditAmount',
                                                     width: '10%',
                                                     align: 'right',
-                                                    render: (text) => <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span>
+                                                    render: (text) => <span className="small-text">{text.toLocaleString()}</span>
                                                 }
                                             ]}
                                             rowKey={(record) => record.id}
@@ -368,15 +369,15 @@ const PendingVoucherInputPage = () => {
                                             size="small"
                                             scroll={{ x: 'max-content' }}
                                             summary={() =>  (
-                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                    <Table.Summary.Cell index={0} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem' }}>합계</Typography></Table.Summary.Cell>
+                                                <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0} ><div className="medium-text">합계</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1} />
                                                     <Table.Summary.Cell index={2} />
                                                     <Table.Summary.Cell index={3} />
                                                     <Table.Summary.Cell index={4} />
                                                     <Table.Summary.Cell index={5} />
-                                                    <Table.Summary.Cell index={6}><Typography sx={{ textAlign: 'right', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={7}><Typography sx={{ textAlign: 'right', fontSize: '0.9rem'}}>{Number(searchData.totalCredit).toLocaleString()}</Typography></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalDebit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalCredit).toLocaleString()}</div></Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             )}
                                         />
@@ -506,15 +507,15 @@ const PendingVoucherInputPage = () => {
                                         dataSource={vouchers}
                                         columns={[
                                             {
-                                                title: "날짜",
+                                                title: <div className="title-text">날짜</div>,
                                                 dataIndex: "voucherDate",
                                                 key: "voucherDate",
                                                 width: "10%",
                                                 align: "center",
-                                                render: () => <span style={{ fontSize: '0.7rem' }}>{formattedDate}</span>,
+                                                render: () => <span className="small-text">{formattedDate}</span>,
                                             },
                                             {
-                                                title: "구분",
+                                                title: <div className="title-text">구분</div>,
                                                 dataIndex: "voucherType",
                                                 key: "voucherType",
                                                 width: "10%",
@@ -539,44 +540,44 @@ const PendingVoucherInputPage = () => {
                                                 }
                                             },
                                             {
-                                                title: "계정과목",
+                                                title: <div className="title-text">계정과목</div>,
                                                 dataIndex: "formattedAccountSubjectCode", // 포맷된 값을 사용
                                                 key: "formattedAccountSubjectCode",
                                                 width: "15%",
                                                 align: "center",
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <span className="small-text">{text}</span>,
                                             },
                                             {
-                                                title: "거래처",
+                                                title: <div className="title-text">거래처</div>,
                                                 dataIndex: "formattedClientCode", // 포맷된 값을 사용
                                                 key: "formattedClientCode",
                                                 width: "15%",
                                                 align: "center",
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <span className="small-text">{text}</span>,
                                             },
                                             {
-                                                title: "적요",
+                                                title: <div className="title-text">적요</div>,
                                                 dataIndex: "transactionDescription",
                                                 key: "transactionDescription",
                                                 width: "20%",
                                                 align: "center",
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <span className="small-text">{text}</span>,
                                             },
                                             {
-                                                title: "차변",
+                                                title: <div className="title-text">차변</div>,
                                                 dataIndex: "debitAmount",
                                                 key: "debitAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{(text || 0).toLocaleString()}</span>,
+                                                render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
                                             },
                                             {
-                                                title: "대변",
+                                                title: <div className="title-text">대변</div>,
                                                 dataIndex: "creditAmount",
                                                 key: "creditAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{(text || 0).toLocaleString()}</span>,
+                                                render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
                                             }
                                         ]}
                                         rowKey={(record) => record.key}
@@ -585,43 +586,23 @@ const PendingVoucherInputPage = () => {
                                         summary={() => (
                                             vouchers.length > 0 &&
                                             <>
-                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                    <Table.Summary.Cell index={0}>
-                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>합계</Typography>
-                                                    </Table.Summary.Cell>
+                                                <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={2}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={3}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={5}>
-                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
-                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}
-                                                        </Typography>
-                                                    </Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={6}>
-                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
-                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}
-                                                        </Typography>
-                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
                                                 </Table.Summary.Row>
-                                                <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                    <Table.Summary.Cell index={0}>
-                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>대차차액</Typography>
-                                                    </Table.Summary.Cell>
+                                                <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0}><div className="medium-text">대차차액</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={2}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={3}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={5}>
-                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
-                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}
-                                                        </Typography>
-                                                    </Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={6}>
-                                                        <Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
-                                                            {(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}
-                                                        </Typography>
-                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             </>
                                         )}
@@ -631,7 +612,7 @@ const PendingVoucherInputPage = () => {
                                     />
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
                                         {/* 삭제 버튼 */}
-                                        <Button danger onClick={handleDeleteRow} style={{ marginRight: '20px' }}>삭제</Button>
+                                        <Button type="danger" onClick={handleDeleteRow} style={{ marginRight: '20px' }}>삭제</Button>
                                         <Button type="primary" onClick={handleSubmit}>저장</Button>
                                     </Box>
                                 </Box>
@@ -667,8 +648,20 @@ const PendingVoucherInputPage = () => {
                                 {modalData && (
                                     <Table
                                         columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                            {
+                                                title: <div className="title-text">코드</div>,
+                                                dataIndex: 'code',
+                                                key: 'code',
+                                                align: 'center',
+                                                render: (text) => <span className="small-text">{text}</span>
+                                            },
+                                            {
+                                                title: <div className="title-text">이름</div>,
+                                                dataIndex: 'name',
+                                                key: 'name',
+                                                align: 'center',
+                                                render: (text) => <span className="small-text">{text}</span>
+                                            },
                                         ]}
                                         dataSource={modalData}
                                         rowKey="id"
@@ -691,8 +684,20 @@ const PendingVoucherInputPage = () => {
                                 {modalData && (
                                     <Table
                                         columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' },
+                                            {
+                                                title: <div className="title-text">코드</div>,
+                                                dataIndex: 'code',
+                                                key: 'code',
+                                                align: 'center',
+                                                render: (text) => <span className="small-text">{text}</span>
+                                            },
+                                            {
+                                                title: <div className="title-text">거래처명</div>,
+                                                dataIndex: 'printClientName',
+                                                key: 'printClientName',
+                                                align: 'center',
+                                                render: (text) => <span className="small-text">{text}</span>
+                                            },
                                         ]}
                                         dataSource={modalData}
                                         rowKey="code"
