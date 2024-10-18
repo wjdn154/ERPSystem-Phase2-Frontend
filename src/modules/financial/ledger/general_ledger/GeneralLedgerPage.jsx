@@ -3,12 +3,13 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './GeneralLedgerUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button, DatePicker, Input, Modal, Spin, Table} from 'antd';
+import {Space, Button, Col, DatePicker, Form, Input, Modal, Row, Spin, Table} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import dayjs from "dayjs";
+import {SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const GeneralLedgerPage = () => {
@@ -21,6 +22,7 @@ const GeneralLedgerPage = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentField, setCurrentField] = useState('');
     const [modalData, setModalData] = useState(null);
+    const [initialModalData, setInitialModalData] = useState(null);
     const [searchParams, setSearchParams] = useState({
         startDate: null,
         endDate: null,
@@ -49,6 +51,7 @@ const GeneralLedgerPage = () => {
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
         setModalData(null); // 모달 열기 전에 데이터를 초기화
+        setInitialModalData(null);
         fetchModalData();  // 모달 데이터 가져오기 호출
         setIsModalVisible(true);  // 모달창 열기
     };
@@ -61,6 +64,7 @@ const GeneralLedgerPage = () => {
             const searchText = null;
             const response = await apiClient.post(FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API, { searchText });
             setModalData(response.data);
+            setInitialModalData(response.data);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -129,6 +133,7 @@ const GeneralLedgerPage = () => {
             const response = await apiClient.post(FINANCIAL_API.GENERAL_ACCOUNT_LEDGER_API, searchParams);
             const data = response.data;
             setSearchData(data);
+            notify('success', '조회 성공', '총계정원장 조회 성공.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '총계정원장 조회 중 오류가 발생했습니다.', 'top');
         }
@@ -153,51 +158,85 @@ const GeneralLedgerPage = () => {
             </Grid>
 
             <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                <Grid item xs={12} md={2} sx={{ minWidth: '400px' }}>
+                <Grid item xs={12} md={2} sx={{ minWidth: '500px' }}>
                     <Grow in={true} timeout={200}>
                         <Paper elevation={3} sx={{ height: '100%' }}>
                             <Typography variant="h6" sx={{ padding: '20px' }} >총계정원장 조회</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                <Grid sx={{ display: 'flex' }}>
-                                    <Input
-                                        name="accountCode"
-                                        placeholder="계정과목 시작 코드"
-                                        value={displayValues.startSubjectCode}
-                                        onClick={() => handleInputClick('startSubjectCode')}
-                                        style={{
-                                            width: '50%',
-                                            marginRight: '10px',
-                                            cursor: 'pointer',
-                                            caretColor: 'transparent',
-                                        }}
-                                    />
-                                    <Input
-                                        name="accountCode"
-                                        placeholder="계정과목 끝 코드"
-                                        value={displayValues.endSubjectCode}
-                                        onClick={() => handleInputClick('endSubjectCode')}
-                                        style={{
-                                            width: '50%',
-                                            cursor: 'pointer',
-                                            caretColor: 'transparent',
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid sx={{ marginTop: '20px' }}>
-                                    <RangePicker
-                                        disabledDate={(current) => current && current.year() !== 2024}
-                                        onChange={handleDateChange}
-                                        style={{ width: '80%', marginRight: '10px' }}
-                                        defaultValue={[
-                                            searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                            searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                        ]}
-                                        format="YYYY-MM-DD"
-                                    />
-                                    <Button type="primary" onClick={handleSearch} style={{ width: 'calc(20% - 10px)' }}>
-                                        검색
-                                    </Button>
-                                </Grid>
+                                <Form layout="vertical">
+                                    <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                        <Col flex="1">
+                                            <Form.Item
+                                                label="계정과목 코드 범위"
+                                                required
+                                                tooltip="검색할 계정과목의 시작 코드와 끝 코드를 선택하세요"
+                                            >
+                                                <Space.Compact style={{ width: '100%' }}>
+                                                    <Form.Item
+                                                        noStyle
+                                                        rules={[{ required: true, message: '시작 코드를 선택하세요' }]}
+                                                    >
+                                                        <Input
+                                                            name="accountCode"
+                                                            placeholder="계정과목 시작 코드"
+                                                            value={displayValues.startSubjectCode}
+                                                            onClick={() => handleInputClick('startSubjectCode')}
+                                                            style={{
+                                                                width: '50%',
+                                                                marginRight: '10px',
+                                                                cursor: 'pointer',
+                                                                caretColor: 'transparent',
+                                                            }}
+                                                        />
+                                                    </Form.Item>
+                                                    <Form.Item
+                                                        noStyle
+                                                        rules={[{ required: true, message: '끝 코드를 선택하세요' }]}
+                                                    >
+                                                        <Input
+                                                            name="accountCode"
+                                                            placeholder="계정과목 끝 코드"
+                                                            value={displayValues.endSubjectCode}
+                                                            onClick={() => handleInputClick('endSubjectCode')}
+                                                            style={{
+                                                                width: '50%',
+                                                                cursor: 'pointer',
+                                                                caretColor: 'transparent',
+                                                            }}
+                                                        />
+                                                    </Form.Item>
+                                                </Space.Compact>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                        <Col>
+                                            <Form.Item
+                                                label="조회 기간"
+                                                required
+                                                tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                            >
+                                                <RangePicker
+                                                    disabledDate={(current) => current && current.year() !== 2024}
+                                                    onChange={handleDateChange}
+                                                    style={{ width: '250px' }}
+                                                    defaultValue={[
+                                                        searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                        searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                    ]}
+                                                    format="YYYY-MM-DD"
+                                                />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col>
+                                            <Form.Item>
+                                                <Button style={{ width: '100px' }} type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
+                                                    검색
+                                                </Button>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                </Form>
                             </Grid>
 
                             <Grid sx={{ margin: '20px' }}>
@@ -282,24 +321,21 @@ const GeneralLedgerPage = () => {
                                                 dataIndex: 'totalDebit',
                                                 key: 'totalDebit',
                                                 align: 'center',
-                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : ''
+                                                render: (text) => text ? <div className="small-text" style={{textAlign: 'right'}}>{Number(text).toLocaleString()}</div> : <div className="small-text" style={{textAlign: 'right'}}>0</div>
                                             },
                                             {
                                                 title: <div className="title-text">대변</div>,
                                                 dataIndex: 'totalCredit',
                                                 key: 'totalCredit',
                                                 align: 'center',
-                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : ''
+                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : <div className="small-text" style={{textAlign: 'right'}}>0</div>
                                             },
                                             {
                                                 title: <div className="title-text">잔액</div>,
                                                 dataIndex: 'totalCash',
                                                 key: 'totalCash',
                                                 align: 'center',
-
-                                                render: (text, record) => record.isPrevious ?
-                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> :
-                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
+                                                render: (text, record) => record.isPrevious ? <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                             }
                                         ]}
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
@@ -342,6 +378,25 @@ const GeneralLedgerPage = () => {
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     계정과목 시작 코드 선택
                                 </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.name && item.name.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
                                 <Table
                                     columns={[
                                         {
@@ -362,7 +417,12 @@ const GeneralLedgerPage = () => {
                                     dataSource={modalData}
                                     rowKey="id"
                                     size={'small'}
-                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                    pagination={{
+                                        pageSize: 15,
+                                        position: ['bottomCenter'],
+                                        showSizeChanger: false,
+                                        showTotal: (total) => `총 ${total}개`,
+                                    }}
                                     onRow={(record) => ({
                                         style: { cursor: 'pointer' },
                                         onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -375,6 +435,25 @@ const GeneralLedgerPage = () => {
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     계정과목 끝 코드 선택
                                 </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.name && item.name.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
                                 <Table
                                     columns={[
                                         {
@@ -393,7 +472,12 @@ const GeneralLedgerPage = () => {
                                     dataSource={modalData}
                                     rowKey="id"
                                     size={'small'}
-                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                    pagination={{
+                                        pageSize: 15,
+                                        position: ['bottomCenter'],
+                                        showSizeChanger: false,
+                                        showTotal: (total) => `총 ${total}개`,
+                                    }}
                                     onRow={(record) => ({
                                         style: { cursor: 'pointer' },
                                         onClick: () => handleModalSelect(record), // 선택 시 처리

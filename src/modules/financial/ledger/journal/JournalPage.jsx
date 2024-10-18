@@ -3,12 +3,13 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './JournalUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button, DatePicker, Input, Table, Tag} from 'antd';
+import {Button, Col, DatePicker, Form, Input, Row, Table, Tag} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import dayjs from "dayjs";
+import {SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const JournalPage = () => {
@@ -80,19 +81,35 @@ const JournalPage = () => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >분개장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        <RangePicker
-                                            disabledDate={(current) => current && current.year() !== 2024}
-                                            onChange={handleDateChange}
-                                            style={{ marginRight: '10px' }}
-                                            defaultValue={[
-                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                            ]}
-                                            format="YYYY-MM-DD"
-                                        />
-                                        <Button type="primary" onClick={handleSearch} >
-                                            검색
-                                        </Button>
+                                        <Form layout="vertical">
+                                            <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                                <Col>
+                                                    <Form.Item
+                                                        label="조회 기간"
+                                                        required
+                                                        tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                    >
+                                                        <RangePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            onChange={handleDateChange}
+                                                            style={{ marginRight: '10px' }}
+                                                            defaultValue={[
+                                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                            ]}
+                                                            format="YYYY-MM-DD"
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item>
+                                                        <Button icon={<SearchOutlined />} style={{ width: '100px' }} type="primary" onClick={handleSearch} >
+                                                            검색
+                                                        </Button>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                        </Form>
                                     </Grid>
                                     <Table
                                         dataSource={journalData?.journalShowDetailDTO}
