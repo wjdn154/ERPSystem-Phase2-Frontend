@@ -3,7 +3,7 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './PendingVoucherApprovalUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button, Col, DatePicker, Form, Row, Table, Tag} from 'antd';
+import {Button, Col, DatePicker, Form, Modal, notification, Row, Table, Tag} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useSelector} from "react-redux";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
@@ -14,6 +14,7 @@ import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import dayjs from "dayjs";
 import {SearchOutlined} from "@ant-design/icons";
 import {jwtDecode} from "jwt-decode";
+const { confirm } = Modal;
 
 const PendingVoucherApprovalPage = () => {
     const { token, isAdmin } = useSelector((state) => state.auth);
@@ -205,7 +206,6 @@ const PendingVoucherApprovalPage = () => {
                                                     setSelectedVouchers(selectedVoucherNumbers); // 배열로 상태 저장
                                                 },
                                                 columnWidth: 50,
-                                                hideSelectAll: true,
                                             }}
                                             onRow={(record) => ({
                                                 style: { cursor: 'pointer' },
@@ -250,30 +250,39 @@ const PendingVoucherApprovalPage = () => {
                                                         return;
                                                     }
 
-                                                    try {
-                                                        console.log(dayjs(selectedDate).format('YYYY-MM-DD'));
-                                                        console.log(selectedVouchers);
-                                                        console.log(isAdmin);
+                                                    confirm({
+                                                        title: '전표 승인 확인',
+                                                        content: '정말 전표를 승인 하시겠습니까?',
+                                                        okText: '확인',
+                                                        cancelText: '취소',
+                                                        async onOk() {
+                                                            try {
+                                                                console.log(dayjs(selectedDate).format('YYYY-MM-DD'));
+                                                                console.log(selectedVouchers);
+                                                                console.log(isAdmin);
 
-                                                        // 미결 전표 승인 API
-                                                        const response = await apiClient.post(FINANCIAL_API.APPROVAL_UNRESOLVED_VOUCHER_API, {
-                                                            searchDate:dayjs(selectedDate).format('YYYY-MM-DD'),
-                                                            searchVoucherNumberList: selectedVouchers,
-                                                            approvalManagerId: jwtDecode(token).employeeId,
-                                                            approvalStatus: 'Approved',
-                                                            superManager: isAdmin
-                                                        });
+                                                                // 미결 전표 승인 API
+                                                                const response = await apiClient.post(FINANCIAL_API.APPROVAL_UNRESOLVED_VOUCHER_API, {
+                                                                    searchDate:dayjs(selectedDate).format('YYYY-MM-DD'),
+                                                                    searchVoucherNumberList: selectedVouchers,
+                                                                    approvalManagerId: jwtDecode(token).employeeId,
+                                                                    approvalStatus: 'Approved',
+                                                                    superManager: isAdmin
+                                                                });
 
-                                                        if (response.status === 200) {
-                                                            notify('success', '전표 승인', '전표 승인이 완료되었습니다.', 'bottomRight');
-                                                            handleSearch();  // 승인 후 데이터 갱신
-                                                        } else {
-                                                            notify('error', '전표 승인 실패', '전표 승인 중 오류가 발생했습니다.', 'bottomRight');
-                                                        }
-                                                    } catch (error) {
-                                                        console.error('전표 승인 중 오류 발생:', error);
-                                                        notify('error', '전표 승인 실패', '전표 승인 중 오류가 발생했습니다.', 'bottomRight');
-                                                    }
+                                                                if (response.status === 200) {
+                                                                    notify('success', '전표 승인', '전표 승인이 완료되었습니다.', 'bottomRight');
+                                                                    handleSearch();  // 승인 후 데이터 갱신
+                                                                } else {
+                                                                    notify('error', '전표 승인 실패', '전표 승인 중 오류가 발생했습니다.', 'bottomRight');
+                                                                }
+                                                            } catch (error) {
+                                                                console.error('전표 승인 중 오류 발생:', error);
+                                                                notify('error', '전표 승인 실패', '전표 승인 중 오류가 발생했습니다.', 'bottomRight');
+                                                            }
+                                                        },
+                                                    onCancel() { notify('warning', '전표 승인 취소', '전표 승인이 취소되었습니다', 'bottomRight'); }
+                                                    });
                                                 }}
                                             >
                                                 전표 승인

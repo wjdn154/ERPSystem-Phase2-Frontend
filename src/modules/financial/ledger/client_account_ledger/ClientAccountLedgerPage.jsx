@@ -155,30 +155,6 @@ const ClientAccountLedgerPage = () => {
         }
     };
 
-    const ClientAndAccountSubjectLedgerColumns = [
-        {
-            title: <div className="title-text">거래처</div>,
-            dataIndex: 'clientCode',
-            key: 'clientCode',
-            align: 'center',
-            render: (text, record) => <div className="small-text">[{text.padStart(5, '0')}] {record.clientName} </div>
-        },
-        {
-            title: <div className="title-text">등록번호</div>,
-            dataIndex: 'clientRegisterNumber',
-            key: 'clientRegisterNumber',
-            align: 'center',
-            render: (text) => <div className="small-text">{text}</div>
-        },
-        {
-            title: <div className="title-text">대표자명</div>,
-            dataIndex: 'ownerName',
-            key: 'ownerName',
-            align: 'center',
-            render: (text) => <div className="small-text">{text}</div>
-        },
-    ];
-
     return (
         <Box sx={{ margin: '20px' }}>
             <Grid container spacing={3}>
@@ -333,7 +309,29 @@ const ClientAccountLedgerPage = () => {
                                 <Grid sx={{ margin: '20px' }}>
                                     <Table
                                         dataSource={clientAndAccountLedgerData}
-                                        columns={ClientAndAccountSubjectLedgerColumns}
+                                        columns={[
+                                            {
+                                                title: <div className="title-text">거래처</div>,
+                                                dataIndex: 'clientCode',
+                                                key: 'clientCode',
+                                                align: 'center',
+                                                render: (text, record) => <div className="small-text">[{text.padStart(5, '0')}] {record.clientName} </div>
+                                            },
+                                            {
+                                                title: <div className="title-text">등록번호</div>,
+                                                dataIndex: 'clientRegisterNumber',
+                                                key: 'clientRegisterNumber',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">대표자명</div>,
+                                                dataIndex: 'ownerName',
+                                                key: 'ownerName',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+                                            }
+                                        ]}
                                         rowKey="clientCode"
                                         rowSelection={{
                                             type: 'radio',
