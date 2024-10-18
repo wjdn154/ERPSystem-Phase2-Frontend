@@ -9,7 +9,7 @@ import {useNotificationContext} from "../../../../config/NotificationContext.jsx
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import dayjs from "dayjs";
-import {SearchOutlined} from "@ant-design/icons";
+import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const GeneralLedgerPage = () => {
@@ -23,6 +23,7 @@ const GeneralLedgerPage = () => {
     const [currentField, setCurrentField] = useState('');
     const [modalData, setModalData] = useState(null);
     const [initialModalData, setInitialModalData] = useState(null);
+    const [isFocusedAccount, setIsFocusedAccount] = useState(false);
     const [searchParams, setSearchParams] = useState({
         startDate: null,
         endDate: null,
@@ -181,14 +182,16 @@ const GeneralLedgerPage = () => {
                                                             placeholder="계정과목 시작 코드"
                                                             value={displayValues.startSubjectCode}
                                                             onClick={() => handleInputClick('startSubjectCode')}
-                                                            style={{
-                                                                width: '50%',
-                                                                marginRight: '10px',
-                                                                cursor: 'pointer',
-                                                                caretColor: 'transparent',
-                                                            }}
+                                                            className="search-input"
+                                                            style={{ width: '47.5%' }}
+                                                            suffix={<DownSquareOutlined />}
                                                         />
                                                     </Form.Item>
+                                                    <Input
+                                                        style={{ width: '5%', padding: 0, textAlign: 'center', borderLeft: 0, pointerEvents: 'none', fontSize: '0.8rem', backgroundColor: '#fff' }}
+                                                        placeholder="~"
+                                                        disabled
+                                                    />
                                                     <Form.Item
                                                         noStyle
                                                         rules={[{ required: true, message: '끝 코드를 선택하세요' }]}
@@ -198,11 +201,13 @@ const GeneralLedgerPage = () => {
                                                             placeholder="계정과목 끝 코드"
                                                             value={displayValues.endSubjectCode}
                                                             onClick={() => handleInputClick('endSubjectCode')}
+                                                            onFocus={() => setIsFocusedAccount(true)}
+                                                            onBlur={() => setIsFocusedAccount(false)}
                                                             style={{
-                                                                width: '50%',
-                                                                cursor: 'pointer',
-                                                                caretColor: 'transparent',
+                                                                width: '47.5%',
+                                                                borderLeft: isFocusedAccount ? '1px solid #4096FF' : '1px solid #fff',
                                                             }}
+                                                            suffix={<DownSquareOutlined />}
                                                         />
                                                     </Form.Item>
                                                 </Space.Compact>

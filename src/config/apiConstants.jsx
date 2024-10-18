@@ -42,6 +42,8 @@ export const FINANCIAL_API = {
     SAVE_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/unresolvedVoucherEntry`, // 미결 전표 저장 API
     APPROVAL_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/approvalUnresolvedVoucher`,  // 미결 전표 승인 API
     UNRESOLVED_VOUCHER_APPROVAL_SEARCH_API: `${API_BASE_URL}/api/financial/general-voucher-entry/approvalSearch`,  // 미결 전표 승인탭 조회 API
+    VOUCHER_PRINT_SEARCH_API: `${API_BASE_URL}/api/financial/ledger/VoucherPrint/show`,  // 전표 출력 조회 API
+
 
     // 거래처 및 계정과목별 원장 API
     CLIENT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/clientLedger/show`, // 거래처원장 목록 조회 API

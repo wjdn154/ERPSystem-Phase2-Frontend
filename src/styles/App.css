@@ -203,7 +203,12 @@ input.ant-input[readonly] {
   background-color: #e6f7ff !important;
 }
 
-.summary-row {
+.ant-table-cell-fix-left {
+  background-color: #F7F7F7 !important;
+  border-right: 1px solid #e8e8e8 !important;
+}
+
+.summary-row .ant-table-cell {
   background-color: #F7F7F7;
 }
 
