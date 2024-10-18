@@ -29,6 +29,9 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const ProductionRequestPage = () => {
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
+    const [form] = Form.useForm(); // 폼 인스턴스 생성
+    const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +59,8 @@ const ProductionRequestPage = () => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [productionRequests, setProductionRequests] = useState(null);
     const [productionRequestDetail, setProductionRequestDetail] = useState(null);
+    // const [fetchProductionRequestDetail, setFetchProductionRequestDetail] = useState(false); // 의뢰 조회한 정보 상태
+    const [productionRequestParam, setProductionRequestParam] = useState(false); //
 
     const handleTabChange = (key) => {
         setActiveTabKey(key);
@@ -94,6 +99,20 @@ const ProductionRequestPage = () => {
         setCurrentRequest(null);
     }
 
+    // 폼 제출 핸들러
+    const handleFormSubmit = async (values, type) => {
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk:async () => {
+                // 확인 버튼 클릭 시 실행되는 저장 로직
+                values.id = propductionRequestParam.id;
+            }
+        })
+    }
+
     // 생산 의뢰 리스트 조회
     const fetchProductionRequests = async () => {
         setIsLoading(true);
@@ -113,6 +132,16 @@ const ProductionRequestPage = () => {
 
 
     // 생산 의뢰 상세 조회
+    const fetchProductionRequestDetail = async (id) => {
+        setIsLoading(true);
+        try {
+            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_DETAIL_API);
+            setCurrentRequest(response.data);
+            notify('success', '조회 성공', '상세 데이터가 조회되었습니다.', 'bottomRight')
+        } catch (error) {
+            notify('error', '조회 실패', '데이터 상세 조회 중 오류가 발생했습니다.', 'top')
+        }
+    }
 
     // 생산 요청 생성 및 업데이트
     const handleSave = async (values) => {
@@ -286,7 +315,7 @@ const ProductionRequestPage = () => {
                                                 <Form.Item label="의뢰 구분" tooltip="검색할 의뢰 구분을 선택하세요">
                                                     <Select
                                                         placeholder="의뢰 구분"
-                                                        value={searchParams.requestType}
+                                                        value={searchParams.requestType || undefined}
                                                         onChange={(value) => setSearchParams({ ...searchParams, requestType: value })}
                                                     >
                                                         <Option value="MASS_PRODUCTION">양산</Option>
@@ -313,7 +342,7 @@ const ProductionRequestPage = () => {
                                                 <Form.Item label="진행 상태" tooltip="검색할 진행 상태를 선택하세요">
                                                     <Select
                                                         placeholder="진행 상태"
-                                                        value={searchParams.progressType}
+                                                        value={searchParams.progressType || undefined}
                                                         onChange={(value) => setSearchParams({ ...searchParams, progressType: value })}
                                                     >
                                                         <Option value="PENDING">대기 중</Option>
@@ -404,97 +433,34 @@ const ProductionRequestPage = () => {
                                 <Paper elevation={3} sx={{ height: '100%' }}>
                                     <Typography variant="h6" sx={{ padding: '20px' }}>생산의뢰 상세 조회</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                        <Table
-                                            dataSource={productionRequestDetail?.detailList}
-                                            columns={[
-                                                {
-                                                    title: <div className="title-text">의뢰구분</div>,
-                                                    dataIndex: 'requestType',
-                                                    key: 'requestType',
-                                                    align: 'center',
-                                                    width: '10%',
-                                                    render: (text) => <div className="small-text">{
-                                                        {
-                                                            'MASS_PRODUCTION': '양산',
-                                                            'PILOT_PRODUCTION': '시험양산',
-                                                            'URGENT_ORDER': '특급수주',
-                                                            'SAMPLE': '샘플',
-                                                            'PMS': 'PMS'
-                                                        }[text] || text
-                                                    }</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">의뢰명</div>,
-                                                    dataIndex: 'name',
-                                                    key: 'name',
-                                                    align: 'center',
-                                                    width: '15%',
-                                                    render: (text) => <div className="small-text">{text}</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">진행상태</div>,
-                                                    dataIndex: 'progressType',
-                                                    key: 'progressType',
-                                                    align: 'center',
-                                                    width: '5%',
-                                                    render: (text) => <div className="small-text">{
-                                                        {
-                                                            'PENDING': '대기 중',
-                                                            'IN_PROGRESS': '진행 중',
-                                                            'COMPLETED': '완료됨'
-                                                        }[text] || text
-                                                    }</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">확정여부</div>,
-                                                    dataIndex: 'isConfirmed',
-                                                    key: 'isConfirmed',
-                                                    align: 'center',
-                                                    width: '5%',
-                                                    render: (value) => <div className="small-text">{value ? '확정됨' : '미확정'}</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">생산 요청일자</div>,
-                                                    dataIndex: 'requestDate',
-                                                    key: 'requestDate',
-                                                    align: 'center',
-                                                    width: '15%',
-                                                    render: (text) => <div className="small-text">{text}</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">완료 요청일자</div>,
-                                                    dataIndex: 'deadlineOfCompletion',
-                                                    key: 'deadlineOfCompletion',
-                                                    align: 'center',
-                                                    width: '15%',
-                                                    render: (text) => <div className="small-text">{text}</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">납기일</div>,
-                                                    dataIndex: 'dueDateToProvide',
-                                                    key: 'dueDateToProvide',
-                                                    align: 'center',
-                                                    width: '15%',
-                                                    render: (text) => <div className="small-text">{text}</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">요청 수량</div>,
-                                                    dataIndex: 'requestQuantity',
-                                                    key: 'requestQuantity',
-                                                    align: 'center',
-                                                    width: '10%',
-                                                    render: (text) => <div className="small-text">{text}</div>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">확정 수량</div>,
-                                                    dataIndex: 'confirmedQuantity',
-                                                    key: 'confirmedQuantity',
-                                                    align: 'center',
-                                                    width: '10%',
-                                                    render: (text) => <div className="small-text">{text}</div>,
-                                                },
-                                            ]}
-                                        />
+                                        <Form
+                                            initialValues={fetchProductionRequestDetail}
+                                            form={form}
+                                            onFinish={(values) => {handleFormSubmit(values, 'update')}}
+                                        >
+                                            <Row gutter={16}>
+                                                <Col span={6}>
+                                                    <Form.Item name="productionRequestType" rules={[{ required: true, message: '의뢰구분을 선택하세요.' }]}>
+                                                        <Input addonBefore="의뢰구분"/>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item name="productionRequestType" rules={[{ required: true, message: '의뢰구분을 선택하세요.' }]}>
+                                                        <Input addonBefore="의뢰명"/>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item name="productionRequestType" rules={[{ required: true, message: '의뢰구분을 선택하세요.' }]}>
+                                                        <Input addonBefore="의뢰구분"/>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item name="productionRequestType" rules={[{ required: true, message: '의뢰구분을 선택하세요.' }]}>
+                                                        <Input addonBefore="의뢰구분"/>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                        </Form>
                                     </Grid>
                                 </Paper>
                             </Grow>
