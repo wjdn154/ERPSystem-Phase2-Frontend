@@ -207,7 +207,6 @@ const ClientAccountLedgerPage = () => {
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
                                             <Col flex="1">
                                                 <Form.Item
-                                                    name="accountCodeRange"
                                                     label="계정과목 코드 범위"
                                                     required
                                                     tooltip="검색할 계정과목의 시작 코드와 끝 코드를 선택하세요"
@@ -254,7 +253,6 @@ const ClientAccountLedgerPage = () => {
                                             </Col>
                                             <Col flex="1">
                                                 <Form.Item
-                                                    name="accountCodeRange"
                                                     label="거래처 코드 범위"
                                                     required
                                                     tooltip="검색할 거래처의 시작 코드와 끝 코드를 선택하세요"

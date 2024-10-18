@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Grid, Grow, Paper, Typography } from '@mui/material';
-import {Spin, Table, Button, DatePicker, Input, Modal, Tag, Row, Form, Space} from 'antd';
+import {Spin, Table, Button, DatePicker, Input, Modal, Tag, Row, Form, Space, Col} from 'antd';
 import dayjs from 'dayjs';
 import apiClient from "../../../../config/apiClient.jsx";
 import { FINANCIAL_API } from "../../../../config/apiConstants.jsx";
@@ -124,6 +124,7 @@ const ClientLedgerPage = () => {
                 totalSumCreditAmount: data.totalSumCreditAmount,
                 totalSumTotalCashAmount: data.totalSumTotalCashAmount
             });
+            notify('success', '조회 성공', '거래처 원장 조회 성공.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '거래처 원장 조회 중 오류가 발생했습니다.', 'top');
         }
@@ -262,95 +263,102 @@ const ClientLedgerPage = () => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >거래처 원장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
-                                        <Form.Item
-                                            name="accountCodeRange"
-                                            label="계정과목 코드"
-                                            required
-                                            tooltip="검색할 계정과목의 코드를 선택하세요"
-                                        >
-                                            <Space.Compact style={{ width: '100%' }}>
+                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                            <Col flex="1">
                                                 <Form.Item
-                                                    noStyle
-                                                    rules={[{ required: true, message: '시작 코드를 선택하세요' }]}
+                                                    label="계정과목 코드"
+                                                    required
+                                                    tooltip="검색할 계정과목의 코드를 선택하세요"
                                                 >
-                                                    <Input
-                                                        placeholder="시작 코드"
-                                                        value={displayValues.accountCode}
-                                                        onClick={() => handleInputClick('accountCode')}
-                                                        className="search-input"
-                                                        style={{ width: '45%' }}
-                                                        suffix={<DownSquareOutlined />}
+                                                    <Form.Item
+                                                        noStyle
+                                                        rules={[{ required: true, message: '시작 코드를 선택하세요' }]}
+                                                    >
+                                                        <Input
+                                                            placeholder="계정과목 코드"
+                                                            value={displayValues.accountCode}
+                                                            onClick={() => handleInputClick('accountCode')}
+                                                            className="search-input"
+                                                            style={{ width: '100%' }}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
+                                                    </Form.Item>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col flex="1">
+                                                <Form.Item
+                                                    label="거래처 코드 범위"
+                                                    required
+                                                    tooltip="검색할 거래처의 시작 코드와 끝 코드를 선택하세요"
+                                                >
+                                                    <Space.Compact style={{ width: '100%' }}>
+                                                        <Form.Item
+                                                            noStyle
+                                                            rules={[{ required: true, message: '시작 코드를 선택하세요' }]}
+                                                        >
+                                                            <Input
+                                                                placeholder="시작 코드"
+                                                                value={displayValues.clientStartCode}
+                                                                onClick={() => handleInputClick('clientStartCode')}
+                                                                className="search-input"
+                                                                style={{ width: '47.5%' }}
+                                                                suffix={<DownSquareOutlined />}
+                                                            />
+                                                        </Form.Item>
+                                                        <Input
+                                                            style={{ width: '5%', padding: 0, textAlign: 'center', borderLeft: 0, pointerEvents: 'none', fontSize: '0.8rem', backgroundColor: '#fff' }}
+                                                            placeholder="~"
+                                                            disabled
+                                                        />
+                                                        <Form.Item
+                                                            noStyle
+                                                            rules={[{ required: true, message: '끝 코드를 선택하세요' }]}
+                                                        >
+                                                            <Input
+                                                                placeholder="끝 코드"
+                                                                value={displayValues.clientEndCode}
+                                                                onClick={() => handleInputClick('clientEndCode')}
+                                                                onFocus={() => setIsFocusedClient(true)}
+                                                                onBlur={() => setIsFocusedClient(false)}
+                                                                className="search-input"
+                                                                style={{
+                                                                    borderLeft: isFocusedClient ? '1px solid #4096FF' : '1px solid #fff',
+                                                                    width: '47.5%',
+                                                                }}
+                                                                suffix={<DownSquareOutlined />}
+                                                            />
+                                                        </Form.Item>
+                                                    </Space.Compact>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                            <Col>
+                                                <Form.Item
+                                                    label="조회 기간"
+                                                    required
+                                                    tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                >
+                                                    <RangePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
+                                                        onChange={handleDateChange}
+                                                        defaultValue={[
+                                                            searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                            searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                        ]}
+                                                        format="YYYY-MM-DD"
+                                                        style={{ width: '250px' }}
                                                     />
                                                 </Form.Item>
-                                            </Space.Compact>
-                                        </Form.Item>
-                                        <Form.Item
-                                            name="accountCodeRange"
-                                            label="거래처 코드 범위"
-                                            required
-                                            tooltip="검색할 거래처의 시작 코드와 끝 코드를 선택하세요"
-                                        >
-                                            <Space.Compact style={{ width: '100%' }}>
-                                                <Form.Item
-                                                    noStyle
-                                                    rules={[{ required: true, message: '시작 코드를 선택하세요' }]}
-                                                >
-                                                    <Input
-                                                        placeholder="시작 코드"
-                                                        value={displayValues.clientStartCode}
-                                                        onClick={() => handleInputClick('clientStartCode')}
-                                                        className="search-input"
-                                                        style={{ width: '45%' }}
-                                                        suffix={<DownSquareOutlined />}
-                                                    />
+                                            </Col>
+                                            <Col>
+                                                <Form.Item>
+                                                    <Button style={{ width: '100px' }} type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
+                                                        검색
+                                                    </Button>
                                                 </Form.Item>
-                                                <Input
-                                                    style={{ width: '10%', textAlign: 'center', borderLeft: 0, pointerEvents: 'none', fontSize: '0.8rem', backgroundColor: '#fff' }}
-                                                    placeholder="~"
-                                                    disabled
-                                                />
-                                                <Form.Item
-                                                    noStyle
-                                                    rules={[{ required: true, message: '끝 코드를 선택하세요' }]}
-                                                >
-                                                    <Input
-                                                        placeholder="끝 코드"
-                                                        value={displayValues.clientEndCode}
-                                                        onClick={() => handleInputClick('clientEndCode')}
-                                                        onFocus={() => setIsFocusedClient(true)}
-                                                        onBlur={() => setIsFocusedClient(false)}
-                                                        className="search-input"
-                                                        style={{
-                                                            borderLeft: isFocusedClient ? '1px solid #4096FF' : '1px solid #fff',
-                                                            width: '45%',
-                                                        }}
-                                                        suffix={<DownSquareOutlined />}
-                                                    />
-                                                </Form.Item>
-                                            </Space.Compact>
-                                        </Form.Item>
-                                        <Form.Item
-                                            label="조회 기간"
-                                            required
-                                            tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
-                                        >
-                                            <RangePicker
-                                                disabledDate={(current) => current && current.year() !== 2024}
-                                                onChange={handleDateChange}
-                                                defaultValue={[
-                                                    searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                    searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                                ]}
-                                                format="YYYY-MM-DD"
-                                                style={{ width: '100%' }}
-                                            />
-                                        </Form.Item>
-
-                                        <Form.Item>
-                                            <Button type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
-                                                검색
-                                            </Button>
-                                        </Form.Item>
+                                            </Col>
+                                        </Row>
                                     </Form>
                                 </Grid>
                                 <Grid sx={{ margin: '20px' }}>
