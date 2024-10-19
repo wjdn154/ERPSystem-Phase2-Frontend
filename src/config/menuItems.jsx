@@ -5,12 +5,10 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 import {
-    DEPARTMENT_API,
     EMPLOYEE_API,
     FINANCIAL_API,
     LOGISTICS_API,
     PRODUCTION_API,
-    USERS_API
 } from "./apiConstants.jsx";
 
 import {jwtDecode} from "jwt-decode";
@@ -35,7 +33,7 @@ export const subMenuItems = {
             text: '기초정보관리',
             items: [
                 { text: '회사정보수정', component: 'CompanyInfoEditPage', apiPath: undefined, url: '/integration/basic-info/company-edit', requiredPermission: 'adminPermission', permissionLevel: 'ADMIN' }, // 관리자 권한
-                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: USERS_API.USERS_PERMISSION_API(Cookies.get('jwt') ? jwtDecode(Cookies.get('jwt')).sub : null), url: '/integration/basic-info/user-management' }, // 사용자 관리 권한
+                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: EMPLOYEE_API.USERS_PERMISSION_API(Cookies.get('jwt') ? jwtDecode(Cookies.get('jwt')).sub : null), url: '/integration/basic-info/user-management' }, // 사용자 관리 권한
             ]
         }
     ],
@@ -127,8 +125,8 @@ export const subMenuItems = {
             text: '기초 정보 관리',
             items: [
                 { text: '사원 관리', component: 'EmployeeManagementPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
-                { text: '사용자 관리', component: 'UserManagementPage', apiPath: USERS_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한
-                { text: '부서 관리', component: 'DepartmentManagementPage', apiPath: DEPARTMENT_API.DEPARTMENT_DATA_API, url: '/hr/basic-info/department-management', requiredPermission: 'departmentManagementPermission', permissionLevel: 'GENERAL' },  // 부서 관리 권한
+                { text: '사용자 관리', component: 'UserManagementPage', apiPath: EMPLOYEE_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한
+                { text: '부서 관리', component: 'DepartmentManagementPage', apiPath: EMPLOYEE_API.DEPARTMENT_DATA_API, url: '/hr/basic-info/department-management', requiredPermission: 'departmentManagementPermission', permissionLevel: 'GENERAL' },  // 부서 관리 권한
                 { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: undefined, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
                 { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: undefined, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
                 { text: '퇴사자 관리', component: 'RetirementManagementPage', apiPath: undefined, url: '/hr/basic-info/retirement-management', requiredPermission: 'retirementManagementPermission', permissionLevel: 'GENERAL' },  // 퇴사자 관리 권한
@@ -188,7 +186,7 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '품목 관리', component: 'ItemManagementPage', apiPath: undefined, url: '/logistics/basic-info/item-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
+                { text: '품목 관리', component: 'ProductManagementPage', apiPath: LOGISTICS_API.PRODUCT_LIST_API, url: '/logistics/basic-info/product-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
                 { text: '품목 그룹 관리', component: 'ItemGroupManagementPage', apiPath: undefined, url: '/logistics/basic-info/item-group-management', requiredPermission: 'itemGroupManagementPermission', permissionLevel: 'GENERAL' },  // 품목 그룹 관리 권한
                 { text: '창고등록', component: 'WarehouseRegistrationPage', apiPath: undefined, url: '/logistics/basic-info/warehouse-registration', requiredPermission: 'warehouseRegistrationPermission', permissionLevel: 'GENERAL' },  // 창고등록 권한
             ]

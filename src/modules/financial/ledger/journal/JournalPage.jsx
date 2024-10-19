@@ -3,12 +3,13 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './JournalUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button, DatePicker, Input, Table, Tag} from 'antd';
+import {Button, Col, DatePicker, Form, Input, Row, Table, Tag} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import dayjs from "dayjs";
+import {SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const JournalPage = () => {
@@ -41,7 +42,7 @@ const JournalPage = () => {
         const { startDate, endDate } = searchParams;
         // 입력값 검증
         if (!startDate || !endDate) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
@@ -74,44 +75,61 @@ const JournalPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={8} sx={{ minWidth: '1200px'}}>
+                    <Grid item xs={12} md={8} sx={{ minWidth: '1400px'}}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >분개장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        <RangePicker
-                                            onChange={handleDateChange}
-                                            style={{ marginRight: '10px' }}
-                                            defaultValue={[
-                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                            ]}
-                                            format="YYYY-MM-DD"
-                                        />
-                                        <Button type="primary" onClick={handleSearch} >
-                                            검색
-                                        </Button>
+                                        <Form layout="vertical">
+                                            <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                                <Col>
+                                                    <Form.Item
+                                                        label="조회 기간"
+                                                        required
+                                                        tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                    >
+                                                        <RangePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            onChange={handleDateChange}
+                                                            style={{ marginRight: '10px' }}
+                                                            defaultValue={[
+                                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                            ]}
+                                                            format="YYYY-MM-DD"
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item>
+                                                        <Button icon={<SearchOutlined />} style={{ width: '100px' }} type="primary" onClick={handleSearch} >
+                                                            검색
+                                                        </Button>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                        </Form>
                                     </Grid>
                                     <Table
                                         dataSource={journalData?.journalShowDetailDTO}
                                         columns={[
                                             {
-                                                title: '전표일자',
+                                                title: <div className="title-text">전표일자</div>,
                                                 dataIndex: 'voucherDate',
                                                 key: 'voucherDate',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
                                             },
                                             {
-                                                title: '전표번호',
+                                                title: <div className="title-text">전표번호</div>,
                                                 dataIndex: 'voucherNumber',
                                                 key: 'voucherNumber',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
                                             },
                                             {
-                                                title: '구분',
+                                                title: <div className="title-text">구분</div>,
                                                 dataIndex: 'voucherType',
                                                 key: 'voucherType',
                                                 align: 'center',
@@ -143,69 +161,64 @@ const JournalPage = () => {
                                                 }
                                             },
                                             {
-                                                title: '계정과목',
+                                                title: <div className="title-text">계정과목</div>,
                                                 dataIndex: 'accountSubjectCode',
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>[{text}] {record.accountSubjectName}</span> : ''
-                                                // render: (text, record) => { return <span><Tag style={{ marginLeft: '5px' }} color='gray'>{text}</Tag>{record.accountSubjectName}</span>; }
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.accountSubjectName}</div> : ''
                                             },
                                             {
                                                 title: (
-                                                    <div>
-                                                        금액
-                                                    </div>
+                                                    <div className="title-text">금액</div>
                                                 ),
                                                 align: 'center',
                                                 children: [
                                                     {
-                                                        title: '차변',
+                                                        title: <div className="title-text">차변</div>,
                                                         dataIndex: 'debitAmount',
                                                         key: 'debitAmount',
                                                         align: 'center',
-                                                        render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''
+                                                        render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''
                                                     },
                                                     {
-                                                        title: '대변',
+                                                        title: <div className="title-text">대변</div>,
                                                         dataIndex: 'creditAmount',
                                                         key: 'creditAmount',
                                                         align: 'center',
-                                                        render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text.toLocaleString()}</span> : ''
+                                                        render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''
                                                     },
                                                 ],
-                                                colSpan: 2,
                                             },
                                             {
-                                                title: '적요',
+                                                title: <div className="title-text">적요</div>,
                                                 dataIndex: 'transactionDescription',
                                                 key: 'transactionDescription',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
                                             },
                                             {
-                                                title: '거래처',
+                                                title: <div className="title-text">거래처</div>,
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>[{text.padStart(5, '0')}] {record.clientName}</span> : ''
-                                                // render: (text, record) => { return <span><Tag style={{ marginLeft: '5px' }} color='gray'>{text.padStart(5, '0')}</Tag>{record.clientName}</span>; }
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.clientName}</div> : ''
                                             },
                                             {
-                                                title: '등록번호',
+                                                title: <div className="title-text">등록번호</div>,
                                                 dataIndex: 'clientRegisterNumber',
                                                 key: 'clientRegisterNumber',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text, record) => text ? <div className="small-text">{text}</div> : ''
                                             },
                                             {
-                                                title: '담당자',
+                                                title: <div className="title-text">담당자</div>,
                                                 dataIndex: 'voucherManagerName',
                                                 key: 'voucherManagerName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.7rem' }}>{text}</span> : ''
+                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
                                             },
                                             {
-                                                title: '유형',
+                                                title: <div className="title-text">유형</div>,
                                                 dataIndex: 'voucherKind',
                                                 key: 'voucherKind',
                                                 align: 'center',
@@ -233,17 +246,20 @@ const JournalPage = () => {
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         // pagination={false}
                                         size={'small'}
+                                        bordered={true}
                                         summary={() => (
-                                            <Table.Summary.Row style={{ backgroundColor: '#FAFAFA'}}>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>총 합계</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalVoucherCount}건</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalCredit.toLocaleString()}</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell><Typography sx={{ textAlign: 'center', fontSize: '0.8rem' }}>{journalData?.totalDebit.toLocaleString()}</Typography></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
-                                                <Table.Summary.Cell></Table.Summary.Cell>
+                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA'}}>
+                                                <Table.Summary.Cell index={0}><div className="medium-text">총 합계</div></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={3}><div className="medium-text">{journalData?.totalVoucherCount}건</div></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={4}><div className="medium-text" style={{ textAlign: 'right' }}>{journalData?.totalCredit.toLocaleString()}</div></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={5}><div className="medium-text" style={{ textAlign: 'right' }}>{journalData?.totalDebit.toLocaleString()}</div></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={6}></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={7}></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={8}></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                                                <Table.Summary.Cell index={10}></Table.Summary.Cell>
                                             </Table.Summary.Row>
                                         )}
                                     />

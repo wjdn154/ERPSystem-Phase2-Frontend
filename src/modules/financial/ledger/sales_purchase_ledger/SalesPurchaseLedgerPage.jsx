@@ -3,13 +3,14 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './SalesPurchaseLedgerUtil.jsx';
 import {Typography} from '@mui/material';
-import {Table, Button, DatePicker, Tag} from 'antd';
+import {Table, Button, DatePicker, Tag, Col, Row, Form} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from "dayjs";
 import apiClient from "../../../../config/apiClient.jsx";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import { Tooltip } from 'antd';
+import {SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const SalesPurchaseLedgerPage = () => {
@@ -45,154 +46,390 @@ const SalesPurchaseLedgerPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '800px' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1450px' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >매입매출장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 20px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        <RangePicker
-                                            onChange={ (dates) => {
-                                                    if (dates) {
-                                                        setSearchParams({
-                                                            ...searchParams,
-                                                            startDate: dates[0].format('YYYY-MM-DD'),
-                                                            endDate: dates[1].format('YYYY-MM-DD'),
-                                                        });
-                                                    }
-                                                }
-                                            }
-                                            style={{ marginRight: '10px' }}
-                                            defaultValue={[
-                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                            ]}
-                                            format="YYYY-MM-DD"
-                                        />
-                                        <Button type="primary" onClick={async () => {
-                                                const { startDate, endDate } = searchParams;
-                                                // 입력값 검증
-                                                if (!startDate || !endDate) {
-                                                    notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
-                                                    return;
-                                                }
+                                        <Form layout="vertical">
+                                            <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                                <Col>
+                                                    <Form.Item
+                                                        label="조회 기간"
+                                                        required
+                                                        tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                    >
+                                                        <RangePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            onChange={ (dates) => {
+                                                                    if (dates) {
+                                                                        setSearchParams({
+                                                                            ...searchParams,
+                                                                            startDate: dates[0].format('YYYY-MM-DD'),
+                                                                            endDate: dates[1].format('YYYY-MM-DD'),
+                                                                        });
+                                                                    }
+                                                                }
+                                                            }
+                                                            style={{ marginRight: '10px' }}
+                                                            defaultValue={[
+                                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                            ]}
+                                                            format="YYYY-MM-DD"
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item>
+                                                        <Button
+                                                            icon={<SearchOutlined />}
+                                                            style={{ width: '100px' }}
+                                                            type="primary"
+                                                            onClick={async () => {
+                                                                const { startDate, endDate } = searchParams;
+                                                                // 입력값 검증
+                                                                if (!startDate || !endDate) {
+                                                                    notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
+                                                                    return;
+                                                                }
 
-                                                try {
-                                                    const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
-                                                    const data = response.data;
-                                                    console.log(data);
-                                                    setSearchData(data);
-                                                } catch (error) {
-                                                    notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
-                                                }
-                                            }
-                                        } >
-                                            검색
-                                        </Button>
+                                                                try {
+                                                                    const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
+                                                                    const data = response.data;
+                                                                    console.log(data);
+                                                                    setSearchData(data);
+                                                                } catch (error) {
+                                                                    notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
+                                                                }
+                                                            }
+                                                            } >
+                                                            검색
+                                                        </Button>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                        </Form>
                                     </Grid>
                                     <Table
-                                        dataSource={searchData ? [
-                                            ...searchData.flatMap((dayData, index) => [
-                                                // 각 일별 데이터
-                                                ...dayData.salesAndPurChaseLedgerShowList.map((entry) => ({
-                                                    ...entry,
-                                                    key: `voucher-${entry.voucherId}`,
-                                                    isPreviousBalance: false,
-                                                    isSummary: false,
-                                                })),
-                                                // 일계 데이터가 있을 경우 추가
-                                                dayData.salesAndPurChaseLedgerDailySumDTO ? {
-                                                    key: `dailyTotal-${index}`,
-                                                    voucherDate: '[일 계]',
-                                                    itemName: null,
-                                                    clientCode: null,
-                                                    clientName: null,
-                                                    supplyAmount: dayData.salesAndPurChaseLedgerDailySumDTO.sumSupplyAmount,
-                                                    vatAmount: dayData.salesAndPurChaseLedgerDailySumDTO.sumVatAmount,
-                                                    sumAmount: dayData.salesAndPurChaseLedgerDailySumDTO.sumAmount,
-                                                    isSummary: true,
-                                                    isDailyTotal: true,
-                                                } : null,
-                                            ]).filter(Boolean), // null 제거
-                                        ] : []}
+                                        dataSource={
+                                            searchData
+                                                ? (() => {
+                                                    const resultList = [];
+
+                                                    // 일계, 월계, 분기계, 반기계 데이터의 인덱스 변수들
+                                                    let dailySummaryIndex = 0;
+                                                    let monthlySummaryIndex = 0;
+                                                    let quarterlySummaryIndex = 0;
+                                                    let halfYearlySummaryIndex = 0;
+
+                                                    const dailySummaries = searchData.dailySummaries;
+                                                    const monthlySummaries = searchData.monthlySummaries;
+                                                    const cumulativeSummaries = searchData.cumulativeSummaries;
+                                                    const quarterlySummaries = searchData.quarterlySummaries;
+                                                    const halfYearlySummaries = searchData.halfYearlySummaries;
+
+                                                    const entries = searchData.salesAndPurChaseLedgerShowList;
+
+                                                    let previousDate = null;
+                                                    let previousMonth = null;
+                                                    let previousQuarter = null;
+                                                    let previousHalfYear = null;
+
+                                                    entries.forEach((entry, index) => {
+                                                        const currentDate = entry.voucherDate;
+                                                        const currentMonth = currentDate.slice(0, 7); // 월 정보 (YYYY-MM)
+                                                        const monthNumber = parseInt(currentDate.slice(5, 7), 10); // 월 숫자 (1 ~ 12)
+                                                        const currentQuarter = Math.floor((monthNumber - 1) / 3) + 1; // 분기 계산
+                                                        const currentHalfYear = monthNumber <= 6 ? 1 : 2; // 반기 계산
+
+                                                        // 1. 날짜가 변경된 경우 일계 요약 추가
+                                                        if (previousDate && currentDate !== previousDate) {
+                                                            if (dailySummaryIndex < dailySummaries.length) {
+                                                                const dailySummary = dailySummaries[dailySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `dailyTotal-${index}`,
+                                                                    vatTypeName: dailySummary.voucherCount + '건',
+                                                                    voucherDate: '[일 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: dailySummary.sumSupplyAmount,
+                                                                    vatAmount: dailySummary.sumVatAmount,
+                                                                    sumAmount: dailySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isDailyTotal: true,
+                                                                });
+                                                                dailySummaryIndex++; // 다음 일계로 이동
+                                                            }
+                                                        }
+
+                                                        // 2. 월이 변경된 경우 월계와 누계 요약 추가
+                                                        if (previousMonth && currentMonth !== previousMonth) {
+                                                            if (monthlySummaryIndex < monthlySummaries.length) {
+                                                                const monthlySummary = monthlySummaries[monthlySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `monthlyTotal-${index}`,
+                                                                    vatTypeName: monthlySummary.voucherCount + '건',
+                                                                    voucherDate: '[월 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: monthlySummary.sumSupplyAmount,
+                                                                    vatAmount: monthlySummary.sumVatAmount,
+                                                                    sumAmount: monthlySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isMonthlyTotal: true,
+                                                                });
+                                                                monthlySummaryIndex++; // 다음 월계로 이동
+                                                            }
+
+                                                            // 누계 요약 추가
+                                                            if (monthlySummaryIndex < cumulativeSummaries.length) {
+                                                                const cumulativeSummary = cumulativeSummaries[monthlySummaryIndex - 1]; // 해당 월 이후의 누계를 가져옴
+                                                                resultList.push({
+                                                                    key: `cumulativeTotal-${index}`,
+                                                                    vatTypeName: cumulativeSummary.voucherCount + '건',
+                                                                    voucherDate: '[누 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: cumulativeSummary.sumSupplyAmount,
+                                                                    vatAmount: cumulativeSummary.sumVatAmount,
+                                                                    sumAmount: cumulativeSummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isCumulativeTotal: true,
+                                                                });
+                                                            }
+                                                        }
+
+                                                        // 3. 분기가 변경된 경우 분기 요약 추가
+                                                        if (previousQuarter && currentQuarter !== previousQuarter) {
+                                                            if (quarterlySummaryIndex < quarterlySummaries.length) {
+                                                                const quarterlySummary = quarterlySummaries[quarterlySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `quarterlyTotal-${index}`,
+                                                                    vatTypeName: quarterlySummary.voucherCount + '건',
+                                                                    voucherDate: '[분기 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: quarterlySummary.sumSupplyAmount,
+                                                                    vatAmount: quarterlySummary.sumVatAmount,
+                                                                    sumAmount: quarterlySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isQuarterlyTotal: true,
+                                                                });
+                                                                quarterlySummaryIndex++; // 다음 분기로 이동
+                                                            }
+                                                        }
+
+                                                        // 4. 반기가 변경된 경우 반기 요약 추가
+                                                        if (previousHalfYear && currentHalfYear !== previousHalfYear) {
+                                                            if (halfYearlySummaryIndex < halfYearlySummaries.length) {
+                                                                const halfYearlySummary = halfYearlySummaries[halfYearlySummaryIndex];
+                                                                resultList.push({
+                                                                    key: `halfYearlyTotal-${index}`,
+                                                                    vatTypeName: halfYearlySummary.voucherCount + '건',
+                                                                    voucherDate: '[반기 계]',
+                                                                    itemName: null,
+                                                                    clientCode: null,
+                                                                    clientName: null,
+                                                                    supplyAmount: halfYearlySummary.sumSupplyAmount,
+                                                                    vatAmount: halfYearlySummary.sumVatAmount,
+                                                                    sumAmount: halfYearlySummary.sumAmount,
+                                                                    isSummary: true,
+                                                                    isHalfYearlyTotal: true,
+                                                                });
+                                                                halfYearlySummaryIndex++; // 다음 반기로 이동
+                                                            }
+                                                        }
+
+                                                        // 현재 거래 데이터를 추가
+                                                        const dayEntry = {
+                                                            ...entry,
+                                                            key: `voucher-${entry.voucherId}`,
+                                                            isPreviousBalance: false,
+                                                            isSummary: false,
+                                                        };
+                                                        resultList.push(dayEntry);
+
+                                                        // 이전 날짜, 월, 분기, 반기를 업데이트
+                                                        previousDate = currentDate;
+                                                        previousMonth = currentMonth;
+                                                        previousQuarter = currentQuarter;
+                                                        previousHalfYear = currentHalfYear;
+                                                    });
+
+                                                    // 마지막 일계, 월계, 분기계, 반기계를 추가하는 로직
+                                                    if (dailySummaryIndex < dailySummaries.length) {
+                                                        const dailySummary = dailySummaries[dailySummaryIndex];
+                                                        resultList.push({
+                                                            key: `dailyTotal-final`,
+                                                            vatTypeName: dailySummary.voucherCount + '건',
+                                                            voucherDate: '[일 계]',
+                                                            itemName: null,
+                                                            clientCode: null,
+                                                            clientName: null,
+                                                            supplyAmount: dailySummary.sumSupplyAmount,
+                                                            vatAmount: dailySummary.sumVatAmount,
+                                                            sumAmount: dailySummary.sumAmount,
+                                                            isSummary: true,
+                                                            isDailyTotal: true,
+                                                        });
+                                                    }
+
+                                                    if (monthlySummaryIndex < monthlySummaries.length) {
+                                                        const monthlySummary = monthlySummaries[monthlySummaryIndex];
+                                                        resultList.push({
+                                                            key: `monthlyTotal-final`,
+                                                            vatTypeName: monthlySummary.voucherCount + '건',
+                                                            voucherDate: '[월 계]',
+                                                            itemName: null,
+                                                            clientCode: null,
+                                                            clientName: null,
+                                                            supplyAmount: monthlySummary.sumSupplyAmount,
+                                                            vatAmount: monthlySummary.sumVatAmount,
+                                                            sumAmount: monthlySummary.sumAmount,
+                                                            isSummary: true,
+                                                            isMonthlyTotal: true,
+                                                        });
+                                                    }
+
+                                                    if (monthlySummaryIndex < cumulativeSummaries.length) {
+                                                        const cumulativeSummary = cumulativeSummaries[monthlySummaryIndex]; // 해당 월 이후의 누계를 가져옴
+                                                        resultList.push({
+                                                            key: `cumulativeTotal-final`,
+                                                            vatTypeName: cumulativeSummary.voucherCount + '건',
+                                                            voucherDate: '[누 계]',
+                                                            itemName: null,
+                                                            clientCode: null,
+                                                            clientName: null,
+                                                            supplyAmount: cumulativeSummary.sumSupplyAmount,
+                                                            vatAmount: cumulativeSummary.sumVatAmount,
+                                                            sumAmount: cumulativeSummary.sumAmount,
+                                                            isSummary: true,
+                                                            isCumulativeTotal: true,
+                                                        });
+                                                    }
+
+                                                    if (quarterlySummaryIndex < quarterlySummaries.length) {
+                                                        const quarterlySummary = quarterlySummaries[quarterlySummaryIndex];
+                                                        resultList.push({
+                                                            key: `quarterlyTotal-final`,
+                                                            vatTypeName: quarterlySummary.voucherCount + '건',
+                                                            voucherDate: '[분기 계]',
+                                                            itemName: null,
+                                                            clientCode: null,
+                                                            clientName: null,
+                                                            supplyAmount: quarterlySummary.sumSupplyAmount,
+                                                            vatAmount: quarterlySummary.sumVatAmount,
+                                                            sumAmount: quarterlySummary.sumAmount,
+                                                            isSummary: true,
+                                                            isQuarterlyTotal: true,
+                                                        });
+                                                    }
+
+                                                    if (halfYearlySummaryIndex < halfYearlySummaries.length) {
+                                                        const halfYearlySummary = halfYearlySummaries[halfYearlySummaryIndex];
+                                                        resultList.push({
+                                                            key: `halfYearlyTotal-final`,
+                                                            vatTypeName: halfYearlySummary.voucherCount + '건',
+                                                            voucherDate: '[반기 계]',
+                                                            itemName: null,
+                                                            clientCode: null,
+                                                            clientName: null,
+                                                            supplyAmount: halfYearlySummary.sumSupplyAmount,
+                                                            vatAmount: halfYearlySummary.sumVatAmount,
+                                                            sumAmount: halfYearlySummary.sumAmount,
+                                                            isSummary: true,
+                                                            isHalfYearlyTotal: true,
+                                                        });
+                                                    }
+
+                                                    return resultList;
+                                                })()
+                                                : []
+                                        }
                                         columns={[
                                             {
-                                                title: '과세유형',
+                                                title: <div className="title-text">과세유형</div>,
                                                 dataIndex: 'vatTypeName',
                                                 key: 'vatTypeName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
+                                                render: (text, record) => record.isSummary ? (
+                                                    <div className="small-text">{text}</div>
+                                                ) : (
+                                                    <div className="small-text">{text}</div>
+                                                ),
                                             },
                                             {
-                                                title: '일자',
+                                                title: <div className="title-text">일자</div>,
                                                 dataIndex: 'voucherDate',
                                                 key: 'voucherDate',
                                                 align: 'center',
-                                                render: (text, record) => {
-                                                    return record.isSummary ? (
-                                                        <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{text}</span>
-                                                    ) : (
-                                                        <span style={{ fontSize: '0.9rem' }}>{new Date(text).toLocaleDateString()}</span>
-                                                    );
-                                                },
+                                                render: (text, record) => record.isSummary ? (
+                                                    <div className="medium-text">{text}</div>
+                                                ) : (
+                                                    <div className="small-text">{new Date(text).toLocaleDateString()}</div>
+                                                ),
                                             },
                                             {
-                                                title: '품목',
+                                                title: <div className="title-text">품목</div>,
                                                 dataIndex: 'itemName',
                                                 key: 'itemName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <div className="small-text">{text}</div> : '',
                                             },
                                             {
-                                                title: '공급가액',
+                                                title: <div className="title-text">공급가액</div>,
                                                 dataIndex: 'supplyAmount',
                                                 key: 'supplyAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ),
                                             },
                                             {
-                                                title: '부가세',
+                                                title: <div className="title-text">부가세</div>,
                                                 dataIndex: 'vatAmount',
                                                 key: 'vatAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ),
                                             },
                                             {
-                                                title: '합계',
+                                                title: <div className="title-text">합계</div>,
                                                 dataIndex: 'sumAmount',
                                                 key: 'sumAmount',
                                                 align: 'center',
                                                 render: (text, record) => record.isSummary ? (
-                                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{Number(text).toLocaleString()}</span>
+                                                    <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ) : (
-                                                    <span style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</span>
+                                                    <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 ),
                                             },
                                             {
-                                                title: '거래처',
+                                                title: <div className="title-text">거래처</div>,
                                                 dataIndex: 'clientCode',
                                                 key: 'clientCode',
                                                 align: 'center',
-                                                render: (text, record) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {record.clientName} </span> : '',
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.clientName} </div> : '',
                                             },
                                             {
-                                                title: '전자',
+                                                title: <div className="title-text">전자</div>,
                                                 dataIndex: 'electronicTaxInvoiceStatus',
                                                 key: 'electronicTaxInvoiceStatus',
                                                 align: 'center',
                                                 render: (text, record) => {
                                                     if (!text) return '';
-
                                                     let color, value, tooltipText;
-
                                                     switch (text) {
                                                         case 'PUBLISHED':
                                                             color = 'green';
@@ -209,7 +446,6 @@ const SalesPurchaseLedgerPage = () => {
                                                             value = text;
                                                             tooltipText = '상태 정보 없음';
                                                     }
-
                                                     return (
                                                         <Tooltip title={tooltipText}>
                                                             <Tag color={color} style={{ cursor: 'pointer' }}>{value}</Tag>
@@ -218,28 +454,28 @@ const SalesPurchaseLedgerPage = () => {
                                                 }
                                             },
                                             {
-                                                title: '분개유형',
+                                                title: <div className="title-text">분개유형</div>,
                                                 dataIndex: 'journalEntryName',
                                                 key: 'journalEntryName',
                                                 align: 'center',
-                                                render: (text) => text ? <span style={{ fontSize: '0.9rem' }}>{text}</span> : '',
+                                                render: (text) => text ? <div className="small-text">{text}</div> : '',
                                             },
                                             {
-                                                title: '계정과목',
+                                                title: <div className="title-text">계정과목</div>,
                                                 dataIndex: 'accountSubjectCode',
                                                 key: 'accountSubjectCode',
                                                 align: 'center',
-                                                render: (text, render) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {render.accountSubjectName}</span> : '',
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.accountSubjectName}</div> : '',
                                             },
                                             {
-                                                title: '담당자',
+                                                title: <div className="title-text">담당자</div>,
                                                 dataIndex: 'voucherManagerCode',
                                                 key: 'voucherManagerCode',
                                                 align: 'center',
-                                                render: (text, render) => text ? <span style={{ fontSize: '0.9rem' }}>[{text}] {render.voucherManagerName}</span> : '',
+                                                render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.voucherManagerName}</div> : '',
                                             },
                                             {
-                                                title: '담당부서',
+                                                title: <div className="title-text">담당부서</div>,
                                                 dataIndex: 'voucherManagerDepartmentName',
                                                 key: 'voucherManagerDepartmentName',
                                                 align: 'center',
@@ -264,88 +500,21 @@ const SalesPurchaseLedgerPage = () => {
                                                             value = '물류';
                                                             break;
                                                         default:
-                                                            color = 'gray'; // 기본 색상
+                                                            color = 'gray';
                                                     }
-                                                    return <Tag style={{marginLeft: '5px'}} color={color}>{value}</Tag>;
+                                                    return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
                                                 })() : '',
                                             },
                                         ]}
                                         rowKey="key"
-                                        pagination={ false }
+                                        pagination={false}
                                         size={'small'}
                                         rowClassName={(record) => {
                                             if (record.isSummary) return 'summary-row';
                                             return '';
                                         }}
-                                        summary={() =>  (
-                                            searchData ? (
-                                                <>
-                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                        <Table.Summary.Cell index={0} ></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[월계]</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={2} />
-                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>월계</Typography></Table.Summary.Cell>
-                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9r, fontWeight: 500em'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                        <Table.Summary.Cell index={6} />
-                                                        <Table.Summary.Cell index={7} />
-                                                        <Table.Summary.Cell index={8} />
-                                                        <Table.Summary.Cell index={9} />
-                                                        <Table.Summary.Cell index={10} />
-                                                        <Table.Summary.Cell index={11} />
-                                                    </Table.Summary.Row>
-                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                        <Table.Summary.Cell index={0} ></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[분기계]</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={2} />
-                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>분기계</Typography></Table.Summary.Cell>
-                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                        <Table.Summary.Cell index={6} />
-                                                        <Table.Summary.Cell index={7} />
-                                                        <Table.Summary.Cell index={8} />
-                                                        <Table.Summary.Cell index={9} />
-                                                        <Table.Summary.Cell index={10} />
-                                                        <Table.Summary.Cell index={11} />
-                                                    </Table.Summary.Row>
-                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                        <Table.Summary.Cell index={0} ></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[반기계]</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={2} />
-                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>반기계</Typography></Table.Summary.Cell>
-                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                        <Table.Summary.Cell index={6} />
-                                                        <Table.Summary.Cell index={7} />
-                                                        <Table.Summary.Cell index={8} />
-                                                        <Table.Summary.Cell index={9} />
-                                                        <Table.Summary.Cell index={10} />
-                                                        <Table.Summary.Cell index={11} />
-                                                    </Table.Summary.Row>
-                                                    <Table.Summary.Row style={{ backgroundColor: '#FAFAFA' }}>
-                                                        <Table.Summary.Cell index={0} />
-                                                        <Table.Summary.Cell index={1} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 'bold'}}>[누계]</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={2} />
-                                                        <Table.Summary.Cell index={3} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
-                                                        {/*<Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '0.9rem'}}>{Number(searchData.totalDebit).toLocaleString()}</Typography></Table.Summary.Cell>*/}
-                                                        <Table.Summary.Cell index={4} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={5} ><Typography sx={{ textAlign: 'center', fontSize: '1rem', fontWeight: 500}}>누계</Typography></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={6} />
-                                                        <Table.Summary.Cell index={7} />
-                                                        <Table.Summary.Cell index={8} />
-                                                        <Table.Summary.Cell index={9} />
-                                                        <Table.Summary.Cell index={10} />
-                                                        <Table.Summary.Cell index={11} />
-                                                    </Table.Summary.Row>
-                                                </>
-                                            ) : (
-                                                <></>
-                                            )
-                                        )}
                                     />
+
                                 </Grid>
                             </Paper>
                         </Grow>

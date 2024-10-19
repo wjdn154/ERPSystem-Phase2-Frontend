@@ -21,18 +21,8 @@ export const employeeDataListColumn= (showDetailModal)  => [
         dataIndex: 'fullName', // 데이터 인덱스는 생략 가능
         key: 'fullName',
         width: '10%', // 컬럼 너비 설정
-        render: (text, record) => `${record.firstName}${record.lastName}`, // 성과 이름을 합침
+        render: (text, record) => `${record.lastName}${record.firstName}`, // 성과 이름을 합침
     },
-    // {
-    //     title: <span>성</span>, // 컬럼 제목
-    //     dataIndex: 'firstName', // 데이터 인덱스: 이 필드는 데이터 객체의 'firstName' 속성과 연결됩니다.
-    //     width: '5%', // 성: 이름은 보통 짧기 때문에 너비를 줄입니다.
-    // },
-    // {
-    //     title: <span>이름</span>, // 컬럼 제목
-    //     dataIndex: 'lastName', // 데이터 인덱스: 이 필드는 데이터 객체의 'lastName' 속성과 연결됩니다.
-    //     width: '5%', // 이름: 이름은 보통 짧기 때문에 너비를 줄입니다.
-    // },
     {
         title: <span>부서번호</span>, // 컬럼 제목
         dataIndex: 'departmentCode', // 데이터 인덱스: 이 필드는 데이터 객체의 'departmentName' 속성과 연결됩니다.
