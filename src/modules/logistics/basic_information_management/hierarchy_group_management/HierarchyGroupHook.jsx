@@ -3,10 +3,9 @@ import { notification } from 'antd';
 import { getHierarchyGroupList, getWarehousesByHierarchyGroup } from './HierarchyGroupApi.jsx';
 
 export const useHierarchyGroups = () => {
-    const [flatHierarchyGroups, setFlatHierarchyGroups] = useState([]); // 드롭다운용 평탄화된 그룹
+    const [flatHierarchyGroups, setFlatHierarchyGroups] = useState([]);
     const [selectedGroupId, setSelectedGroupId] = useState(null);
 
-    // **트리 및 평탄화된 계층 그룹 데이터 생성 함수**
     const flattenGroups = (groups = []) => {
         return groups.flatMap((group) => [
             {
@@ -18,7 +17,6 @@ export const useHierarchyGroups = () => {
         ]);
     };
 
-    // **계층 그룹 목록 조회 및 설정**
     const fetchHierarchyGroups = useCallback(async () => {
         try {
             const groups = await getHierarchyGroupList();
@@ -33,7 +31,6 @@ export const useHierarchyGroups = () => {
         }
     }, []);
 
-    // **창고 목록 조회 함수 정의 (반드시 확인!)**
     const fetchWarehousesByGroup = useCallback(async (groupId) => {
         try {
             const data = await getWarehousesByHierarchyGroup(groupId);
@@ -45,15 +42,14 @@ export const useHierarchyGroups = () => {
     }, []);
 
 
-    // **컴포넌트 마운트 시 계층 그룹 데이터 조회**
     useEffect(() => {
         fetchHierarchyGroups();
     }, [fetchHierarchyGroups]);
 
     return {
-        flatHierarchyGroups, // 드롭다운용 평탄화된 데이터
-        selectedGroupId, // 선택된 그룹 ID
-        setSelectedGroupId, // 그룹 ID 설정 함수
+        flatHierarchyGroups,
+        selectedGroupId,
+        setSelectedGroupId,
         fetchWarehousesByGroup
     };
 };

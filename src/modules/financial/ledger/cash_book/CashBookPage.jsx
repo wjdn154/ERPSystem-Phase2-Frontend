@@ -218,7 +218,8 @@ const CashBookPage = () => {
                                             },
                                         ]}
                                         rowKey="key"
-                                        pagination={{ pageSize: 30, position: ['bottomCenter'], showSizeChanger: false }}
+                                        pagination={ false }
+                                        style={{ marginBottom: '20px' }}
                                         // pagination={false}
                                         size={'small'}
                                         rowClassName={(record) => {
