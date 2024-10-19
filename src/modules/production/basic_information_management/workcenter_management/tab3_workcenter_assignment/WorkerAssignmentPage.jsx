@@ -4,8 +4,8 @@ import { workerAssignmentColumns } from './WorkerAssignmentColumns.jsx'; // 컬�
 import { DatePicker, Button } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
-import apiClient from "../../../../config/apiClient.jsx";
-import { PRODUCTION_API } from "../../../../config/apiConstants.jsx"
+import apiClient from "../../../../../config/apiClient.jsx";
+import { PRODUCTION_API } from "../../../../../config/apiConstants.jsx"
 
 const { RangePicker } = DatePicker;
 
@@ -59,9 +59,9 @@ const WorkerAssignmentPage = () => {
     };
 
     return (
-        <div>
-            <h2>작업장별 작업자 배정 명단</h2>
 
+
+        <div>
             {/* 날짜 범위 선택 */}
             <div style={{ marginBottom: '20px' }}>
                 <RangePicker
