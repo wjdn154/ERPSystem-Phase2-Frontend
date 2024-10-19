@@ -170,8 +170,8 @@ const PendingVoucherInputPage = () => {
                     throw new Error("차변/대변과 입금/출금은 동시에 사용할 수 없습니다.");
                 }
                 if (v.voucherType === 'Debit' || v.voucherType === 'Credit') {
-                    const totalDebit = updatedVouchers.reduce((sum, item) => sum + (item.debitAmount || 0), 0);
-                    const totalCredit = updatedVouchers.reduce((sum, item) => sum + (item.creditAmount || 0), 0);
+                    const totalDebit = updatedVouchers.reduce((sum, item) => sum + Number(item.debitAmount || 0), 0);
+                    const totalCredit = updatedVouchers.reduce((sum, item) => sum + Number(item.creditAmount || 0), 0);
                     if (totalDebit !== totalCredit) throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
                 }
 
@@ -279,7 +279,7 @@ const PendingVoucherInputPage = () => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '1400px !important' }} container spacing={3}>
+                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '1400px !important', maxWidth: '1700px' }} container spacing={3}>
                     <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
@@ -459,7 +459,7 @@ const PendingVoucherInputPage = () => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    <Grid item xs={12} md={12}>
+                    <Grid item xs={12} md={12} style={{ minWidth: '1400px !important', maxWidth: '1700px' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>전표 입력</Typography>
@@ -550,7 +550,12 @@ const PendingVoucherInputPage = () => {
                                                             style={{ width: '100%' }}
                                                             placeholder="차변"
                                                             value={voucher.debitAmount}
-                                                            onChange={(value) => setVoucher({ ...voucher, debitAmount: value })}
+                                                            onChange={(value) => {
+                                                                const formattedValue = value?.toString().replace(/[^0-9]/g, '');  // 숫자만 허용
+                                                                setVoucher({ ...voucher, debitAmount: formattedValue });
+                                                            }}
+                                                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}  // 3자리마다 콤마 추가
+                                                            parser={(value) => value.replace(/\$\s?|(,*)/g, '')}  // 콤마 제거
                                                             disabled={voucher.voucherType === 'Credit' || voucher.voucherType === 'Deposit'}
                                                         />
                                                     </Form.Item>
@@ -567,7 +572,12 @@ const PendingVoucherInputPage = () => {
                                                             style={{ width: '100%' }}
                                                             placeholder="대변"
                                                             value={voucher.creditAmount}
-                                                            onChange={(value) => setVoucher({ ...voucher, creditAmount: value })}
+                                                            onChange={(value) => {
+                                                                const formattedValue = value?.toString().replace(/[^0-9]/g, '');  // 숫자만 허용
+                                                                setVoucher({ ...voucher, creditAmount: formattedValue });
+                                                            }}
+                                                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}  // 3자리마다 콤마 추가
+                                                            parser={(value) => value.replace(/\$\s?|(,*)/g, '')}  // 콤마 제거
                                                             disabled={voucher.voucherType === 'Debit' || voucher.voucherType === 'Withdrawal'}
                                                         />
                                                     </Form.Item>
@@ -636,7 +646,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "formattedAccountSubjectCode",
                                                 width: "15%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">거래처</div>,
@@ -644,7 +654,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "formattedClientCode",
                                                 width: "15%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">적요</div>,
@@ -652,7 +662,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "transactionDescription",
                                                 width: "20%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">차변</div>,
@@ -660,7 +670,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "debitAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
+                                                render: (text) => <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">대변</div>,
@@ -668,7 +678,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "creditAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
+                                                render: (text) => <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div>,
                                             }
                                         ]}
                                         rowKey={(record) => record.key}
@@ -683,8 +693,8 @@ const PendingVoucherInputPage = () => {
                                                     <Table.Summary.Cell index={2}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={3}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}> <div style={{ textAlign: 'right' }} className="medium-text"> {vouchers.length > 0 ? vouchers.reduce((acc, cur) => acc + Number(cur?.debitAmount || 0), 0).toLocaleString() : '0'} </div> </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}> <div style={{ textAlign: 'right' }} className="medium-text"> {vouchers.length > 0 ? vouchers.reduce((acc, cur) => acc + Number(cur?.creditAmount || 0), 0).toLocaleString() : '0'} </div> </Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                                 <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
                                                     <Table.Summary.Cell index={0}><div className="medium-text">대차차액</div></Table.Summary.Cell>
@@ -692,8 +702,8 @@ const PendingVoucherInputPage = () => {
                                                     <Table.Summary.Cell index={2}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={3}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}> <div style={{ textAlign: 'right' }} className="medium-text"> {(vouchers.reduce((acc, cur) => acc + (Number(cur?.debitAmount) || 0), 0) - vouchers.reduce((acc, cur) => acc + (Number(cur?.creditAmount) || 0), 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}> <div style={{ textAlign: 'right' }} className="medium-text"> {(vouchers.reduce((acc, cur) => acc + (Number(cur?.creditAmount) || 0), 0) - vouchers.reduce((acc, cur) => acc + (Number(cur?.debitAmount) || 0), 0)).toLocaleString()} </div> </Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             </>
                                         )}
