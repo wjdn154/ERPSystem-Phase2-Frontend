@@ -959,6 +959,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                 />
                                                             )}
                                                         </>
+
                                                     )}
 
                                                     {/* 거래처 선택 모달 */}
@@ -1036,10 +1037,21 @@ const ProductManagementPage = ( {initialData} ) => {
                                                         </>
                                                     )}
 
-                                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                                                        {currentField === 'productGroup' && (
+                                                            <>
+                                                                <Button onClick={handleModalCancel} variant="contained" type="primary" sx={{ mr: 1 }}>
+                                                                    추가
+                                                                </Button>
+                                                                <Button onClick={handleModalCancel} variant="contained" type="default" sx={{ mr: 1 }}>
+                                                                    수정
+                                                                </Button>
+                                                            </>
+                                                        )}
                                                         <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
                                                             닫기
                                                         </Button>
+
                                                     </Box>
                                                 </>
                                             )}
