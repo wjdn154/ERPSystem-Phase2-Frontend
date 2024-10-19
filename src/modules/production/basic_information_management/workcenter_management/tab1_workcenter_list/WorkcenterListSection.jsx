@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table } from 'antd';
+import {Grid} from "@mui/material";
 
 const WorkcenterListSection = ({ columns, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
   if (!data) {
@@ -7,7 +8,7 @@ const WorkcenterListSection = ({ columns, data, handleRowSelection, handleSelect
   }
 
   return (
-      <div style={{ padding: '20px' }}>
+      <Grid sx={{ padding: '0px 20px 0px 20px' }}>
         <Table
             columns={columns}
             dataSource={data}
@@ -21,7 +22,7 @@ const WorkcenterListSection = ({ columns, data, handleRowSelection, handleSelect
             })}
             rowClassName={rowClassName}
         />
-      </div>
+      </Grid>
   );
 };
 
