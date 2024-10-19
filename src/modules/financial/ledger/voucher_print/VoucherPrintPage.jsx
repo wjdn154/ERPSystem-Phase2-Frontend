@@ -124,7 +124,7 @@ const VoucherPrintPage = () => {
             const response = await apiClient.post(FINANCIAL_API.VOUCHER_PRINT_SEARCH_API, searchParams);
             const data = response.data;
             setSearchData(data); // 조회된 데이터를 상태로 설정
-            console.log(data);
+            notify('success', '조회 성공', '전표 조회 성공.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '전표 조회 중 오류가 발생했습니다.', 'top');
         }
@@ -167,14 +167,14 @@ const VoucherPrintPage = () => {
                     <Grid item xs={12} md={10} sx={{ minWidth: '1400px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }} >세금계산서(계산서) 조회</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >전표 출력</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
                                             <Col>
                                                 <Form.Item
                                                     label="전표구분"
-                                                    tooltip="조회할 전표의 구분(입금, 출금, 차변, 대변)을 선택하세요"
+                                                    tooltip="조회할 전표의 구분(전체, 입금, 출금, 차변, 대변)을 선택하세요"
                                                     required
                                                     style={{ width: '200px' }}
                                                 >
@@ -184,17 +184,18 @@ const VoucherPrintPage = () => {
                                                         value={searchParams.voucherType || "선택"}
                                                         onChange={handleVoucherTypeChange}
                                                     >
-                                                        <Select.Option value="Deposit">입금</Select.Option>
-                                                        <Select.Option value="Withdrawal">출금</Select.Option>
-                                                        <Select.Option value="Debit">차변</Select.Option>
-                                                        <Select.Option value="Credit">대변</Select.Option>
+                                                        <Select.Option value='null'>전체</Select.Option>
+                                                        <Select.Option value='Deposit'>입금</Select.Option>
+                                                        <Select.Option value='Withdrawal'>출금</Select.Option>
+                                                        <Select.Option value='Debit'>차변</Select.Option>
+                                                        <Select.Option value='Credit'>대변</Select.Option>
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
                                             <Col>
                                                 <Form.Item
                                                     label="전표유형"
-                                                    tooltip="조회할 전표의 유형(일반전표, 매출매입전표)을 선택하세요"
+                                                    tooltip="조회할 전표의 유형(전체, 일반전표, 매출매입전표)을 선택하세요"
                                                     required
                                                     style={{ width: '200px' }}
                                                 >
@@ -204,8 +205,9 @@ const VoucherPrintPage = () => {
                                                         value={searchParams.voucherKind || "선택"}
                                                         onChange={handleVoucherKindChange}
                                                     >
-                                                        <Select.Option value="General">일반전표</Select.Option>
-                                                        <Select.Option value="Sale_and_Purchase">매출매입전표</Select.Option>
+                                                        <Select.Option value='null'>전체</Select.Option>
+                                                        <Select.Option value='General'>일반전표</Select.Option>
+                                                        <Select.Option value='Sale_and_Purchase'>매출매입전표</Select.Option>
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
