@@ -95,7 +95,10 @@ export const EMPLOYEE_API = {
 // 물류관리
 export const LOGISTICS_API = {
     WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse/`, // 창고 목록 조회 API
-    PRODUCT_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/product-groups/`,
+    PRODUCT_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/product-groups/`, //품목 그룹 목록 조회 API
+    PRODUCT_GROUP_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/product-groups/update/${id}`, // 품목 그룹 수정 API
+    PRODUCT_GROUP_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/product-groups/delete/${id}`, // 품목 그룹 삭제 API
+    PRODUCT_GROUP_CREATE_API: `${API_BASE_URL}/api/logistics/product-groups/save`, //품목 그룹 등록 API
     PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/products/`,   //품목 목록 조회 API
     PRODUCT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/products/${id}`, // 품목 상세 조회 API
     PRODUCT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/products/update/${id}`,
