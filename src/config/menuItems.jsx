@@ -39,9 +39,6 @@ export const subMenuItems = {
     ],
     '재무회계': [
         {
-            text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/finance', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL'
-        },
-        {
             text: '기초정보관리',
             items: [
                 { text: '거래처등록', component: 'ClientRegistrationPage', apiPath: FINANCIAL_API.FETCH_CLIENT_LIST_API, url: '/finance/basic-info/client-registration', requiredPermission: 'clientRegistrationPermission', permissionLevel: 'GENERAL' },  // 거래처등록 권한
@@ -52,9 +49,9 @@ export const subMenuItems = {
         {
             text: '전표관리',
             items: [
-                { text: '미결전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 미결전표입력 권한
-                { text: '미결전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '일반전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 미결전표입력 권한
                 { text: '매입매출전표입력', component: 'SalesPurchaseVoucherEntryPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
+                { text: '미결전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
                 { text: '전자세금계산서발행', component: 'ElectronicTaxInvoicePage', apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한
             ]
         },
@@ -119,9 +116,6 @@ export const subMenuItems = {
     ],
     '인사관리': [
         {
-            text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL'
-        },
-        {
             text: '기초 정보 관리',
             items: [
                 { text: '사원 관리', component: 'EmployeeManagementPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
@@ -180,9 +174,6 @@ export const subMenuItems = {
         },
     ],
     '물류관리': [
-        {
-            text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL'
-        },
         {
             text: '기초정보관리',
             items: [
@@ -260,9 +251,6 @@ export const subMenuItems = {
         }
     ],
     '생산관리': [
-        {
-            text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production', requiredPermission: 'mpsPermission', permissionLevel: 'GENERAL'
-        },
         {
             text: '기초정보 관리',
             items: [

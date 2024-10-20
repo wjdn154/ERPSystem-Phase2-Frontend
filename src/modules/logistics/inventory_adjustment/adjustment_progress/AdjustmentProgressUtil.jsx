@@ -13,10 +13,10 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '진행 단계 상세',
+            label: '실사 등록',
             children: (
                 <Typography>
-                    각 재고 조정의 세부 단계를 조회하고 필요한 경우 수정할 수 있음.
+                    신규 실사를 등록할 수 있음.
                 </Typography>
             ),
         },
