@@ -4,12 +4,9 @@ import apiClient from "../../../../config/apiClient.jsx";
 
 // 작업장 목록 조회 함수
 export const fetchWorkcenters = async () => {
-    console.log("fetchWorkcenters 호출됨"); // 추가된 로그
-    console.log("API 요청 URL:", PRODUCTION_API.WORKCENTER_LIST_API); // API URL 확인 로그
-
     try {
         const response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API);
-        console.log("응답 데이터:", response.data); // 응답 데이터 확인용 로그
+        console.log("작업장목록 데이터:", response.data); // 응답 데이터 확인용 로그
         return response.data;
     } catch (error) {
         console.error("작업장 정보를 가져오는 중 오류 발생:", error);
@@ -62,3 +59,26 @@ export const deleteWorkcenter = async (code) => {
         throw new Error(errorMessage);
     }
 };
+
+// const fetchEquipmentData = async (equipmentIds) => {
+//     try {
+//         const response = await apiClient.post(
+//             PRODUCTION_API.EQUIPMENT_LIST_BY_IDS,
+//             { equipmentIds }
+//         );
+//
+//         // 설비 ID를 키로, 번호와 이름을 값으로 매핑
+//         return response.data.reduce((acc, equipment) => {
+//             acc[equipment.id] = {
+//                 equipmentNum: equipment.equipmentNum,
+//                 equipmentName: equipment.equipmentName,
+//             };
+//             return acc;
+//         }, {});
+//     } catch (error) {
+//         console.error("설비 데이터 로딩 중 오류:", error);
+//         return {};
+//     }
+// };
+//
+// return { data, equipmentMapping };
