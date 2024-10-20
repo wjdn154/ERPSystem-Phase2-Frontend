@@ -42,7 +42,7 @@ const SecondMaterialListSection = ({
     return (
         <Grid container spacing={2}>
             {/*자재 목록 왼쪽에 배치*/}
-            <Grid item xs={4}>
+            <Grid item xs={5}>
                 <Paper elevation={3} sx={{height: '100%', p: 2, mr: 2}}>
 
                     <AntTable
@@ -67,7 +67,7 @@ const SecondMaterialListSection = ({
             </Grid>
 
             {/*품목과 유해물질 리스트를 위아래로 배치*/}
-            <Grid item xs={8}>
+            <Grid item xs={7}>
                 <Grid container spacing={2} direction={'column'}>
                     {/*품목 리스트*/}
                     <Grid item>
