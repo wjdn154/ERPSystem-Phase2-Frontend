@@ -30,7 +30,7 @@ const SalesPurchaseVoucherEntryPage = () => {
     const [voucher, setVoucher] = useState({});
     const [vouchers, setVouchers] = useState([]);
     const [displayValues, setDisplayValues] = useState({
-        accountSubjectCode: '',
+        vatTypeCode: '',
         clientCode: ''
     });
 
@@ -39,27 +39,49 @@ const SalesPurchaseVoucherEntryPage = () => {
         setActiveTabKey(key);
     };
 
+    const handleModalSelect = (record) => {
+        const formattedValue = `[${record.code || record.vatTypeCode}] ${record.printClientName || record.vatTypeName}`;
+
+        setVoucher((prevParams) => ({
+            ...prevParams,
+            [currentField]: record.code || record.vatTypeCode,
+        }));
+
+        if(currentField === 'vatTypeCode') {
+            setVoucher((prevParams) => ({
+                ...prevParams,
+                transactionType: record.transactionType,
+            }));
+        }
+
+        console.log(voucher);
+
+        setDisplayValues((prevValues) => ({
+            ...prevValues,
+            [currentField]: formattedValue,
+        }));
+
+        setIsModalVisible(false);
+    };
+
 
     // 모달 데이터 가져오기
     const fetchModalData = async (fieldName) => {
-        console.log(fieldName);
         setIsLoading(true);
-        const apiPath = (fieldName === 'vatType')
+        const apiPath = (fieldName === 'vatTypeCode')
             ? FINANCIAL_API.VAT_TYPE_SEARCH_API
             : FINANCIAL_API.CLIENT_SEARCH_API;
         try {
             const searchText = null;
             const response = await apiClient.post(apiPath, { searchText });
-            if(fieldName === 'vatType') {
+            if(fieldName === 'vatTypeCode') {
                 const combinedData = [...response.data.salesVatTypeShowDTO, ...response.data.purchaseVatTypeShowDTO];
                 setModalData(combinedData);
                 setInitialModalData(combinedData);
-                console.log(combinedData);
             }else {
                 setModalData(response.data);
                 setInitialModalData(response.data);
             }
-            console.log(modalData);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -76,55 +98,77 @@ const SalesPurchaseVoucherEntryPage = () => {
         setIsModalVisible(true);  // 모달창 열기
     };
 
+    const handleAddRow = async () => {
+        try {
+            // 필수 필드 검사
+            if (voucher.supplyAmount) {
+                if (!voucher.vatTypeCode || !voucher.itemName || !voucher.supplyAmount || !voucher.clientCode || !voucher.journalEntryCode) {
+                    notify('warning', '입력 오류', '모든 필수 필드를 입력해주세요.', 'bottomRight');
+                    return;
+                }
 
-    const handleVoucherTypeChange = (value) => {
-        setVoucher((prevVoucher) => {
-            let updatedVoucher = { ...prevVoucher, voucherType: value };
+                if (voucher.supplyAmount <= 0) {
+                    notify('warning', '입력 오류', '공급가액은 0보다 커야 합니다.', 'bottomRight');
+                    return;
+                }
+            } else {
+                if (!voucher.vatTypeCode || !voucher.itemName || !voucher.quantity || !voucher.unitPrice || !voucher.clientCode || !voucher.journalEntryCode) {
+                    notify('warning', '입력 오류', '모든 필수 필드를 입력해주세요.', 'bottomRight');
+                    return;
+                }
 
-            // 구분이 'Credit' 또는 'Withdrawal'일 경우 차변 값 0으로 설정
-            if (value === 'Debit' || value === 'Withdrawal') {
-                updatedVoucher.creditAmount = null;
+                if (voucher.quantity <= 0 || voucher.unitPrice <= 0) {
+                    notify('warning', '입력 오류', '수량과 단가는 0보다 커야 합니다.', 'bottomRight');
+                    return;
+                }
             }
 
-            // 구분이 'Debit' 또는 'Deposit'일 경우 대변 값 0으로 설정
-            if (value === 'Credit' || value === 'Deposit') {
-                updatedVoucher.debitAmount = null;
+            // 부가세 조회 API 호출
+            let vatAmount = 0;
+
+            // const searchVatTypeId = await apiClient.post(FINANCIAL_API.VAT_TYPE_ID_API(voucher.vatTypeCode));
+            const searchVatTypeId = (await apiClient.post(FINANCIAL_API.VAT_TYPE_ID_API, { vatTypeCode: voucher.vatTypeCode})).data;
+            // const searchVatTypeId = voucher.vatTypeCode;
+            console.log(searchVatTypeId);
+
+            if (voucher.supplyAmount) {
+                // 공급가액을 기준으로 부가세 계산
+
+                const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_SUPPLY_AMOUNT_API, {
+                    vatTypeId: searchVatTypeId,
+                    supplyAmount: voucher.supplyAmount,
+                });
+                vatAmount = response.data; // API 응답에서 부가세 금액을 가져옴
+            } else {
+                // 수량과 단가를 기준으로 부가세 계산
+                const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
+                    vatTypeId: searchVatTypeId,
+                    quantity: voucher.quantity,
+                    price: voucher.unitPrice,
+                });
+                vatAmount = response.data; // API 응답에서 부가세 금액을 가져옴
             }
 
-            return updatedVoucher;
-        });
-    };
+            // 새로운 전표 추가
+            const newVoucher = {
+                ...voucher,
+                key: Date.now(), // 고유한 키 추가
+                formattedClientCode: displayValues.clientCode,
+                formattedVatTypeCode: displayValues.vatTypeCode,
+                vatAmount: vatAmount // 부가세 금액을 전표에 추가
+            };
 
-    const handleAddRow = () => {
+            // 전표 배열에 새로운 전표 추가
+            setVouchers([...vouchers, newVoucher]);
 
-        if (voucher.voucherType === 'Deposit' || voucher.voucherType === 'Withdrawal') {
-            if (vouchers.length > 0) {
-                notify('warning', '입력 오류', '입금 또는 출금일 경우 한 행만 추가할 수 있습니다.', 'bottomRight');
-                return;
-            }
+            // 입력폼 및 displayValues 초기화
+            setVoucher({});
+            setDisplayValues({ vatTypeCode: '', clientCode: '' });
+
+            notify('success', '전표 추가 완료', '전표가 성공적으로 추가되었습니다.', 'bottomRight');
+        } catch (error) {
+            notify('error', '부가세 조회 실패', '부가세 금액을 조회하는 중 오류가 발생했습니다.', 'bottomRight');
         }
-
-        const hasDepositOrWithdrawal = vouchers.some(v => v.voucherType === 'Deposit' || v.voucherType === 'Withdrawal');
-        if (hasDepositOrWithdrawal) {
-            notify('warning', '입력 오류', '입금 또는 출금일 경우 한 행만 추가할 수 있습니다.', 'bottomRight');
-            return;
-        }
-
-        if (!voucher.voucherType || !voucher.accountSubjectCode || !voucher.clientCode) {
-            notify('warning', '입력 오류', '모든 필수 필드를 입력해주세요.', 'bottomRight');
-            return;
-        }
-
-        const newVoucher = {
-            ...voucher,
-            key: Date.now(),
-            formattedAccountSubjectCode: displayValues.accountSubjectCode, // 포맷된 값 추가
-            formattedClientCode: displayValues.clientCode, // 포맷된 값 추가
-        };
-
-        setVouchers([...vouchers, newVoucher]);
-        setVoucher({}); // 입력폼 초기화
-        setDisplayValues({ accountSubjectCode: '', clientCode: '' });
     };
 
     const handleDeleteRow = () => {
@@ -139,74 +183,49 @@ const SalesPurchaseVoucherEntryPage = () => {
 
         // displayValues도 lastVoucher에 맞게 업데이트
         setDisplayValues({
-            accountSubjectCode: lastVoucher.formattedAccountSubjectCode,
-            clientCode: lastVoucher.formattedClientCode
+            clientCode: lastVoucher.formattedClientCode,
+            vatTypeCode: lastVoucher.formattedVatTypeCode
         });
     };
 
     const handleSubmit = async () => {
         try {
-            // vouchers 배열이 비어 있으면 현재 voucher 객체를 추가
-            console.log(vouchers.length);
-            if(!vouchers.length) throw new Error("전표를 추가해주세요.");
+            if (!vouchers.length) throw new Error("전표를 추가해주세요.");
 
             const updatedVouchers = vouchers.length ? vouchers : [{
                 ...voucher, // voucher 상태에서 필요한 값들 모두 가져옴
-                creditAmount: voucher.creditAmount || 0,
-                debitAmount: voucher.debitAmount || 0,
             }];
 
-            const processedVouchers = updatedVouchers.map((v) => {
-                // 유효성 검사
-                if ((v.voucherType === 'Withdrawal' || v.voucherType === 'Deposit') && v.accountSubjectCode === '101') throw new Error("입금, 출금 전표는 현금 계정과목을 사용 할 수 없습니다.");
-                if (v.debitAmount < 0 || v.creditAmount < 0) throw new Error("금액은 음수가 될 수 없습니다.");
-                if (!v.voucherType || !v.accountSubjectCode || !v.clientCode) throw new Error("필수 입력값이 누락되었습니다.");
-                if (v.voucherType === 'Deposit' && v.creditAmount === 0) throw new Error("전표 구분이 입금일 경우 금액을 입력해주세요.");
-                if (v.voucherType === 'Withdrawal' && v.debitAmount === 0) throw new Error("전표 구분이 출금일 경우 금액을 입력해주세요.");
-                if ((v.voucherType === 'Debit' || v.voucherType === 'Credit') &&
-                    (v.voucherType === 'Deposit' || v.voucherType === 'Withdrawal')) {
-                    throw new Error("차변/대변과 입금/출금은 동시에 사용할 수 없습니다.");
-                }
-                if (v.voucherType === 'Debit' || v.voucherType === 'Credit') {
-                    const totalDebit = updatedVouchers.reduce((sum, item) => sum + (item.debitAmount || 0), 0);
-                    const totalCredit = updatedVouchers.reduce((sum, item) => sum + (item.creditAmount || 0), 0);
-                    if (totalDebit !== totalCredit) throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
-                }
+            for (const v of updatedVouchers) {
+                const { formattedClientCode, ...rest } = v;
 
-                // formattedAccountSubjectCode와 formattedClientCode에서 숫자만 추출하고 반환
-                const { formattedAccountSubjectCode, formattedClientCode, ...rest } = v;
+                const clientCode = formattedClientCode ? formattedClientCode.match(/\d+/)?.[0] : rest.clientCode;
 
-                const accountSubjectCode = formattedAccountSubjectCode ? formattedAccountSubjectCode.match(/\d+/)[0] : rest.accountSubjectCode;
-                const clientCode = formattedClientCode ? formattedClientCode.match(/\d+/)[0] : rest.clientCode;
-
-                return {
-                    ...rest, // 나머지 필드 유지 (formattedAccountSubjectCode와 formattedClientCode는 포함되지 않음)
+                const processedVoucher = {
+                    ...rest,
                     voucherDate: format(selectedDate, 'yyyy-MM-dd'),
-                    voucherKind: "General",
                     voucherManagerId: jwtDecode(token).employeeId,
-                    debitAmount: v.debitAmount ? v.debitAmount : 0,
-                    creditAmount: v.creditAmount ? v.creditAmount : 0,
-                    accountSubjectCode, // 숫자로 변환된 accountSubjectCode
-                    clientCode, // 숫자로 변환된 clientCode
-                    transactionDescription: v.transactionDescription,
-                    voucherType: v.voucherType,
+                    quantity: rest.quantity || 0,
+                    clientCode,
+                    electronicTaxInvoiceStatus: 'Unpublished',
                 };
-            });
 
-            console.log(processedVouchers);
+                // 각 요청을 순차적으로 전송 (각 요청이 독립적으로 처리됨)
+                await apiClient.post(FINANCIAL_API.SALE_AND_PURCHASE_UNRESOLVED_VOUCHER_ENTRY_API, processedVoucher);
+            }
 
-            // 데이터 저장
-            await apiClient.post(FINANCIAL_API.SAVE_UNRESOLVED_VOUCHER_API, processedVouchers); // API 호출
+            // 성공적으로 저장되었을 때 후속 처리
             handleSearch(); // 저장 후 조회
-            notify('success', '저장 완료', '전표가 성공적으로 저장되었습니다.', 'bottomRight');
+            notify('success', '저장 완료', '모든 매출/매입 전표가 성공적으로 저장되었습니다.', 'bottomRight');
             setVoucher({}); // 저장 후 입력폼 초기화
-            setDisplayValues({ accountSubjectCode: '', clientCode: '' });
+            setDisplayValues({ vatTypeCode: '', clientCode: '' });
             setVouchers([]); // 저장 후 배열 초기화
 
         } catch (err) {
             notify('error', '저장 실패', err.message || '전표 저장 중 오류가 발생했습니다.', 'bottomRight');
         }
     };
+
 
     const formattedDate = useMemo(() => {
         return format(selectedDate, 'yyyy-MM-dd', { locale: ko });
@@ -223,7 +242,6 @@ const SalesPurchaseVoucherEntryPage = () => {
             notify('success', '조회 성공', '전표 목록 데이터 조회 성공.', 'bottomRight');
 
         } catch (err) {
-            console.error('데이터를 불러오는 중 오류 발생:', err);
             notify('error', '조회 오류', '데이터를 불러오는 중 오류가 발생했습니다.', 'top');
         }
     }
@@ -304,11 +322,31 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                     render: (text) => <div className="small-text">{text}</div>
                                                 },
                                                 {
-                                                    title: <div className="title-text">전표유형</div>,
-                                                    dataIndex: 'vatTypeName',
-                                                    key: 'vatTypeName',
+                                                    title: <div className="title-text">거래유형</div>,
+                                                    dataIndex: 'transactionType',
+                                                    key: 'transactionType',
                                                     align: 'center',
-                                                    render: (text) => <div className="small-text">{text}</div>
+                                                    render: (text) => {
+                                                        let color = 'gray';
+                                                        let value = '없음';
+
+                                                        if (text === 'SALES') {
+                                                            color = 'green';
+                                                            value = '매출';
+                                                        } else if (text === 'PURCHASE') {
+                                                            color = 'red';
+                                                            value = '매입';
+                                                        }
+
+                                                        return <Tag color={color}>{value}</Tag>;
+                                                    }
+                                                },
+                                                {
+                                                    title: <div className="title-text">부가세유형</div>,
+                                                    dataIndex: 'vatTypeCode',
+                                                    key: 'vatTypeCode',
+                                                    align: 'center',
+                                                    render: (text, record) => <div className="small-text">[{text}] {record.vatTypeName}</div>
                                                 },
                                                 {
                                                     title: <div className="title-text">품목</div>,
@@ -425,13 +463,14 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                         <Table.Summary.Cell index={1} />
                                                         <Table.Summary.Cell index={2} />
                                                         <Table.Summary.Cell index={3} />
-                                                        <Table.Summary.Cell index={4}> <div className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.quantity, 0)).toLocaleString()} EA</div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={5}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.unitPrice, 0)).toLocaleString()} </div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={6}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.supplyAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={7}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.vatAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={8} />
+                                                        <Table.Summary.Cell index={4} />
+                                                        <Table.Summary.Cell index={5}> <div className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.quantity, 0)).toLocaleString()} EA</div> </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={6}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.unitPrice, 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={7}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.supplyAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={8}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.vatAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
                                                         <Table.Summary.Cell index={9} />
                                                         <Table.Summary.Cell index={10} />
+                                                        <Table.Summary.Cell index={11} />
                                                     </Table.Summary.Row>
                                                 ) : null
                                             )}
@@ -449,7 +488,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
                                         <Form layout="vertical">
                                             <Row gutter={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                {/* 유형 - 모달 */}
+                                                {/* 부가세유형 - 모달 */}
                                                 <Col span={3}>
                                                     <Form.Item
                                                         label="부가세유형"
@@ -458,8 +497,8 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                     >
                                                         <Input
                                                             placeholder="부가세유형 선택"
-                                                            value={displayValues.voucherType}
-                                                            onClick={() => handleInputClick('vatType')}
+                                                            value={displayValues.vatTypeCode}
+                                                            onClick={() => handleInputClick('vatTypeCode')}
                                                             style={{ cursor: 'pointer', caretColor: 'transparent' }}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -487,13 +526,15 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                 <Col span={2}>
                                                     <Form.Item
                                                         label="수량"
-                                                        tooltip="등록할 수량을 입력하세요"
+                                                        tooltip={<span>등록할 수량을 입력하세요.<br />수량과 단가를 입력하면 공급가액이 자동으로 계산되므로, 공급가액 입력이 비활성화됩니다.</span>}
+                                                        required
                                                     >
                                                         <InputNumber
                                                             style={{ width: '100%' }}
                                                             placeholder="수량"
                                                             value={voucher.quantity}
                                                             onChange={(value) => setVoucher({ ...voucher, quantity: value })}
+                                                            disabled={!!voucher.supplyAmount}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -502,7 +543,8 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                 <Col span={3}>
                                                     <Form.Item
                                                         label="단가"
-                                                        tooltip="등록할 단가를 입력하세요"
+                                                        tooltip={<span>등록할 단가를 입력하세요.<br />수량과 단가를 입력하면 공급가액이 자동으로 계산되므로, 공급가액 입력이 비활성화됩니다.</span>}
+                                                        required
                                                     >
                                                         <InputNumber
                                                             style={{ width: '100%' }}
@@ -514,6 +556,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                             }}
                                                             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                                             parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                                                            disabled={!!voucher.supplyAmount}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -522,7 +565,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                 <Col span={3}>
                                                     <Form.Item
                                                         label="공급가액"
-                                                        tooltip="공급가액을 입력하세요"
+                                                        tooltip={<span>공급가액을 입력하세요.<br />공급가액을 직접 입력하면 수량과 단가는 자동으로 계산되므로, 수량과 단가 입력이 비활성화됩니다.</span>}
                                                         required
                                                     >
                                                         <InputNumber
@@ -535,22 +578,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                             }}
                                                             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                                             parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-
-                                                {/* 부가세 */}
-                                                <Col span={3}>
-                                                    <Form.Item
-                                                        label="부가세"
-                                                        tooltip="부가세 금액을 입력하세요"
-                                                        required
-                                                    >
-                                                        <InputNumber
-                                                            style={{ width: '100%' }}
-                                                            placeholder="부가세"
-                                                            value={voucher.vatAmount}
-                                                            onChange={(value) => setVoucher({ ...voucher, vatAmount: value })}
+                                                            disabled={!!voucher.quantity || !!voucher.unitPrice}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -582,12 +610,12 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                         <Select
                                                             placeholder="유형 선택"
                                                             style={{ width: '100%' }}
-                                                            value={voucher.journalEntryName}
-                                                            onChange={(value) => setVoucher({ ...voucher, journalEntryName: value })}
+                                                            value={voucher.journalEntryCode}
+                                                            onChange={(value) => setVoucher({ ...voucher, journalEntryCode: value })}
                                                         >
-                                                            <Option value="현금">현금</Option>
-                                                            <Option value="외상">외상</Option>
-                                                            <Option value="카드">카드</Option>
+                                                            <Option value="1">현금</Option>
+                                                            <Option value="2">외상</Option>
+                                                            <Option value="3">카드</Option>
                                                         </Select>
                                                     </Form.Item>
                                                 </Col>
@@ -613,101 +641,125 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                     dataIndex: "voucherDate",
                                                     key: "voucherDate",
                                                     align: "center",
-                                                    render: () => <span className="small-text">{formattedDate}</span>,
+                                                    render: () => <span className="small-text">{formattedDate}</span>, // formattedDate 변수를 적절히 설정
                                                 },
                                                 {
-                                                    title: <div className="title-text">구분</div>,
-                                                    dataIndex: "voucherType",
-                                                    key: "voucherType",
-                                                    align: "center",
+                                                    title: <div className="title-text">거래유형</div>,
+                                                    dataIndex: 'transactionType',
+                                                    key: 'transactionType',
+                                                    align: 'center',
                                                     render: (text) => {
-                                                        let color;
-                                                        let value;
-                                                        switch (text) {
-                                                            case 'Deposit':
-                                                                color = 'green';
-                                                                value = '입금';
-                                                                break;
-                                                            case 'Withdrawal':
-                                                                color = 'red';
-                                                                value = '출금';
-                                                                break;
-                                                            case 'Debit':
-                                                                color = 'green';
-                                                                value = '차변';
-                                                                break;
-                                                            case 'Credit':
-                                                                color = 'red';
-                                                                value = '대변';
-                                                                break;
-                                                            default:
-                                                                color = 'gray';
-                                                                value = text;
+                                                        let color = 'gray';
+                                                        let value = '없음';
+
+                                                        if (text === 'SALES') {
+                                                            color = 'green';
+                                                            value = '매출';
+                                                        } else if (text === 'PURCHASE') {
+                                                            color = 'red';
+                                                            value = '매입';
                                                         }
+
                                                         return <Tag color={color}>{value}</Tag>;
                                                     }
                                                 },
                                                 {
-                                                    title: <div className="title-text">계정과목</div>,
-                                                    dataIndex: "formattedAccountSubjectCode", // 포맷된 값을 사용
-                                                    key: "formattedAccountSubjectCode",
+                                                    title: <div className="title-text">부가세유형</div>,
+                                                    dataIndex: "vatTypeCode",
+                                                    key: "vatTypeCode",
+                                                    align: "center",
+                                                    render: (text, record) => <span className="small-text">{record.formattedVatTypeCode}</span>,
+                                                },
+                                                {
+                                                    title: <div className="title-text">품목</div>,
+                                                    dataIndex: "itemName",
+                                                    key: "itemName",
                                                     align: "center",
                                                     render: (text) => <span className="small-text">{text}</span>,
+                                                },
+                                                {
+                                                    title: <div className="title-text">수량</div>,
+                                                    dataIndex: "quantity",
+                                                    key: "quantity",
+                                                    align: "center",
+                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()} EA</span> : null,
+                                                },
+                                                {
+                                                    title: <div className="title-text">단가</div>,
+                                                    dataIndex: "unitPrice",
+                                                    key: "unitPrice",
+                                                    align: "center",
+                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }}>0</div>,
+                                                },
+                                                {
+                                                    title: <div className="title-text">공급가액</div>,
+                                                    dataIndex: "supplyAmount",
+                                                    key: "supplyAmount",
+                                                    align: "center",
+                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }}>0</div>,
+                                                },
+                                                {
+                                                    title: <div className="title-text">부가세</div>,
+                                                    dataIndex: "vatAmount",
+                                                    key: "vatAmount",
+                                                    align: "center",
+                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }}>0</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">거래처</div>,
-                                                    dataIndex: "formattedClientCode", // 포맷된 값을 사용
-                                                    key: "formattedClientCode",
+                                                    dataIndex: "clientCode",
+                                                    key: "clientCode",
                                                     align: "center",
-                                                    render: (text) => <span className="small-text">{text}</span>,
+                                                    render: (text, record) => <span className="small-text">{record.formattedClientCode}</span>,
                                                 },
                                                 {
-                                                    title: <div className="title-text">적요</div>,
-                                                    dataIndex: "transactionDescription",
-                                                    key: "transactionDescription",
+                                                    title: <div className="title-text">분개유형</div>,
+                                                    dataIndex: "journalEntryCode",
+                                                    key: "journalEntryCode",
                                                     align: "center",
-                                                    render: (text) => <span className="small-text">{text}</span>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">차변</div>,
-                                                    dataIndex: "debitAmount",
-                                                    key: "debitAmount",
-                                                    align: "center",
-                                                    render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
-                                                },
-                                                {
-                                                    title: <div className="title-text">대변</div>,
-                                                    dataIndex: "creditAmount",
-                                                    key: "creditAmount",
-                                                    align: "center",
-                                                    render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
+                                                    render: (text) => {
+                                                        let color;
+                                                        let journalEntryName;
+                                                        switch (text) {
+                                                            case '1':
+                                                                color = 'green';
+                                                                journalEntryName = '외상';
+                                                                break;
+                                                            case '2':
+                                                                color = 'blue';
+                                                                journalEntryName = '카드';
+                                                                break;
+                                                            case '3':
+                                                                color = 'red';
+                                                                journalEntryName = '현금';
+                                                                break;
+                                                            default:
+                                                                color = 'gray';
+                                                        }
+                                                        return <Tag color={color}>{journalEntryName}</Tag>;
+                                                    },
                                                 }
                                             ]}
                                             rowKey={(record) => record.key}
                                             pagination={false}
                                             size="small"
                                             summary={() => (
-                                                vouchers.length > 0 &&
-                                                <>
-                                                    <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
-                                                        <Table.Summary.Cell index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={2}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                    </Table.Summary.Row>
-                                                    <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
-                                                        <Table.Summary.Cell index={0}><div className="medium-text">대차차액</div></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={2}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                    </Table.Summary.Row>
-                                                </>
+                                                vouchers.length > 0 && (
+                                                    <>
+                                                        <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                            <Table.Summary.Cell index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={4}><div className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.quantity || 0), 0).toLocaleString()} EA</div></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={5}><div style={{ textAlign: 'right' }} className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.unitPrice || 0), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={6}><div style={{ textAlign: 'right' }} className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.supplyAmount || 0), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.vatAmount || 0), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={8}></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                                                        </Table.Summary.Row>
+                                                    </>
+                                                )
                                             )}
                                             locale={{
                                                 emptyText: '데이터가 없습니다.',
@@ -748,7 +800,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                     <Spin />  // 로딩 스피너
                 ) : (
                     <>
-                        {currentField === 'vatType' && (
+                        {currentField === 'vatTypeCode' && (
                             <>
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     부가세 유형 선택
@@ -759,18 +811,16 @@ const SalesPurchaseVoucherEntryPage = () => {
                                     onChange={(e) => {
                                         const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
                                         if (!value) {
-                                            // 두 배열을 합쳐서 초기 데이터로 설정
-                                            setModalData([...salesVatTypeShowDTO, ...purchaseVatTypeShowDTO]);
+                                            setModalData(initialModalData);
                                         } else {
-                                            const combinedData = [...salesVatTypeShowDTO, ...purchaseVatTypeShowDTO];
-                                            const filtered = combinedData.filter((item) => {
+                                            const filtered = initialModalData.filter((item) => {
                                                 return (
+                                                    (item.transactionType && item.transactionType.toLowerCase().includes(value)) ||
                                                     (item.vatTypeCode && item.vatTypeCode.toLowerCase().includes(value)) ||
-                                                    (item.vatTypeName && item.vatTypeName.toLowerCase().includes(value)) ||
-                                                    (item.description && item.description.toLowerCase().includes(value))
+                                                    (item.vatTypeName && item.vatTypeName.toLowerCase().includes(value))
                                                 );
                                             });
-                                            setModalData(filtered); // 필터링된 결과 적용
+                                            setModalData(filtered);
                                         }
                                     }}
                                     style={{ marginBottom: 16 }}
@@ -785,7 +835,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                 align: 'center',
                                                 width: '30%',
                                                 render: (text) => (
-                                                    <Tag color={text === 'SALES' ? 'green' : 'blue'}>
+                                                    <Tag color={text === 'SALES' ? 'green' : 'red'}>
                                                         {text === 'SALES' ? '매출' : '매입'}
                                                     </Tag>
                                                 ),
@@ -816,7 +866,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                         }}
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
-                                            onClick: () => handleModalSelect(record), // 선택 시 처리
+                                            onClick: () => handleModalSelect(record),
                                         })}
                                     />
                                 )}
