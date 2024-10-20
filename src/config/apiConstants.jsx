@@ -131,6 +131,8 @@ export const PRODUCTION_API = {
     UPDATE_WORKCENTER_API: (code) =>`${API_BASE_URL}/api/production/workcenters/update/${code}`, // 작업장 수정 API
     DELETE_WORKCENTER_API: (code) => `${API_BASE_URL}/api/production/workcenters/delete?code=${code}`, // 작업장 삭제 API
     SEARCH_FACTORIES_API: `${API_BASE_URL}/api/production/workcenters/factories`,
+    EQUIPMENT_LIST_BY_WORKCENTER: (code) =>`${API_BASE_URL}/api/production/equipments/byWorkcenter`, // 작업장 코드로 설비 목록 조회 API
+    EQUIPMENT_LIST_BY_IDS: (ids) => `${API_BASE_URL}/api/production/equipments/byIDs/${ids}`,
 
     PROCESS_LIST_API: `${API_BASE_URL}/api/production/processDetails`, // 생산공정 목록 조회 API
     PROCESS_DETAILS_API: (code) => `${API_BASE_URL}/api/production/processDetails/details/${code}`, // 생산공정 세부정보 조회 API

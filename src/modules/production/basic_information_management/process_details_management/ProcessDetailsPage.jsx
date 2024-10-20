@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import { Box, Grid, Grow } from '@mui/material';
+import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import {Typography} from '@mui/material';
 import {Button, Col, Modal, Row} from 'antd';
@@ -56,72 +56,69 @@ const ProcessDetailsPage = ({ initialData }) => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} >
+                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '1400px !important', maxWidth: '1700px' }} container spacing={3}>
+                    <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                {/* 검색 바 */}
-                                <Row gutter={16} style={{marginBottom: '16px'}}>
-                                    <Col span={8}>
-                                        <SearchBar onSearch={handleSearch}/>
-                                    </Col>
-                                </Row>
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                {/*/!* 검색 바 *!/*/}
+                                {/*<Row gutter={16} style={{marginBottom: '16px'}}>*/}
+                                {/*    <Col span={8}>*/}
+                                {/*        <SearchBar onSearch={handleSearch}/>*/}
+                                {/*    </Col>*/}
+                                {/*</Row>*/}
 
-                                {/* 검색 결과 목록 또는 경고 메시지 */}
-                                {isSearchActive && (
-                                    <>
-                                        {searchData && searchData.length > 0 ? (
-                                            <Row gutter={16} style={{marginBottom: '16px'}}>
-                                                <Col span={24}>
-                                                    <ProcessDetailsListSection
-                                                        columns={processDetailsColumn}
-                                                        data={searchData}
-                                                        handleSelectedRow={handleSelectedRow}
-                                                        rowClassName={getRowClassName}
-                                                    />
-                                                </Col>
-                                            </Row>
-                                        ) : (
-                                            <Text type="warning">검색하신 공정명을 찾을 수 없습니다.</Text>
-                                        )}
-                                    </>
-                                )}
+                                {/*/!* 검색 결과 목록 또는 경고 메시지 *!/*/}
+                                {/*{isSearchActive && (*/}
+                                {/*    <>*/}
+                                {/*        {searchData && searchData.length > 0 ? (*/}
+                                {/*            <Row gutter={16} style={{marginBottom: '16px'}}>*/}
+                                {/*                <Col span={24}>*/}
+                                {/*                    <ProcessDetailsListSection*/}
+                                {/*                        columns={processDetailsColumn}*/}
+                                {/*                        data={searchData}*/}
+                                {/*                        handleSelectedRow={handleSelectedRow}*/}
+                                {/*                        rowClassName={getRowClassName}*/}
+                                {/*                    />*/}
+                                {/*                </Col>*/}
+                                {/*            </Row>*/}
+                                {/*        ) : (*/}
+                                {/*            <Text type="warning">검색하신 공정명을 찾을 수 없습니다.</Text>*/}
+                                {/*        )}*/}
+                                {/*    </>*/}
+                                {/*)}*/}
 
                                 {/* 기본 데이터 목록 */}
-                                <Row gutter={16}
-                                     style={{marginTop: isSearchActive && searchData && searchData.length > 0 ? '16px' : '0'}}>
-                                    <Col span={24}>
-                                        <ProcessDetailsListSection
-                                            columns={processDetailsColumn}
-                                            data={data}
-                                            handleSelectedRow={handleSelectedRow}
-                                            rowClassName={getRowClassName}
-                                        />
-                                    </Col>
-                                </Row>
-
-                                {/* 공정 추가 버튼 */}
-                                <Button type="primary" onClick={handleAddProcess} style={{marginTop: '16px'}}>
-                                    등록
-                                </Button>
-
-                                {/* 모달 컴포넌트 */}
-                                {processDetail && (
-                                    <Modal
-                                        visible={isProcessModalVisible} // 모달 상태에 따라 표시
-                                        onCancel={handleClose} // 모달을 닫는 함수
-                                        footer={null} // 모달의 하단 버튼 제거
-                                    >
-                                        <SelectedProcessDetailsSection
-                                            processDetail={processDetail}
-                                            handleClose={handleClose}
-                                            handleInputChange={handleInputChange}
-                                            handleSave={handleSave}
-                                            handleDeleteProcessDetail={handleDeleteProcessDetail}
-                                        />
-                                    </Modal>
-                                )}
-                            </div>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >생산공정 목록</Typography>
+                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Row gutter={16}
+                                         style={{marginTop: isSearchActive && searchData && searchData.length > 0 ? '16px' : '0'}}>
+                                        <Col span={24}>
+                                            <ProcessDetailsListSection
+                                                columns={processDetailsColumn}
+                                                data={data}
+                                                handleSelectedRow={handleSelectedRow}
+                                                rowClassName={getRowClassName}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    {/* 모달 컴포넌트 */}
+                                    {processDetail && (
+                                        <Modal
+                                            visible={isProcessModalVisible} // 모달 상태에 따라 표시
+                                            onCancel={handleClose} // 모달을 닫는 함수
+                                            footer={null} // 모달의 하단 버튼 제거
+                                        >
+                                            <SelectedProcessDetailsSection
+                                                processDetail={processDetail}
+                                                handleClose={handleClose}
+                                                handleInputChange={handleInputChange}
+                                                handleSave={handleSave}
+                                                handleDeleteProcessDetail={handleDeleteProcessDetail}
+                                            />
+                                        </Modal>
+                                    )}
+                                </Grid>
+                            </Paper>
                         </Grow>
                     </Grid>
                 </Grid>
