@@ -8,18 +8,23 @@ export const workcenterColumns = [
         dataIndex: 'code',  // DTO의 code 필드에 접근
         key: 'code',
         width: '5%',
+        align: 'center',
     },
     {
         title: <span>이름</span>,
         dataIndex: 'name',  // DTO의 name 필드에 접근
         key: 'name',
         width: '15%',
+        align: 'center',
+
     },
     {
         title: <span>유형</span>,
         dataIndex: 'workcenterType',  // DTO의 workcenterType 필드에 접근
         key: 'workcenterType',
         width: '10%',
+        align: 'center',
+
         render: (workcenterType) => {
             const typeToKorean = {
                 "Press": "프레스",
@@ -63,12 +68,14 @@ export const workcenterColumns = [
         dataIndex: 'description',  // DTO의 description 필드에 접근
         key: 'description',
         width: '25%',
+        align: 'center',
     },
     {
         title: <span>공장코드</span>,
         dataIndex: ['factoryCode', 'code'],  // DTO의 factoryCode의 code 필드에 접근
         key: 'factoryCode',
         width: '10%',
+        align: 'center',
         render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
     },
     {
@@ -76,6 +83,7 @@ export const workcenterColumns = [
         dataIndex: ['processCode', 'code'],  // DTO의 processCode의 code 필드에 접근
         key: 'processCode',
         width: '10%',
+        align: 'center',
         render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
     },
     {
@@ -83,6 +91,7 @@ export const workcenterColumns = [
         dataIndex: 'workerAssignments',  // DTO의 workerAssignments 필드에 접근
         key: 'workerAssignments',
         width: '10%',
+        align: 'center',
         render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-', // 작업자 할당 리스트의 길이 표시
     },
     {
@@ -90,6 +99,8 @@ export const workcenterColumns = [
         dataIndex: 'equipmentList',  // DTO의 equipmentList 필드에 접근
         key: 'equipmentList',
         width: '10%',
+        align: 'center',
+
         render: (equipmentList) => equipmentList ? equipmentList.length : '-', // 장비 리스트의 길이 표시
     },
     {
@@ -97,6 +108,7 @@ export const workcenterColumns = [
         dataIndex: 'isActive',  // DTO의 isActive 필드에 접근
         key: 'isActive',
         width: '5%',
+        align: 'center',
         render: (isActive) => {
             return (
                 <Tag color={isActive ? 'green' : 'red'}>
@@ -113,6 +125,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'code',
         key: 'code',
         width: '5%',
+        align: 'center',
         editable: true, // 수정 가능
     },
     {
@@ -120,6 +133,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'name',
         key: 'name',
         width: '15%',
+        align: 'center',
         editable: true, // 수정 가능
     },
     {
@@ -127,6 +141,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'workcenterType',
         key: 'workcenterType',
         width: '10%',
+        align: 'center',
         render: (workcenterType) => {
             const typeToKorean = {
                 Press: "프레스",
@@ -149,6 +164,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'description',
         key: 'description',
         width: '25%',
+        align: 'center',
         editable: true, // 수정 가능
     },
     {
@@ -156,6 +172,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'factoryName',
         key: 'factoryName',
         width: '10%',
+        align: 'center',
         editable: true,
         render: (text) => text || '-',
     },
@@ -164,6 +181,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'processName',
         key: 'processName',
         width: '10%',
+        align: 'center',
         editable: true, // 수정 불가
         render: (text) => text || '-',
     },
@@ -171,6 +189,7 @@ export const workcenterDetailColumns = [
         title: <span>작업자</span>,
         dataIndex: 'workerAssignments',
         key: 'workerAssignments',
+        align: 'center',
         width: '10%',
         editable: true, // 수정 불가
         render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-',
@@ -180,6 +199,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'equipmentList',
         key: 'equipmentList',
         width: '10%',
+        align: 'center',
         editable: true, // 수정 불가
         render: (equipmentList) => equipmentList ? equipmentList.length : '-',
     },
@@ -188,6 +208,7 @@ export const workcenterDetailColumns = [
         dataIndex: 'isActive',
         key: 'isActive',
         width: '5%',
+        align: 'center',
         render: (_, record) => (
             <Select
                 value={record.isActive ? '사용중' : '미사용'} // 드롭다운의 현재 값

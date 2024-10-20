@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Select, message } from "antd";
 import { CircularProgress } from "@mui/material";
 import axios from 'axios';
-import apiClient from "../../../../config/apiClient.jsx";
-import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import apiClient from "../../../../../config/apiClient.jsx";
+import {PRODUCTION_API} from "../../../../../config/apiConstants.jsx";
 
 const { Option } = Select;
 

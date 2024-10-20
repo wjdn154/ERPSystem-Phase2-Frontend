@@ -76,7 +76,7 @@ const RoutingManagementPage = () => {
         // 해당 필드에 맞는 데이터를 비동기적으로 가져오는 로직 추가
         if (fieldName === 'processDetails') {
             try {
-                const response = await apiClient.get(PRODUCTION_API.PROCESS_DETAILS_API);
+                const response = await apiClient.post(PRODUCTION_API.ROUTING_PREVIEW_PROCESS_DETAILS_API);
                 setModalData(response.data);
             } catch (error) {
                 console.error('Error fetching modal data:', error);
@@ -105,27 +105,49 @@ const RoutingManagementPage = () => {
             onOk: async () => {
                 values.id = routingParam.id;
 
-                // try {
-                //     const API_PATH : type === 'update' ? PRODUCTION_API.ROUTING_UPDATE_API : PRODUCTION_API.ROUTING_CREATE_API;
-                //     const response = await apiClient.post(API_PATH, values);
-                //     const updatedData = response.data;
-                //     setRoutingList(prevRoutingList => [...prevRoutingList, ...prevRoutingList]);
-                //
-                // } catch (error) {
-                //     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
-                // }
+                try {
+                    if (type === 'register') {
+                        // 공정 단계가 없는 경우 에러 처리
+                        if (!values.routingSteps || values.routingSteps.length === 0) {
+                            notify('error', '저장 실패', '적어도 하나의 공정 단계를 추가해야 합니다.', 'top');
+                            return;
+                        }
+
+                        // routingSteps에 stepOrder 자동 할당
+                        if (values.routingSteps && values.routingSteps.length > 0) {
+                            values.routingSteps = values.routingSteps.map((step, index) => ({
+                                ...step,
+                                stepOrder: index + 1,
+                            }));
+                        }
+
+                        // API 요청
+                        await apiClient.post(PRODUCTION_API.ROUTING_CREATE_API, values);
+                        notify('success', '등록 성공', '새 공정 경로가 성공적으로 추가되었습니다.', 'bottomLeft');
+                        setIsModalVisible(false);
+                        refreshProcessRoutings(); // 데이터 새로고침
+                    } else if (type === 'update') {
+                        // 수정 로직 구현
+                        await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API(selectedRouting.id), values);
+                        notify('success', '수정 성공', '공정 경로가 성공적으로 수정되었습니다.', 'bottomLeft');
+                        setIsModalVisible(false);
+                        refreshProcessRoutings(); // 데이터 새로고침
+                    }
+                } catch (error) {
+                    console.error('Error saving process routing:', error);
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                }
             },
             onCancel() {
                 notification.warning({
                     message: '저장 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomRight',
+                    placement: 'bottomLeft',
                 });
             },
 
         })
     }
-
 
     // 1. ProcessRouting 전체 조회
     useEffect(() => {
@@ -184,7 +206,7 @@ const RoutingManagementPage = () => {
     useEffect(() => {
         const fetchProcesses = async () => {
             try {
-                const response = await apiClient.get(PRODUCTION_API.PROCESS_LIST_API); // 공정 목록 API 엔드포인트
+                const response = await apiClient.post(PRODUCTION_API.PROCESS_LIST_API); // 공정 목록 API 엔드포인트
                 setProcessOptions(response.data);
             } catch (error) {
                 console.error('Error fetching processes:', error);
@@ -198,7 +220,7 @@ const RoutingManagementPage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await apiClient.get(LOGISTICS_API.PRODUCT_LIST_API); // 제품 목록 API 엔드포인트
+                const response = await apiClient.post(LOGISTICS_API.PRODUCT_LIST_API); // 제품 목록 API 엔드포인트
                 setProductOptions(response.data); // [{ id: 1, name: '제품 A' }, { id: 2, name: '제품 B' }, ...]
             } catch (error) {
                 console.error('Error fetching products:', error);
@@ -210,34 +232,34 @@ const RoutingManagementPage = () => {
     }, [notify]);
 
     // 2. ProcessRouting 생성
-    const handleAddProcessRouting = async () => {
-        try {
-            await apiClient.post(PRODUCTION_API.ROUTING_CREATE_API, newRouting);
-            notify('success', '조회 성공', '새 공정 경로가 성공적으로 추가되었습니다.', 'bottomRight');
-            setIsModalVisible(false);
-            // 데이터 새로고침
-            const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
-            setData(response.data);
-        } catch (error) {
-            console.error('Error adding process routing:', error);
-            notify('error', '등록 실패', '새 공정 경로 추가 중 오류가 발생했습니다.', 'top');
-        }
-    };
-
-    // 3. ProcessRouting 수정
-    const handleEditProcessRouting = async () => {
-        try {
-            await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API(selectedRouting.id), newRouting);
-            message.success('공정 경로가 성공적으로 수정되었습니다.');
-            setIsModalVisible(false);
-            // 데이터 새로고침
-            const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
-            setData(response.data);
-        } catch (error) {
-            console.error('Error updating process routing:', error);
-            message.error('공정 경로 수정 중 오류가 발생했습니다.');
-        }
-    };
+    // const handleAddProcessRouting = async () => {
+    //     try {
+    //         await apiClient.post(PRODUCTION_API.ROUTING_CREATE_API, newRouting);
+    //         notify('success', '조회 성공', '새 공정 경로가 성공적으로 추가되었습니다.', 'bottomLeft');
+    //         setIsModalVisible(false);
+    //         // 데이터 새로고침
+    //         const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
+    //         setData(response.data);
+    //     } catch (error) {
+    //         console.error('Error adding process routing:', error);
+    //         notify('error', '등록 실패', '새 공정 경로 추가 중 오류가 발생했습니다.', 'top');
+    //     }
+    // };
+    //
+    // // 3. ProcessRouting 수정
+    // const handleEditProcessRouting = async () => {
+    //     try {
+    //         await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API(selectedRouting.id), newRouting);
+    //         message.success('공정 경로가 성공적으로 수정되었습니다.');
+    //         setIsModalVisible(false);
+    //         // 데이터 새로고침
+    //         const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
+    //         setData(response.data);
+    //     } catch (error) {
+    //         console.error('Error updating process routing:', error);
+    //         message.error('공정 경로 수정 중 오류가 발생했습니다.');
+    //     }
+    // };
 
     // 4. ProcessRouting 삭제
     // 삭제 핸들러
@@ -251,7 +273,7 @@ const RoutingManagementPage = () => {
                 setIsLoading(true);
                 try {
                     await apiClient.post(PRODUCTION_API.ROUTING_DELETE_API(id));
-                    notify('success', '삭제 성공', '공정 경로가 성공적으로 삭제되었습니다.', 'bottomRight');
+                    notify('success', '삭제 성공', '공정 경로가 성공적으로 삭제되었습니다.', 'bottomLeft');
                     refreshProcessRoutings();
                 } catch (error) {
                     console.error('Error deleting process routing:', error);
@@ -268,7 +290,7 @@ const RoutingManagementPage = () => {
         try {
             const response = await apiClient.post(PRODUCTION_API.ROUTING_SEARCH_PROCESS_DETAILS_API, { keyword });
             setData(response.data);
-            notify('success', '조회 성공', '공정이 성공적으로 조회되었습니다.', 'bottomRight');
+            notify('success', '조회 성공', '공정이 성공적으로 조회되었습니다.', 'bottomLeft');
 
         } catch (error) {
             console.error('Error searching process details:', error);
@@ -327,9 +349,40 @@ const RoutingManagementPage = () => {
     };
 
     const handleTabChange = (key) => {
+        setEditRouting(false);
+        setFetchRoutingData(null);
+        setDisplayValues({});
+
+        form.resetFields(); // 1탭 폼 초기화
+        registrationForm.resetFields(); // 2탭 폼 초기화
+        registrationForm.setFieldValue('isActive', true);
+
         setActiveTabKey(key);
-        // 탭 변경 시 값 초기화
     };
+
+    // 공정 단계 순서 자동 재정렬
+    useEffect(() => {
+        const adjustStepOrder = () => {
+            const steps = registrationForm.getFieldValue('routingSteps') || [];
+            const updatedSteps = steps.map((step, index) => ({
+                ...step,
+                stepOrder: index + 1,
+            }));
+            registrationForm.setFieldsValue({ routingSteps: updatedSteps });
+        };
+
+        // // 등록 폼이 렌더링될 때마다 stepOrder를 조정
+        // const unsubscribe = registrationForm.subscribe(({ values }) => {
+        //     if (values.routingSteps) {
+        //         adjustStepOrder();
+        //     }
+        // });
+
+        // cleanup
+        return () => {
+            unsubscribe();
+        };
+    }, [registrationForm]);
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -435,6 +488,10 @@ const RoutingManagementPage = () => {
                                             layout="vertical"
                                             onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                             form={registrationForm}
+
+                                            initialValues={{
+                                                routingSteps: [], // 공정 단계 초기값 설정
+                                            }}
                                         >
                                             <Row gutter={16}>
                                                 <Col span={6}>
@@ -453,72 +510,107 @@ const RoutingManagementPage = () => {
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
-                                                    <Form.Item name="isStandard" rules={[{ required: true, message: '표준 여부를 선택하세요.' }]}>
+                                                    <Form.Item
+                                                        name="isStandard" rules={[{ required: false }]}
+                                                        label="표준 여부" valuePropName="checked"
+                                                    >
                                                         <Checkbox>표준 여부</Checkbox>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
-                                                    <Form.Item name="isActive" rules={[{ required: true, message: '사용 여부를 선택하세요.' }]}>
+                                                    <Form.Item 
+                                                        name="isActive" rules={[{ required: false }]}
+                                                        label="사용 여부" valuePropName="checked"
+                                                    >
                                                         <Checkbox>사용 여부</Checkbox>
                                                     </Form.Item>
                                                 </Col>
 
-                                                {/*    공정별 단계 등록 */}
+                                                {/* 공정 단계 헤더 */}
+                                                <Divider orientation="left">공정 단계</Divider>
                                                 {/* 공정 단계 추가 */}
                                                 <Form.List name="routingSteps">
-                                                    {(fields, { add, remove }) => (
-                                                        <>
-                                                            <Typography variant="h6" gutterBottom>
-                                                                공정 단계
-                                                            </Typography>
-                                                            {fields.map(({ key, name, fieldKey, ...restField }) => (
-                                                                <Row gutter={16} key={key} align="middle">
+                                                    {(fields, { add, remove }) => {
+                                                        // 공정 단계 추가 시 stepOrder 자동 설정
+                                                        const handleAdd = () => {
+                                                            const steps = registrationForm.getFieldValue('routingSteps') || [];
+                                                            const maxStepOrder = steps.length > 0 ? Math.max(...steps.map(step => step.stepOrder)) : 0;
+                                                            add({ stepOrder: maxStepOrder + 1 });
+                                                        };
+
+                                                        // 공정 단계 삭제 시 stepOrder 재정렬
+                                                        const handleRemove = (name) => {
+                                                            remove(name);
+                                                            // 상태 업데이트 후 stepOrder 재정렬
+                                                            setTimeout(() => {
+                                                                const steps = registrationForm.getFieldValue('routingSteps') || [];
+                                                                const updatedSteps = steps.map((step, index) => ({
+                                                                    ...step,
+                                                                    stepOrder: index + 1,
+                                                                }));
+                                                                registrationForm.setFieldsValue({ routingSteps: updatedSteps });
+                                                            }, 0);
+                                                        };
+
+                                                        return (
+                                                            <>
+                                                                {fields.map(({ key, name, fieldKey, ...restField }) => (
+                                                                    <Row gutter={16} key={key} align="middle">
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'stepOrder']}
+                                                                                fieldKey={[fieldKey, 'stepOrder']}
+                                                                                label="순서"
+                                                                            >
+                                                                                <Input type="number" min={1} disabled />
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={12}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'processId']}
+                                                                                fieldKey={[fieldKey, 'processId']}
+                                                                                label="공정"
+                                                                                rules={[{ required: true, message: '공정을 선택하세요.' }]}
+                                                                            >
+                                                                                <Select placeholder="공정을 선택하세요">
+                                                                                    {processOptions.map((process) => (
+                                                                                        <Option key={process.id} value={process.id}>
+                                                                                            {process.name}
+                                                                                        </Option>
+                                                                                    ))}
+                                                                                </Select>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={6} style={{ display: 'flex', alignItems: 'flex-end', marginTop: '5px' }}>
+                                                                            <Button
+                                                                                type="danger"
+                                                                                onClick={() => remove(name)}
+                                                                            >
+                                                                                삭제
+                                                                            </Button>
+                                                                        </Col>
+                                                                    </Row>
+                                                                ))}
+                                                                <Row gutter={16} style={{ marginTop: '30px' }} justify="start" align="middle">
                                                                     <Col span={6}>
-                                                                        <Form.Item
-                                                                            {...restField}
-                                                                            name={[name, 'stepOrder']}
-                                                                            fieldKey={[fieldKey, 'stepOrder']}
-                                                                            label="순서"
-                                                                            rules={[{ required: true, message: '순서를 입력하세요.' }]}
-                                                                        >
-                                                                            <Input type="number" min={1} />
+                                                                        <Form.Item>
+                                                                            <Button type="dashed" onClick={() => add()} block style={{ minWidth: '80px' }}>
+                                                                                단계 추가
+                                                                            </Button>
                                                                         </Form.Item>
                                                                     </Col>
                                                                     <Col span={12}>
-                                                                        <Form.Item
-                                                                            {...restField}
-                                                                            name={[name, 'processId']}
-                                                                            fieldKey={[fieldKey, 'processId']}
-                                                                            label="공정"
-                                                                            rules={[{ required: true, message: '공정을 선택하세요.' }]}
-                                                                        >
-                                                                            <Select placeholder="공정을 선택하세요">
-                                                                                {processOptions.map((process) => (
-                                                                                    <Option key={process.id} value={process.id}>
-                                                                                        {process.name}
-                                                                                    </Option>
-                                                                                ))}
-                                                                            </Select>
-                                                                        </Form.Item>
+                                                                        {/* 빈 공간 유지 */}
                                                                     </Col>
                                                                     <Col span={6}>
-                                                                        <Button
-                                                                            type="danger"
-                                                                            onClick={() => remove(name)}
-                                                                            style={{ marginTop: '40px' }}
-                                                                        >
-                                                                            삭제
-                                                                        </Button>
+                                                                        {/* 빈 공간 유지 */}
                                                                     </Col>
                                                                 </Row>
-                                                            ))}
-                                                            <Form.Item>
-                                                                <Button type="dashed" onClick={() => add()} block>
-                                                                    공정 단계 추가
-                                                                </Button>
-                                                            </Form.Item>
-                                                        </>
-                                                    )}
+                                                            </>
+                                                        );
+                                                    }}
                                                 </Form.List>
 
                                             </Row>

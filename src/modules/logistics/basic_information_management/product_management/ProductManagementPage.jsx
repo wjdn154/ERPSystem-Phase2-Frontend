@@ -12,11 +12,14 @@ import dayjs from 'dayjs';
 import { Divider, Tooltip } from 'antd';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {SearchOutlined, EditOutlined, CheckOutlined, DeleteOutlined} from "@ant-design/icons";
+import image from "../../../../assets/img/uploads/원목책상사진.png"
+import defaultImage from '../../../../assets/img/uploads/defaultImage.png';
 
 const { Option } = Select;
 const { confirm } = Modal;
 
 const ProductManagementPage = ( {initialData} ) => {
+    console.log(initialData);
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [productList, setProductList] = useState(initialData);
     const [form] = Form.useForm(); // 폼 인스턴스 생성
@@ -429,15 +432,13 @@ const ProductManagementPage = ( {initialData} ) => {
                                                         height: '100%', // 모든 행의 높이를 동일하게 고정
                                                     }}>
                                                         <img
-                                                            src={record.imagePath
-                                                                ? `/src/assets/img/uploads/${record.imagePath}`
-                                                                : `/src/assets/img/uploads/defaultImage.png`}
+                                                            src={record.imagePath ? record.imagePath: defaultImage}
                                                             alt="이미지"
                                                             style={{
                                                                 width: '60px',
                                                                 height: '60px',
-                                                                objectFit: 'cover', // 고정 크기 내에서 잘라내기
-                                                                borderRadius: '5px' // 선택사항: 이미지 모서리를 둥글게 처리
+                                                                objectFit: 'cover',
+                                                                borderRadius: '5px',
                                                             }}
                                                         />
                                                     </div>
@@ -696,27 +697,28 @@ const ProductManagementPage = ( {initialData} ) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>이미지</Divider>
                                             <Row gutter={16}>
                                                 <Col span={12}>
-                                                    <Form.Item name="imageFile">
-                                                        {/* 이미지 미리보기 */}
+                                                    <Form.Item>
                                                         <div style={{ marginBottom: '20px' }}>
                                                             <img
                                                                 src={selectedFile
-                                                                    ? URL.createObjectURL(selectedFile) // 선택된 파일이 있으면 미리보기로 보여줌
+                                                                    ? URL.createObjectURL(selectedFile)
                                                                     : detailProductData?.imagePath
-                                                                        ? `/src/assets/img/uploads/${detailProductData?.imagePath}` // 기존 이미지
-                                                                        : `/src/assets/img/uploads/defaultImage.png`} // 기본 이미지
+                                                                        ? detailProductData?.imagePath
+                                                                        : '/src/img/uploads/defaultImage.png'}
                                                                 alt="미리보기 이미지"
                                                                 style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                                             />
                                                         </div>
+                                                    </Form.Item>
 
+                                                    <Form.Item name="imageFile">
                                                         <Upload
-                                                            beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
+                                                            beforeUpload={() => false}
                                                             onChange={(info) => {
-                                                                const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
-                                                                setSelectedFile(file); // 선택된 파일을 상태로 설정
+                                                                const file = info.fileList[info.fileList.length - 1]?.originFileObj;
+                                                                setSelectedFile(file);
                                                             }}
-                                                            fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []} // 파일 리스트 설정
+                                                            fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []}
                                                         >
                                                             <Button icon={<CloudUploadIcon />}>파일 선택</Button>
                                                         </Upload>
@@ -1005,7 +1007,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                                     {/* 이미지 미리보기 */}
                                                     <div style={{ marginBottom: '20px' }}>
                                                         <img
-                                                            src={selectedFile ? URL.createObjectURL(selectedFile) : `/src/assets/img/uploads/defaultImage.png`}
+                                                            src={selectedFile ? URL.createObjectURL(selectedFile) : defaultImage}
                                                             alt="미리보기 이미지"
                                                             style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                                         />
