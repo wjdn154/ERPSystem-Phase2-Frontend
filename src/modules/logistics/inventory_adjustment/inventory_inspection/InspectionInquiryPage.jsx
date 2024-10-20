@@ -6,9 +6,9 @@ import {Typography} from '@mui/material';
 import {useNotificationContext} from '../../../../config/NotificationContext.jsx';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {LOGISTICS_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import dayjs from "dayjs";
-import {Button, Col, DatePicker, Divider, Form, Input, Row, Spin, Table} from "antd";
+import {Button, Col, DatePicker, Divider, Form, Input, Modal, Row, Spin, Table} from "antd";
 import {SearchOutlined} from "@ant-design/icons";
 
 const {RangePicker} = DatePicker;
@@ -17,7 +17,7 @@ const InspectionInquiryPage = () => {
     const notify = useNotificationContext();
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [inspectionListData, setInspectionListData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const [searchParams, setSearchParams] = useState({
         startDate: dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
         endDate: dayjs().format('YYYY-MM-DD'),
@@ -30,7 +30,8 @@ const InspectionInquiryPage = () => {
     const [modalData, setModalData] = useState([]);
     const [initialModalData, setInitialModalData] = useState([]);
     const [currentField, setCurrentField] = useState('');
-
+    const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
+    const [currentFieldIndex, setCurrentFieldIndex] = useState(null);
 
     // 탭 전환 처리 함수
     const handleTabChange = (key) => {
@@ -43,7 +44,6 @@ const InspectionInquiryPage = () => {
             // API 호출
             const response = await apiClient.post(LOGISTICS_API.INVENTORY_INSPECTION_LIST_API(startDate, endDate));
             setInspectionListData(response.data);  // 데이터 설정
-            console.log(response.data);
             notify('success', '데이터 조회 성공', '재고실사 현황 데이터를 성공적으로 조회했습니다.', 'bottomRight');
         } catch (error) {
             notify('error', '데이터 조회 오류', '재고실사 현황 데이터를 조회하는 중 오류가 발생했습니다.', 'top');
@@ -54,17 +54,38 @@ const InspectionInquiryPage = () => {
 
     const handleFormSubmit = async (values) => {
         try {
-            // 수정할 실사의 ID를 가져옵니다. (id는 수정하고자 하는 실사의 고유 식별자라고 가정)
-            const id = detailInspectionData.id;  // 수정할 값에 따라 다르게 설정 가능
+            // 기존 데이터에 대한 ID 및 관계 정보 유지
+            const filteredDetails = values.details.filter(detail => {
+                // 모든 필드가 비어 있는 항목을 필터링
+                return detail.productCode || detail.productName || detail.standard || detail.unit || detail.warehouseLocationName || detail.actualQuantity || detail.comment;
+            });
 
+            const requestDTO = {
+                inspectionDate: values.inspectionDate,
+                warehouseId: values.warehouseId,
+                employeeId: values.employeeId,
+                comment: values.comment,
+                details: filteredDetails.map((detail) => ({
+                    id: detail.id || null, // 항목 고유 ID가 없을 경우 null로 설정
+                    productId: detail.productId || null, // 제품 ID가 없을 경우 null로 설정
+                    inventoryId: detail.inventoryId || null, // 재고 ID가 없을 경우 null로 설정
+                    warehouseLocationId: detail.warehouseLocationId || null, // 창고 위치 ID가 없을 경우 null로 설정
+                    productCode: detail.productCode,
+                    productName: detail.productName,
+                    standard: detail.standard || '',
+                    unit: detail.unit || '',
+                    actualQuantity: detail.actualQuantity,
+                    comment: detail.comment || '',  // 코멘트가 없을 경우 빈 문자열로 설정
+                })),
+            };
+
+            console.log('요청 데이터:', requestDTO);
             // API 호출
-            const response = await apiClient.put(LOGISTICS_API.INVENTORY_INSPECTION_UPDATE_API(id), values);
+            const id = detailInspectionData.id;
+            const response = await apiClient.put(LOGISTICS_API.INVENTORY_INSPECTION_UPDATE_API(id), requestDTO);
 
-            // 성공 시 알림 표시
             notify('success', '수정 완료', '재고 실사 정보가 성공적으로 저장되었습니다.', 'bottomRight');
         } catch (error) {
-            console.error('실사 정보 저장 중 오류 발생:', error);
-            // 실패 시 알림 표시
             notify('error', '저장 오류', '재고 실사 정보 저장 중 오류가 발생했습니다.', 'top');
         }
     };
@@ -72,20 +93,99 @@ const InspectionInquiryPage = () => {
     // 모달 닫기 핸들러
     const handleModalCancel = () => setIsModalVisible(false);
 
-    // 모달창 열기 핸들러
-    const handleInputClick = async (field) => {
+    const handleInputClick = (fieldName, index) => {
         setCurrentField(fieldName);
+        setCurrentFieldIndex(index);  // 수정하려는 항목의 인덱스를 설정
         setModalData(null);
         setInitialModalData(null);
+        if (!selectedWarehouseId && detailInspectionData.warehouseId) {
+            setSelectedWarehouseId(detailInspectionData.warehouseId);
+        }
         fetchModalData(fieldName);
         setIsModalVisible(true);
-    }
+    };
 
     // 모달 데이터 조회 함수
     const fetchModalData = async (fieldName) => {
         setLoading(true);
         let apiPath;
+        if (fieldName === 'employeeName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
+        if (fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
+        if (fieldName === 'productCode') {
+            if (!selectedWarehouseId) {
+                notify('error', '창고 선택 오류', '창고를 먼저 선택해 주세요.', 'top');
+                setLoading(false);
+                return;
+            }
+            apiPath = LOGISTICS_API.WAREHOUSE_INVENTORY_DETAIL_API(selectedWarehouseId);
+        }
+
+        try {
+            const response = await apiClient.post(apiPath);
+            let data = response.data;
+            if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
+                data = JSON.parse(data);
+            }
+            const modalData = Array.isArray(data) ? data : [data];
+            console.log('모달 데이터:', modalData);
+            setModalData(modalData);
+            setInitialModalData(modalData);
+        } catch (error) {
+            notify('error', '데이터 조회 오류', '데이터를 조회하는 중 오류가 발생했습니다.', 'top');
+        } finally {
+            setLoading(false);
+        }
     }
+
+    const handleModalSelect = (record) => {
+        const prevValues = form.getFieldsValue(); // 기존 필드 값 가져오기
+        const details = prevValues.details || []; // 기존 details 필드 유지
+
+        if (currentField === 'employeeName') {
+            // 담당자명 필드가 선택된 경우
+            form.setFieldsValue({
+                ...prevValues, // 기존 필드 값 유지
+                employeeName: `${record.lastName}${record.firstName}`, // 성과 이름을 합쳐서 설정
+                employeeId: record.id, // 담당자 ID 설정
+            });
+        } else if (currentField === 'warehouseName') {
+            // 창고명 필드가 선택된 경우
+            form.setFieldsValue({
+                ...prevValues, // 기존 필드 값 유지
+                warehouseName: record.name, // 창고명 설정
+                warehouseId: record.id, // 창고 ID 설정
+            });
+            setSelectedWarehouseId(record.id);
+        } else if (currentField === 'productCode') {
+            // 품목 코드가 선택된 경우, 기존 항목을 업데이트하거나 새 항목 추가
+            const updatedDetails = details.map((item, index) => {
+                if (index === currentFieldIndex) {
+                    // 선택된 항목 업데이트
+                    return {
+                        ...item,
+                        productCode: record.productCode,
+                        productName: record.productName,
+                        standard: record.standard, // 규격 설정
+                        unit: record.unit, // 단위 설정
+                        warehouseLocationName: record.warehouseLocationName, // 창고 위치 설정
+                        actualQuantity: record.quantity, // 조회된 수량을 실사 수량 필드에 설정
+                        warehouseLocationId: record.warehouseLocationId, // 창고 위치 ID 설정
+                        inventoryId: record.inventoryNumber, // 재고 ID 설정
+                        productId: record.id, // 제품 ID 설정
+                    };
+                }
+                return item; // 다른 항목은 그대로 유지
+            });
+
+            form.setFieldsValue({
+                ...prevValues, // 기존 필드 값 유지
+                details: updatedDetails, // 수정된 details 반영
+            });
+        }
+
+        setIsModalVisible(false); // 모달 닫기
+    };
+
 
     // 날짜 범위 변경 핸들러
     const handleDateChange = (dates, dateStrings) => {
@@ -102,9 +202,32 @@ const InspectionInquiryPage = () => {
 
     useEffect(() => {
         if (editInspection && detailInspectionData) {
-            form.setFieldsValue(detailInspectionData);
+            form.setFieldsValue({
+                ...detailInspectionData,
+                details: detailInspectionData.details.map((detail) => ({
+                    id: detail.id,
+                    productId: detail.productId,
+                    inventoryId: detail.inventoryId,
+                    warehouseLocationId: detail.warehouseLocationId,
+                    warehouseLocationName: detail.warehouseLocationName,
+                    productCode: detail.productCode,
+                    productName: detail.productName,
+                    standard: detail.standard,
+                    unit: detail.unit,
+                    actualQuantity: detail.actualQuantity,
+                    comment: detail.comments,  // 서버에서 받아온 comments를 form의 comment로 매핑
+                })),
+                warehouseId: detailInspectionData.warehouseId,  // 창고 ID 설정
+                employeeId: detailInspectionData.employeeId,  // 담당자 ID 설정
+                comment: detailInspectionData.comment,  // 코멘트 설정
+            });
+
+            if (detailInspectionData.warehouseId) {
+                setSelectedWarehouseId(detailInspectionData.warehouseId);
+            }
         }
     }, [detailInspectionData, form, editInspection]);
+
 
     useEffect(() => {
         fetchInspectionStatus(searchParams.startDate, searchParams.endDate);
@@ -242,9 +365,9 @@ const InspectionInquiryPage = () => {
                                             const id = record.id;
                                             try {
                                                 const response = await apiClient.post(LOGISTICS_API.INVENTORY_INSPECTION_DETAIL_API(id));
+                                                console.log(response.data);
                                                 setDetailInspectionData(response.data);
                                                 setEditInspection(true);
-                                                console.log('실사 상세데이터:', response.data);
                                                 notify('success', '실사 조회', '실사 정보 조회 성공.', 'bottomRight')
                                             } catch (error) {
                                                 notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -269,7 +392,8 @@ const InspectionInquiryPage = () => {
                                             }}
                                         >
                                             {/* 기초 정보 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{marginTop: '0px', fontWeight: 600}}>
+                                            <Divider orientation={'left'} orientationMargin="0"
+                                                     style={{marginTop: '0px', fontWeight: 600}}>
                                                 기초 정보
                                             </Divider>
                                             <Row gutter={16}>
@@ -294,7 +418,12 @@ const InspectionInquiryPage = () => {
                                                         name="employeeName"
                                                         rules={[{required: true, message: '담당자명을 입력하세요.'}]}
                                                     >
-                                                        <Input addonBefore="담당자명"/>
+                                                        <Input addonBefore="담당자명"
+                                                               onDoubleClick={() => handleInputClick('employeeName')}
+                                                        />
+                                                    </Form.Item>
+                                                    <Form.Item name="employeeId" hidden>
+                                                        <Input/>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
@@ -302,88 +431,110 @@ const InspectionInquiryPage = () => {
                                                         name="warehouseName"
                                                         rules={[{required: true, message: '창고명을 입력하세요.'}]}
                                                     >
-                                                        <Input addonBefore="창고명"/>
+                                                        <Input addonBefore="창고명"
+                                                               onDoubleClick={() => handleInputClick('warehouseName')}
+                                                        />
+                                                    </Form.Item>
+                                                    <Form.Item name="warehouseId" hidden>
+                                                        <Input/>
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
 
                                             {/* 실사 품목 정보 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{marginTop: '0px', fontWeight: 600}}>
+                                            <Divider orientation={'left'} orientationMargin="0"
+                                                     style={{marginTop: '0px', fontWeight: 600}}>
                                                 실사 품목 정보
                                             </Divider>
 
                                             <Form.List name="details">
-                                                {(fields, { add, remove }) => (
+                                                {(fields, {add, remove}) => (
                                                     <>
-                                                        {fields.map(({ key, name, ...restField }) => (
-                                                            <Row gutter={16} key={key} style={{ marginBottom: '10px' }}>
+                                                        {fields.map(({key, name, ...restField}, index) => (
+                                                            <Row gutter={16} key={key} style={{marginBottom: '10px'}}>
                                                                 <Col span={6}>
                                                                     <Form.Item
                                                                         {...restField}
                                                                         name={[name, 'productCode']}
-                                                                        rules={[{ required: true, message: '품목 코드를 입력하세요.' }]}
                                                                     >
-                                                                        <Input addonBefore="품목 코드" />
+                                                                        <Input addonBefore="품목 코드"
+                                                                               onDoubleClick={() => handleInputClick('productCode', index)}/>
+                                                                    </Form.Item>
+                                                                    <Form.Item name={[name, 'productId']} hidden>
+                                                                        <Input/>
                                                                     </Form.Item>
                                                                 </Col>
                                                                 <Col span={6}>
                                                                     <Form.Item
                                                                         {...restField}
                                                                         name={[name, 'productName']}
-                                                                        rules={[{ required: true, message: '품목명을 입력하세요.' }]}
                                                                     >
-                                                                        <Input addonBefore="품목명" />
+                                                                        <Input addonBefore="품목명"/>
                                                                     </Form.Item>
                                                                 </Col>
                                                                 <Col span={6}>
                                                                     <Form.Item
                                                                         {...restField}
                                                                         name={[name, 'standard']}
-                                                                        >
-                                                                        <Input addonBefore="규격" />
+                                                                    >
+                                                                        <Input addonBefore="규격"/>
                                                                     </Form.Item>
                                                                 </Col>
                                                                 <Col span={6}>
                                                                     <Form.Item
                                                                         {...restField}
                                                                         name={[name, 'unit']}
-                                                                        >
-                                                                        <Input addonBefore="단위" />
+                                                                    >
+                                                                        <Input addonBefore="단위"/>
                                                                     </Form.Item>
                                                                 </Col>
                                                                 <Col span={6}>
                                                                     <Form.Item
                                                                         {...restField}
                                                                         name={[name, 'warehouseLocationName']}
-                                                                        rules={[{ required: true, message: '창고 위치를 입력하세요.' }]}
                                                                     >
-                                                                        <Input addonBefore="창고 위치" />
+                                                                        <Input addonBefore="창고 위치"/>
+                                                                    </Form.Item>
+                                                                    <Form.Item name={[name, 'warehouseLocationId']}
+                                                                               hidden>
+                                                                        <Input/>
                                                                     </Form.Item>
                                                                 </Col>
                                                                 <Col span={6}>
                                                                     <Form.Item
                                                                         {...restField}
                                                                         name={[name, 'actualQuantity']}
-                                                                        rules={[{ required: true, message: '실사 수량을 입력하세요.' }]}
                                                                     >
-                                                                        <Input addonBefore="실사 수량" />
+                                                                        <Input addonBefore="실사 수량"/>
                                                                     </Form.Item>
                                                                 </Col>
-                                                                <Col span={12}>
+                                                                <Col span={10}>
                                                                     <Form.Item
                                                                         {...restField}
-                                                                        name={[name, 'comments']}
+                                                                        name={[name, 'comment']}
                                                                     >
-                                                                        <Input addonBefore="코멘트" />
+                                                                        <Input addonBefore="코멘트"/>
                                                                     </Form.Item>
+                                                                </Col>
+                                                                <Col span={2} style={{display: 'flex', justifyContent: 'flex-end'}}>
+                                                                    <Button type="danger" onClick={() => remove(name)}>삭제</Button>
                                                                 </Col>
                                                             </Row>
                                                         ))}
+                                                        <Form.Item>
+                                                            <Button type="dashed" onClick={() => add()} block>
+                                                                항목 추가
+                                                            </Button>
+                                                        </Form.Item>
                                                     </>
                                                 )}
                                             </Form.List>
 
-                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: 'flex-end',
+                                                marginBottom: '20px'
+                                            }}>
                                                 <Button type="primary" htmlType="submit">저장</Button>
                                             </Box>
                                             <Modal
@@ -393,18 +544,19 @@ const InspectionInquiryPage = () => {
                                                 width="40vw"
                                             >
                                                 {isLoading ? (
-                                                    <Spin />  // 로딩 스피너
+                                                    <Spin/>  // 로딩 스피너
                                                 ) : (
                                                     <>
                                                         {/* 담당자 선택 모달 */}
                                                         {currentField === 'employeeName' && (
                                                             <>
-                                                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                <Typography id="modal-modal-title" variant="h6"
+                                                                            component="h2" sx={{marginBottom: '20px'}}>
                                                                     담당자 선택
                                                                 </Typography>
                                                                 <Input
                                                                     placeholder="검색"
-                                                                    prefix={<SearchOutlined />}
+                                                                    prefix={<SearchOutlined/>}
                                                                     onChange={(e) => {
                                                                         const value = e.target.value.toLowerCase();
                                                                         if (!value) {
@@ -419,20 +571,37 @@ const InspectionInquiryPage = () => {
                                                                             setModalData(filtered);
                                                                         }
                                                                     }}
-                                                                    style={{ marginBottom: 16 }}
+                                                                    style={{marginBottom: 16}}
                                                                 />
                                                                 {modalData && (
                                                                     <Table
                                                                         columns={[
-                                                                            { title: '사번', dataIndex: 'employeeNumber', key: 'employeeNumber', align: 'center' },
-                                                                            { title: '이름', dataIndex: 'name', key: 'name', align: 'center', render: (_, record) => `${record.lastName}${record.firstName}` }
+                                                                            {
+                                                                                title: <div className="title-text">사번</div>,
+                                                                                dataIndex: 'employeeNumber',
+                                                                                key: 'employeeNumber',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            },
+                                                                            {
+                                                                                title: <div className="title-text">이름</div>,
+                                                                                dataIndex: 'name',
+                                                                                key: 'name',
+                                                                                align: 'center',
+                                                                                render: (_, record) => `${record.lastName}${record.firstName}`
+                                                                            }
                                                                         ]}
                                                                         dataSource={modalData}
                                                                         rowKey="id"
                                                                         size="small"
-                                                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false, showTotal: (total) => `총 ${total}개` }}
+                                                                        pagination={{
+                                                                            pageSize: 15,
+                                                                            position: ['bottomCenter'],
+                                                                            showSizeChanger: false,
+                                                                            showTotal: (total) => `총 ${total}개`
+                                                                        }}
                                                                         onRow={(record) => ({
-                                                                            style: { cursor: 'pointer' },
+                                                                            style: {cursor: 'pointer'},
                                                                             onClick: () => handleModalSelect(record)
                                                                         })}
                                                                     />
@@ -443,12 +612,13 @@ const InspectionInquiryPage = () => {
                                                         {/* 창고 선택 모달 */}
                                                         {currentField === 'warehouseName' && (
                                                             <>
-                                                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                <Typography id="modal-modal-title" variant="h6"
+                                                                            component="h2" sx={{marginBottom: '20px'}}>
                                                                     창고 선택
                                                                 </Typography>
                                                                 <Input
                                                                     placeholder="검색"
-                                                                    prefix={<SearchOutlined />}
+                                                                    prefix={<SearchOutlined/>}
                                                                     onChange={(e) => {
                                                                         const value = e.target.value.toLowerCase();
                                                                         if (!value) {
@@ -463,21 +633,44 @@ const InspectionInquiryPage = () => {
                                                                             setModalData(filtered);
                                                                         }
                                                                     }}
-                                                                    style={{ marginBottom: 16 }}
+                                                                    style={{marginBottom: 16}}
                                                                 />
                                                                 {modalData && (
                                                                     <Table
                                                                         columns={[
-                                                                            { title: '창고 코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                            { title: '창고명', dataIndex: 'name', key: 'name', align: 'center' },
-                                                                            { title: '창고 유형', dataIndex: 'warehouseType', key: 'warehouseType', align: 'center' }
+                                                                            {
+                                                                                title: <div className="title-text">창고 코드</div>,
+                                                                                dataIndex: 'code',
+                                                                                key: 'code',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            },
+                                                                            {
+                                                                                title: <div className="title-text">창고명</div>,
+                                                                                dataIndex: 'name',
+                                                                                key: 'name',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            },
+                                                                            {
+                                                                                title: <div className="title-text">창고 유형</div>,
+                                                                                dataIndex: 'warehouseType',
+                                                                                key: 'warehouseType',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            }
                                                                         ]}
                                                                         dataSource={modalData}
                                                                         rowKey="id"
                                                                         size="small"
-                                                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false, showTotal: (total) => `총 ${total}개` }}
+                                                                        pagination={{
+                                                                            pageSize: 15,
+                                                                            position: ['bottomCenter'],
+                                                                            showSizeChanger: false,
+                                                                            showTotal: (total) => `총 ${total}개`
+                                                                        }}
                                                                         onRow={(record) => ({
-                                                                            style: { cursor: 'pointer' },
+                                                                            style: {cursor: 'pointer'},
                                                                             onClick: () => handleModalSelect(record)
                                                                         })}
                                                                     />
@@ -488,12 +681,13 @@ const InspectionInquiryPage = () => {
                                                         {/* 품목 코드 선택 모달 */}
                                                         {currentField === 'productCode' && (
                                                             <>
-                                                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                <Typography id="modal-modal-title" variant="h6"
+                                                                            component="h2" sx={{marginBottom: '20px'}}>
                                                                     품목 코드 선택
                                                                 </Typography>
                                                                 <Input
                                                                     placeholder="검색"
-                                                                    prefix={<SearchOutlined />}
+                                                                    prefix={<SearchOutlined/>}
                                                                     onChange={(e) => {
                                                                         const value = e.target.value.toLowerCase();
                                                                         if (!value) {
@@ -508,23 +702,58 @@ const InspectionInquiryPage = () => {
                                                                             setModalData(filtered);
                                                                         }
                                                                     }}
-                                                                    style={{ marginBottom: 16 }}
+                                                                    style={{marginBottom: 16}}
                                                                 />
                                                                 {modalData && (
                                                                     <Table
                                                                         columns={[
-                                                                            { title: '품목 코드', dataIndex: 'productCode', key: 'productCode', align: 'center' },
-                                                                            { title: '품목명', dataIndex: 'productName', key: 'productName', align: 'center' },
-                                                                            { title: '수량', dataIndex: 'quantity', key: 'quantity', align: 'center' },
-                                                                            { title: '창고명', dataIndex: 'warehouseName', key: 'warehouseName', align: 'center' },
-                                                                            { title: '위치', dataIndex: 'locationName', key: 'locationName', align: 'center' }
+                                                                            {
+                                                                                title: <div className="title-text">품목 코드</div>,
+                                                                                dataIndex: 'productCode',
+                                                                                key: 'productCode',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            },
+                                                                            {
+                                                                                title: <div className="title-text">품목명</div>,
+                                                                                dataIndex: 'productName',
+                                                                                key: 'productName',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            },
+                                                                            {
+                                                                                title: <div className="title-text">규격</div>,
+                                                                                dataIndex: 'quantity',
+                                                                                key: 'quantity',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            },
+                                                                            {
+                                                                                title: <div className="title-text">창고명</div>,
+                                                                                dataIndex: 'warehouseName',
+                                                                                key: 'warehouseName',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            },
+                                                                            {
+                                                                                title: <div className="title-text">로케이션 위치</div>,
+                                                                                dataIndex: 'warehouseLocationName',
+                                                                                key: 'warehouseLocationName',
+                                                                                align: 'center',
+                                                                                render: (text) => <div className="small-text">{text}</div>,
+                                                                            }
                                                                         ]}
                                                                         dataSource={modalData}
                                                                         rowKey="id"
                                                                         size="small"
-                                                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false, showTotal: (total) => `총 ${total}개` }}
+                                                                        pagination={{
+                                                                            pageSize: 15,
+                                                                            position: ['bottomCenter'],
+                                                                            showSizeChanger: false,
+                                                                            showTotal: (total) => `총 ${total}개`
+                                                                        }}
                                                                         onRow={(record) => ({
-                                                                            style: { cursor: 'pointer' },
+                                                                            style: {cursor: 'pointer'},
                                                                             onClick: () => handleModalSelect(record)
                                                                         })}
                                                                     />
@@ -532,8 +761,9 @@ const InspectionInquiryPage = () => {
                                                             </>
                                                         )}
 
-                                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                                            <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
+                                                        <Box sx={{mt: 2, display: 'flex', justifyContent: 'flex-end'}}>
+                                                            <Button onClick={handleModalCancel} variant="contained"
+                                                                    type="danger" sx={{mr: 1}}>
                                                                 닫기
                                                             </Button>
                                                         </Box>
