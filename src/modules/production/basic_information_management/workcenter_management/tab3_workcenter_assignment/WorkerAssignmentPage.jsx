@@ -8,8 +8,6 @@ import {useNotificationContext} from "../../../../../config/NotificationContext.
 import dayjs from 'dayjs';
 import {Grid, Box } from "@mui/material";
 import {PrinterOutlined, SearchOutlined} from "@ant-design/icons";
-import FactorySelectSection from "./FactorySelectSection.jsx";
-
 
 const { RangePicker } = DatePicker;
 
@@ -102,11 +100,15 @@ const WorkerAssignmentPage = () => {
     // 작업장 목록 불러오기
     const fetchWorkcentersByFactory = async (factoryCode) => {
         try {
-            const response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API);
-            const filteredWorkcenters = response.data.filter(
-                (workcenter) => workcenter.factoryCode === factoryCode
-            );
-            setInitialModalData(filteredWorkcenters);
+            let response;
+            if (selectedFactory) {
+                response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API, {
+                    factoryCode: selectedFactory
+                });
+            } else {
+                response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API);
+            }
+            // setInitialModalData(filteredWorkcenters);
             console.log('작업장 데이터:', response.data); // 데이터 확인
             setWorkcenterList(response.data);
             setFilteredWorkcenterList(response.data);
@@ -197,7 +199,7 @@ const WorkerAssignmentPage = () => {
         }));
 
         setIsFactoryModalVisible(false); // 모달 닫기
-        setFilteredWorkcenterList([]); // 공장 선택 시 작업장 목록 초기화
+        // setFilteredWorkcenterList([]); // 공장 선택 시 작업장 목록 초기화
         fetchWorkcentersByFactory(record.code); // 해당 공장의 작업장 목록 불러오기
         console.log('선택된 공장:', record); // 디버깅용 로그
     };
@@ -214,40 +216,39 @@ const WorkerAssignmentPage = () => {
         console.log('선택된 작업장:', record); // 디버깅용 로그
     };
 
-
-
     return (
-        <Grid style={{ padding: '20px' }}>
+        <Grid>
             <Form layout="vertical">
                 <Row gutter={16} style={{ marginBottom: '16px' }}>
                     <Col span={6}>
-                        <Form.Item label="공장 선택">
+                        <Form.Item label="공장 선택" tooltip="찾으시는 공장을 검색하세요.">
                             <Input
-                                placeholder={selectedFactory ? `[${selectedFactory.code}] ${selectedFactory.name}` : '공장 선택'}
+                                placeholder={displayValues.factory || '공장 선택'}
+
+                                // placeholder={selectedFactory ? `[${selectedFactory.code}] ${selectedFactory.name}` : '공장 선택'}
                                 onClick={() => {
                                     setIsFactoryModalVisible(true);
                                     fetchFactories();
                                 }}
-                                className={selectedFactory ? 'selected-input' : 'placeholder-input'}
+                                className={displayValues.factory ? 'selected-input' : 'placeholder-input'}
                                 style={{ caretColor: 'transparent', cursor: 'pointer' }}                            />
                         </Form.Item>
                     </Col>
                     <Col span={6}>
-                        <Form.Item label="작업장 선택">
+                        <Form.Item label="작업장 선택" tooltip="찾으시는 작업장을 검색하세요.">
                             <Input
                                 placeholder={selectedWorkcenter ? `[${selectedWorkcenter.code}] ${selectedWorkcenter.name}` : '작업장 선택'}
                                 onClick={() => {
                                     setIsWorkcenterModalVisible(true);
                                     fetchWorkcentersByFactory(selectedFactory);
                             }}
-                                // disabled={!selectedFactory}
-                                style={{ color: selectedWorkcenter ? 'black' : 'rgba(0,0,0,0.45)' }} // 글자색 설정
-
+                                className={displayValues.workcenter ? 'selected-input' : 'placeholder-input'}
+                                style={{ caretColor: 'transparent', cursor: 'pointer' }}
                             />
                         </Form.Item>
                     </Col>
                     <Col span={8}>
-                        <Form.Item label="조회 기간">
+                        <Form.Item label="조회 기간" tooltip="찾으시는 날짜를 선택하세요.">
                             <RangePicker
                                 value={dateRange}
                                 onChange={(dates) => setDateRange(dates)}
@@ -335,6 +336,7 @@ const WorkerAssignmentPage = () => {
                     display: 'flex',
                     justifyContent: 'flex-end', // 버튼을 오른쪽 끝으로 정렬
                     marginTop: '16px',
+                    marginBottom: '16px',
                 }}
             >
                 <Button
@@ -346,54 +348,6 @@ const WorkerAssignmentPage = () => {
                 </Button>
             </Box>
         </Grid>
-        // <Grid style={{ padding: '0px 20px' }}>
-        //     <Form layout="vertical">
-        //         <Row
-        //             gutter={16}
-        //             style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}
-        //         >
-        //             <Col>
-        //                 {/* 공장 선택 컴포넌트 */}
-        //                 <FactorySelectSection onFactoryChange={handleFactoryChange} />
-        //             </Col>
-        //             <Col>
-        //                 <Form.Item
-        //                     label="조회 기간"
-        //                     required
-        //                     tooltip="검색할 날짜를 선택하세요"
-        //                 >
-        //                     <DatePicker
-        //                         disabledDate={(current) => current && current.year() !== 2024}
-        //                         value={selectedDate ? dayjs(selectedDate) : null}
-        //                         onChange={(date) => {
-        //                             if (date) {
-        //                                 setSelectedDate(date.toDate());
-        //                             } else {
-        //                                 setSelectedDate(null);
-        //                             }
-        //                         }}
-        //                         style={{ width: '100%' }}
-        //                     />
-        //                 </Form.Item>
-        //             </Col>
-        //             <Col>
-        //                 <Form.Item>
-        //                     <Button
-        //                         type="primary"
-        //                         style={{ width: '100px' }}
-        //                         onClick={handleSearchByDate}
-        //                         icon={<SearchOutlined />}
-        //                         block
-        //                     >
-        //                         검색
-        //                     </Button>
-        //                 </Form.Item>
-        //             </Col>
-        //         </Row>
-        //     </Form>
-
-        // </Grid>
-
     );
 };
 

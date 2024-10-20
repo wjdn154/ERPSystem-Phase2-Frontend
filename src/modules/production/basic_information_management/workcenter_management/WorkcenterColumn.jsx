@@ -1,5 +1,7 @@
 import {Select, Tag} from 'antd';
-import React from "react";
+import React, {useEffect, useState} from "react";
+import apiClient from "../../../../config/apiClient.jsx";
+import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 
 // 전체 조회 컬럼 (기존 컬럼 유지)
 export const workcenterColumns = [
@@ -14,7 +16,7 @@ export const workcenterColumns = [
         title: <div>이름</div>,
         dataIndex: 'name',  // DTO의 name 필드에 접근
         key: 'name',
-        width: '15%',
+        width: '10%',
         align: 'center',
 
     },
@@ -67,41 +69,65 @@ export const workcenterColumns = [
         title: <div>설명</div>,
         dataIndex: 'description',  // DTO의 description 필드에 접근
         key: 'description',
-        width: '25%',
+        width: '20%',
         align: 'center',
     },
     {
-        title: <div>공장코드</div>,
-        dataIndex: ['factoryCode', 'code'],  // DTO의 factoryCode의 code 필드에 접근
-        key: 'factoryCode',
-        width: '10%',
+        title: <div>공장</div>,
+        key: 'factory',
+        render: (text, record) => {
+            const { factoryCode, factoryName } = record;
+
+            // 코드와 공장명 둘 다 있는 경우 조합
+            if (factoryCode && factoryName) {
+                return `[${factoryCode}] ${factoryName}`;
+            }
+
+            // 값이 없는 경우 대체 텍스트
+            return '-';
+        },
+        width: '15%',
         align: 'center',
-        render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
     },
     {
         title: <div>생산공정</div>,
-        dataIndex: ['processCode', 'code'],  // DTO의 processCode의 code 필드에 접근
-        key: 'processCode',
-        width: '10%',
+        key: 'process',
+        render: (text, record) => {
+            const { processCode, processName } = record;
+
+            // 코드와 공장명 둘 다 있는 경우 조합
+            if (processCode && processName) {
+                return `[${processCode}] ${processName}`;
+            }
+
+            // 값이 없는 경우 대체 텍스트
+            return '-';
+        },
+        width: '15%',
         align: 'center',
-        render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
     },
     {
         title: <div>작업자</div>,
-        dataIndex: 'workerAssignments',  // DTO의 workerAssignments 필드에 접근
-        key: 'workerAssignments',
-        width: '10%',
+        dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
+        key: 'todayWorkers',
+        render: (workers) =>
+            workers && workers.length > 0 ? workers.join(', ') : '배정없음',  // 쉼표로 구분된 문자열
+        width: '15%',
         align: 'center',
-        render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-', // 작업자 할당 리스트의 길이 표시
     },
     {
-        title: <div>설비</div>,
-        dataIndex: 'equipmentList',  // DTO의 equipmentList 필드에 접근
-        key: 'equipmentList',
+        title: <div>설비 번호</div>,
+        dataIndex: 'equipmentIds',  // 설비 ID 리스트 접근
+        key: 'equipmentIds',
         width: '10%',
         align: 'center',
-
-        render: (equipmentList) => equipmentList ? equipmentList.length : '-', // 장비 리스트의 길이 표시
+        render: (equipmentIds) => {
+            if (!equipmentIds || equipmentIds.length === 0) {
+                return '설비 없음';
+            }
+            // 설비 번호들을 콤마로 구분하여 반환
+            return equipmentIds.join(', ');
+        }
     },
     {
         title: <div>사용</div>,
@@ -168,40 +194,58 @@ export const workcenterDetailColumns = [
         editable: true, // 수정 가능
     },
     {
-        title: <div>공장명</div>,
-        dataIndex: 'factoryName',
-        key: 'factoryName',
-        width: '10%',
+        title: <div>공장</div>,
+        key: 'factory',
+        render: (text, record) => {
+            const { factoryCode, factoryName } = record;
+
+            // 코드와 공장명 둘 다 있는 경우 조합
+            if (factoryCode && factoryName) {
+                return `[${factoryCode}] ${factoryName}`;
+            }
+
+            // 값이 없는 경우 대체 텍스트
+            return '-';
+        },
+        width: '15%',
         align: 'center',
-        editable: true,
-        render: (text) => text || '-',
     },
     {
-        title: <div>생산공정명</div>,
-        dataIndex: 'processName',
-        key: 'processName',
-        width: '10%',
+        title: <div>생산공정</div>,
+        key: 'process',
+        render: (text, record) => {
+            const { processCode, processName } = record;
+
+            // 코드와 공장명 둘 다 있는 경우 조합
+            if (processCode && processName) {
+                return `[${processCode}] ${processName}`;
+            }
+
+            // 값이 없는 경우 대체 텍스트
+            return '-';
+        },
+        width: '15%',
         align: 'center',
-        editable: true, // 수정 불가
-        render: (text) => text || '-',
     },
     {
         title: <div>작업자</div>,
-        dataIndex: 'workerAssignments',
-        key: 'workerAssignments',
+        dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
+        key: 'todayWorkers',
+        render: (workers) =>
+            workers && workers.length > 0 ? workers.join(', ') : '배정없음',  // 쉼표로 구분된 문자열
+        width: '15%',
         align: 'center',
-        width: '10%',
-        editable: true, // 수정 불가
-        render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-',
     },
     {
-        title: <div>설비</div>,
-        dataIndex: 'equipmentList',
-        key: 'equipmentList',
-        width: '10%',
+        title: <div>설비 번호</div>,
+        dataIndex: 'equipmentIds', // 설비 ID 목록 접근
+        key: 'equipmentIds',
         align: 'center',
-        editable: true, // 수정 불가
-        render: (equipmentList) => equipmentList ? equipmentList.length : '-',
+        width: '20%',
+        render: (equipmentIds) =>
+            equipmentIds && equipmentIds.length > 0
+                ? equipmentIds.map(id => `EQ-${id}`).join(', ')
+                : '설비 없음',
     },
     {
         title: <div>사용</div>,
@@ -231,4 +275,6 @@ export const workcenterDetailColumns = [
         editable: true
     },
 ];
+
+
 
