@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { Divider } from 'antd';
 import {setAuth} from "../../../../config/redux/authSlice.jsx";
 import {jwtDecode} from "jwt-decode";
+import {DownSquareOutlined} from "@ant-design/icons";
 const { Option } = Select;
 const { confirm } = Modal;
 

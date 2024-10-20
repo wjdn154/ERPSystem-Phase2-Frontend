@@ -5,7 +5,7 @@ import {
     PlusOutlined,
     SaveOutlined,
     ExclamationCircleOutlined,
-    InfoCircleOutlined, SearchOutlined
+    InfoCircleOutlined, SearchOutlined, DownSquareOutlined
 } from '@ant-design/icons'
 import {
     Space,
@@ -20,7 +20,7 @@ import {
     AutoComplete,
     Modal,
     Tag,
-    Col, Row, Form, Tooltip
+    Col, Row, Form, Tooltip, notification
 } from 'antd'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
@@ -140,7 +140,7 @@ const PendingVoucherInputPage = () => {
             console.error('데이터를 불러오는 중 오류 발생:', err);
             notify('error', '조회 오류', '데이터를 불러오는 중 오류가 발생했습니다.', 'top');
         }
-    };
+    }
 
     const formattedDate = useMemo(() => {
         return format(selectedDate, 'yyyy-MM-dd', { locale: ko });
@@ -149,6 +149,9 @@ const PendingVoucherInputPage = () => {
     const handleSubmit = async () => {
         try {
             // vouchers 배열이 비어 있으면 현재 voucher 객체를 추가
+            console.log(vouchers.length);
+            if(!vouchers.length) throw new Error("전표를 추가해주세요.");
+
             const updatedVouchers = vouchers.length ? vouchers : [{
                 ...voucher, // voucher 상태에서 필요한 값들 모두 가져옴
                 creditAmount: voucher.creditAmount || 0,
@@ -167,8 +170,8 @@ const PendingVoucherInputPage = () => {
                     throw new Error("차변/대변과 입금/출금은 동시에 사용할 수 없습니다.");
                 }
                 if (v.voucherType === 'Debit' || v.voucherType === 'Credit') {
-                    const totalDebit = updatedVouchers.reduce((sum, item) => sum + (item.debitAmount || 0), 0);
-                    const totalCredit = updatedVouchers.reduce((sum, item) => sum + (item.creditAmount || 0), 0);
+                    const totalDebit = updatedVouchers.reduce((sum, item) => sum + Number(item.debitAmount || 0), 0);
+                    const totalCredit = updatedVouchers.reduce((sum, item) => sum + Number(item.creditAmount || 0), 0);
                     if (totalDebit !== totalCredit) throw new Error("차변과 대변의 합계가 일치하지 않습니다.");
                 }
 
@@ -209,13 +212,19 @@ const PendingVoucherInputPage = () => {
 
     const handleAddRow = () => {
 
-        // 입금, 출금일 경우에는 행 추가를 허용하지 않음
         if (voucher.voucherType === 'Deposit' || voucher.voucherType === 'Withdrawal') {
-            notify('warning', '입력 오류', '입금 또는 출금일 경우 행을 추가할 수 없습니다.', 'bottomRight');
+            if (vouchers.length > 0) {
+                notify('warning', '입력 오류', '입금 또는 출금일 경우 한 행만 추가할 수 있습니다.', 'bottomRight');
+                return;
+            }
+        }
+
+        const hasDepositOrWithdrawal = vouchers.some(v => v.voucherType === 'Deposit' || v.voucherType === 'Withdrawal');
+        if (hasDepositOrWithdrawal) {
+            notify('warning', '입력 오류', '입금 또는 출금일 경우 한 행만 추가할 수 있습니다.', 'bottomRight');
             return;
         }
 
-        // 필수 입력값 모두 체크 (차변 또는 대변 금액이 0이어도 허용)
         if (!voucher.voucherType || !voucher.accountSubjectCode || !voucher.clientCode) {
             notify('warning', '입력 오류', '모든 필수 필드를 입력해주세요.', 'bottomRight');
             return;
@@ -270,7 +279,7 @@ const PendingVoucherInputPage = () => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '1400px !important' }} container spacing={3}>
+                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '1400px !important', maxWidth: '1700px' }} container spacing={3}>
                     <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
@@ -385,6 +394,30 @@ const PendingVoucherInputPage = () => {
                                                     render: (text) => <span className="small-text">{text}</span>
                                                 },
                                                 {
+                                                    title: '승인여부',
+                                                    dataIndex: 'approvalStatus',
+                                                    key: 'approvalStatus',
+                                                    align: 'center',
+                                                    render: (text) => {
+                                                        let color;
+                                                        let value;
+                                                        switch (text) {
+                                                            case 'APPROVED':
+                                                                color = 'green';
+                                                                value = '승인';
+                                                                break;
+                                                            case 'PENDING':
+                                                                color = 'red';
+                                                                value = '미승인';
+                                                                break;
+                                                            default:
+                                                                color = 'gray';
+                                                                value = text;
+                                                        }
+                                                        return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+                                                    }
+                                                },
+                                                {
                                                     title: <div className="title-text" style={{ textAlign: 'center' }}>차변</div>,
                                                     dataIndex: 'debitAmount',
                                                     key: 'debitAmount',
@@ -406,6 +439,7 @@ const PendingVoucherInputPage = () => {
                                             size="small"
                                             scroll={{ x: 'max-content' }}
                                             summary={() =>  (
+                                                searchData?.voucherDtoList && searchData.voucherDtoList.length > 0 ? (
                                                 <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
                                                     <Table.Summary.Cell index={0} ><div className="medium-text">합계</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1} />
@@ -413,9 +447,11 @@ const PendingVoucherInputPage = () => {
                                                     <Table.Summary.Cell index={3} />
                                                     <Table.Summary.Cell index={4} />
                                                     <Table.Summary.Cell index={5} />
-                                                    <Table.Summary.Cell index={6}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalDebit).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalCredit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6} />
+                                                    <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalDebit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={8}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalCredit).toLocaleString()}</div></Table.Summary.Cell>
                                                 </Table.Summary.Row>
+                                                ) : null
                                             )}
                                         />
                                     </Grid>
@@ -423,7 +459,7 @@ const PendingVoucherInputPage = () => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    <Grid item xs={12} md={12}>
+                    <Grid item xs={12} md={12} style={{ minWidth: '1400px !important', maxWidth: '1700px' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>전표 입력</Typography>
@@ -465,6 +501,7 @@ const PendingVoucherInputPage = () => {
                                                             value={displayValues.accountSubjectCode}
                                                             onClick={() => handleInputClick('accountSubjectCode')}
                                                             style={{ caretColor: 'transparent' }}
+                                                            suffix={<DownSquareOutlined />}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -482,6 +519,7 @@ const PendingVoucherInputPage = () => {
                                                             value={displayValues.clientCode}
                                                             onClick={() => handleInputClick('clientCode')}
                                                             style={{ cursor: 'pointer', caretColor: 'transparent' }}
+                                                            suffix={<DownSquareOutlined />}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -512,7 +550,12 @@ const PendingVoucherInputPage = () => {
                                                             style={{ width: '100%' }}
                                                             placeholder="차변"
                                                             value={voucher.debitAmount}
-                                                            onChange={(value) => setVoucher({ ...voucher, debitAmount: value })}
+                                                            onChange={(value) => {
+                                                                const formattedValue = value?.toString().replace(/[^0-9]/g, '');  // 숫자만 허용
+                                                                setVoucher({ ...voucher, debitAmount: formattedValue });
+                                                            }}
+                                                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}  // 3자리마다 콤마 추가
+                                                            parser={(value) => value.replace(/\$\s?|(,*)/g, '')}  // 콤마 제거
                                                             disabled={voucher.voucherType === 'Credit' || voucher.voucherType === 'Deposit'}
                                                         />
                                                     </Form.Item>
@@ -529,7 +572,12 @@ const PendingVoucherInputPage = () => {
                                                             style={{ width: '100%' }}
                                                             placeholder="대변"
                                                             value={voucher.creditAmount}
-                                                            onChange={(value) => setVoucher({ ...voucher, creditAmount: value })}
+                                                            onChange={(value) => {
+                                                                const formattedValue = value?.toString().replace(/[^0-9]/g, '');  // 숫자만 허용
+                                                                setVoucher({ ...voucher, creditAmount: formattedValue });
+                                                            }}
+                                                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}  // 3자리마다 콤마 추가
+                                                            parser={(value) => value.replace(/\$\s?|(,*)/g, '')}  // 콤마 제거
                                                             disabled={voucher.voucherType === 'Debit' || voucher.voucherType === 'Withdrawal'}
                                                         />
                                                     </Form.Item>
@@ -569,6 +617,14 @@ const PendingVoucherInputPage = () => {
                                                     let color;
                                                     let value;
                                                     switch (text) {
+                                                        case 'Deposit':
+                                                            color = 'green';
+                                                            value = '입금';
+                                                            break;
+                                                        case 'Withdrawal':
+                                                            color = 'red';
+                                                            value = '출금';
+                                                            break;
                                                         case 'Debit':
                                                             color = 'green';
                                                             value = '차변';
@@ -590,7 +646,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "formattedAccountSubjectCode",
                                                 width: "15%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">거래처</div>,
@@ -598,7 +654,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "formattedClientCode",
                                                 width: "15%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">적요</div>,
@@ -606,7 +662,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "transactionDescription",
                                                 width: "20%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">차변</div>,
@@ -614,7 +670,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "debitAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
+                                                render: (text) => <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">대변</div>,
@@ -622,7 +678,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "creditAmount",
                                                 width: "10%",
                                                 align: "center",
-                                                render: (text) => <span className="small-text">{(text || 0).toLocaleString()}</span>,
+                                                render: (text) => <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div>,
                                             }
                                         ]}
                                         rowKey={(record) => record.key}
@@ -637,8 +693,8 @@ const PendingVoucherInputPage = () => {
                                                     <Table.Summary.Cell index={2}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={3}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}> <div style={{ textAlign: 'right' }} className="medium-text"> {vouchers.length > 0 ? vouchers.reduce((acc, cur) => acc + Number(cur?.debitAmount || 0), 0).toLocaleString() : '0'} </div> </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}> <div style={{ textAlign: 'right' }} className="medium-text"> {vouchers.length > 0 ? vouchers.reduce((acc, cur) => acc + Number(cur?.creditAmount || 0), 0).toLocaleString() : '0'} </div> </Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                                 <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
                                                     <Table.Summary.Cell index={0}><div className="medium-text">대차차액</div></Table.Summary.Cell>
@@ -646,8 +702,8 @@ const PendingVoucherInputPage = () => {
                                                     <Table.Summary.Cell index={2}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={3}></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={4}></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={5}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={6}><div className="medium-text">{(vouchers.reduce((acc, cur) => acc + (cur?.creditAmount || 0), 0) - vouchers.reduce((acc, cur) => acc + (cur?.debitAmount || 0), 0) || 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}> <div style={{ textAlign: 'right' }} className="medium-text"> {(vouchers.reduce((acc, cur) => acc + (Number(cur?.debitAmount) || 0), 0) - vouchers.reduce((acc, cur) => acc + (Number(cur?.creditAmount) || 0), 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}> <div style={{ textAlign: 'right' }} className="medium-text"> {(vouchers.reduce((acc, cur) => acc + (Number(cur?.creditAmount) || 0), 0) - vouchers.reduce((acc, cur) => acc + (Number(cur?.debitAmount) || 0), 0)).toLocaleString()} </div> </Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             </>
                                         )}
@@ -658,7 +714,7 @@ const PendingVoucherInputPage = () => {
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
                                         {/* 삭제 버튼 */}
                                         <Button type="danger" onClick={handleDeleteRow} style={{ marginRight: '20px' }}>삭제</Button>
-                                        <Button type="primary" onClick={handleSubmit}>저장</Button>
+                                        <Button type="primary" onClick={handleSubmit}>미결전표 등록</Button>
                                     </Box>
                                     </Grid>
                                 </Grid>
