@@ -4,14 +4,14 @@ import React from "react";
 // 전체 조회 컬럼 (기존 컬럼 유지)
 export const workcenterColumns = [
     {
-        title: <span>코드</span>,
+        title: <div>코드</div>,
         dataIndex: 'code',  // DTO의 code 필드에 접근
         key: 'code',
         width: '5%',
         align: 'center',
     },
     {
-        title: <span>이름</span>,
+        title: <div>이름</div>,
         dataIndex: 'name',  // DTO의 name 필드에 접근
         key: 'name',
         width: '15%',
@@ -19,7 +19,7 @@ export const workcenterColumns = [
 
     },
     {
-        title: <span>유형</span>,
+        title: <div>유형</div>,
         dataIndex: 'workcenterType',  // DTO의 workcenterType 필드에 접근
         key: 'workcenterType',
         width: '10%',
@@ -64,14 +64,14 @@ export const workcenterColumns = [
         }
     },
     {
-        title: <span>설명</span>,
+        title: <div>설명</div>,
         dataIndex: 'description',  // DTO의 description 필드에 접근
         key: 'description',
         width: '25%',
         align: 'center',
     },
     {
-        title: <span>공장코드</span>,
+        title: <div>공장코드</div>,
         dataIndex: ['factoryCode', 'code'],  // DTO의 factoryCode의 code 필드에 접근
         key: 'factoryCode',
         width: '10%',
@@ -79,7 +79,7 @@ export const workcenterColumns = [
         render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
     },
     {
-        title: <span>생산공정</span>,
+        title: <div>생산공정</div>,
         dataIndex: ['processCode', 'code'],  // DTO의 processCode의 code 필드에 접근
         key: 'processCode',
         width: '10%',
@@ -87,7 +87,7 @@ export const workcenterColumns = [
         render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
     },
     {
-        title: <span>작업자</span>,
+        title: <div>작업자</div>,
         dataIndex: 'workerAssignments',  // DTO의 workerAssignments 필드에 접근
         key: 'workerAssignments',
         width: '10%',
@@ -95,7 +95,7 @@ export const workcenterColumns = [
         render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-', // 작업자 할당 리스트의 길이 표시
     },
     {
-        title: <span>설비</span>,
+        title: <div>설비</div>,
         dataIndex: 'equipmentList',  // DTO의 equipmentList 필드에 접근
         key: 'equipmentList',
         width: '10%',
@@ -104,7 +104,7 @@ export const workcenterColumns = [
         render: (equipmentList) => equipmentList ? equipmentList.length : '-', // 장비 리스트의 길이 표시
     },
     {
-        title: <span>사용</span>,
+        title: <div>사용</div>,
         dataIndex: 'isActive',  // DTO의 isActive 필드에 접근
         key: 'isActive',
         width: '5%',
@@ -121,7 +121,7 @@ export const workcenterColumns = [
 
 export const workcenterDetailColumns = [
     {
-        title: <span>코드</span>,
+        title: <div>코드</div>,
         dataIndex: 'code',
         key: 'code',
         width: '5%',
@@ -129,7 +129,7 @@ export const workcenterDetailColumns = [
         editable: true, // 수정 가능
     },
     {
-        title: <span>이름</span>,
+        title: <div>이름</div>,
         dataIndex: 'name',
         key: 'name',
         width: '15%',
@@ -137,7 +137,7 @@ export const workcenterDetailColumns = [
         editable: true, // 수정 가능
     },
     {
-        title: <span>유형</span>,
+        title: <div>유형</div>,
         dataIndex: 'workcenterType',
         key: 'workcenterType',
         width: '10%',
@@ -160,7 +160,7 @@ export const workcenterDetailColumns = [
         editable: true, // 드롭다운으로 선택 가능
     },
     {
-        title: <span>설명</span>,
+        title: <div>설명</div>,
         dataIndex: 'description',
         key: 'description',
         width: '25%',
@@ -168,7 +168,7 @@ export const workcenterDetailColumns = [
         editable: true, // 수정 가능
     },
     {
-        title: <span>공장명</span>,
+        title: <div>공장명</div>,
         dataIndex: 'factoryName',
         key: 'factoryName',
         width: '10%',
@@ -177,7 +177,7 @@ export const workcenterDetailColumns = [
         render: (text) => text || '-',
     },
     {
-        title: <span>생산공정명</span>,
+        title: <div>생산공정명</div>,
         dataIndex: 'processName',
         key: 'processName',
         width: '10%',
@@ -186,7 +186,7 @@ export const workcenterDetailColumns = [
         render: (text) => text || '-',
     },
     {
-        title: <span>작업자</span>,
+        title: <div>작업자</div>,
         dataIndex: 'workerAssignments',
         key: 'workerAssignments',
         align: 'center',
@@ -195,7 +195,7 @@ export const workcenterDetailColumns = [
         render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-',
     },
     {
-        title: <span>설비</span>,
+        title: <div>설비</div>,
         dataIndex: 'equipmentList',
         key: 'equipmentList',
         width: '10%',
@@ -204,7 +204,7 @@ export const workcenterDetailColumns = [
         render: (equipmentList) => equipmentList ? equipmentList.length : '-',
     },
     {
-        title: <span>사용</span>,
+        title: <div>사용</div>,
         dataIndex: 'isActive',
         key: 'isActive',
         width: '5%',
