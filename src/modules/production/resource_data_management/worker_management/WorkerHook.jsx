@@ -6,7 +6,7 @@ import {
     updateWorkerDetail,
     fetchWorkerAttendanceAssignmentList
 } from "./WorkerApi.jsx";
-import {notification, Popconfirm} from "antd";
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 export const workerHook = (initialData) => {
 
@@ -17,6 +17,7 @@ export const workerHook = (initialData) => {
     const [workerAttendanceDetail, setWorkerAttendanceDetail] = useState(null);   //작업배치, 근태 목록
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
     const [activeTabKey, setActiveTabKey] = useState('1'); // tabs state
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
 
     const workerMemoizedData = useMemo(() => data, [data]);
 
@@ -133,13 +134,10 @@ export const workerHook = (initialData) => {
 
             await updateWorkerDetail(workerDetail.id, workerDetail);
             const updatedData = await fetchWorkerList();
-            notification.success({message:'수정되었습니다.'});
+            notify('success', '안전교육 이수 여부 수정', '안전교육 이수 여부 수정 성공', 'bottomRight')
             setData(updatedData);
         } catch (error) {
-            notification.error({
-                message: '수정 실패',
-                description: '수정 중 오류가 발생했습니다.',
-            });
+            notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
     };
 

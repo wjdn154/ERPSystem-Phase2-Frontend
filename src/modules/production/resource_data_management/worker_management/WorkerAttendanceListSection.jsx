@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import {Grid,Paper,Typography}  from "@mui/material";
-import {Button, Table as AntTable, Modal, Input, Select, DatePicker} from "antd";
+import {Button, Table as AntTable, Modal, Input, Select, DatePicker, Col, Form, Row} from "antd";
 import moment from "moment";
 import {workerAttendanceListColumn} from "./WorkerAttendanceListColumn.jsx";
 const {Option} = Select;
@@ -67,37 +67,33 @@ const WorkerAttendanceListSection = ({columns,
 
             {/* 오른쪽 선택된 작업자 근태 및 작업 배치 목록 */}
             <Grid item xs={7}>
+                {workerAttendanceDetail && (
                 <Paper elevation={3} sx={{ height: '100%', p: 2 }}>
                     <Typography variant="h6" marginBottom="20px">
                         작업배치 및 근태 목록
                     </Typography>
-                    {workerAttendanceDetail && (
+
                         <div>
-                            <div style={{ display: 'flex', marginBottom: '20px'}}>
-                                <Input
-                                    value="사원번호"
-                                    style={{ marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6' }}
-                                    readOnly
-                                />
-                                <Input
-                                    value={workerAttendanceDetail?.employeeNumber}
-                                    style={{ flex: 1 }}
-                                    readOnly
-                                />
-                                <Input
-                                    value="성명"
-                                    style={{ marginLeft: '20px', marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6' }}
-                                    readOnly
-                                />
-                                <Input
-                                    value={
-                                        workerAttendanceDetail?.employeeLastName +
-                                        workerAttendanceDetail?.employeeFirstName
-                                    }
-                                    style={{ flex: 1 }}
-                                    readOnly
-                                />
+                            <div style={{ display: 'flex', marginBottom: '20px', justifyContent:'center'}}>
+                                <Row gutter={16} justify="center">
+                                    <Col span={12} >
+                                        <Form.Item>
+                                            <Input addonBefore="사원번호" value={workerAttendanceDetail?.employeeNumber} readOnly />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Input
+                                            addonBefore="성명"
+                                            value={
+                                                workerAttendanceDetail?.employeeLastName +
+                                                workerAttendanceDetail?.employeeFirstName
+                                            }
+                                            readOnly
+                                        />
+                                    </Col>
+                                </Row>
                             </div>
+
                             <AntTable
                                 style={{ padding: '20px' }}
                                 columns={workerAttendanceListColumn}
@@ -111,8 +107,8 @@ const WorkerAttendanceListSection = ({columns,
                                 rowKey="id"
                             />
                         </div>
-                    )}
                 </Paper>
+                )}
             </Grid>
         </Grid>
 )
