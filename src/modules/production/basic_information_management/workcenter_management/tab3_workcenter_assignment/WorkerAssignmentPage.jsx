@@ -12,7 +12,18 @@ const { RangePicker } = DatePicker;
 
 const WorkerAssignmentPage = () => {
     const today = dayjs(); // 오늘 날짜 설정
-
+    const [searchParams, setSearchParams] = useState({
+        startDate: null,
+        endDate: null,
+        factoryCode: '',
+        workcenterCode: ''
+    });
+    const [searchDetailParams, setSearchDetailParams] = useState({
+        startDate : null,
+        endDate : null,
+        factoryCode : '',
+        workcenterCode : '',
+    });
     const [isFactoryModalVisible, setIsFactoryModalVisible] = useState(false); // 공장 모달 상태
     const [isWorkcenterModalVisible, setIsWorkcenterModalVisible] = useState(false); // 작업장 모달 상태
 
@@ -54,19 +65,38 @@ const WorkerAssignmentPage = () => {
         console.log('Display Values:', displayValues);
     }, [selectedFactory, selectedWorkcenter, displayValues]);
 
+    // 날짜 선택 처리
+    const handleDateChange = (dates) => {
+        if (dates) {
+            setSearchParams({
+                ...searchParams,
+                startDate: dates[0].format('YYYY-MM-DD'),
+                endDate: dates[1].format('YYYY-MM-DD'),
+            });
+            setSearchDetailParams({
+                ...searchDetailParams,
+                startDate: dates[0].format('YYYY-MM-DD'),
+                endDate: dates[1].format('YYYY-MM-DD'),
+            });
+        }
+    };
+
     // API 호출 함수
     const fetchWorkerAssignments = async () => {
         setLoading(true);
+        const { startDate, endDate, factoryCode, workcenterCode } = searchParams; // searchParams에서 필요한 값들을 가져옴
+
         try {
             const response = await apiClient.post(
-                PRODUCTION_API.WORKER_ASSIGNMENT_DAILY_API,
+                PRODUCTION_API.WORKER_ASSIGNMENT_DATES_API,
                 null, // POST 요청 본문은 필요하지 않음
                 {
                     params: {
-                        includeShiftType: false, // 필수 파라미터
-                        // shiftType: 1, // 유효한 기본값 설정 (예: 1)
-                        date: selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
-
+                        includeShiftType: false,
+                        startDate: startDate ? dayjs(startDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+                        endDate: endDate ? dayjs(endDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+                        factoryCode: selectedFactory?.code || '',
+                        workcenterCode: selectedWorkcenter?.code || '',
                     },
                 }
             );
@@ -123,7 +153,14 @@ const WorkerAssignmentPage = () => {
     // 기간 조회 버튼 클릭 핸들러
     const handleSearchByDate = () => {
         if (dateRange && dateRange.length === 2) {
-            fetchWorkerAssignments(selectedDate);
+            const [startDate, endDate] = dateRange; // 날짜 범위의 시작일과 종료일을 분리
+            setSearchParams((prevParams) => ({
+                ...prevParams,
+                startDate: startDate.format('YYYY-MM-DD'),
+                endDate:endDate.format('YYYY-MM-DD')
+            }))
+
+            fetchWorkerAssignments(startDate, endDate); // 날짜 범위를 fetchWorkerAssignments로 전달
         } else {
             notify('warning', '오류', '유효한 날짜 범위를 선택하세요.');
         }
@@ -197,6 +234,12 @@ const WorkerAssignmentPage = () => {
         setDisplayValues((prevValues) => ({
             ...prevValues,
             factory: `[${record.code}] ${record.name}`, // 공장 이름과 코드 포맷팅
+        }));
+
+        // searchParams에도 선택된 공장 정보 반영
+        setSearchParams((prevParams) => ({
+            ...prevParams,
+            factoryCode: record.code,
         }));
 
         setIsFactoryModalVisible(false); // 모달 닫기
