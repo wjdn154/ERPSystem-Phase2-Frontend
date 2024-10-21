@@ -3,49 +3,49 @@ import {Tag, Typography} from "antd";
 
 export const sbomColumns = [
     {
-        title: '버전',
+        title: <div className="title-text">버전</div>,
         dataIndex: 'version',
         key: 'version',
         align: 'center',
     },
     {
-        title: '생성일자',
+        title: <div className="title-text">생성일자</div>,
         dataIndex: 'createdDate',
         key: 'createdDate',
         align: 'center',
     },
     {
-        title: '비고',
+        title: <div className="title-text">비고</div>,
         dataIndex: 'remarks',
         key: 'remarks',
         align: 'center',
     },
     {
-        title: '손실율(%)',
+        title: <div className="title-text">손실율(%)</div>,
         dataIndex: 'lossRate',
         key: 'lossRate',
         align: 'center',
     },
     {
-        title: '외주 구분',
+        title: <div className="title-text">외주 구분</div>,
         dataIndex: 'outsourcingType',
         key: 'outsourcingType',
         align: 'center',
     },
     {
-        title: '유효 시작일',
+        title: <div className="title-text">유효 시작일</div>,
         dataIndex: 'startDate',
         key: 'startDate',
         align: 'center',
     },
     {
-        title: '유효 종료일',
+        title: <div className="title-text">유효 종료일</div>,
         dataIndex: 'expiredDate',
         key: 'expiredDate',
         align: 'center',
     },
     {
-        title: '사용 여부',
+        title: <div className="title-text">사용 여부</div>,
         dataIndex: 'isActive',
         key: 'isActive',
         align: 'center',
@@ -59,7 +59,7 @@ export const sbomColumns = [
 
 export const greenBomColumns = [
     {
-        title: '유해 물질 정보',
+        title: <div className="title-text">유해 물질</div>,
         dataIndex: 'hazardousMaterials',
         key: 'hazardousMaterials',
         align: 'center',
@@ -68,7 +68,7 @@ export const greenBomColumns = [
         ),
     },
     {
-        title: '재활용 가능 여부',
+        title: <div className="title-text">재활용</div>,
         dataIndex: 'recyclable',
         key: 'recyclable',
         align: 'center',
@@ -79,7 +79,7 @@ export const greenBomColumns = [
         ),
     },
     {
-        title: '재사용 가능 여부',
+        title: <div className="title-text">재사용</div>,
         dataIndex: 'reusable',
         key: 'reusable',
         align: 'center',
@@ -90,19 +90,19 @@ export const greenBomColumns = [
         ),
     },
     {
-        title: '에너지 소비량',
+        title: <div className="title-text">에너지 소비량</div>,
         dataIndex: 'energyConsumption',
         key: 'energyConsumption',
         align: 'center',
     },
     {
-        title: '탄소 발자국',
+        title: <div className="title-text">탄소발자국</div>,
         dataIndex: 'carbonFootprint',
         key: 'carbonFootprint',
         align: 'center',
     },
     {
-        title: '친환경 인증 정보',
+        title: <div className="title-text">친환경 인증</div>,
         dataIndex: 'ecoCertification',
         key: 'ecoCertification',
         align: 'center',

@@ -45,8 +45,6 @@ const SystemEnvironmentSettingsPage = ({initialData}) => {
         setDisplayValues(newDisplayValues);
     }, [fetchJournalEntryType]);
 
-    console.log('fetchJournalEntryType:', fetchJournalEntryType);
-
     const handleTabChange = (key) => {
         setActiveTabKey(key);
     };
@@ -112,6 +110,10 @@ const SystemEnvironmentSettingsPage = ({initialData}) => {
                     setFetchJournalEntryType(response.data);
                     notify('success', '분개유형 수정', '분개유형 정보 수정 성공.', 'bottomRight');
                 } catch (error) {
+                    console.log(error);
+                    if(error.response === '해당 계정과목은 다른 분개 유형에서 사용 중이므로 변경할 수 없습니다.'){
+                        notify('error', '저장 실패', error.response, 'bottomRight');
+                    }
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
                 }
             },
@@ -201,7 +203,6 @@ const SystemEnvironmentSettingsPage = ({initialData}) => {
                                                         placeholder="검색"
                                                         prefix={<SearchOutlined />}
                                                         onChange={(e) => {
-                                                            console.log('modalData:', modalData);
                                                             const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
                                                             if (!value) {
                                                                 setModalData(initialModalData);

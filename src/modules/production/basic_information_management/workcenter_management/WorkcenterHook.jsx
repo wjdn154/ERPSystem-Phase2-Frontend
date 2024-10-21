@@ -23,6 +23,7 @@ export const useWorkcenter = (initialData) => {
     const [activeRate, setActiveRate] = useState(null);
     const [equipmentMapping, setEquipmentMapping] = useState({});
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
 
 
     const handleTabChange = (key) => {
@@ -71,7 +72,7 @@ export const useWorkcenter = (initialData) => {
 
     const fetchEquipmentDetails = async (id) => {
         try {
-            const response = await apiClient.get(PRODUCTION_API.EQUIPMENT_DATA_DETAIL_API(id));
+            const response = await apiClient.post(PRODUCTION_API.EQUIPMENT_DATA_DETAIL_API(id));
             return response.data;
         } catch (error) {
             console.error(`설비 ID ${id}의 정보를 가져오는 중 오류 발생:`, error);
@@ -133,19 +134,19 @@ export const useWorkcenter = (initialData) => {
     };
 
     // 행 선택 핸들러 설정
-    const handleRowSelection = {
-        type: 'radio',
-        onSelect: async (record) => {
-            try {
-                const detail = await fetchWorkcenter(record.code);
-                setWorkcenter(detail);
-                setIsWorkcenterModalVisible(true);
-                notify('success')
-            } catch (error) {
-                console.error('작업장 상세 정보 조회 실패:', error);
-            }
-        },
-    };
+    // const handleRowSelection = {
+    //     type: 'radio',
+    //     onSelect: async (record) => {
+    //         try {
+    //             const detail = await fetchWorkcenter(record.code);
+    //             setWorkcenter(detail);
+    //             setIsWorkcenterModalVisible(true);
+    //             notify('success')
+    //         } catch (error) {
+    //             console.error('작업장 상세 정보 조회 실패:', error);
+    //         }
+    //     },
+    // };
 
     // 행 선택 시 상세정보 설정
     const handleSelectedRow = async (selectedRow) => {
@@ -166,9 +167,11 @@ export const useWorkcenter = (initialData) => {
                 .join(', ');
 
             setWorkcenter({ ...detail, formattedEquipments });
-            setIsWorkcenterModalVisible(true); // 모달 열기
+            // setIsWorkcenterModalVisible(true); // 모달 열기
         } catch (error) {
             console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -207,31 +210,28 @@ export const useWorkcenter = (initialData) => {
                 await updateWorkcenter(workcenter.code, workcenter);
             }
 
-            // 데이터 저장 후 리스트 새로고침
-            const updatedData = await fetchWorkcenters();
-            setData(updatedData);
-
-
-            // 리스트 새로고침 후 활성화율 재계산
-            const activeCount = updatedData.filter((wc) => wc.isActive).length;
-            const totalCount = updatedData.length;
-            const activeRate = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
-            const newActiveRate = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
-            if (newActiveRate !== activeRate) {
-                setActiveRate(newActiveRate);
+            // 새로운 작업장 추가 시, 기존 상태에 추가
+            if (isEditing) {
+                setData(prevData => [...prevData, workcenter]);
+                notify('success', '저장 성공', '작업장 데이터 저장 성공.', 'bottomRight')
+            } else {
+                // 업데이트 시, 기존 데이터에서 수정된 데이터 반영
+                setData(prevData =>
+                    prevData.map(item => (item.code === workcenter.code ? workcenter : item))
+                );
             }
-            console.log("사용률 새로고침:", newActiveRate); // 로그 추가
 
-            handleClose();
+            // handleClose(); // 모달 닫기
         } catch (error) {
-            console.error("작업장 저장 중 오류 발생:", error); // TODO 에러페이지 반환
+            console.error("작업장 저장 중 오류 발생:", error);
+            notify('error', '조회 오류', '작업장 저장 중 오류 발생', 'top');
         }
     };
 
-    // handleClose
-    const handleClose = () => {
-        setIsWorkcenterModalVisible(false);
-    };
+    // // handleClose
+    // const handleClose = () => {
+    //     setIsWorkcenterModalVisible(false);
+    // };
 
     // 새 작업장 추가 핸들러
     const handleAddWorkcenter = () => {
@@ -248,19 +248,19 @@ export const useWorkcenter = (initialData) => {
             workerAssignments: []
         });
         setIsEditing(true);
-        setIsWorkcenterModalVisible(true);
+        // setIsWorkcenterModalVisible(true);
     };
 
     return {
         data,
         workcenter,
         setWorkcenter,
-        isWorkcenterModalVisible,
+        // isWorkcenterModalVisible,
         handleDeleteWorkcenter,
         handleSelectedRow,
         handleInputChange,
         handleSave,
-        handleClose,
+        // handleClose,
         handleAddWorkcenter,
         handleSearch, // useSearch 훅에서 반환된 handleSearch
         searchData,
