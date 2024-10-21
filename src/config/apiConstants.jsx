@@ -232,6 +232,8 @@ export const PRODUCTION_API = {
     WORKER_ASSIGNMENT_TODAY_SUMMARY_API: `${API_BASE_URL}/api/production/workerAssignment/today/summary`, // 오늘의 작업장별 배정인원 상세명단 조회 API
     WORKER_ASSIGNMENT_PRODUCTION_ORDER_SUMMARY_API: (productionOrderId) => `${API_BASE_URL}/api/production/workerAssignment/productionOrder/${productionOrderId}/summary`, // 작업지시별 작업자 명단 조회 API
     WORKER_ASSIGNMENT_WORKER_HISTORY_API: (workerId) => `${API_BASE_URL}/api/production/workerAssignment/worker/${workerId}/assignments`, // 작업자별 배치이력 조회 API
+    WORKER_ASSIGNMENT_DATES_API: `${API_BASE_URL}/api/production/workerAssignment/dates`, // 특정 기간조회
+
 
     PRODUCTION_ORDER_LIST_API: `${API_BASE_URL}/api/production/productionOrder`, // 전체 작업 지시 목록 조회 API
     PRODUCTION_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}`, // 특정 작업 지시 조회 API

@@ -100,7 +100,6 @@ const SelectedWorkcenterSection = ({
                         />
                       </Form.Item>
 
-                      {/* 공장 코드 */}
                       <Form.Item label="공장명">
                         <Input
                             value={workcenter.factoryName || ''}
@@ -108,14 +107,12 @@ const SelectedWorkcenterSection = ({
                         />
                       </Form.Item>
 
-                      {/* 공정 코드 */}
                       <Form.Item label="생산공정 코드">
                         <Input
                             value={workcenter.processCode || ''}
                             onChange={(e) => handleInputChange(e, 'processCode')}
                         />
                       </Form.Item>
-                      {/* 공정 코드 */}
                       <Form.Item label="생산공정명">
                         <Input
                             value={workcenter.processName || ''}
