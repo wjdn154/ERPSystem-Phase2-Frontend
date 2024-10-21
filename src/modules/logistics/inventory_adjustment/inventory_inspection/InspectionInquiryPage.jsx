@@ -403,39 +403,40 @@ const InspectionInquiryPage = () => {
                                                         rules={[{required: true, message: '실사 날짜를 입력하세요.'}]}
                                                     >
                                                         <Input addonBefore="실사 날짜"/>
+                                                        {/*<DatePicker placeholder="실사 날짜 선택" format=" YYYY-MM-DD"/>*/}
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
                                                     <Form.Item
-                                                        name="inspectionNumber"
+                                                        name=" inspectionNumber"
                                                         rules={[{required: true, message: '실사 번호를 입력하세요.'}]}
                                                     >
-                                                        <Input addonBefore="실사 번호" disabled={true}/>
+                                                        <Input addonBefore=" 실사 번호" disabled={true}/>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
                                                     <Form.Item
-                                                        name="employeeName"
+                                                        name=" employeeName"
                                                         rules={[{required: true, message: '담당자명을 입력하세요.'}]}
                                                     >
-                                                        <Input addonBefore="담당자명"
+                                                        <Input addonBefore=" 담당자명"
                                                                onDoubleClick={() => handleInputClick('employeeName')}
                                                         />
                                                     </Form.Item>
-                                                    <Form.Item name="employeeId" hidden>
+                                                    <Form.Item name=" employeeId" hidden>
                                                         <Input/>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
                                                     <Form.Item
-                                                        name="warehouseName"
+                                                        name=" warehouseName"
                                                         rules={[{required: true, message: '창고명을 입력하세요.'}]}
                                                     >
-                                                        <Input addonBefore="창고명"
+                                                        <Input addonBefore=" 창고명"
                                                                onDoubleClick={() => handleInputClick('warehouseName')}
                                                         />
                                                     </Form.Item>
-                                                    <Form.Item name="warehouseId" hidden>
+                                                    <Form.Item name=" warehouseId" hidden>
                                                         <Input/>
                                                     </Form.Item>
                                                 </Col>
@@ -443,341 +444,379 @@ const InspectionInquiryPage = () => {
 
                                             {/* 실사 품목 정보 */}
                                             <Divider orientation={'left'} orientationMargin="0"
-                                                     style={{marginTop: '0px', fontWeight: 600}}>
-                                                실사 품목 정보
-                                            </Divider>
+                                                        style={{marginTop: '0px', fontWeight: 600}}>
+                                                        실사 품목 정보
+                                                    </Divider>
 
-                                            <Form.List name="details">
-                                                {(fields, {add, remove}) => (
-                                                    <>
-                                                        {fields.map(({key, name, ...restField}, index) => (
-                                                            <Row gutter={16} key={key} style={{marginBottom: '10px'}}>
-                                                                <Col span={6}>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'productCode']}
-                                                                    >
-                                                                        <Input addonBefore="품목 코드"
-                                                                               onDoubleClick={() => handleInputClick('productCode', index)}/>
-                                                                    </Form.Item>
-                                                                    <Form.Item name={[name, 'productId']} hidden>
-                                                                        <Input/>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={6}>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'productName']}
-                                                                    >
-                                                                        <Input addonBefore="품목명"/>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={6}>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'standard']}
-                                                                    >
-                                                                        <Input addonBefore="규격"/>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={6}>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'unit']}
-                                                                    >
-                                                                        <Input addonBefore="단위"/>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={6}>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'warehouseLocationName']}
-                                                                    >
-                                                                        <Input addonBefore="창고 위치"/>
-                                                                    </Form.Item>
-                                                                    <Form.Item name={[name, 'warehouseLocationId']}
-                                                                               hidden>
-                                                                        <Input/>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={6}>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'actualQuantity']}
-                                                                    >
-                                                                        <Input addonBefore="실사 수량"/>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={10}>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'comment']}
-                                                                    >
-                                                                        <Input addonBefore="코멘트"/>
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={2} style={{display: 'flex', justifyContent: 'flex-end'}}>
-                                                                    <Button type="danger" onClick={() => remove(name)}>삭제</Button>
-                                                                </Col>
-                                                            </Row>
-                                                        ))}
-                                                        <Form.Item>
-                                                            <Button type="dashed" onClick={() => add()} block>
-                                                                항목 추가
-                                                            </Button>
-                                                        </Form.Item>
-                                                    </>
-                                                )}
-                                            </Form.List>
-
-                                            <Box sx={{
-                                                display: 'flex',
-                                                justifyContent: 'flex-end',
-                                                marginBottom: '20px'
-                                            }}>
-                                                <Button type="primary" htmlType="submit">저장</Button>
-                                            </Box>
-                                            <Modal
-                                                open={isModalVisible}
-                                                onCancel={handleModalCancel}
-                                                footer={null}
-                                                width="40vw"
-                                            >
-                                                {isLoading ? (
-                                                    <Spin/>  // 로딩 스피너
-                                                ) : (
-                                                    <>
-                                                        {/* 담당자 선택 모달 */}
-                                                        {currentField === 'employeeName' && (
+                                                    <Form.List name="details">
+                                                        {(fields, {add, remove}) => (
                                                             <>
-                                                                <Typography id="modal-modal-title" variant="h6"
-                                                                            component="h2" sx={{marginBottom: '20px'}}>
-                                                                    담당자 선택
-                                                                </Typography>
-                                                                <Input
-                                                                    placeholder="검색"
-                                                                    prefix={<SearchOutlined/>}
-                                                                    onChange={(e) => {
-                                                                        const value = e.target.value.toLowerCase();
-                                                                        if (!value) {
-                                                                            setModalData(initialModalData);
-                                                                        } else {
-                                                                            const filtered = initialModalData.filter((item) => {
-                                                                                return (
-                                                                                    (item.employeeNumber && item.employeeNumber.toLowerCase().includes(value)) ||
-                                                                                    (`${item.lastName}${item.firstName}`.toLowerCase().includes(value))
-                                                                                );
-                                                                            });
-                                                                            setModalData(filtered);
-                                                                        }
-                                                                    }}
-                                                                    style={{marginBottom: 16}}
-                                                                />
-                                                                {modalData && (
-                                                                    <Table
-                                                                        columns={[
-                                                                            {
-                                                                                title: <div className="title-text">사번</div>,
-                                                                                dataIndex: 'employeeNumber',
-                                                                                key: 'employeeNumber',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            },
-                                                                            {
-                                                                                title: <div className="title-text">이름</div>,
-                                                                                dataIndex: 'name',
-                                                                                key: 'name',
-                                                                                align: 'center',
-                                                                                render: (_, record) => `${record.lastName}${record.firstName}`
-                                                                            }
-                                                                        ]}
-                                                                        dataSource={modalData}
-                                                                        rowKey="id"
-                                                                        size="small"
-                                                                        pagination={{
-                                                                            pageSize: 15,
-                                                                            position: ['bottomCenter'],
-                                                                            showSizeChanger: false,
-                                                                            showTotal: (total) => `총 ${total}개`
-                                                                        }}
-                                                                        onRow={(record) => ({
-                                                                            style: {cursor: 'pointer'},
-                                                                            onClick: () => handleModalSelect(record)
-                                                                        })}
-                                                                    />
-                                                                )}
+                                                                {fields.map(({key, name, ...restField}, index) => (
+                                                                    <Row gutter={16} key={key}
+                                                                         style={{marginBottom: '10px'}}>
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'productCode']}
+                                                                            >
+                                                                                <Input addonBefore="품목 코드"
+                                                                                       onDoubleClick={() => handleInputClick('productCode', index)}/>
+                                                                            </Form.Item>
+                                                                            <Form.Item name={[name, 'productId']}
+                                                                                       hidden>
+                                                                                <Input/>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'productName']}
+                                                                            >
+                                                                                <Input addonBefore="품목명"/>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'standard']}
+                                                                            >
+                                                                                <Input addonBefore="규격"/>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'unit']}
+                                                                            >
+                                                                                <Input addonBefore="단위"/>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'warehouseLocationName']}
+                                                                            >
+                                                                                <Input addonBefore="창고 위치"/>
+                                                                            </Form.Item>
+                                                                            <Form.Item
+                                                                                name={[name, 'warehouseLocationId']}
+                                                                                hidden>
+                                                                                <Input/>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={6}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'actualQuantity']}
+                                                                            >
+                                                                                <Input addonBefore="실사 수량"/>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={10}>
+                                                                            <Form.Item
+                                                                                {...restField}
+                                                                                name={[name, 'comment']}
+                                                                            >
+                                                                                <Input addonBefore="코멘트"/>
+                                                                            </Form.Item>
+                                                                        </Col>
+                                                                        <Col span={2} style={{
+                                                                            display: 'flex',
+                                                                            justifyContent: 'flex-end'
+                                                                        }}>
+                                                                            <Button type="danger"
+                                                                                    onClick={() => remove(name)}>삭제</Button>
+                                                                        </Col>
+                                                                    </Row>
+                                                                ))}
+                                                                <Form.Item>
+                                                                    <Button type="dashed" onClick={() => add()} block>
+                                                                        항목 추가
+                                                                    </Button>
+                                                                </Form.Item>
                                                             </>
                                                         )}
+                                                    </Form.List>
 
-                                                        {/* 창고 선택 모달 */}
-                                                        {currentField === 'warehouseName' && (
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'flex-end',
+                                                        marginBottom: '20px'
+                                                    }}>
+                                                        <Button type="primary" htmlType="submit">저장</Button>
+                                                    </Box>
+                                                    <Modal
+                                                        open={isModalVisible}
+                                                        onCancel={handleModalCancel}
+                                                        footer={null}
+                                                        width="40vw"
+                                                    >
+                                                        {isLoading ? (
+                                                            <Spin/>  // 로딩 스피너
+                                                        ) : (
                                                             <>
-                                                                <Typography id="modal-modal-title" variant="h6"
-                                                                            component="h2" sx={{marginBottom: '20px'}}>
-                                                                    창고 선택
-                                                                </Typography>
-                                                                <Input
-                                                                    placeholder="검색"
-                                                                    prefix={<SearchOutlined/>}
-                                                                    onChange={(e) => {
-                                                                        const value = e.target.value.toLowerCase();
-                                                                        if (!value) {
-                                                                            setModalData(initialModalData);
-                                                                        } else {
-                                                                            const filtered = initialModalData.filter((item) => {
-                                                                                return (
-                                                                                    (item.code && item.code.toLowerCase().includes(value)) ||
-                                                                                    (item.name && item.name.toLowerCase().includes(value))
-                                                                                );
-                                                                            });
-                                                                            setModalData(filtered);
-                                                                        }
-                                                                    }}
-                                                                    style={{marginBottom: 16}}
-                                                                />
-                                                                {modalData && (
-                                                                    <Table
-                                                                        columns={[
-                                                                            {
-                                                                                title: <div className="title-text">창고 코드</div>,
-                                                                                dataIndex: 'code',
-                                                                                key: 'code',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            },
-                                                                            {
-                                                                                title: <div className="title-text">창고명</div>,
-                                                                                dataIndex: 'name',
-                                                                                key: 'name',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            },
-                                                                            {
-                                                                                title: <div className="title-text">창고 유형</div>,
-                                                                                dataIndex: 'warehouseType',
-                                                                                key: 'warehouseType',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            }
-                                                                        ]}
-                                                                        dataSource={modalData}
-                                                                        rowKey="id"
-                                                                        size="small"
-                                                                        pagination={{
-                                                                            pageSize: 15,
-                                                                            position: ['bottomCenter'],
-                                                                            showSizeChanger: false,
-                                                                            showTotal: (total) => `총 ${total}개`
-                                                                        }}
-                                                                        onRow={(record) => ({
-                                                                            style: {cursor: 'pointer'},
-                                                                            onClick: () => handleModalSelect(record)
-                                                                        })}
-                                                                    />
+                                                                {/* 담당자 선택 모달 */}
+                                                                {currentField === 'employeeName' && (
+                                                                    <>
+                                                                        <Typography id="modal-modal-title" variant="h6"
+                                                                                    component="h2"
+                                                                                    sx={{marginBottom: '20px'}}>
+                                                                            담당자 선택
+                                                                        </Typography>
+                                                                        <Input
+                                                                            placeholder="검색"
+                                                                            prefix={<SearchOutlined/>}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value.toLowerCase();
+                                                                                if (!value) {
+                                                                                    setModalData(initialModalData);
+                                                                                } else {
+                                                                                    const filtered = initialModalData.filter((item) => {
+                                                                                        return (
+                                                                                            (item.employeeNumber && item.employeeNumber.toLowerCase().includes(value)) ||
+                                                                                            (`${item.lastName}${item.firstName}`.toLowerCase().includes(value))
+                                                                                        );
+                                                                                    });
+                                                                                    setModalData(filtered);
+                                                                                }
+                                                                            }}
+                                                                            style={{marginBottom: 16}}
+                                                                        />
+                                                                        {modalData && (
+                                                                            <Table
+                                                                                columns={[
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">사번</div>,
+                                                                                        dataIndex: 'employeeNumber',
+                                                                                        key: 'employeeNumber',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    },
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">이름</div>,
+                                                                                        dataIndex: 'name',
+                                                                                        key: 'name',
+                                                                                        align: 'center',
+                                                                                        render: (_, record) => `${record.lastName}${record.firstName}`
+                                                                                    }
+                                                                                ]}
+                                                                                dataSource={modalData}
+                                                                                rowKey="id"
+                                                                                size="small"
+                                                                                pagination={{
+                                                                                    pageSize: 15,
+                                                                                    position: ['bottomCenter'],
+                                                                                    showSizeChanger: false,
+                                                                                    showTotal: (total) => `총 ${total}개`
+                                                                                }}
+                                                                                onRow={(record) => ({
+                                                                                    style: {cursor: 'pointer'},
+                                                                                    onClick: () => handleModalSelect(record)
+                                                                                })}
+                                                                            />
+                                                                        )}
+                                                                    </>
                                                                 )}
+
+                                                                {/* 창고 선택 모달 */}
+                                                                {currentField === 'warehouseName' && (
+                                                                    <>
+                                                                        <Typography id="modal-modal-title" variant="h6"
+                                                                                    component="h2"
+                                                                                    sx={{marginBottom: '20px'}}>
+                                                                            창고 선택
+                                                                        </Typography>
+                                                                        <Input
+                                                                            placeholder="검색"
+                                                                            prefix={<SearchOutlined/>}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value.toLowerCase();
+                                                                                if (!value) {
+                                                                                    setModalData(initialModalData);
+                                                                                } else {
+                                                                                    const filtered = initialModalData.filter((item) => {
+                                                                                        return (
+                                                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                                            (item.name && item.name.toLowerCase().includes(value))
+                                                                                        );
+                                                                                    });
+                                                                                    setModalData(filtered);
+                                                                                }
+                                                                            }}
+                                                                            style={{marginBottom: 16}}
+                                                                        />
+                                                                        {modalData && (
+                                                                            <Table
+                                                                                columns={[
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">창고
+                                                                                            코드</div>,
+                                                                                        dataIndex: 'code',
+                                                                                        key: 'code',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    },
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">창고명</div>,
+                                                                                        dataIndex: 'name',
+                                                                                        key: 'name',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    },
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">창고
+                                                                                            유형</div>,
+                                                                                        dataIndex: 'warehouseType',
+                                                                                        key: 'warehouseType',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    }
+                                                                                ]}
+                                                                                dataSource={modalData}
+                                                                                rowKey="id"
+                                                                                size="small"
+                                                                                pagination={{
+                                                                                    pageSize: 15,
+                                                                                    position: ['bottomCenter'],
+                                                                                    showSizeChanger: false,
+                                                                                    showTotal: (total) => `총 ${total}개`
+                                                                                }}
+                                                                                onRow={(record) => ({
+                                                                                    style: {cursor: 'pointer'},
+                                                                                    onClick: () => handleModalSelect(record)
+                                                                                })}
+                                                                            />
+                                                                        )}
+                                                                    </>
+                                                                )}
+
+                                                                {/* 품목 코드 선택 모달 */}
+                                                                {currentField === 'productCode' && (
+                                                                    <>
+                                                                        <Typography id="modal-modal-title" variant="h6"
+                                                                                    component="h2"
+                                                                                    sx={{marginBottom: '20px'}}>
+                                                                            품목 코드 선택
+                                                                        </Typography>
+                                                                        <Input
+                                                                            placeholder="검색"
+                                                                            prefix={<SearchOutlined/>}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value.toLowerCase();
+                                                                                if (!value) {
+                                                                                    setModalData(initialModalData);
+                                                                                } else {
+                                                                                    const filtered = initialModalData.filter((item) => {
+                                                                                        return (
+                                                                                            (item.productCode && item.productCode.toLowerCase().includes(value)) ||
+                                                                                            (item.productName && item.productName.toLowerCase().includes(value))
+                                                                                        );
+                                                                                    });
+                                                                                    setModalData(filtered);
+                                                                                }
+                                                                            }}
+                                                                            style={{marginBottom: 16}}
+                                                                        />
+                                                                        {modalData && (
+                                                                            <Table
+                                                                                columns={[
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">품목
+                                                                                            코드</div>,
+                                                                                        dataIndex: 'productCode',
+                                                                                        key: 'productCode',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    },
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">품목명</div>,
+                                                                                        dataIndex: 'productName',
+                                                                                        key: 'productName',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    },
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">규격</div>,
+                                                                                        dataIndex: 'quantity',
+                                                                                        key: 'quantity',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    },
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">창고명</div>,
+                                                                                        dataIndex: 'warehouseName',
+                                                                                        key: 'warehouseName',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    },
+                                                                                    {
+                                                                                        title: <div
+                                                                                            className="title-text">로케이션
+                                                                                            위치</div>,
+                                                                                        dataIndex: 'warehouseLocationName',
+                                                                                        key: 'warehouseLocationName',
+                                                                                        align: 'center',
+                                                                                        render: (text) => <div
+                                                                                            className="small-text">{text}</div>,
+                                                                                    }
+                                                                                ]}
+                                                                                dataSource={modalData}
+                                                                                rowKey="id"
+                                                                                size="small"
+                                                                                pagination={{
+                                                                                    pageSize: 15,
+                                                                                    position: ['bottomCenter'],
+                                                                                    showSizeChanger: false,
+                                                                                    showTotal: (total) => `총 ${total}개`
+                                                                                }}
+                                                                                onRow={(record) => ({
+                                                                                    style: {cursor: 'pointer'},
+                                                                                    onClick: () => handleModalSelect(record)
+                                                                                })}
+                                                                            />
+                                                                        )}
+                                                                    </>
+                                                                )}
+
+                                                                <Box sx={{
+                                                                    mt: 2,
+                                                                    display: 'flex',
+                                                                    justifyContent: 'flex-end'
+                                                                }}>
+                                                                    <Button onClick={handleModalCancel}
+                                                                            variant="contained"
+                                                                            type="danger" sx={{mr: 1}}>
+                                                                        닫기
+                                                                    </Button>
+                                                                </Box>
                                                             </>
                                                         )}
-
-                                                        {/* 품목 코드 선택 모달 */}
-                                                        {currentField === 'productCode' && (
-                                                            <>
-                                                                <Typography id="modal-modal-title" variant="h6"
-                                                                            component="h2" sx={{marginBottom: '20px'}}>
-                                                                    품목 코드 선택
-                                                                </Typography>
-                                                                <Input
-                                                                    placeholder="검색"
-                                                                    prefix={<SearchOutlined/>}
-                                                                    onChange={(e) => {
-                                                                        const value = e.target.value.toLowerCase();
-                                                                        if (!value) {
-                                                                            setModalData(initialModalData);
-                                                                        } else {
-                                                                            const filtered = initialModalData.filter((item) => {
-                                                                                return (
-                                                                                    (item.productCode && item.productCode.toLowerCase().includes(value)) ||
-                                                                                    (item.productName && item.productName.toLowerCase().includes(value))
-                                                                                );
-                                                                            });
-                                                                            setModalData(filtered);
-                                                                        }
-                                                                    }}
-                                                                    style={{marginBottom: 16}}
-                                                                />
-                                                                {modalData && (
-                                                                    <Table
-                                                                        columns={[
-                                                                            {
-                                                                                title: <div className="title-text">품목 코드</div>,
-                                                                                dataIndex: 'productCode',
-                                                                                key: 'productCode',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            },
-                                                                            {
-                                                                                title: <div className="title-text">품목명</div>,
-                                                                                dataIndex: 'productName',
-                                                                                key: 'productName',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            },
-                                                                            {
-                                                                                title: <div className="title-text">규격</div>,
-                                                                                dataIndex: 'quantity',
-                                                                                key: 'quantity',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            },
-                                                                            {
-                                                                                title: <div className="title-text">창고명</div>,
-                                                                                dataIndex: 'warehouseName',
-                                                                                key: 'warehouseName',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            },
-                                                                            {
-                                                                                title: <div className="title-text">로케이션 위치</div>,
-                                                                                dataIndex: 'warehouseLocationName',
-                                                                                key: 'warehouseLocationName',
-                                                                                align: 'center',
-                                                                                render: (text) => <div className="small-text">{text}</div>,
-                                                                            }
-                                                                        ]}
-                                                                        dataSource={modalData}
-                                                                        rowKey="id"
-                                                                        size="small"
-                                                                        pagination={{
-                                                                            pageSize: 15,
-                                                                            position: ['bottomCenter'],
-                                                                            showSizeChanger: false,
-                                                                            showTotal: (total) => `총 ${total}개`
-                                                                        }}
-                                                                        onRow={(record) => ({
-                                                                            style: {cursor: 'pointer'},
-                                                                            onClick: () => handleModalSelect(record)
-                                                                        })}
-                                                                    />
-                                                                )}
-                                                            </>
-                                                        )}
-
-                                                        <Box sx={{mt: 2, display: 'flex', justifyContent: 'flex-end'}}>
-                                                            <Button onClick={handleModalCancel} variant="contained"
-                                                                    type="danger" sx={{mr: 1}}>
-                                                                닫기
-                                                            </Button>
-                                                        </Box>
-                                                    </>
-                                                )}
-                                            </Modal>
+                                                    </Modal>
                                         </Form>
                                     </Grid>
                                 </Paper>
                             </Grow>
                         </Grid>
-                    )}
+                        )}
                 </Grid>
-            )}
+                )}
 
             {activeTabKey === '2' && (
                 <Grid sx={{padding: '0px 20px 0px 20px'}} container spacing={3}>
