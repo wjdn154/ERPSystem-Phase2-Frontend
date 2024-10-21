@@ -19,7 +19,6 @@ const { Option } = Select;
 const { confirm } = Modal;
 
 const ProductManagementPage = ( {initialData} ) => {
-    console.log(initialData);
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [productList, setProductList] = useState(initialData);
     const [form] = Form.useForm(); // 폼 인스턴스 생성
@@ -98,11 +97,27 @@ const ProductManagementPage = ( {initialData} ) => {
                     // 삭제 API 호출 (DELETE 메서드)
                     const response = await apiClient.delete(LOGISTICS_API.PRODUCT_GROUP_DELETE_API(record.id));
 
-                    console.log("삭제: " + response.data)
-
                     // 삭제 성공 시 UI에서 해당 항목 제거
                     notify('success', '품목 그룹 삭제', '품목 그룹 삭제 성공.', 'bottomRight')
                     setModalData((prevData) => prevData.filter((item) => item.id !== record.id));
+                    setInitialModalData((prevData) => prevData.filter((item) => item.id !== record.id));
+
+                    setProductList((prevList) =>
+                        prevList.map((product) =>
+                            product.productGroupId === record.id
+                                ? { ...product, productGroupName: '', productGroupId: null }
+                                : product
+                        )
+                    );
+
+                    if (detailProductData && detailProductData.productGroupId === record.id) {
+                        setDetailProductData((prevData) => ({
+                            ...prevData,
+                            productGroupId: null,
+                            productGroupCode: null,
+                            productGroupName: '',
+                        }));
+                    }
 
                 } catch (error) {
                     notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
@@ -140,11 +155,14 @@ const ProductManagementPage = ( {initialData} ) => {
 
                     // 서버로 새로운 그룹 데이터 전송
                     const response = await apiClient.post(LOGISTICS_API.PRODUCT_GROUP_CREATE_API, newGroup);
+                    const savedGroup = response.data;
 
-                    console.log(response.data);
+                    console.log("savedGroup: " + savedGroup);
 
-                    notify('success', '품목 그룹 삭제', '품목 그룹 삭제 성공.', 'bottomRight')
-                    setModalData((prevData) => [...prevData, newGroup]);
+                    notify('success', '품목 그룹 저장', '품목 그룹 저장 성공.', 'bottomRight')
+                    setModalData((prevData) => [...prevData, savedGroup]);
+                    setInitialModalData((prevData) => [...prevData, savedGroup]);
+
                     setIsAdding(false);  // 추가 모드 해제
                     setNewGroup({code: '', name: ''});  // 입력 필드 초기화
 
@@ -771,25 +789,138 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                     style={{ marginBottom: 16 }}
                                                                 />
                                                                 {modalData && (
-                                                                    <Table
-                                                                        columns={[
-                                                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                            { title: '그룹명', dataIndex: 'name', key: 'name', align: 'center' }
-                                                                        ]}
-                                                                        dataSource={modalData}
-                                                                        rowKey="id"
-                                                                        size="small"
-                                                                        pagination={{
-                                                                            pageSize: 15,
-                                                                            position: ['bottomCenter'],
-                                                                            showSizeChanger: false,
-                                                                            showTotal: (total) => `총 ${total}개`,
-                                                                        }}
-                                                                        onRow={(record) => ({
-                                                                            style: { cursor: 'pointer' },
-                                                                            onClick: () => handleModalSelect(record) // 선택 시 처리
-                                                                        })}
-                                                                    />
+                                                                    <>
+                                                                        <Table
+                                                                            columns={[
+                                                                                {
+                                                                                    title: '코드',
+                                                                                    dataIndex: 'code',
+                                                                                    key: 'code',
+                                                                                    align: 'center',
+                                                                                    width: '100px',
+                                                                                    render: (text, record) => {
+                                                                                        return editingRow === record.id ? (
+                                                                                            <Input
+                                                                                                value={editingValues.code}
+                                                                                                onChange={(e) => handleFieldChange('code', e.target.value)}
+                                                                                            />
+                                                                                        ) : (
+                                                                                            text
+                                                                                        );
+                                                                                    },
+                                                                                },
+                                                                                {
+                                                                                    title: '그룹명',
+                                                                                    dataIndex: 'name',
+                                                                                    key: 'name',
+                                                                                    align: 'center',
+                                                                                    render: (text, record) => (
+                                                                                        <div
+                                                                                            style={{
+                                                                                                display: 'flex',
+                                                                                                justifyContent: 'space-between',
+                                                                                                alignItems: 'center',
+                                                                                            }}
+                                                                                            className="group-row"
+                                                                                        >
+                                                                                            {editingRow === record.id ? (
+                                                                                                <Input
+                                                                                                    value={editingValues.name}
+                                                                                                    onChange={(e) => handleFieldChange('name', e.target.value)}
+                                                                                                />
+                                                                                            ) : (
+                                                                                                <div style={{ textAlign: 'center', flex: 1 }}>{text}</div>
+                                                                                            )}
+                                                                                            <div
+                                                                                                className="group-actions"
+                                                                                                style={{ position: 'absolute', right: 5, opacity: 0, display: 'flex' }}
+                                                                                            >
+                                                                                                {editingRow === record.id ? (
+                                                                                                    <Tooltip title="저장">
+                                                                                                        <CheckOutlined
+                                                                                                            style={{ marginRight: '10px', cursor: 'pointer', color: 'blue' }}
+                                                                                                            onClick={(event) => saveEdit(record.id, event)} // 기존 그룹 저장
+                                                                                                        />
+                                                                                                    </Tooltip>
+                                                                                                ) : (
+                                                                                                    <>
+                                                                                                        <Tooltip title="수정">
+                                                                                                            <EditOutlined
+                                                                                                                style={{ marginRight: '10px', cursor: 'pointer' }}
+                                                                                                                onClick={(event) => handleEdit(record, event)} // 수정 핸들러 추가
+                                                                                                            />
+                                                                                                        </Tooltip>
+                                                                                                        <Tooltip title="삭제">
+                                                                                                            <DeleteOutlined
+                                                                                                                style={{ cursor: 'pointer', color: 'red' }}
+                                                                                                                onClick={(event) => handleDelete(record, event)} // 삭제 핸들러 추가
+                                                                                                            />
+                                                                                                        </Tooltip>
+                                                                                                    </>
+                                                                                                )}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ),
+                                                                                },
+                                                                            ]}
+                                                                            dataSource={modalData} // 기존 데이터만 포함
+                                                                            rowKey={(record) => record.id || record.key}
+                                                                            size="small"
+                                                                            pagination={{
+                                                                                pageSize: 15,
+                                                                                position: ['bottomCenter'],
+                                                                                showSizeChanger: false,
+                                                                                showTotal: (total) => `총 ${total}개`,
+                                                                            }}
+                                                                            onRow={(record) => ({
+                                                                                onMouseEnter: (event) => {
+                                                                                    const actionDiv = event.currentTarget.querySelector('.group-actions');
+                                                                                    if (actionDiv && editingRow !== record.id) actionDiv.style.opacity = '1'; // 마우스를 올리면 아이콘을 보이게 함
+                                                                                },
+                                                                                onMouseLeave: (event) => {
+                                                                                    const actionDiv = event.currentTarget.querySelector('.group-actions');
+                                                                                    if (actionDiv && editingRow !== record.id) actionDiv.style.opacity = '0'; // 마우스가 떠나면 아이콘을 보이지 않게 함
+                                                                                },
+                                                                                style: { cursor: 'pointer' },
+                                                                                onClick: (event) => {
+                                                                                    if (editingRow === record.id) {
+                                                                                        event.stopPropagation(); // 수정 모드일 때 행 클릭 방지
+                                                                                    } else {
+                                                                                        handleModalSelect(record); // 행 클릭 시 품목 그룹 선택
+                                                                                    }
+                                                                                },
+                                                                            })}
+                                                                        />
+
+                                                                        {/* 추가 필드 렌더링 */}
+                                                                        {isAdding && (
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                                                                                {/* 코드 입력 필드 */}
+                                                                                <Input
+                                                                                    value={newGroup.code}
+                                                                                    onChange={(e) => setNewGroup({ ...newGroup, code: e.target.value })}
+                                                                                    placeholder="코드 입력"
+                                                                                    style={{ width: '30%', marginRight: '10px'  }} // 너비와 높이 조절
+                                                                                />
+
+                                                                                {/* 그룹명 입력 필드 */}
+                                                                                <Input
+                                                                                    value={newGroup.name}
+                                                                                    onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
+                                                                                    placeholder="그룹명 입력"
+                                                                                    style={{ width: '70%', marginRight: '10px'  }} // 너비는 코드 필드와 맞춤
+                                                                                />
+
+                                                                                {/* 저장 아이콘 */}
+                                                                                <Tooltip title="저장">
+                                                                                    <CheckOutlined
+                                                                                        style={{ fontSize: '20px', cursor: 'pointer', color: 'blue' }}
+                                                                                        onClick={handleAddGroup} // 새 그룹 저장 함수
+                                                                                    />
+                                                                                </Tooltip>
+                                                                            </div>
+                                                                        )}
+                                                                    </>
                                                                 )}
                                                             </>
                                                         )}
@@ -870,6 +1001,13 @@ const ProductManagementPage = ( {initialData} ) => {
                                                         )}
 
                                                         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                            {currentField === 'productGroup' && (
+                                                                <>
+                                                                    <Button onClick={handleAddNewRow} variant="contained" type="primary" sx={{ mr: 1 }}>
+                                                                        추가
+                                                                    </Button>
+                                                                </>
+                                                            )}
                                                             <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
                                                                 닫기
                                                             </Button>
