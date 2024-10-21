@@ -4,15 +4,17 @@ export const workerAssignmentColumns = [
         dataIndex: 'workcenterName',
         key: 'workcenterName',
         width: '20%',
+        align: 'center',
         render: (text, record) => (
             <div>[{record.workcenterCode}] {text}</div>
         ),
     },
     {
-        title: <div>작업자</div>,
+        title: <div>작업자(사번)</div>,
         dataIndex: 'workerName',
         key: 'workerName',
         width: '25%',
+        align: 'center',
         render: (text, record) => (
             <div>{text} ({record.employeeNumber})</div>
         ),
@@ -22,6 +24,7 @@ export const workerAssignmentColumns = [
         dataIndex: 'assignmentDate',
         key: 'assignmentDate',
         width: '15%',
+        align: 'center',
         render: (text) => (
             <div>{text ? new Date(text).toLocaleDateString() : '-'}</div>
         ),
@@ -31,6 +34,7 @@ export const workerAssignmentColumns = [
         dataIndex: 'shiftTypeName',
         key: 'shiftTypeName',
         width: '15%',
+        align: 'center',
         render: (text) => <div>{text}</div>,
     },
     {
@@ -38,6 +42,7 @@ export const workerAssignmentColumns = [
         dataIndex: 'productionOrderName',
         key: 'productionOrderName',
         width: '25%',
+        align: 'center',
         render: (text) => <div>{text}</div>,
     },
 ];
