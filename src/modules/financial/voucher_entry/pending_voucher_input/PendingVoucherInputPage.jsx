@@ -448,9 +448,10 @@ const PendingVoucherInputPage = () => {
                                                     <Table.Summary.Cell index={3} />
                                                     <Table.Summary.Cell index={4} />
                                                     <Table.Summary.Cell index={5} />
-                                                    <Table.Summary.Cell index={6} />
-                                                    <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalDebit).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={8}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalCredit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalDebit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalCredit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={8} />
+                                                    <Table.Summary.Cell index={9} />
                                                 </Table.Summary.Row>
                                                 ) : null
                                             )}
