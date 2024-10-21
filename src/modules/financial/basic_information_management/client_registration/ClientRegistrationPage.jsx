@@ -364,7 +364,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 dataIndex: 'representativeName',
                                                 key: 'representativeName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
@@ -372,7 +372,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 dataIndex: 'printClientName',
                                                 key: 'printClientName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '15%'
                                             },
                                             {
@@ -1269,9 +1269,24 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                    { title: '은행명', dataIndex: 'name', key: 'name', align: 'center' },
-                                                                    { title: '사업자번호', dataIndex: 'businessNumber', key: 'businessNumber', align: 'center' },
+                                                                    {
+                                                                        title: <div className="title-text">코드</div>,
+                                                                        dataIndex: 'code',
+                                                                        key: 'code',
+                                                                        align: 'center'
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">은행명</div>,
+                                                                        dataIndex: 'name',
+                                                                        key: 'name',
+                                                                        align: 'center'
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">사업자번호</div>,
+                                                                        dataIndex: 'businessNumber',
+                                                                        key: 'businessNumber',
+                                                                        align: 'center'
+                                                                    },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="code"
@@ -1318,9 +1333,14 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '사원번호', dataIndex: 'employeeNumber', key: 'employeeNumber', align: 'center' },
                                                                     {
-                                                                        title: '이름',
+                                                                        title: <div className="title-text">사원번호</div>,
+                                                                        dataIndex: 'employeeNumber',
+                                                                        key: 'employeeNumber',
+                                                                        align: 'center'
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">이름</div>,
                                                                         key: 'name',
                                                                         align: 'center',
                                                                         render: (text, record) => `${record.lastName}${record.firstName}`, // firstName과 lastName을 합쳐서 출력
@@ -1370,8 +1390,20 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    {
+                                                                        title: <div className="title-text">코드</div>,
+                                                                        dataIndex: 'code',
+                                                                        key: 'code',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>,
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">이름</div>,
+                                                                        dataIndex: 'name',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>,
+                                                                    },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="id"

@@ -199,6 +199,10 @@ input.ant-input[readonly] {
  /*antd 테이블 영역 시작 */
 
 /* 모든 테이블 제목에 적용 */
+.child-table-row {
+    background-color: red !important;
+}
+
 .highlight-row {
   background-color: #e6f7ff !important;
 }
