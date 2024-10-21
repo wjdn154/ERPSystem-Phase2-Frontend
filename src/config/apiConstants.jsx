@@ -45,6 +45,9 @@ export const FINANCIAL_API = {
     UNRESOLVED_VOUCHER_SEARCH_API: `${API_BASE_URL}/api/financial/general-voucher-entry/showUnresolvedVoucher`, // 미결 전표 조회 API
     SAVE_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/unresolvedVoucherEntry`, // 미결 전표 저장 API
     SALE_END_PURCHASE_RESOLVED_VOUCHER_SEARCH_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/shows`, // 매입매출 전표 조회 API
+    SALE_END_PURCHASE_RESOLVED_VOUCHER_APPROVE_SEARCH_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/approveSearch`, // 매입매출 전표 승인 조회 API
+    SALE_END_PURCHASE_RESOLVED_VOUCHER_ENTRY_SEARCH_API: `${API_BASE_URL}/api/financial/sale-and-purchase-resolved-voucher/show/entryShow`,
+    SALE_END_PURCHASE_RESOLVED_VOUCHER_ENTRY_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/entryShow`,
     VAT_TYPE_SEARCH_API: `${API_BASE_URL}/api/financial/vatType/show`, // 부가세유형 목록 조회 API
     APPROVAL_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/approvalUnresolvedVoucher`,  // 미결 전표 승인 API
     UNRESOLVED_VOUCHER_APPROVAL_SEARCH_API: `${API_BASE_URL}/api/financial/general-voucher-entry/approvalSearch`,  // 미결 전표 승인탭 조회 API
@@ -52,7 +55,10 @@ export const FINANCIAL_API = {
     VAT_AMOUNT_QUANTITY_PRICE_API: `${API_BASE_URL}/api/financial/vatType/vatAmount/quantityPrice`, // 수량, 단가로 부가세 계산 API
     VAT_AMOUNT_SUPPLY_AMOUNT_API: `${API_BASE_URL}/api/financial/vatType/vatAmount/supplyAmount`, // 공급가액으로 부가세 계산 API
     SALE_AND_PURCHASE_UNRESOLVED_VOUCHER_ENTRY_API: `${API_BASE_URL}/api/financial/sale-and-purchase-unresolved-voucher/entry`, // 매입매출 미결전표 등록 API
+    SALE_AND_PURCHASE_UNRESOLVED_VOUCHER_APPROVE_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/approve`, // 매입매출 미결전표 승인 API
     VAT_TYPE_ID_API: `${API_BASE_URL}/api/financial/vatType/vatType/id`, // 부가세유형 ID로 조회 API
+
+
 
 
     // 거래처 및 계정과목별 원장 API

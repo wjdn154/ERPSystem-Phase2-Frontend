@@ -50,8 +50,9 @@ export const subMenuItems = {
             text: '전표관리',
             items: [
                 { text: '일반전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 미결전표입력 권한
-                { text: '매입매출전표입력', component: 'SalesPurchaseVoucherEntryPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
-                { text: '미결전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '일반전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '매입매출전표입력', component: 'PendingSalesPurchaseVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
+                { text: '미결매입매출전표승인', component: 'PendingSalesPurchaseVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-sales-purchase-voucher-approval', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'ADMIN' },
                 { text: '전자세금계산서발행', component: 'ElectronicTaxInvoicePage', apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한
             ]
         },
