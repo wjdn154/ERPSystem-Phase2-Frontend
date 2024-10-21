@@ -199,7 +199,16 @@ input.ant-input[readonly] {
  /*antd 테이블 영역 시작 */
 
 /* 모든 테이블 제목에 적용 */
-.summary-row {
+.highlight-row {
+  background-color: #e6f7ff !important;
+}
+
+.ant-table-cell-fix-left {
+  background-color: #F7F7F7 !important;
+  border-right: 1px solid #e8e8e8 !important;
+}
+
+.summary-row .ant-table-cell {
   background-color: #F7F7F7;
 }
 

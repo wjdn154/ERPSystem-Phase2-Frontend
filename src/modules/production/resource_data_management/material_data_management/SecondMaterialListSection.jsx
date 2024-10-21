@@ -42,7 +42,7 @@ const SecondMaterialListSection = ({
     return (
         <Grid container spacing={2}>
             {/*자재 목록 왼쪽에 배치*/}
-            <Grid item xs={4}>
+            <Grid item xs={5}>
                 <Paper elevation={3} sx={{height: '100%', p: 2, mr: 2}}>
 
                     <AntTable
@@ -67,7 +67,7 @@ const SecondMaterialListSection = ({
             </Grid>
 
             {/*품목과 유해물질 리스트를 위아래로 배치*/}
-            <Grid item xs={8}>
+            <Grid item xs={7}>
                 <Grid container spacing={2} direction={'column'}>
                     {/*품목 리스트*/}
                     <Grid item>
@@ -104,7 +104,7 @@ const SecondMaterialListSection = ({
                                            readOnly/>
                                     <Input value={materialDataDetail.product?.productCode || ''}
                                            style={{marginRight: '30px', flex: 1}}
-                                           onClick={handleProductCodeClick}
+                                           //onClick={handleProductCodeClick}
                                            readOnly/>
 
                                     <Input value={"품목 명"}
@@ -114,29 +114,29 @@ const SecondMaterialListSection = ({
                                            onChange={(e) => handleInputChange(e, 'productName')}/>
                                 </div>
 
-                                <AntModal
-                                    title={"품목 코드 선택"}
-                                    open={isProductCodeModalVisible}
-                                    onOk={handleProductCodeSelectOk}
-                                    onCancel={handleProductCodeModalCancel}
-                                    width={600}
-                                >
-                                    <AntTable
-                                        style={{padding: '20px'}}
-                                        columns={productCodeColumn}
-                                        dataSource={productCodeData}
-                                        pagination={{pageSize: 5, position: ['bottomCenter'], showSizeChanger: false}}
-                                        rowSelection={handleProductRowSelection}
-                                        size="small"
-                                        rowKey="id"
-                                        onRow={(record) => ({
-                                            onClick: () => onProductCodeRowClick(record),
-                                            style: {cursor: 'pointer'},
-                                        })}
-                                    >
+                                {/*<AntModal*/}
+                                {/*    title={"품목 코드 선택"}*/}
+                                {/*    open={isProductCodeModalVisible}*/}
+                                {/*    onOk={handleProductCodeSelectOk}*/}
+                                {/*    onCancel={handleProductCodeModalCancel}*/}
+                                {/*    width={600}*/}
+                                {/*>*/}
+                                {/*    <AntTable*/}
+                                {/*        style={{padding: '20px'}}*/}
+                                {/*        columns={productCodeColumn}*/}
+                                {/*        dataSource={productCodeData}*/}
+                                {/*        pagination={{pageSize: 5, position: ['bottomCenter'], showSizeChanger: false}}*/}
+                                {/*        rowSelection={handleProductRowSelection}*/}
+                                {/*        size="small"*/}
+                                {/*        rowKey="id"*/}
+                                {/*        onRow={(record) => ({*/}
+                                {/*            onClick: () => onProductCodeRowClick(record),*/}
+                                {/*            style: {cursor: 'pointer'},*/}
+                                {/*        })}*/}
+                                {/*    >*/}
 
-                                    </AntTable>
-                                </AntModal>
+                                {/*    </AntTable>*/}
+                                {/*</AntModal>*/}
                             </AntModal>
                         </Paper>
                     </Grid>
