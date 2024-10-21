@@ -9,11 +9,11 @@ const WorkcenterListSection = ({ columns, data, handleRowSelection, handleSelect
 
   return (
       <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-        <Table
+          <Table
             columns={columns}
             dataSource={data}
             pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-            rowSelection={handleRowSelection} // checkbox or radio btn 활성화
+            rowSelection={handleSelectedRow} // checkbox or radio btn 활성화
             size="small"
             rowKey="code" // Workcenter에서 고유 CODE 필드를 사용
             onRow={(record) => ({
