@@ -11,14 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '재고 실사 상세',
-            children: (
-                <Typography>
-                    특정 실사의 세부 내용을 확인하고, 필요 시 실사 결과를 수정할 수 있음.
-                </Typography>
-            ),
-        },
     ];
 }
