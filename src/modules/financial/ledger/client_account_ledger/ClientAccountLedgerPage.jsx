@@ -149,34 +149,11 @@ const ClientAccountLedgerPage = () => {
             const response = await apiClient.post(FINANCIAL_API.CLIENT_AND_ACCOUNT_SUBJECT_LEDGER_API, searchParams);
             const data = response.data;
             setClientAndAccountLedgerData(data);
+            notify('success', '조회 성공', '거래처별 계정과목별 조회 성공.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '거래처별 계정과목별 원장 조회 중 오류가 발생했습니다.', 'top');
         }
     };
-
-    const ClientAndAccountSubjectLedgerColumns = [
-        {
-            title: <div className="title-text">거래처</div>,
-            dataIndex: 'clientCode',
-            key: 'clientCode',
-            align: 'center',
-            render: (text, record) => <div className="small-text">[{text.padStart(5, '0')}] {record.clientName} </div>
-        },
-        {
-            title: <div className="title-text">등록번호</div>,
-            dataIndex: 'clientRegisterNumber',
-            key: 'clientRegisterNumber',
-            align: 'center',
-            render: (text) => <div className="small-text">{text}</div>
-        },
-        {
-            title: <div className="title-text">대표자명</div>,
-            dataIndex: 'ownerName',
-            key: 'ownerName',
-            align: 'center',
-            render: (text) => <div className="small-text">{text}</div>
-        },
-    ];
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -201,7 +178,7 @@ const ClientAccountLedgerPage = () => {
                     <Grid item xs={12} md={6} sx={{ minWidth: '610px' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }} >거래처 원장 조회</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >거래처별 계정과목별 원장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
@@ -301,29 +278,29 @@ const ClientAccountLedgerPage = () => {
 
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
                                             <Col>
-                                            <Form.Item
-                                                label="조회 기간"
-                                                required
-                                                tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
-                                            >
-                                                <RangePicker
-                                                    disabledDate={(current) => current && current.year() !== 2024}
-                                                    onChange={handleDateChange}
-                                                    defaultValue={[
-                                                        searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                        searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                                    ]}
-                                                    format="YYYY-MM-DD"
-                                                    style={{ width: '250px' }}
-                                                />
-                                            </Form.Item>
+                                                <Form.Item
+                                                    label="조회 기간"
+                                                    required
+                                                    tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                >
+                                                    <RangePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
+                                                        onChange={handleDateChange}
+                                                        defaultValue={[
+                                                            searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                            searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                        ]}
+                                                        format="YYYY-MM-DD"
+                                                        style={{ width: '250px' }}
+                                                    />
+                                                </Form.Item>
                                             </Col>
                                             <Col>
-                                            <Form.Item>
-                                                <Button style={{ width: '100px' }} type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
-                                                    검색
-                                                </Button>
-                                            </Form.Item>
+                                                <Form.Item>
+                                                    <Button style={{ width: '100px' }} type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
+                                                        검색
+                                                    </Button>
+                                                </Form.Item>
                                             </Col>
                                         </Row>
                                     </Form>
@@ -332,7 +309,29 @@ const ClientAccountLedgerPage = () => {
                                 <Grid sx={{ margin: '20px' }}>
                                     <Table
                                         dataSource={clientAndAccountLedgerData}
-                                        columns={ClientAndAccountSubjectLedgerColumns}
+                                        columns={[
+                                            {
+                                                title: <div className="title-text">거래처</div>,
+                                                dataIndex: 'clientCode',
+                                                key: 'clientCode',
+                                                align: 'center',
+                                                render: (text, record) => <div className="small-text">[{text.padStart(5, '0')}] {record.clientName} </div>
+                                            },
+                                            {
+                                                title: <div className="title-text">등록번호</div>,
+                                                dataIndex: 'clientRegisterNumber',
+                                                key: 'clientRegisterNumber',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">대표자명</div>,
+                                                dataIndex: 'ownerName',
+                                                key: 'ownerName',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>
+                                            }
+                                        ]}
                                         rowKey="clientCode"
                                         rowSelection={{
                                             type: 'radio',
@@ -372,7 +371,7 @@ const ClientAccountLedgerPage = () => {
                         <Grid item xs={12} md={6} sx={{ minWidth: '610px' }}>
                             <Grow in={true} timeout={200}>
                                 <Paper elevation={3} sx={{ height: '100%' }}>
-                                    <Typography variant="h6" sx={{ padding: '20px' }}>거래처 원장 상세 조회</Typography>
+                                    <Typography variant="h6" sx={{ padding: '20px' }}>거래처별 계정과목별 원장 상세 조회</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                         <Table
                                             dataSource={clientAndAccountLedgerDetailData?.detailList}
@@ -396,14 +395,14 @@ const ClientAccountLedgerPage = () => {
                                                     dataIndex: 'totalDebitAmount',
                                                     key: 'totalDebitAmount',
                                                     align: 'center',
-                                                    render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : ''
+                                                    render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : <div className="small-text" style={{ textAlign: 'right' }}>0</div>
                                                 },
                                                 {
                                                     title: <div className="title-text">대변</div>,
                                                     dataIndex: 'totalCreditAmount',
                                                     key: 'totalCreditAmount',
                                                     align: 'center',
-                                                    render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : ''
+                                                    render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> : <div className="small-text" style={{ textAlign: 'right' }}>0</div>
                                                 },
                                                 {
                                                     title: <div className="title-text">잔액</div>,

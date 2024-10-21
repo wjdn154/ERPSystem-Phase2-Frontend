@@ -16,17 +16,7 @@ export const equipmentDataHook = (initialData) => {
     const [equipmentDataDetail, setEquipmentDataDetail] = useState(null);   //상세정보
     const [isInsertModalVisible, setIsInsertModalVisible] = useState(false); //삭제 모달 상태
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
-    const [activeTabKey, setActiveTabKey] = useState('1'); // tabs state
-    const workcenterCodeRef = useRef(null);
-    const factoryCodeRef = useRef(null);
-    const equipmentNumRef = useRef(null);
-    const equipmentNameRef = useRef(null);
-    const modelNameRef = useRef(null);
-    const manufacturerRef = useRef(null);
-    const equipmentTypeRef = useRef(null);
-    const installDateRef = useRef(null);
-    const purchaseDateRef = useRef(null);
-    const equipmentImgRef = useRef(null);
+
 
     const equipmentMemoizedData = useMemo(() => data, [data]);
 
@@ -303,8 +293,7 @@ export const equipmentDataHook = (initialData) => {
         isUpdateModalVisible,
         handleInsertCancel,
         handleOpenInsertModal,
-        handleCostInput,
-        activeTabKey
+        handleCostInput
     };
 
 };

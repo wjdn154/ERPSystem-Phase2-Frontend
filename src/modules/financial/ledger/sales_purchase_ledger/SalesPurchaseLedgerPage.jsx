@@ -3,13 +3,14 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './SalesPurchaseLedgerUtil.jsx';
 import {Typography} from '@mui/material';
-import {Table, Button, DatePicker, Tag} from 'antd';
+import {Table, Button, DatePicker, Tag, Col, Row, Form} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from "dayjs";
 import apiClient from "../../../../config/apiClient.jsx";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import { Tooltip } from 'antd';
+import {SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const SalesPurchaseLedgerPage = () => {
@@ -51,45 +52,65 @@ const SalesPurchaseLedgerPage = () => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >매입매출장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 20px 20px' }}>
                                     <Grid sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        <RangePicker
-                                            disabledDate={(current) => current && current.year() !== 2024}
-                                            onChange={ (dates) => {
-                                                    if (dates) {
-                                                        setSearchParams({
-                                                            ...searchParams,
-                                                            startDate: dates[0].format('YYYY-MM-DD'),
-                                                            endDate: dates[1].format('YYYY-MM-DD'),
-                                                        });
-                                                    }
-                                                }
-                                            }
-                                            style={{ marginRight: '10px' }}
-                                            defaultValue={[
-                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                            ]}
-                                            format="YYYY-MM-DD"
-                                        />
-                                        <Button type="primary" onClick={async () => {
-                                                const { startDate, endDate } = searchParams;
-                                                // 입력값 검증
-                                                if (!startDate || !endDate) {
-                                                    notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
-                                                    return;
-                                                }
+                                        <Form layout="vertical">
+                                            <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                                <Col>
+                                                    <Form.Item
+                                                        label="조회 기간"
+                                                        required
+                                                        tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                                    >
+                                                        <RangePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            onChange={ (dates) => {
+                                                                    if (dates) {
+                                                                        setSearchParams({
+                                                                            ...searchParams,
+                                                                            startDate: dates[0].format('YYYY-MM-DD'),
+                                                                            endDate: dates[1].format('YYYY-MM-DD'),
+                                                                        });
+                                                                    }
+                                                                }
+                                                            }
+                                                            style={{ marginRight: '10px' }}
+                                                            defaultValue={[
+                                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                            ]}
+                                                            format="YYYY-MM-DD"
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item>
+                                                        <Button
+                                                            icon={<SearchOutlined />}
+                                                            style={{ width: '100px' }}
+                                                            type="primary"
+                                                            onClick={async () => {
+                                                                const { startDate, endDate } = searchParams;
+                                                                // 입력값 검증
+                                                                if (!startDate || !endDate) {
+                                                                    notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
+                                                                    return;
+                                                                }
 
-                                                try {
-                                                    const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
-                                                    const data = response.data;
-                                                    console.log(data);
-                                                    setSearchData(data);
-                                                } catch (error) {
-                                                    notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
-                                                }
-                                            }
-                                        } >
-                                            검색
-                                        </Button>
+                                                                try {
+                                                                    const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
+                                                                    const data = response.data;
+                                                                    console.log(data);
+                                                                    setSearchData(data);
+                                                                } catch (error) {
+                                                                    notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
+                                                                }
+                                                            }
+                                                            } >
+                                                            검색
+                                                        </Button>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                        </Form>
                                     </Grid>
                                     <Table
                                         dataSource={

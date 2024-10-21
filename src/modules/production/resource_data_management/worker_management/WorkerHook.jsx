@@ -6,6 +6,7 @@ import {
     updateWorkerDetail,
     fetchWorkerAttendanceAssignmentList
 } from "./WorkerApi.jsx";
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 export const workerHook = (initialData) => {
 
@@ -16,6 +17,7 @@ export const workerHook = (initialData) => {
     const [workerAttendanceDetail, setWorkerAttendanceDetail] = useState(null);   //작업배치, 근태 목록
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
     const [activeTabKey, setActiveTabKey] = useState('1'); // tabs state
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
 
     const workerMemoizedData = useMemo(() => data, [data]);
 
@@ -128,18 +130,16 @@ export const workerHook = (initialData) => {
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
-            const confirmSave = window.confirm("수정하시겠습니까?");
             console.log("수정버튼 클릭 시 workerDetail : ",workerDetail);
 
             await updateWorkerDetail(workerDetail.id, workerDetail);
             const updatedData = await fetchWorkerList();
-            window.alert("수정완료되었습니다.");
-            setIsUpdateModalVisible(false);
+            notify('success', '안전교육 이수 여부 수정', '안전교육 이수 여부 수정 성공', 'bottomRight')
             setData(updatedData);
         } catch (error) {
-            console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
+            notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
-    }
+    };
 
 
     return {
@@ -159,7 +159,8 @@ export const workerHook = (initialData) => {
         handleTabChange,
         handleSelectedAttendanceRow,
         setWorkerAttendanceDetail,
-        workerAttendanceDetail
+        workerAttendanceDetail,
+        handleUpdate,
 
     };
 
