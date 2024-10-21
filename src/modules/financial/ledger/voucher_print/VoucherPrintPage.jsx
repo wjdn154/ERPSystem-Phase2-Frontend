@@ -122,8 +122,8 @@ const VoucherPrintPage = () => {
 
         try {
             const response = await apiClient.post(FINANCIAL_API.VOUCHER_PRINT_SEARCH_API, searchParams);
-            const data = response.data;
-            setSearchData(data); // 조회된 데이터를 상태로 설정
+            setSearchData(response.data);
+            console.log(response.data);
             notify('success', '조회 성공', '전표 조회 성공.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '전표 조회 중 오류가 발생했습니다.', 'top');
