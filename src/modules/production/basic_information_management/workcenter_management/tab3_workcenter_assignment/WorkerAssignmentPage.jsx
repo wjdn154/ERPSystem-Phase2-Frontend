@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import WorkerAssignmentPerWorkcenterList from './WorkerAssignmentPerWorkcenterList.jsx';
 import { workerAssignmentColumns } from './WorkerAssignmentColumns.jsx'; // 컬럼 설정
-import {Modal, Select, Table, Input, DatePicker, Button, Typography, Col, Row, Form} from 'antd';
+import {Modal, Select, Table, Input, DatePicker, Button, Typography, Col, Row, Form, Spin} from 'antd';
 import apiClient from "../../../../../config/apiClient.jsx";
 import { PRODUCTION_API } from "../../../../../config/apiConstants.jsx"
 import {useNotificationContext} from "../../../../../config/NotificationContext.jsx";
 import dayjs from 'dayjs';
 import {Grid, Box } from "@mui/material";
-import {PrinterOutlined, SearchOutlined} from "@ant-design/icons";
+import {DownSquareOutlined, PrinterOutlined, SearchOutlined} from "@ant-design/icons";
 
 const { RangePicker } = DatePicker;
 
@@ -21,6 +20,7 @@ const WorkerAssignmentPage = () => {
     const [currentField, setCurrentField] = useState(null); // 현재 선택된 필드 (공장 or 작업장)
     const [modalData, setModalData] = useState([]);
     const [initialModalData, setInitialModalData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [workerAssignments, setWorkerAssignments] = useState([]);
     const [selectedFactory, setSelectedFactory] = useState(null);  // 공장 선택 상태
@@ -58,26 +58,27 @@ const WorkerAssignmentPage = () => {
     const fetchWorkerAssignments = async () => {
         setLoading(true);
         try {
-            console.log("fetchWorkerAssignments API 호출 시작");
-
             const response = await apiClient.post(
-                PRODUCTION_API.WORKER_ASSIGNMENT_TODAY_SUMMARY_API,
+                PRODUCTION_API.WORKER_ASSIGNMENT_DAILY_API,
                 null, // POST 요청 본문은 필요하지 않음
                 {
                     params: {
-                        includeShiftType: true, // 필수 파라미터
-                        shiftType: 1, // 유효한 기본값 설정 (예: 1)
+                        includeShiftType: false, // 필수 파라미터
+                        // shiftType: 1, // 유효한 기본값 설정 (예: 1)
                         date: selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
 
                     },
                 }
             );
+            console.log("fetchWorkerAssignments API 응답:", response.data); // 응답 확인
 
-            setWorkerAssignments(response.data.workerAssignments); // 데이터 설정
+            setWorkerAssignments(response.data); // workerAssignments 필드가 아닌 리스트 자체로 설정
             setLoading(false);
         } catch (error) {
             console.error("작업자 배정 데이터를 불러오는데 실패했습니다.", error);
-            setLoading(false);
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -87,13 +88,13 @@ const WorkerAssignmentPage = () => {
             const response = await apiClient.post(PRODUCTION_API.SEARCH_FACTORIES_API);
             setInitialModalData(response.data);
             setModalData(response.data);
-            console.log('공장 데이터:', response.data); // 데이터 확인
             setFactoryList(response.data);
             setFilteredFactoryList(response.data);
-            notify('success', '조회 성공', '공장 목록을 정상적으로 조회했습니다.')
         } catch (error) {
             console.error('공장 목록을 불러오는데 실패했습니다.', error);
             notify('error', '조회 오류', '공장목록을 불러오는 중 오류가 발생했습니다.')
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -109,14 +110,13 @@ const WorkerAssignmentPage = () => {
                 response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API);
             }
             // setInitialModalData(filteredWorkcenters);
-            console.log('작업장 데이터:', response.data); // 데이터 확인
             setWorkcenterList(response.data);
             setFilteredWorkcenterList(response.data);
-            notify('success', '조회 성공', '공장별 작업장 목록을 정상적으로 조회했습니다.')
-
         } catch (error) {
             console.error('작업장 목록을 불러오는데 실패했습니다.', error);
             notify('error', '조회 오류', '작업장 목록을 불러오는 중 오류가 발생했습니다.')
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -149,20 +149,21 @@ const WorkerAssignmentPage = () => {
         }
     };
 
-    // 모달 닫기
-    const closeModal = () => setIsModalVisible(false);
-
-    // **모달에서 선택한 값 처리**
-    const handleModalSelect = (field, record) => {
-        setDisplayValues((prev) => ({
-            ...prev,
-            [field]: `[${record.code}] ${record.name}`
-        }));
-        field === 'factory'
-            ? fetchWorkcentersByFactory(record.code)
-            : setIsWorkcenterModalVisible(false);
-        setIsFactoryModalVisible(false);
+    const handleModalCancel = () => {
+        setIsModalVisible(false);  // 모달창 닫기
     };
+    //
+    // // **모달에서 선택한 값 처리**
+    // const handleModalSelect = (field, record) => {
+    //     setDisplayValues((prev) => ({
+    //         ...prev,
+    //         [field]: `[${record.code}] ${record.name}`
+    //     }));
+    //     field === 'factory'
+    //         ? fetchWorkcentersByFactory(record.code)
+    //         : setIsWorkcenterModalVisible(false);
+    //     setIsFactoryModalVisible(false);
+    // };
 
     // 모달 검색 핸들러
     const handleSearch = (value, field) => {
@@ -223,27 +224,30 @@ const WorkerAssignmentPage = () => {
                     <Col span={6}>
                         <Form.Item label="공장 선택" tooltip="찾으시는 공장을 검색하세요.">
                             <Input
-                                placeholder={displayValues.factory || '공장 선택'}
-
-                                // placeholder={selectedFactory ? `[${selectedFactory.code}] ${selectedFactory.name}` : '공장 선택'}
+                                value={displayValues.factory}
+                                placeholder="공장 선택"
                                 onClick={() => {
                                     setIsFactoryModalVisible(true);
                                     fetchFactories();
                                 }}
                                 className={displayValues.factory ? 'selected-input' : 'placeholder-input'}
-                                style={{ caretColor: 'transparent', cursor: 'pointer' }}                            />
+                                style={{ caretColor: 'transparent', cursor: 'pointer' }}
+                                suffix={<DownSquareOutlined />}
+                            />
                         </Form.Item>
                     </Col>
                     <Col span={6}>
                         <Form.Item label="작업장 선택" tooltip="찾으시는 작업장을 검색하세요.">
                             <Input
-                                placeholder={selectedWorkcenter ? `[${selectedWorkcenter.code}] ${selectedWorkcenter.name}` : '작업장 선택'}
+                                value={displayValues.workcenter}
+                                placeholder="작업장 선택"
                                 onClick={() => {
                                     setIsWorkcenterModalVisible(true);
                                     fetchWorkcentersByFactory(selectedFactory);
                             }}
                                 className={displayValues.workcenter ? 'selected-input' : 'placeholder-input'}
                                 style={{ caretColor: 'transparent', cursor: 'pointer' }}
+                                suffix={<DownSquareOutlined />}
                             />
                         </Form.Item>
                     </Col>
@@ -259,6 +263,7 @@ const WorkerAssignmentPage = () => {
                     <Col span={4}>
                         <Form.Item label=" ">
                             <Button
+                                style={{ width: '100px' }}
                                 type="primary"
                                 icon={<SearchOutlined />}
                                 onClick={handleSearchByDate}
@@ -272,65 +277,149 @@ const WorkerAssignmentPage = () => {
 
                 {/* 공장 선택 모달 */}
                 <Modal
-                    title="공장 선택"
-                    visible={isFactoryModalVisible}
+                    open={isFactoryModalVisible}
                     onCancel={() => setIsFactoryModalVisible(false)}
+                    // onCancel={handleModalCancel}
                     footer={null}
                     width="40vw"
                 >
-                    <Input
-                        placeholder="공장 코드 또는 이름 검색"
-                        onChange={(e) => handleSearch(e.target.value, 'factory')}
-                        style={{ marginBottom: '16px' }}
-                    />
-                    <Table
-                        dataSource={filteredFactoryList}
-                        columns={[
-                            { title: '코드', dataIndex: 'code', key: 'code' },
-                            { title: '이름', dataIndex: 'name', key: 'name' },
-                        ]}
-                        rowKey="code"
-                        onRow={(record) => ({
-                            onClick: () => handleFactorySelect(record),
-                            // onClick: () => handleModalSelect(record), // 선택 핸들러 연결
-                        })}
-                    />
+                    {isLoading ? (
+                        <Spin />  // 로딩 스피너
+                    ) : (
+                    <>
+                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                            공장 선택
+                        </Typography>
+                        <Input
+                            placeholder="공장 코드 또는 이름 검색"
+                            prefix={<SearchOutlined />}
+                            onChange={(e) => handleSearch(e.target.value, 'factory')}
+                            style={{ marginBottom: 16 }}
+                        />
+                        <Table
+                            dataSource={filteredFactoryList}
+                            columns={[
+                                {
+                                    title: <div className="title-text">코드</div>,
+                                    dataIndex: 'code',
+                                    key: 'code',
+                                    align: 'center',
+                                    render: (text) => <div className="small-text">{text}</div>
+                                },
+                                {
+                                    title: <div className="title-text">이름</div>,
+                                    dataIndex: 'name',
+                                    key: 'name',
+                                    align: 'center',
+                                    render: (text) => <div className="small-text">{text}</div>
+                                },
+                            ]}
+                            rowKey="code"
+                            size={'small'}
+                            pagination={{
+                                pageSize: 15,
+                                position: ['bottomCenter'],
+                                showSizeChanger: false,
+                                showTotal: (total) => `총 ${total}개`,
+                            }}
+                            onRow={(record) => ({
+                                style: { cursor: 'pointer' },
+                                onClick: () => handleFactorySelect(record),
+                                // onClick: () => handleModalSelect(record), // 선택 핸들러 연결
+                            })}
+                        />
+                    </>)}
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button onClick={() => setIsFactoryModalVisible(false)} variant="contained" type="danger" sx={{ mr: 1 }}>
+                            닫기
+                        </Button>
+                    </Box>
                 </Modal>
 
                 {/* 작업장 선택 모달 */}
                 <Modal
-                    title="작업장 선택"
-                    visible={isWorkcenterModalVisible}
+                    open={isWorkcenterModalVisible}
                     onCancel={() => setIsWorkcenterModalVisible(false)}
                     footer={null}
                     width="40vw"
                 >
+                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                        작업장 선택
+                    </Typography>
                     <Input
                         placeholder="작업장 코드 또는 이름 검색"
+                        prefix={<SearchOutlined />}
                         onChange={(e) => handleSearch(e.target.value, 'workcenter')}
                         style={{ marginBottom: '16px' }}
                     />
                     <Table
                         dataSource={filteredWorkcenterList}
                         columns={[
-                            { title: '코드', dataIndex: 'code', key: 'code' },
-                            { title: '이름', dataIndex: 'name', key: 'name' },
+                            {
+                                title: <div className="title-text">코드</div>,
+                                dataIndex: 'code',
+                                key: 'code',
+                                align: 'center',
+                                render: (text) => <div className="small-text">{text}</div>
+                            },
+                            {
+                                title: <div className="title-text">이름</div>,
+                                dataIndex: 'name',
+                                key: 'name',
+                                align: 'center',
+                                render: (text) => <div className="small-text">{text}</div>
+                            },
                         ]}
                         rowKey="code"
+                        size={'small'}
+                        pagination={{
+                            pageSize: 15,
+                            position: ['bottomCenter'],
+                            showSizeChanger: false,
+                            showTotal: (total) => `총 ${total}개`,
+                        }}
                         onRow={(record) => ({
+                            style: { cursor: 'pointer' },
                             onClick: () => handleWorkcenterSelect(record),
                             // onClick: () => handleModalSelect(record), // 선택 핸들러 연결
                         })}
                     />
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button onClick={() => setIsWorkcenterModalVisible(false)} variant="contained" type="danger" sx={{ mr: 1 }}>
+                            닫기
+                        </Button>
+                    </Box>
                 </Modal>
             </Form>
             {/* 작업자 배정 리스트 */}
-            <WorkerAssignmentPerWorkcenterList
-                columns={workerAssignmentColumns}
-                data={workerAssignments}
-                loading={loading}
-                rowClassName={(record) => (record.id === selectedDate?.id ? 'selected-row' : '')}
-            />
+            <Grid>
+                <Table
+                    columns={workerAssignmentColumns}
+                    dataSource={workerAssignments}
+                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                    size="small"
+                    rowKey="id" // WorkerAssignment에서 id 필드를 사용
+                    onRow={(record) => ({
+                        onClick: () => handleSelectedRow(record), // 행 클릭 시 해당 배정이력 선택
+                        style: { cursor: 'pointer' },
+                    })}
+                    rowClassName={(record) => (record.id === selectedDate?.id ? 'selected-row' : '')}
+                />
+                {/*{tableData.length === 0 && (*/}
+                {/*    <Typography style={{ marginTop: '16px', textAlign: 'center' }}>*/}
+                {/*        배정된 작업자 명단이 없습니다.*/}
+                {/*    </Typography>*/}
+                {/*)}*/}
+            </Grid>
+
+
+
+            {/*<WorkerAssignmentPerWorkcenterList*/}
+            {/*    columns={workerAssignmentColumns}*/}
+            {/*    data={workerAssignments}*/}
+            {/*    loading={loading}*/}
+            {/*    rowClassName={(record) => (record.id === selectedDate?.id ? 'selected-row' : '')}*/}
+            {/*/>*/}
             <Box
                 sx={{
                     display: 'flex',

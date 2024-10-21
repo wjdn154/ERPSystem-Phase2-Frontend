@@ -10,7 +10,6 @@ const WorkerAssignmentPerWorkcenterList = ({ columns, data, handleRowSelection, 
     const [allAssignments, setAllAssignments] = useState([]);
     const notify = useNotificationContext();
 
-
     // 전체 작업자 배정 목록 가져오기
     useEffect(() => {
         fetchAllAssignments();
@@ -18,9 +17,9 @@ const WorkerAssignmentPerWorkcenterList = ({ columns, data, handleRowSelection, 
 
     const fetchAllAssignments = async () => {
         try {
-            console.log("fetchAllAssignments: ");
+            console.log("fetchAllAssignments @perList: ");
             const response = await apiClient.post(
-                PRODUCTION_API.WORKER_ASSIGNMENT_TODAY_SUMMARY_API,
+                PRODUCTION_API.WORKER_ASSIGNMENT_DAILY_API,
                 null, // 본문이 필요 없으면 null로 설정
                 {
                     params: {
@@ -46,18 +45,18 @@ const WorkerAssignmentPerWorkcenterList = ({ columns, data, handleRowSelection, 
         }
     };
 
-    // 교대유형별 구분
-    const fetchWorkerAssignmentsByShiftType = async (shiftTypeId) => {
-        try {
-            const response = await apiClient.post(PRODUCTION_API.WORKER_ASSIGNMENT_TODAY_SUMMARY_API, null, {
-                params: { includeShiftType: true, shiftType: shiftTypeId },
-            });
-            setAllAssignments(response.data.workerAssignments);
-        } catch (error) {
-            console.error("작업자 배정 조회 실패:", error);
-            notify('error', '조회 오류', '전체 작업자 배정 목록을 불러오는 중 오류가 발생했습니다.');
-        }
-    };
+    // // 교대유형별 구분
+    // const fetchWorkerAssignmentsByShiftType = async (shiftTypeId) => {
+    //     try {
+    //         const response = await apiClient.post(PRODUCTION_API.WORKER_ASSIGNMENT_TODAY_SUMMARY_API, null, {
+    //             params: { includeShiftType: true, shiftType: shiftTypeId },
+    //         });
+    //         setAllAssignments(response.data.workerAssignments);
+    //     } catch (error) {
+    //         console.error("작업자 배정 조회 실패:", error);
+    //         notify('error', '조회 오류', '전체 작업자 배정 목록을 불러오는 중 오류가 발생했습니다.');
+    //     }
+    // };
 
     // `data`가 존재하면 사용하고, 없으면 `allAssignments` 사용
     const tableData = Array.isArray(data) && data.length > 0 ? data : allAssignments;
