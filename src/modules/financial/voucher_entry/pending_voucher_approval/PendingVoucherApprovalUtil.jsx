@@ -5,7 +5,7 @@ export const tabItems = () => {
     return [
         {
             key: '1',
-            label: '미결 전표 목록',
+            label: '미결 일반전표 승인',
             children: (
                 <Typography>
                     승인 대기 중인 전표를 확인하고 검토할 수 있음.<br/>
@@ -15,7 +15,7 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '승인 내역',
+            label: '미결 매입매출전표 승인',
             children: (
                 <Typography>
                     승인된 전표 목록을 확인하고, 승인 일자 및 승인자를 조회할 수 있음.<br/>

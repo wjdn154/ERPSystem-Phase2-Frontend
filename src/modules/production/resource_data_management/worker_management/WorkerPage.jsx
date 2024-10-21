@@ -66,7 +66,7 @@ const WorkerPage = ({initialData}) => {
                 {/* 작업자 목록 및 상세내용 영역 */}
                 {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={9} md={9}>
+                    <Grid item xs={8} md={8}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <WorkerListSection
@@ -85,7 +85,8 @@ const WorkerPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                    <Grid item xs={9} md={9}>
+                    {workerDetail &&(
+                    <Grid item xs={8} md={8}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <WorkerDetailSection
@@ -105,12 +106,13 @@ const WorkerPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
+                        )}
                 </Grid>
 
             )}
 
             {/* 작업자 작업배치 및 근태목록 영역 */}
-            {activeTabKey === '2' && (
+            {activeTabKey === '2' &&  (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={10}>
                         <Grow in={true} timeout={200}>
