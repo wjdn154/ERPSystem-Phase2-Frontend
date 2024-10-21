@@ -129,31 +129,31 @@ export const getPermissionData = (permissions) => [
 // 사용자 테이블 컬럼 설정
 export const userColumns = [
     {
-        title: '사원번호',
+        title: <div className="title-text">사원번호</div>,
         dataIndex: 'employeeNumber',
         align: 'center',
         render: (text, record) => <span style={{ fontSize: '0.7rem' }}>{record.employeeNumber}</span>,
     },
-    {
-        title: '이름',
-        dataIndex: 'firstName',
-        align: 'center',
-        render: (text, record) => <span style={{ fontSize: '0.7rem' }}>{record.lastName}{record.firstName}</span>,
+            {
+                title: <div className="title-text">이름</div>,
+                dataIndex: 'firstName',
+                align: 'center',
+                render: (text, record) => <span style={{fontSize: '0.7rem'}}>{record.lastName}{record.firstName}</span>,
     },
     {
-        title: '직위',
+        title: <div className="title-text">직위</div>,
         dataIndex: 'positionName',
         align: 'center',
         render: (text, record) => <span style={{ fontSize: '0.7rem' }}>{record.positionName}</span>,
     },
-    {
-        title: '직책',
-        dataIndex: 'jobTitleName',
-        align: 'center',
-        render: (text, record) => <span style={{ fontSize: '0.7rem' }}>{record.jobTitleName}</span>,
+            {
+                title: <div className="title-text">직책</div>,
+                dataIndex: 'jobTitleName',
+                align: 'center',
+                render: (text, record) => <span style={{fontSize: '0.7rem'}}>{record.jobTitleName}</span>,
     },
     {
-        title: '부서',
+        title: <div className="title-text">부서</div>,
         dataIndex: 'departmentName',
         align: 'center',
         width: '20%',
