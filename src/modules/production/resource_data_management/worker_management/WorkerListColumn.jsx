@@ -1,14 +1,13 @@
 import React from "react";
 import {Tag} from "antd";
 
-const employmentStatusMap = {
+export const employmentStatusMap = {
     "ACTIVE" : "재직 중",
     "ON_LEAVE" : "휴직 중",
-    "RESIGNED" : "퇴직",
-    "PACKAGING" : "포장 설비"
+    "RESIGNED" : "퇴직"
 };
 
-const employmentTypeMap = {
+export const employmentTypeMap = {
     "FULL_TIME" : "정규직",
     "CONTRACT" : "계약직",
     "PART_TIME" : "파트타임",
