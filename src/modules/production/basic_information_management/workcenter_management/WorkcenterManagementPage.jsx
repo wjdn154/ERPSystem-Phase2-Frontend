@@ -164,6 +164,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                             handleSelectedRow={handleSelectedRow}
                             handleDeleteWorkcenter={handleDeleteWorkcenter}
                             rowClassName={getRowClassName}
+                            handleFormSubmit={handleFormSubmit}
                         />
 
                             // handleClose={handleClose}
