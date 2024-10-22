@@ -1,12 +1,17 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Grid,Paper,Typography, Box}  from "@mui/material";
-const { Option } = Select;
-import {Form, Row, Col, Input, Button, Select, Modal, DatePicker, Divider, Space} from 'antd';
+import {Form, Row, Col, Input, Button, Select, Modal, DatePicker, Divider, Space, Spin, Table} from 'antd';
 import moment from 'moment';
+import apiClient from "../../../../config/apiClient.jsx";
+import {LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {SearchOutlined} from "@ant-design/icons";
+const { Option } = Select;
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 const MaintenanceHistoryDetailSection = ({
                                         data,
                                         maintenanceDataDetail,
+                                        setMaintenanceDataDetail,
                                         handleInputChange,
                                         handleDelete,
                                         showModal,
@@ -14,7 +19,10 @@ const MaintenanceHistoryDetailSection = ({
                                         handleUpdateCancel,
                                         isUpdateModalVisible,
                                         handleUpdate
-                                    }) => (
+                                    }) =>{
+
+
+    return(
     <Paper elevation={3} sx={{p: 2}}>
         <Typography variant="h6" marginBottom={'20px'}>설비 유지보수 상세 정보</Typography>
         <Box sx={{padding: '20px'}}>
@@ -37,6 +45,26 @@ const MaintenanceHistoryDetailSection = ({
                                 addonBefore="설비 명"
                                 value={maintenanceDataDetail.equipmentName}
                                 onChange={(e) => handleInputChange(e, 'equipmentName')}
+                                readOnly
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="설치된 작업장"
+                                value={maintenanceDataDetail.workcenterName}
+                                onClick={() => handleInputClick('workcenter')}
+                                readOnly
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="설치된 공장"
+                                value={maintenanceDataDetail.factoryName}
+                                onClick={() => handleInputClick('factory')}
                                 readOnly
                             />
                         </Form.Item>
@@ -64,9 +92,9 @@ const MaintenanceHistoryDetailSection = ({
                     </Col>
                     <Col span={6}>
                         <Space.Compact>
-                            <Input style={{ width: '20%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="유형" disabled />
+                            <Input style={{ width: '30%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="유형" disabled />
                             <Select
-                                style={{ width: '80%' }}
+                                style={{ width: '70%' }}
                                 value={maintenanceDataDetail.maintenanceType}
                                 onChange={(value) =>
                                     handleInputChange({ target: { value: value } }, 'maintenanceType')
@@ -150,36 +178,15 @@ const MaintenanceHistoryDetailSection = ({
                         </Form.Item>
                     </Col>
                 </Row>
-                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>추가 정보</Divider>
-                <Row gutter={16}>
-                    <Col span={6}>
-                        <Form.Item>
-                            <Input
-                                addonBefore="설치된 작업장"
-                                value={maintenanceDataDetail.workcenterName}
-                                onChange={(e) => handleInputChange(e, 'workcenterName')}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                        <Form.Item>
-                            <Input
-                                addonBefore="설치된 공장"
-                                value={maintenanceDataDetail.factoryName}
-                                onChange={(e) => handleInputChange(e, 'factoryName')}
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
-
             </Form>
         </Box>
         <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
             <Button onClick={handleUpdate} type="primary" style={{marginRight: '10px'}}>수정</Button>
             <Button onClick={handleDelete} type="danger">삭제</Button>
         </div>
+
     </Paper>
-);
+)};
 
 
 export default MaintenanceHistoryDetailSection ;

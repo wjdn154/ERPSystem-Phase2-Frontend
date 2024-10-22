@@ -101,17 +101,13 @@ export const equipmentDataHook = (initialData) => {
     // 저장 버튼 클릭 시 실행되는 함수
     const handleSave = async () => {
         try {
-            const confirmSave = window.confirm("저장하시겠습니까?");
-
-            if (!confirmSave) return;
             console.log("저장버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
             await saveEquipmentDataDetail(equipmentDataDetail);
             const savedData = await fetchEquipmentData();
-            window.alert("저장되었습니다.");
-            setIsInsertModalVisible(false);
+            notify('success', '설비 등록', '설비 등록 성공', 'bottomRight')
             setData(savedData);
         } catch (error) {
-            console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
+            notify('error', '등록 실패', '데이터 등록 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -132,112 +128,12 @@ export const equipmentDataHook = (initialData) => {
     const handleInsertCancel = () => {
         setIsInsertModalVisible(false);
     }
-    const handleInsertOk = async () => {
-        if (!equipmentDataDetail.workcenterCode) {
-            alert("작업장 코드를 입력하세요.");
-            setTimeout(() => workcenterCodeRef.current?.focus(), 0); // 경고창 닫힌 후 해당 input으로 포커스 이동
-            return;
-        }
-        if (!equipmentDataDetail.factoryCode) {
-            alert("공장 코드를 입력하세요.");
-            setTimeout(() => factoryCodeRef.current?.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.equipmentNum) {
-            alert("설비 번호를 입력하세요.");
-            setTimeout(() => equipmentNumRef.current?.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.equipmentName) {
-            alert("설비 명을 입력하세요.");
-            setTimeout(() => equipmentNameRef.current?.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.modelName) {
-            alert("모델 명을 입력하세요.");
-            setTimeout(() => modelNameRef.current?.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.equipmentType) {
-            alert("설비 유형을 입력하세요.");
-            return;
-        }
-        if (!equipmentDataDetail.manufacturer) {
-            alert("제조사를 입력하세요.");
-            setTimeout(() => manufacturerRef.current?.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.purchaseDate) {
-            alert("구매 날짜를 입력하세요.");
-            return;
-        }if (!equipmentDataDetail.installDate) {
-            alert("설치 날짜를 입력하세요.");
-            return;
-        }
-        if (!equipmentDataDetail.operationStatus) {
-            alert("가동 상태를 입력하세요.");
-            return;
-        }
-        if (!equipmentDataDetail.cost) {
-            alert("비용을 입력하세요.");
-            setTimeout(() => costRef.current?.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.equipmentImg) {
-            alert("설비 이미지를 입력하세요.");
-            setTimeout(() => equipmentImgRef.current?.focus(), 0);
-            return;
-        }
-
-        await handleSave();
-    }
 
     //수정 버튼 클릭 시 모달창 띄우는 함수
     const showModal = () => {
         setIsUpdateModalVisible(true);
     };
 
-    const handleUpdateOk = async () => {
-        if (!equipmentDataDetail.workcenterCode) {
-            alert("작업장 코드를 입력하세요.");
-            setTimeout(() => workcenterCodeRef.current.focus(), 0); // 경고창 닫힌 후 해당 input으로 포커스 이동
-            return;
-        }
-        if (!equipmentDataDetail.factoryCode) {
-            alert("공장 코드를 입력하세요.");
-            setTimeout(() => factoryCodeRef.current.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.equipmentName) {
-            alert("설비 명을 입력하세요.");
-            setTimeout(() => equipmentNameRef.current.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.modelName) {
-            alert("모델 명을 입력하세요.");
-            setTimeout(() => modelNameRef.current.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.manufacturer) {
-            alert("제조사를 입력하세요.");
-            setTimeout(() => manufacturerRef.current.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.cost) {
-            alert("비용을 입력하세요.");
-            setTimeout(() => costRef.current.focus(), 0);
-            return;
-        }
-        if (!equipmentDataDetail.equipmentImg) {
-            alert("설비 이미지를 입력하세요.");
-            setTimeout(() => equipmentImgRef.current?.focus(), 0);
-            return;
-        }
-
-
-        await handleUpdate();
-        // 여기서 수정 작업을 진행하거나 저장할 수 있습니다.
-    };
 
     const handleUpdateCancel = () => {
         setIsUpdateModalVisible(false);
@@ -296,10 +192,8 @@ export const equipmentDataHook = (initialData) => {
         handleUpdate,
         handleDelete,
         showModal,
-        handleUpdateOk,
         handleUpdateCancel,
         insertEquipmentModal,
-        handleInsertOk,
         isInsertModalVisible,
         isUpdateModalVisible,
         handleInsertCancel,

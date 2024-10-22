@@ -6,26 +6,16 @@ import {equipmentDataListColumn} from "./EquipmentDataListColumn.jsx";
 import EquipmentDataDetailSection from "./EquipmentDataDetailSection.jsx";
 import {tabItems} from "./EquipmentDataUtil.jsx"
 import WelcomeSection from "../../../../components/WelcomeSection.jsx";
-import {
-    Button,
-    Checkbox,
-    Col,
-    DatePicker,
-    Divider,
-    Form,
-    Input,
-    Modal,
-    notification,
-    Row,
-    Select,
-    Space,
-    Spin,
-    Table
-} from "antd";
+import {Button, Checkbox, Col, DatePicker, Divider, Form, Input, Modal, notification, Row, Select, Space, Spin, Table, Upload} from "antd";
 import dayjs from "dayjs";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {PRODUCTION_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx"
 import apiClient from "../../../../config/apiClient.jsx";
+import moment from "moment/moment.js";
+import defaultImage from "../../../../assets/img/uploads/defaultImage.png";
+import {SearchOutlined} from "@ant-design/icons";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload.js";
+
 
 const EquipmentDataPage = ({initialData}) => {
 
@@ -40,6 +30,7 @@ const EquipmentDataPage = ({initialData}) => {
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
     const [displayValues, setDisplayValues] = useState({});
     const [activeTabKey, setActiveTabKey] = useState('1');
+    const [selectedFile, setSelectedFile] = useState(null);
 
     const {
         data,
@@ -51,6 +42,7 @@ const EquipmentDataPage = ({initialData}) => {
         handleInputChange,
         handleDelete,
         handleUpdate,
+        handleSave,
         showModal,
         handleInsertOk,
         handleUpdateCancel,
@@ -89,8 +81,8 @@ const EquipmentDataPage = ({initialData}) => {
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
         let apiPath;
-        if(fieldName === 'workcenter') apiPath = PRODUCTION_API.WORKER_LIST_API;
-        //if(fieldName === 'factory') apiPath = LOGISTICS_API.FACTORY_LIST_API;
+        if(fieldName === 'workcenter') apiPath = PRODUCTION_API.WORKCENTER_LIST_API;
+        if(fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         try{
             const response = await apiClient.post(apiPath);
             setModalData(response.data);
@@ -104,33 +96,29 @@ const EquipmentDataPage = ({initialData}) => {
     //모달창 선택 핸들러
     const handleModalSelect = (record) => {
 
-        switch (currentField) {
+        switch (equipmentField) {
             case 'workcenter':
-                setEquipmentParam((prevParams) => ({
-                ...prevParams,
-                equipmentDataDetail:{
-                    workcenterCode: record.workcenterCode,
-                    workcenterName: record.workcenterName,
-                },
+                setEquipmentDataDetail((prevState) => ({
+                    ...prevState,
+                    workcenterCode: record.code,
+                    workcenterName: record.name,
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    equipmentDataDetail: `[${record.workcenterCode}] ${record.workcenterName}`,
+                    workcenter: `[${record.code}] ${record.name}`,
                 }));
             break;
             case 'factory':
-                setEquipmentParam((prevParams) => ({
-                ...prevParams,
-                equipmentDataDetail:{
-                    factoryCode: record.factoryCode,
-                    factoryName: record.factoryName,
-                },
+                setEquipmentDataDetail((prevState) => ({
+                    ...prevState,
+                    factoryCode: record.code,
+                    factoryName: record.name,
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    equipmentDataDetail: `[${record.factoryCode}] ${record.factoryName}`,
+                    factory: `[${record.code}] ${record.name}`,
                 }));
-            break;
+                break;
         }
         //모달창 닫기
         setIsModalVisible(false);
@@ -177,264 +165,338 @@ const EquipmentDataPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                 </Grid>
+                        <Grid item xs={9} md={9}>
+                            {equipmentDataDetail && (
+                                <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
+                                    <div>
+                                        <EquipmentDataDetailSection
+                                            data={data}
+                                            equipmentDataDetail={equipmentDataDetail}
+                                            handleInputChange={handleInputChange}
+                                            setEquipmentDataDetail={setEquipmentDataDetail}
+                                            handleDelete={handleDelete}
+                                            isUpdateModalVisible={isUpdateModalVisible}
+                                            showModal={showModal}
+                                            handleUpdateOk={handleUpdateOk}
+                                            handleUpdateCancel={handleUpdateCancel}
+                                            handleCostInput={handleCostInput}
+                                            handleUpdate={handleUpdate}
+                                        />
+                                    </div>
+                                </Grow>
+                            )}
+                        </Grid>
+                    </Grid>
             )}
-            <Grid sx={{ padding: '10px 20px 0px 20px' }} container spacing={3}>
-                <Grid item xs={9} md={9}>
-                    {equipmentDataDetail && (
-                        <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
-                            <div>
-                                <EquipmentDataDetailSection
-                                    data={data}
-                                    equipmentDataDetail={equipmentDataDetail}
-                                    handleInputChange={handleInputChange}
-                                    setEquipmentDataDetail={setEquipmentDataDetail}
-                                    handleDelete={handleDelete}
-                                    isUpdateModalVisible={isUpdateModalVisible}
-                                    showModal={showModal}
-                                    handleUpdateOk={handleUpdateOk}
-                                    handleUpdateCancel={handleUpdateCancel}
-                                    handleCostInput={handleCostInput}
-                                    handleUpdate={handleUpdate}
-                                />
-                            </div>
-                        </Grow>
-                    )}
-                </Grid>
-            </Grid>
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={8} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>
+                    <Grid item xs={8} md={8} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>설비 상세 정보 등록</Typography>
-                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                    <Form
-                                        layout="vertical"
-                                        onFinish={(values) => { handleFormSubmit(values, 'register') }}
-                                        form={registrationForm}
-                                    >
-                                        {/* 기본 정보 */}
-                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>설비 상세 정보 등록</Divider>
+                            <Paper elevation={3} sx={{p: 2}}>
+                                <Typography variant="h6" marginBottom={'20px'}>설비 상세 정보 등록</Typography>
+                                    <Form layout="vertical">
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>설비 정보</Divider>
                                         <Row gutter={16}>
-                                            <Col span={5}>
-                                                <Form.Item>
+                                            <Col span={8}>
+                                                <Form.Item rules={[{ required: true, message: '설비 번호를 입력하세요.' }]}>
                                                     <Input
-                                                        addonBefore="설치된 작업장 코드"
-                                                        onClick={() => handleInputClick('workcenterCode')}
-                                                        value={displayValues.workcenterCode}
-                                                        onFocus={(e) => e.target.blur()}
+                                                        addonBefore="설비 번호"
+                                                        value={equipmentDataDetail.equipmentNum}
+                                                        onChange={(e) => handleInputChange(e, 'equipmentNum')}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={5}>
-                                                <Form.Item>
+                                            <Col span={8}>
+                                                <Form.Item rules={[{ required: true, message: '설비 명을 입력하세요.' }]}>
                                                     <Input
-                                                        addonBefore="설치된 공장 코드"
-                                                        onClick={() => handleInputClick('factoryCode')}
-                                                        value={displayValues.factoryCode}
-                                                        onFocus={(e) => e.target.blur()}
+                                                        addonBefore="설비 명"
+                                                        value={equipmentDataDetail.equipmentName}
+                                                        onChange={(e) => handleInputChange(e, 'equipmentName')}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item rules={[{ required: true, message: '모델명을 입력하세요.' }]}>
+                                                    <Input
+                                                        addonBefore="모델 명"
+                                                        value={equipmentDataDetail.modelName}
+                                                        onChange={(e) => handleInputChange(e, 'modelName')}
                                                     />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
+                                        <Row gutter={16}>
+                                            <Col span={8}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="제조사"
+                                                        value={equipmentDataDetail.manufacturer}
+                                                        onChange={(e) => handleInputChange(e, 'manufacturer')}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="구매 비용"
+                                                        value={equipmentDataDetail.cost}
+                                                        onChange={(e) => handleInputChange(e, 'cost')}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
 
+                                            <Col span={8}>
+                                                <Form.Item>
+                                                    <Space.Compact>
+                                                        <Input style={{ width: '30%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="유형" disabled />
+                                                        <Select
+                                                            style={{ width: '70%' }}
+                                                            value={equipmentDataDetail.equipmentType}
+                                                            onChange={(value) =>
+                                                                handleInputChange({ target: { value: value } }, 'equipmentType')
+                                                            }
+                                                        >
+                                                            <Option value={"ASSEMBLY"}>조립 설비</Option>
+                                                            <Option value={"MACHINING"}>가공 설비</Option>
+                                                            <Option value={"INSPECTION"}>검사 설비</Option>
+                                                            <Option value={"PACKAGING"}>포장 설비</Option>
+                                                        </Select>
+                                                    </Space.Compact>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={16}>
+                                            <Col span={8}>
+                                                <Form.Item>
+                                                    <Input.Group compact>
+                                                        <Input
+                                                            style={{ width: '30%' }}
+                                                            value="구매 날짜"
+                                                            readOnly
+                                                        />
+                                                        <DatePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            value={equipmentDataDetail.purchaseDate ? moment(equipmentDataDetail.purchaseDate, 'YYYY-MM-DD') : null}
+                                                            onChange={(date, dateString) => handleInputChange({ target: { value: dateString } }, 'purchaseDate')}
+                                                            format="YYYY-MM-DD"
+                                                            style={{ width: '70%' }}
+                                                        />
+                                                    </Input.Group>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Input.Group compact>
+                                                    <Input
+                                                        style={{ width: '30%',align:'center'}}
+                                                        value="설치 날짜"
+                                                        readOnly
+                                                    />
+                                                    <DatePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
+                                                        value={equipmentDataDetail.installDate ? moment(equipmentDataDetail.installDate, 'YYYY-MM-DD') : null}
+                                                        onChange={(date, dateString) => handleInputChange({ target: { value: dateString } }, 'installDate')}
+                                                        format="YYYY-MM-DD"
+                                                        style={{ width: '70%' }}
+                                                    />
+                                                </Input.Group>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Space.Compact>
+                                                    <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="가동 상태" disabled />
+                                                    <Select
+                                                        style={{ width: '60%' }}
+                                                        value={equipmentDataDetail.operationStatus}
+                                                        onChange={(value) =>
+                                                            handleInputChange({ target: { value: value } }, 'operationStatus')
+                                                        }
+                                                    >
+                                                        <Option value={"BEFORE_OPERATION"}>가동 전</Option>
+                                                        <Option value={"OPERATING"}>가동 중</Option>
+                                                        <Option value={"MAINTENANCE"}>유지보수 중</Option>
+                                                        <Option value={"FAILURE"}>고장</Option>
+                                                        <Option value={"REPAIRING"}>수리 중</Option>
+                                                    </Select>
+                                                </Space.Compact>
+                                            </Col>
+                                        </Row>
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>추가 정보</Divider>
+                                        <Row gutter={16}>
+                                            <Col span={8}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="설치된 작업장"
+                                                        onClick={() => handleInputClick('workcenter')}
+                                                        value={equipmentDataDetail.workcenterName}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="설치된 공장"
+                                                        onClick={() => handleInputClick('factory')}
+                                                        value={equipmentDataDetail.factoryName}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
+                                            이미지 업로드
+                                        </Divider>
                                         <Row gutter={16}>
                                             <Col span={12}>
-                                                <Form.Item name={['contactInfo', 'faxNumber']} rules={[{ required: true, message: '설비 번호를 입력하세요.' }]}>
-                                                    <Input addonBefore="설비 번호" onChange={(e) => registrationForm.setFieldValue(['contactInfo', 'faxNumber'], formatPhoneNumber(e.target.value))} />
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-
-                                        <Row gutter={16}>
-                                            <Col span={6}>
-                                                <Form.Item name={['businessInfo', 'businessType']} rules={[{ required: true, message: '설비 명을 입력하세요.' }]}>
-                                                    <Input addonBefore="설비 명" />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item name={['businessInfo', 'businessItem']} rules={[{ required: true, message: '모델명을 입력하세요.' }]}>
-                                                    <Input addonBefore="모델 명" />
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-
-                                        <Row gutter={16}>
-                                            <Col span={5}>
-                                                <Form.Item name="equipmentType">
-                                                    <Space.Compact>
-                                                        <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="거래유형" disabled />
-                                                        <Select
-                                                            style={{ width: '60%' }}
-                                                            value={clientParam.equipmentType}
-                                                            onChange={(value) => {
-                                                                setClientParam((prevState) => ({
-                                                                    ...prevState,
-                                                                    equipmentType: value, // 선택된 값을 transactionType에 반영
-                                                                }));
-                                                            }}
-                                                        >
-                                                            <Option value="ASSEMBLY">조립 설비</Option>
-                                                            <Option value="MACHINING">가공 설비</Option>
-                                                            <Option value="INSPECTION">검사 설비</Option>
-                                                            <Option value="PACKAGING">포장 설비</Option>
-                                                        </Select>
-                                                    </Space.Compact>
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={5}>
-                                                <Form.Item name={['financialInfo', 'creditLimit']} rules={[{ required: true, message: '제조사를 입력하세요.' }]}>
-                                                    <Input addonBefore="제조사" onChange={(e) => registrationForm.setFieldValue(['financialInfo', 'creditLimit'], formatNumberWithComma(e.target.value))} />
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-
-                                        {/* 담당자 정보 */}
-                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight:600 }}>담당자 정보</Divider>
-                                        <Row gutter={16}>
-                                            <Col>
-                                                <Typography>구매 날짜</Typography>
-                                            </Col>
-                                            <Col>
-                                                <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '구매 날짜를 입력하세요.' }]}>
-                                                    <DatePicker
-                                                        value={dayjs(clientParam.purchaseDate)}
-                                                        onChange={handleStartDateChange}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col>
-                                                <Typography>설치 날짜</Typography>
-                                            </Col>
-                                            <Col>
-                                                <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '설치 날짜를 입력하세요.' }]}>
-                                                    <DatePicker
-                                                        value={dayjs(clientParam.installDate)}
-                                                        onChange={handleStartDateChange}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={16}>
-                                            <Col span={5}>
-                                                <Form.Item name="operationStatus">
-                                                    <Space.Compact>
-                                                        <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="가동 상태" disabled />
-                                                        <Select
-                                                            style={{ width: '60%' }}
-                                                            value={clientParam.operationStatus}
-                                                            onChange={(value) => {
-                                                                setClientParam((prevState) => ({
-                                                                    ...prevState,
-                                                                    operationStatus: value, // 선택된 값을 transactionType에 반영
-                                                                }));
-                                                            }}
-                                                        >
-                                                            <Option value="BEFORE_OPERATION">가동 전</Option>
-                                                            <Option value="OPERATING">가동 중</Option>
-                                                            <Option value="MAINTENANCE">유지보수 중</Option>
-                                                            <Option value="FAILURE">고장</Option>
-                                                            <Option value="REPAIRING">수리 중</Option>
-                                                        </Select>
-                                                    </Space.Compact>
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={5}>
-                                                <Form.Item name={['financialInfo', 'current']} rules={[{ required: true, message: '구매 비용을 입력하세요.' }]}>
-                                                    <Input addonBefore="구매 비용" onChange={(e) => registrationForm.setFieldValue(['financialInfo', 'creditLimit'], formatNumberWithComma(e.target.value))} />
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                        <Row gutter={16}>
-                                            <Col span={6}>
-                                                <Form.Item name={['businessInfo', 'equipmentImg']} rules={[{ required: true, message: '설비 이미지를 입력하세요.' }]}>
-                                                    <Input addonBefore="설비 이미지" />
+                                                <Form.Item label="설비 이미지">
+                                                    {/* 이미지 미리보기 */}
+                                                    <div style={{ marginBottom: '20px' }}>
+                                                        <img
+                                                            src={selectedFile ? URL.createObjectURL(selectedFile) : defaultImage}
+                                                            alt="프로필 사진"
+                                                            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                        />
+                                                    </div>
+                                                    <Upload
+                                                        beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
+                                                        onChange={(info) => {
+                                                            const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
+                                                            setSelectedFile(file); // 선택된 파일을 상태로 설정
+                                                        }}
+                                                        fileList={
+                                                            selectedFile
+                                                                ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }]
+                                                                : []
+                                                        } // 파일 리스트 설정
+                                                    >
+                                                        <Button icon={<CloudUploadIcon />}>파일 선택</Button>
+                                                    </Upload>
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                         {/* 저장 버튼 */}
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                                            <Button type="primary" htmlType="submit">
-                                                저장
-                                            </Button>
+                                            <Button onClick={handleSave} type="primary" style={{marginRight: '10px'}}>등록</Button>
                                         </Box>
-                                        {/* 모달창 */}
                                         <Modal
                                             open={isModalVisible}
                                             onCancel={handleModalCancel}
                                             width="40vw"
                                             footer={null}
-                                        >{isLoading ? (
-                                            <Spin />  // 로딩 스피너
-                                        ) : (
-                                            <>
-                                                {currentField === 'workcenter' && (
-                                                    <>
-                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                                            작업장 코드 선택
-                                                        </Typography>
-                                                        {modalData && (
-                                                            <Table
-                                                                columns={[
-                                                                    { title: '코드', dataIndex: 'workcenterCode', key: 'workcenterCode', align: 'center' },
-                                                                    { title: '작업장 명', dataIndex: 'workcenterName', key: 'workcenterName', align: 'center' },
-                                                                ]}
-                                                                dataSource={modalData}
-                                                                rowKey="code"
-                                                                size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                                                onRow={(record) => ({
-                                                                    style: { cursor: 'pointer' },
-                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                                })}
+                                        >
+                                            {isLoading ? (
+                                                <Spin />  // 로딩 스피너
+                                            ) : (
+                                                <>
+                                                    {/* 작업장 선택 모달 */}
+                                                    {equipmentField === 'workcenter' && (
+                                                        <>
+                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                작업장 선택
+                                                            </Typography>
+                                                            <Input
+                                                                placeholder="검색"
+                                                                prefix={<SearchOutlined />}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.toLowerCase();
+                                                                    if (!value) {
+                                                                        setModalData(initialModalData);
+                                                                    } else {
+                                                                        const filtered = initialModalData.filter((item) => {
+                                                                            return (
+                                                                                (item.code && item.name.toString().toLowerCase().includes(value)) ||
+                                                                                (item.name && item.name.toLowerCase().includes(value))
+                                                                            );
+                                                                        });
+                                                                        setModalData(filtered);
+                                                                    }
+                                                                }}
+                                                                style={{ marginBottom: 16 }}
                                                             />
-                                                        )}
-                                                    </>
-                                                )}
-                                                {currentField === 'factory' && (
-                                                    <>
-                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                                            공장 코드 선택
-                                                        </Typography>
-                                                        {modalData && (
-                                                            <Table
-                                                                columns={[
-                                                                    { title: '코드', dataIndex: 'factoryCode', key: 'factoryCode', align: 'center' },
-                                                                    { title: '공장 명', dataIndex: 'factoryName', key: 'factoryName', align: 'center' },
-                                                                ]}
-                                                                dataSource={modalData}
-                                                                rowKey="id"
-                                                                size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                                                onRow={(record) => ({
-                                                                    style: { cursor: 'pointer' },
-                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                                })}
-                                                            />
-                                                        )}
-                                                    </>
-                                                )}
-
+                                                            {modalData && (
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                        { title: '작업장 명', dataIndex: 'name', key: 'name', align: 'center' }
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{
+                                                                        pageSize: 15,
+                                                                        position: ['bottomCenter'],
+                                                                        showSizeChanger: false,
+                                                                        showTotal: (total) => `총 ${total}개`,
+                                                                    }}
+                                                                    onRow={(record) => ({
+                                                                        style: { cursor: 'pointer' },
+                                                                        onClick: () => handleModalSelect(record)
+                                                                    })}
+                                                                />
+                                                            )}
+                                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                        <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
+                                                            닫기
+                                                        </Button>
+                                                    </Box>
+                                                        </>
+                                                    )}
+                                                </>
+                                            )}
+                                            {/* 공장 선택 모달 */}
+                                            {equipmentField === 'factory' && (
+                                                <>
+                                                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                        공장 선택
+                                                    </Typography>
+                                                    <Input
+                                                        placeholder="검색"
+                                                        prefix={<SearchOutlined />}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value.toLowerCase();
+                                                            if (!value) {
+                                                                setModalData(initialModalData);
+                                                            } else {
+                                                                const filtered = initialModalData.filter((item) => {
+                                                                    return (
+                                                                        (item.code && item.name.toString().toLowerCase().includes(value)) ||
+                                                                        (item.name && item.name.toLowerCase().includes(value))
+                                                                    );
+                                                                });
+                                                                setModalData(filtered);
+                                                            }
+                                                        }}
+                                                        style={{ marginBottom: 16 }}
+                                                    />
+                                                    {modalData && (
+                                                        <Table
+                                                            columns={[
+                                                                { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                { title: '이름', dataIndex: 'name', key: 'name', align: 'center' }
+                                                            ]}
+                                                            dataSource={modalData}
+                                                            rowKey="id"
+                                                            size="small"
+                                                            pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                            onRow={(record) => ({
+                                                                style: { cursor: 'pointer' },
+                                                                onClick: () => handleModalSelect(record) // 선택 시 처리
+                                                            })}
+                                                        />
+                                                    )}
                                                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
                                                     <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
                                                         닫기
                                                     </Button>
                                                 </Box>
-                                            </>
-                                        )}
+                                                </>
+                                            )}
                                         </Modal>
                                     </Form>
-                                </Grid>
                             </Paper>
                         </Grow>
                     </Grid>
                 </Grid>
-            )}
-
+                )}
         </Box>
-    );
-};
+    )};
 
 
 

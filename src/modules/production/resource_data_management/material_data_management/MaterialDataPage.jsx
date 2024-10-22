@@ -25,15 +25,6 @@ const MaterialDataPage = ({initialData}) => {
         handleDelete,
         handleUpdate,
         handleSave,
-        updateModal,
-        handleUpdateOk,
-        handleUpdateCancel,
-        insertModal,
-        handleInsertOk,
-        isInsertModalVisible,
-        isUpdateModalVisible,
-        handleInsertCancel,
-        handleOpenInsertModal,
         handleTabChange,
         activeTabKey,
         filteredProductData,
@@ -167,7 +158,7 @@ const MaterialDataPage = ({initialData}) => {
                                     </Typography>
 
                                     <Row gutter={16}>
-                                        <Col span={6}>
+                                        <Col span={7}>
                                             <Form.Item>
                                                 <Input
                                                     addonBefore="자재 코드"
@@ -176,7 +167,7 @@ const MaterialDataPage = ({initialData}) => {
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={6}>
+                                        <Col span={7}>
                                             <Form.Item>
                                                 <Input
                                                     addonBefore="자재 명"
@@ -185,7 +176,7 @@ const MaterialDataPage = ({initialData}) => {
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={6}>
+                                        <Col span={7}>
                                             <Form.Item>
                                                 <Input
                                                     addonBefore="유해물질 개수"
@@ -196,7 +187,7 @@ const MaterialDataPage = ({initialData}) => {
                                         </Col>
                                     </Row>
                                     <Row gutter={16}>
-                                        <Col span={6}>
+                                        <Col span={7}>
                                             <Form.Item>
                                                 <Input
                                                     addonBefore="자재 수량"
@@ -205,7 +196,7 @@ const MaterialDataPage = ({initialData}) => {
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={6}>
+                                        <Col span={7}>
                                             <Form.Item>
                                                 <Input
                                                     addonBefore="구매 가격"
@@ -214,7 +205,7 @@ const MaterialDataPage = ({initialData}) => {
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={6}>
+                                        <Col span={7}>
                                             <Space.Compact>
                                                 <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="자재 유형" disabled />
                                                 <Select
@@ -243,7 +234,7 @@ const MaterialDataPage = ({initialData}) => {
 
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>추가 정보</Divider>
                                     <Row gutter={16}>
-                                        <Col span={6}>
+                                        <Col span={7}>
                                             <Form.Item>
                                                 <Input
                                                     addonBefore="거래처"
@@ -344,7 +335,7 @@ const MaterialDataPage = ({initialData}) => {
 
                                 {/* 자재 필드들 - 초기 로드시 빈값으로 표시 */}
                                 <Row gutter={16}>
-                                    <Col span={6}>
+                                    <Col span={7}>
                                         <Form.Item>
                                             <Input
                                                 addonBefore="자재 코드"
@@ -353,7 +344,7 @@ const MaterialDataPage = ({initialData}) => {
                                             />
                                         </Form.Item>
                                     </Col>
-                                    <Col span={6}>
+                                    <Col span={7}>
                                         <Form.Item>
                                             <Input
                                                 addonBefore="자재 명"
@@ -366,7 +357,7 @@ const MaterialDataPage = ({initialData}) => {
 
                                 {/* 추가 자재 정보들 */}
                                 <Row gutter={16}>
-                                    <Col span={6}>
+                                    <Col span={7}>
                                         <Form.Item>
                                             <Input
                                                 addonBefore="자재 수량"
@@ -375,7 +366,7 @@ const MaterialDataPage = ({initialData}) => {
                                             />
                                         </Form.Item>
                                     </Col>
-                                    <Col span={6}>
+                                    <Col span={7}>
                                         <Form.Item>
                                             <Input
                                                 addonBefore="구매 가격"
@@ -384,7 +375,7 @@ const MaterialDataPage = ({initialData}) => {
                                             />
                                         </Form.Item>
                                     </Col>
-                                    <Col span={6}>
+                                    <Col span={7}>
                                         <Space.Compact>
                                             <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="자재 유형" disabled />
                                             <Select
@@ -414,7 +405,7 @@ const MaterialDataPage = ({initialData}) => {
                                 {/* 거래처 정보 */}
                                 <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>추가 정보</Divider>
                                 <Row gutter={16}>
-                                    <Col span={6}>
+                                    <Col span={7}>
                                         <Form.Item>
                                             <Input
                                                 addonBefore="거래처"

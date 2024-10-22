@@ -37,10 +37,27 @@ export const
             key:'maintenanceType',
             width: '12%',  // 컬럼 너비 설정
             align: 'center',
-            render: (text) => {
-                return maintenanceTypeMap[text] || text;  // 한글로 변환 후 표시
-            }
-        },
+            render: (text) =>  {
+                let color;
+                let value;
+                switch (text) {
+                    case 'EMERGENCY_REPAIR':
+                        color = 'red';
+                        value = '긴급수리';
+                        break;
+                    case 'REGULAR_INSPECTION':
+                        color = 'green';
+                        value = '정기점검';
+                        break;
+                    case 'FAILURE_REPAIR':
+                        color = 'orange';
+                        value = '고장수리';
+                        break;
+                    default:
+                        color = 'gray'; // 기본 색상
+                }
+                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+            }},
         {
             title: <span>유지보수 일자</span>,  // 컬럼 제목
             dataIndex: 'maintenanceDate',  // 데이터 인덱스: 이 필드는 데이터 객체의 'maintenanceDate' 속성과 연결됩니다.

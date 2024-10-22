@@ -8,9 +8,12 @@ import {maintenanceHistoryHook} from "./MaintenanceHistoryHook.jsx";
 import MaintenanceHistoryDetailSection from "./MaintenanceHistoryDetailSection.jsx";
 import EquipmentDataDetailSection from "./MaintenanceHistoryDetailSection.jsx";
 import TemporarySection from "../../../../components/TemporarySection.jsx";
-import {Button, Col, DatePicker, Divider, Form, Input, Row, Select, Space} from "antd";
+import {Button, Col, DatePicker, Divider, Form, Input, Row, Select, Space, Spin, Table,Modal} from "antd";
 import moment from "moment/moment.js";
-
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
+import {LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import apiClient from "../../../../config/apiClient.jsx";
+import {SearchOutlined} from "@ant-design/icons";
 
 const MaintenanceHistoryPage = ({initialData}) => {
 
@@ -52,6 +55,68 @@ const MaintenanceHistoryPage = ({initialData}) => {
 
     } = maintenanceHistoryHook(initialData);
 
+
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentField, setCurrentField] = useState('');
+    const [modalData, setModalData] = useState(null);
+    const [initialModalData, setInitialModalData] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [displayValues, setDisplayValues] = useState({});
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
+
+    const handleInputClick = (fieldName) => {
+        setCurrentField(fieldName);
+        setModalData(null);
+        setInitialModalData(null);
+        fetchModalData(fieldName);
+        setIsModalVisible(true);
+    };
+
+    const handleModalCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const fetchModalData = async (fieldName) => {
+        setIsLoading(true);
+        let apiPath;
+
+        if(fieldName === 'equipment') apiPath = PRODUCTION_API.EQUIPMENT_DATA_API;
+
+        try {
+            const response = await apiClient.post(apiPath);
+            let data = response.data;
+            if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
+                data = JSON.parse(data);
+            }
+
+            const modalData = Array.isArray(data) ? data : [data];
+            setModalData(modalData);
+            setInitialModalData(modalData);
+        } catch (error) {
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleModalSelect = (record) => {
+        console.log('selected recod' , record);
+        switch (currentField) {
+            case 'equipment':
+                setMaintenanceDataDetail((prevState) => ({
+                    ...prevState,
+                    equipmentNum: record.equipmentNum,
+                    equipmentName: record.equipmentName,
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    equipment: `[${record.equipmentNum}] ${record.equipmentName}`,
+                }));
+                break;
+        }
+        setIsModalVisible(false);
+    };
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -98,7 +163,6 @@ const MaintenanceHistoryPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                    <Grid sx={{ padding: '10px 20px 0px 20px' }} container spacing={3}>
                         <Grid item xs={9} md={9} >
                             {maintenanceDataDetail && (
                                 <Grow in={showDetail} timeout={200} key={maintenanceDataDetail.id}>
@@ -121,7 +185,6 @@ const MaintenanceHistoryPage = ({initialData}) => {
                             )}
                         </Grid>
                     </Grid>
-                </Grid>
             )}
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
@@ -135,18 +198,9 @@ const MaintenanceHistoryPage = ({initialData}) => {
                                             <Col span={6}>
                                                 <Form.Item>
                                                     <Input
-                                                        addonBefore="설비 번호"
-                                                        value={maintenanceDataDetail.equipmentNum}
-                                                        onChange={(e) => handleInputChange(e, 'equipmentNum')}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item>
-                                                    <Input
-                                                        addonBefore="설비 명"
+                                                        addonBefore="설비"
                                                         value={maintenanceDataDetail.equipmentName}
-                                                        onChange={(e) => handleInputChange(e, 'equipmentName')}
+                                                        onClick={() => handleInputClick('equipment')}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -259,31 +313,71 @@ const MaintenanceHistoryPage = ({initialData}) => {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>추가 정보</Divider>
-                                        <Row gutter={16}>
-                                            <Col span={6}>
-                                                <Form.Item>
-                                                    <Input
-                                                        addonBefore="설치된 작업장"
-                                                        value={maintenanceDataDetail.workcenterName}
-                                                        onChange={(e) => handleInputChange(e, 'workcenterName')}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item>
-                                                    <Input
-                                                        addonBefore="설치된 공장"
-                                                        value={maintenanceDataDetail.factoryName}
-                                                        onChange={(e) => handleInputChange(e, 'factoryName')}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
                                     </Form>
                                 <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
                                     <Button onClick={handleSave} type="primary" style={{marginRight: '10px'}}>등록</Button>
                                 </div>
+                                <Modal
+                                    open={isModalVisible}
+                                    onCancel={handleModalCancel}
+                                    width="40vw"
+                                    footer={null}
+                                >
+                                    {isLoading ? (
+                                        <Spin />  // 로딩 스피너
+                                    ) : (
+                                        <>
+                                            {/* 작업장 선택 모달 */}
+                                            {currentField === 'equipment' && (
+                                                <>
+                                                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                        설비 선택
+                                                    </Typography>
+                                                    <Input
+                                                        placeholder="검색"
+                                                        prefix={<SearchOutlined />}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value.toLowerCase();
+                                                            if (!value) {
+                                                                setModalData(initialModalData);
+                                                            } else {
+                                                                const filtered = initialModalData.filter((item) => {
+                                                                    return (
+                                                                        (item.equipmentNum && item.equipmentNum.toString().toLowerCase().includes(value)) ||
+                                                                        (item.equipmentName && item.equipmentName.toLowerCase().includes(value))
+                                                                    );
+                                                                });
+                                                                setModalData(filtered);
+                                                            }
+                                                        }}
+                                                        style={{ marginBottom: 16 }}
+                                                    />
+                                                    {modalData && (
+                                                        <Table
+                                                            columns={[
+                                                                { title: '설비 번호', dataIndex: 'equipmentNum', key: 'equipmentNum', align: 'center' },
+                                                                { title: '설비 명', dataIndex: 'equipmentName', key: 'equipmentName', align: 'center' }
+                                                            ]}
+                                                            dataSource={modalData}
+                                                            rowKey="id"
+                                                            size="small"
+                                                            pagination={{
+                                                                pageSize: 15,
+                                                                position: ['bottomCenter'],
+                                                                showSizeChanger: false,
+                                                                showTotal: (total) => `총 ${total}개`,
+                                                            }}
+                                                            onRow={(record) => ({
+                                                                style: { cursor: 'pointer' },
+                                                                onClick: () => handleModalSelect(record)
+                                                            })}
+                                                        />
+                                                    )}
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+                                </Modal>
                             </Paper>
                         </Grow>
                     </Grid>
