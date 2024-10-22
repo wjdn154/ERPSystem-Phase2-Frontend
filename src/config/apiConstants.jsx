@@ -123,7 +123,6 @@ export const LOGISTICS_API = {
     HIERARCHY_GROUP_SAVE_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/saveHierarchyGroup`, // 계층 그룹 저장 API
     HIERARCHY_GROUP_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/hierarchyGroup/test/update/${id}`, // 계층 그룹 수정 API
     HIERARCHY_GROUP_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/hierarchyGroup/deleteHierarchyGroup/${id}`, // 계층 그룹 삭제 API
-    //재고 실사 조회
     INVENTORY_INSPECTION_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/?startDate=${startDate}&endDate=${endDate}`,
     INVENTORY_INSPECTION_DETAILS_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/details?startDate=${startDate}&endDate=${endDate}`,
     INVENTORY_INSPECTION_CREATE_API: `${API_BASE_URL}/api/logistics/inventory/inspection/create`, // 재고 실사 생성 API
@@ -131,6 +130,13 @@ export const LOGISTICS_API = {
     INVENTORY_INSPECTION_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/inventory/inspection/update/${id}`, // 재고 실사 수정 API
     INVENTORY_INSPECTION_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/inventory/inspection/delete/${id}`, // 재고 실사 삭제 API
     INVENTORY_INSPECTION_ADJUST_REQUEST_API: (id) => `${API_BASE_URL}/api/logistics/inventory/inspection/adjustRequest/${id}`, // 재고 실사 조정 요청 API
+
+    SHIPMENT_CREATE_API: `${API_BASE_URL}/api/logistics/shipment/create`, // 출하 생성 API
+    SHIPMENT_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipment/?startDate=${startDate}&endDate=${endDate}`, // 출하 목록 조회 API
+    SHIPMENT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/shipment/${id}`, // 출하 상세 조회 API
+    SHIPMENT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/shipment/update/${id}`, // 출하 수정 API
+    SHIPMENT_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/shipment/delete/${id}`, // 출하 삭제 API
+    SHIPMENT_ITEMS_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipment/items?startDate=${startDate}&endDate=${endDate}`, // 출하 품목 조회 API
 };
 // 생산관리
 export const PRODUCTION_API = {
