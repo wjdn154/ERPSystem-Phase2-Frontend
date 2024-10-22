@@ -41,10 +41,6 @@ const EquipmentDataPage = ({initialData}) => {
     const [displayValues, setDisplayValues] = useState({});
     const [activeTabKey, setActiveTabKey] = useState('1');
 
-    const handleTabChange = (key) => {
-        setActiveTabKey(key);
-    };
-
     const {
         data,
         showDetail,
@@ -54,6 +50,7 @@ const EquipmentDataPage = ({initialData}) => {
         setEquipmentDataDetail,
         handleInputChange,
         handleDelete,
+        handleUpdate,
         showModal,
         handleInsertOk,
         handleUpdateCancel,
@@ -68,19 +65,15 @@ const EquipmentDataPage = ({initialData}) => {
 
     } = equipmentDataHook(initialData);
 
-    //설비 조회 데이터가 있을 경우 폼에 데이터 셋팅
-    useEffect(() => {
-        if(!setEquipmentDataDetail) return;
+// 등록 탭으로 이동할 때 materialDataDetail 초기화
+    const handleTabChangeWithReset = (key) => {
+        setActiveTabKey(key);
+        if (key === '2') {   // '2'는 등록 탭이라고 가정
+            setEquipmentDataDetail({
 
-        form.setFieldsValue(equipmentDataDetail);
-        setEquipmentParam(equipmentDataDetail);
-
-        setDisplayValues({
-            workcenter: `[${equipmentDataDetail.workcenterCode}] ${equipmentDataDetail.workcenterName}`,
-            factory: `[${equipmentDataDetail.factoryCode}] ${equipmentDataDetail.factoryName}`
-        });
-    }, [equipmentDataDetail, form]);
-
+            });  // 등록 탭으로 이동할 때 빈 값으로 초기화
+        }
+    };
     //모달창 열기 핸들러
     const handleInputClick = (fieldName) => {
         setEquipmentField(fieldName);
@@ -143,59 +136,8 @@ const EquipmentDataPage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    //폼 제출 핸들러
-    const handleFormSubmit = async (values, type) => {
-        confirm({
-            title: '저장 확인',
-            content: '정말로 저장하시겠습니까?',
-            okText: '확인',
-            cancelText: '취소',
-            onOk: async () => {
-                //확인 버튼 클릭 시 실행되는 저장 로직
-                values.id = equipmentParam.id;
-                values.workcenterCode = equipmentDataDetail ? equipmentDataDetail.workcenterCode: null;
-                values.factoryCode = equipmentDataDetail ? equipmentDataDetail.factoryCode : null;
-                values.equipmentNum = equipmentDataDetail ? equipmentDataDetail.equipmentNum : null;
-                values.equipmentName = equipmentDataDetail ? equipmentDataDetail.equipmentName : null;
-                valuse.modelName = equipmentDataDetail ? equipmentDataDetail.modelName : null;
-                values.equipmentType = equipmentParam.equipmentType;
-                values.manufacturer = equipmentDataDetail ? equipmentDataDetail.manufacturer : null;
-                values.purchaseDate = dayjs(equipmentParam.purchaseDate).format('YYYY-MM-DD');
-                values.installDate = dayjs(equipmentParam).format('YYYY-MM-DD');
-                values.operationStatus = equipmentParam.operationStatus;
-                values.cost = equipmentDataDetail ? equipmentDataDetail.cost : null;
-                values.equipmentImg = equipmentDataDetail ? equipmentDataDetail.equipmentImg : null;
-                values.workcenter = {
-                    workcenterCode : equipmentParam.workcenterCode,
-                    workcenterName : equipmentParam.workcenterName,
-                };
-                values.factory = {
-                    factoryCode : equipmentParam.factoryCode,
-                    factoryName : equipmentParam.factoryName,
-                };
-
-                try{
-                    const API_PATH = type === 'update' ? PRODUCTION_API.UPDATE_EQUIPMENT_DATA_API : PRODUCTION_API.SAVE_EQUIPMENT_DATA_API;
-                    const response = await apiClient.post(API_PATH, values);
-                    const updatedData = response.data;
-
-                }catch (error){
-                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
-                }
-
-            },
-            onCancel(){
-                notification.warning({
-                    message: '저장 취소',
-                    description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
-                });
-            },
-        });
-    };
-
     return (
-        <Box sx={{ margin: '20px' }}>
+        <Box sx={{ flexGrow: 1, p: 3 }}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
@@ -207,17 +149,14 @@ const EquipmentDataPage = ({initialData}) => {
                         )}
                         tabItems={tabItems()}
                         activeTabKey={activeTabKey}
-                        handleTabChange={handleTabChange}
+                        handleTabChange={handleTabChangeWithReset}
                     />
                 </Grid>
             </Grid>
             {/* 설비정보 리스트 영역 */}
             {activeTabKey === '1' && (
-                // <Grid container spacing={2}
-                //       justifyContent="center"  // 수평 중앙 정렬
-                //       alignItems="center"      // 수직 중앙 정렬
-                // >
-                    <Grid item xs={12} md={10} mb={5}>
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={9} md={9}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <EquipmentDataListSection
@@ -238,13 +177,10 @@ const EquipmentDataPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                // </Grid>
+                 </Grid>
             )}
-            {/*<Grid container spacing={2} sx={{ marginTop: 3 }}*/}
-            {/*      justifyContent="center"  // 수평 중앙 정렬*/}
-            {/*      alignItems="center"      // 수직 중앙 정렬*/}
-            {/*>*/}
-                <Grid item xs={11} >
+            <Grid sx={{ padding: '10px 20px 0px 20px' }} container spacing={3}>
+                <Grid item xs={9} md={9}>
                     {equipmentDataDetail && (
                         <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
                             <div>
@@ -259,11 +195,13 @@ const EquipmentDataPage = ({initialData}) => {
                                     handleUpdateOk={handleUpdateOk}
                                     handleUpdateCancel={handleUpdateCancel}
                                     handleCostInput={handleCostInput}
+                                    handleUpdate={handleUpdate}
                                 />
                             </div>
                         </Grow>
                     )}
                 </Grid>
+            </Grid>
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12} md={8} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>

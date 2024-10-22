@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState, useRef} from "react";
 import axios from "axios";
+const { confirm } = Modal;
 import {
     fetchEquipmentData,
     fetchEquipmentDataDetail,
@@ -7,6 +8,9 @@ import {
     saveEquipmentDataDetail,
     deleteEquipmentDataDetail
 } from "./EquipmentDataApi.jsx";
+import {deleteMaterialData, fetchMaterialDataList} from "../material_data_management/MaterialDataApi.jsx";
+import {Modal} from "antd";
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 export const equipmentDataHook = (initialData) => {
 
@@ -16,7 +20,7 @@ export const equipmentDataHook = (initialData) => {
     const [equipmentDataDetail, setEquipmentDataDetail] = useState(null);   //상세정보
     const [isInsertModalVisible, setIsInsertModalVisible] = useState(false); //삭제 모달 상태
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
-
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
 
     const equipmentMemoizedData = useMemo(() => data, [data]);
 
@@ -242,31 +246,38 @@ export const equipmentDataHook = (initialData) => {
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
-            const confirmSave = window.confirm("수정하시겠습니까?");
             console.log("수정버튼 클릭시 id : ",equipmentDataDetail.id);
             console.log("수정버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
 
             await updateEquipmentDataDetail(equipmentDataDetail.id, equipmentDataDetail);
             const updatedData = await fetchEquipmentData();
             setData(updatedData);
-            window.alert("수정완료되었습니다.");
-            setIsUpdateModalVisible(false);
+            notify('success', '설비 수정', '설비 수정 성공.', 'bottomRight');
         } catch (error) {
-            console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
+            notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
     }
 
     //삭제 버튼 선택 클릭 시 실행되는 함수
     const handleDelete = async () => {
-        const confirmDelete = window.confirm("정말로 삭제 하시겠습니까?");
-        try{
-            await deleteEquipmentDataDetail(equipmentDataDetail.id);
-            const deletedData = await fetchEquipmentData();
-            window.alert('삭제 완료되었습니다.');
-            setData(deletedData);
-        }catch (error){
-            console.error("API에서 데이터를 삭제하는 중 오류 발생:", error);
-        }
+        confirm({
+            title: '삭제 확인',
+            content: '정말로 삭제하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                try{
+                    await deleteEquipmentDataDetail(equipmentDataDetail.id);
+                    const deletedData = await fetchEquipmentData();
+                    notify('success', '삭제 성공', '설비 정보 삭제 성공', 'bottomRight');
+                    setData(deletedData);
+                    // 선택된 행 초기화 및 상세보기 숨기기
+                    setSelectedRow(null);
+                }catch (error){
+                    notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
+                }
+            }
+        })
     }
 
 
