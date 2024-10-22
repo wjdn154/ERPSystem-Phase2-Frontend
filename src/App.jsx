@@ -163,6 +163,14 @@ const AppContent = () => {
 };
 
 const App = () => {
+
+    useEffect(() => {
+        notification.config({
+            duration: 1,
+        });
+    }, []);
+
+
     return (
         <NotificationProvider>
             <ThemeProvider theme={theme}>

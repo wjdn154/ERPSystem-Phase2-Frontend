@@ -212,10 +212,10 @@ const JournalPage = () => {
                                             },
                                             {
                                                 title: <div className="title-text">담당자</div>,
-                                                dataIndex: 'voucherManagerName',
-                                                key: 'voucherManagerName',
+                                                dataIndex: 'voucherManagerCode',
+                                                key: 'voucherManagerCode',
                                                 align: 'center',
-                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
+                                                render: (text, record) => text ? <div className="small-text">[{text}] {record.voucherManagerName}</div> : ''
                                             },
                                             {
                                                 title: <div className="title-text">유형</div>,
