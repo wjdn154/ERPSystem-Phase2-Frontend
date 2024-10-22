@@ -91,10 +91,18 @@ const RoutingManagementPage = ({initialData}) => {
     };
 
     const handleModalSelect = (record) => {
-        // 선택한 공정 경로를 processDetails에 추가
+        const isDuplicate = fetchRoutingData.processDetails.some(
+            (detail) => detail.id === record.id
+        );
+
+        if (isDuplicate) {
+            notify('warning', '중복 경고', '이미 추가된 공정 경로입니다.', 'bottomRight');
+            return;
+        }
+
         setFetchRoutingData((prevParams) => ({
             ...prevParams,
-            processDetails: [...prevParams.processDetails, record], // 기존 processDetails 배열에 새 공정을 추가
+            processDetails: [...prevParams.processDetails, record],
         }));
 
         setIsModalVisible(false); // 모달창 닫기
