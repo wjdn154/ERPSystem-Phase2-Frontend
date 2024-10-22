@@ -25,56 +25,56 @@ const WorkerDetailSection = ({
                     <Grid sx={{ padding: '20px 20px 0px 20px' }}>
                         <Form layout="vertical">
                             <Row gutter={16} >
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Form.Item>
                                         <Input addonBefore="사원번호" value={workerDetail?.employeeNumber} readOnly />
                                     </Form.Item>
                                 </Col>
-                                <Col span={6}>
+                                <Col span={7}>
                                         <Input
                                             addonBefore="성명" value={workerDetail?.employeeLastName + workerDetail?.employeeFirstName}
                                             readOnly
                                         />
                                 </Col>
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Input addonBefore="부서" value={workerDetail?.departmentName} readOnly />
                                 </Col>
                             </Row>
 
                             <Row gutter={16}>
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Form.Item>
                                         <Input addonBefore="직위" value={workerDetail?.positionName} readOnly />
                                     </Form.Item>
                                 </Col>
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Input addonBefore="직책" value={workerDetail?.jobTitleName} readOnly />
                                 </Col>
                             </Row>
                             <Row gutter={16}>
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Input addonBefore="고용상태" value={employmentStatusMap[workerDetail?.employmentStatus]} readOnly />
                                 </Col>
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Form.Item>
                                         <Input addonBefore="고용유형" value={employmentTypeMap[workerDetail?.employmentType]} readOnly />
                                     </Form.Item>
                                 </Col>
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Input addonBefore="고용일" value={workerDetail?.hireDate} readOnly />
                                 </Col>
                             </Row>
                             <Row gutter={16}>
-                                <Col span={6}>
+                                <Col span={7}>
                                     <Form.Item>
-                                        <Input addonBefore="배치된 작업장" value={workerDetail?.workcenterName} readOnly />
+                                        <Input addonBefore="배치된 작업장" value={workerDetail?.workcenterName || '미 배치'} readOnly />
                                     </Form.Item>
                                 </Col>
-                                <Col span={6}>
+                                <Col span={8}>
                                         <Space.Compact>
-                                            <Input style={{ width: '80%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="안전교육 이수 여부" disabled />
+                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="안전교육 이수 여부" disabled />
                                             <Select
-                                                style={{ width: '60%' }}
+                                                style={{ width: '40%' }}
                                                 value={workerDetail?.trainingStatus}
                                                 onChange={(value) =>
                                                     handleInputChange({ target: { value: value } }, 'trainingStatus')
