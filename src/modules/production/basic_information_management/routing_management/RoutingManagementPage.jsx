@@ -53,8 +53,18 @@ const RoutingManagementPage = ({initialData}) => {
     const [fetchRoutingData, setFetchRoutingData] = useState(null);
     const [editRouting, setEditRouting] = useState(false);
 
+    useEffect(() => {
+        if (!fetchRoutingData) return;
+
+        form.setFieldsValue(fetchRoutingData);
+
+    }, [fetchRoutingData, form]);
+
+
+
     const handleTabChange = (key) => { setActiveTabKey(key); };
     const handleModalCancel = () => { setIsModalVisible(false) };  // 모달창 닫기
+
 
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
@@ -73,7 +83,6 @@ const RoutingManagementPage = ({initialData}) => {
             const response = await apiClient.post(apiPath);
             setModalData(response.data);
             setInitialModalData(response.data);
-            console.log('response.data', response.data);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -116,7 +125,6 @@ const RoutingManagementPage = ({initialData}) => {
                         // await apiClient.post(PRODUCTION_API.SAVE_WORKCENTER_API, values);
                         // notify('success', '등록 성공', '새 작업장이 등록되었습니다.', 'bottomRight');
                     } else if (type === 'update') {
-                        console.log(fetchRoutingData);
                         // await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API, {
                         //     code:"PRC001",
                         //     cost:500000,
@@ -128,9 +136,8 @@ const RoutingManagementPage = ({initialData}) => {
                         //     isUsed:true,
                         //     name:"조립"
                         // });
-                        console.log(fetchRoutingData.processDetails);
                         await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API, {
-                            id:values.id,
+                            id:fetchRoutingData.id,
                             code:values.code,
                             name:values.name,
                             // cost:values.cost,
@@ -228,7 +235,7 @@ const RoutingManagementPage = ({initialData}) => {
                                                 key: 'active',
                                                 align: 'center',
                                                 render: (active) => (
-                                                    <Tag color={active ? 'green' : 'gray'}>
+                                                    <Tag color={active ? 'green' : 'red'}>
                                                         {active ? '활성' : '비활성'}
                                                     </Tag>
                                                 ),
@@ -240,7 +247,7 @@ const RoutingManagementPage = ({initialData}) => {
                                                 render: (record) => <div className="small-text">{record.products && record.products.length > 0
                                                     ? `${record.products[0].name} 외 ${record.products.length - 1}건`
                                                     : '제품 없음'}</div>,
-                                            }
+                                            },
                                         ]}
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -261,7 +268,6 @@ const RoutingManagementPage = ({initialData}) => {
                                                     const response = await apiClient.post(PRODUCTION_API.ROUTING_DETAIL_API(id));
                                                     setFetchRoutingData(response.data);
                                                     setEditRouting(true);
-                                                    console.log('response:', response.data);
 
                                                     notify('success', '루트 조회', '루트 정보 조회 성공.', 'bottomRight');
                                                 } catch (error) {
@@ -346,10 +352,18 @@ const RoutingManagementPage = ({initialData}) => {
                                                                 }
                                                                 description={
                                                                     <>
-                                                                        <div className="small-text"><span className="medium-text">비용: </span>{step.cost.toLocaleString()} 원</div>
-                                                                        <div className="small-text"><span className="medium-text">소요 시간: </span>{step.duration} 시간</div>
-                                                                        <div className="small-text"><span className="medium-text">불량률: </span>{(step.defectRate * 100).toFixed(2)}%</div>
-                                                                        <div className="small-text"><span className="medium-text">설명: </span>{step.description}</div>
+                                                                        <div className="small-text">
+                                                                            <span className="medium-text">비용: </span>{step.cost.toLocaleString()} 원
+                                                                        </div>
+                                                                        <div className="small-text">
+                                                                            <span className="medium-text">소요 시간: </span>{step.duration} 시간
+                                                                        </div>
+                                                                        <div className="small-text">
+                                                                            <span className="medium-text">불량률: </span>{(step.defectRate * 100).toFixed(2)}%
+                                                                        </div>
+                                                                        <div className="small-text">
+                                                                            <span className="medium-text">설명: </span>{step.description}
+                                                                        </div>
                                                                         <div>
                                                                             외주 여부: <Tag color={step.isOutsourced ? 'red' : 'green'}>{step.isOutsourced ? '외주' : '내부'}</Tag>
                                                                         </div>
@@ -357,25 +371,26 @@ const RoutingManagementPage = ({initialData}) => {
                                                                 }
                                                             />
                                                         ))}
+                                                    </Steps>
                                                         {/* 공정 추가 버튼 */}
                                                         <Step
                                                             key="add-step"
                                                             description={
                                                                 <Button
-                                                                    type="dashed"
                                                                     icon={<PlusOutlined />}
                                                                     onClick={() => handleInputClick('processDetails')}
                                                                     style={{
+                                                                        outline: 'none',
+                                                                        marginTop: '20px',
+                                                                        marginBottom: '20px',
                                                                         width: '50%',
                                                                         height: '40px',
-                                                                        borderRadius: '4px',
                                                                     }}
                                                                 >
                                                                     공정 경로 추가
                                                                 </Button>
                                                             }
                                                         />
-                                                    </Steps>
                                                 </Col>
                                             </Row>
 
