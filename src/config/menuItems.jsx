@@ -50,8 +50,9 @@ export const subMenuItems = {
             text: '전표관리',
             items: [
                 { text: '일반전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 미결전표입력 권한
-                { text: '매입매출전표입력', component: 'SalesPurchaseVoucherEntryPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
-                { text: '미결전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '일반전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '매입매출전표입력', component: 'PendingSalesPurchaseVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
+                { text: '미결매입매출전표승인', component: 'PendingSalesPurchaseVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-sales-purchase-voucher-approval', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'ADMIN' },
                 { text: '전자세금계산서발행', component: 'ElectronicTaxInvoicePage', apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한
             ]
         },
@@ -177,8 +178,7 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '품목 관리', component: 'ProductManagementPage', apiPath: LOGISTICS_API.PRODUCT_LIST_API, url: '/logistics/basic-info/product-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
-                { text: '품목 그룹 관리', component: 'ItemGroupManagementPage', apiPath: undefined, url: '/logistics/basic-info/item-group-management', requiredPermission: 'itemGroupManagementPermission', permissionLevel: 'GENERAL' },  // 품목 그룹 관리 권한
+                { text: '품목 등록', component: 'ProductManagementPage', apiPath: LOGISTICS_API.PRODUCT_LIST_API, url: '/logistics/basic-info/product-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
                 { text: '창고등록', component: 'WarehouseRegistrationPage', apiPath: undefined, url: '/logistics/basic-info/warehouse-registration', requiredPermission: 'warehouseRegistrationPermission', permissionLevel: 'GENERAL' },  // 창고등록 권한
             ]
         },
@@ -195,10 +195,8 @@ export const subMenuItems = {
         {
             text: '구매 관리',
             items: [
-                { text: '발주 요청', component: 'PurchaseRequestPage', apiPath: undefined, url: '/logistics/purchase/purchase-request', requiredPermission: 'purchaseRequestPermission', permissionLevel: 'GENERAL' },  // 발주 요청 권한
-                { text: '발주 계획', component: 'PurchasePlanPage', apiPath: undefined, url: '/logistics/purchase/purchase-plan', requiredPermission: 'purchasePlanPermission', permissionLevel: 'GENERAL' },  // 발주 계획 권한
-                { text: '단가 요청', component: 'PriceRequestPage', apiPath: undefined, url: '/logistics/purchase/price-request', requiredPermission: 'priceRequestPermission', permissionLevel: 'GENERAL' },  // 단가 요청 권한
-                { text: '발주서', component: 'PurchaseOrderPage', apiPath: undefined, url: '/logistics/purchase/purchase-order', requiredPermission: 'purchaseOrderPermission', permissionLevel: 'GENERAL' },  // 발주서 권한
+                { text: '발주 요청', component: 'PurchaseRequestPage', apiPath: LOGISTICS_API.PURCHASE_REQUEST_LIST_API, url: '/logistics/purchase/purchase-request', requiredPermission: 'purchaseRequestPermission', permissionLevel: 'GENERAL' },  // 발주 요청 권한
+                { text: '발주서', component: 'PurchaseOrderPage', apiPath: LOGISTICS_API.PURCHASE_ORDER_LIST_API, url: '/logistics/purchase/purchase-order', requiredPermission: 'purchaseOrderPermission', permissionLevel: 'GENERAL' },  // 발주서 권한
                 { text: '구매', component: 'PurchasePage', apiPath: undefined, url: '/logistics/purchase/purchase', requiredPermission: 'purchasePermission', permissionLevel: 'GENERAL' },  // 구매 권한
                 { text: '입고지시서', component: 'ReceivingInstructionPage', apiPath: undefined, url: '/logistics/purchase/inbound-order', requiredPermission: 'inboundOrderPermission', permissionLevel: 'GENERAL' },  // 입고지시서 권한
             ]

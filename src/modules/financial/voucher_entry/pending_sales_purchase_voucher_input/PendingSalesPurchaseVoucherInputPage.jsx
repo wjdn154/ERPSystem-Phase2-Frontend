@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './SalesPurchaseVoucherEntryUtil.jsx';
+import { tabItems } from './PendingSalesPurchaseVoucherInputUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button, Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select, Spin, Table, Tag, Tooltip} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
@@ -16,7 +16,7 @@ import {ko} from "date-fns/locale";
 import {jwtDecode} from "jwt-decode";
 const { Option } = Select
 
-const SalesPurchaseVoucherEntryPage = () => {
+const PendingSalesPurchaseVoucherInputPage = () => {
     const token = useSelector(state => state.auth.token);
     const notify = useNotificationContext();
     const [activeTabKey, setActiveTabKey] = useState('1');
@@ -29,6 +29,9 @@ const SalesPurchaseVoucherEntryPage = () => {
     const [currentField, setCurrentField] = useState('');
     const [voucher, setVoucher] = useState({});
     const [vouchers, setVouchers] = useState([]);
+    const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+    const [loadingDetail, setLoadingDetail] = useState(false);
+    const [voucherDetails, setVoucherDetails] = useState({})
     const [displayValues, setDisplayValues] = useState({
         vatTypeCode: '',
         clientCode: ''
@@ -206,6 +209,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                     voucherDate: format(selectedDate, 'yyyy-MM-dd'),
                     voucherManagerId: jwtDecode(token).employeeId,
                     quantity: rest.quantity || 0,
+                    unitPrice: rest.unitPrice || 0,
                     clientCode,
                     electronicTaxInvoiceStatus: 'Unpublished',
                 };
@@ -346,7 +350,30 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                     dataIndex: 'vatTypeCode',
                                                     key: 'vatTypeCode',
                                                     align: 'center',
-                                                    render: (text, record) => <div className="small-text">[{text}] {record.vatTypeName}</div>
+                                                    render: (text, record) => <div className="small-text">[{text.padStart(5, '0')}] {record.vatTypeName}</div>
+                                                },
+                                                {
+                                                    title: <div className="title-text">분개유형</div>,
+                                                    dataIndex: 'journalEntryName',
+                                                    key: 'journalEntryName',
+                                                    align: 'center',
+                                                    render: (text) => {
+                                                        let color;
+                                                        switch (text) {
+                                                            case '외상':
+                                                                color = 'green';
+                                                                break;
+                                                            case '카드':
+                                                                color = 'blue';
+                                                                break;
+                                                            case '현금':
+                                                                color = 'red';
+                                                                break;
+                                                            default:
+                                                                color = 'gray';
+                                                        }
+                                                        return <Tag style={{ marginLeft: '5px' }} color={color}>{text}</Tag>;
+                                                    }
                                                 },
                                                 {
                                                     title: <div className="title-text">품목</div>,
@@ -360,7 +387,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                     dataIndex: 'quantity',
                                                     key: 'quantity',
                                                     align: 'center',
-                                                    render: (text) => <div className="small-text">{Number(text).toLocaleString()} EA</div>
+                                                    render: (text) => <div className="small-text">{Number(text).toLocaleString()}</div>
                                                 },
                                                 {
                                                     title: <div className="title-text">단가</div>,
@@ -389,29 +416,6 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                     key: 'clientName',
                                                     align: 'center',
                                                     render: (text, record) => <div className="small-text">[{record.clientCode.padStart(5, '0')}] {text}</div>
-                                                },
-                                                {
-                                                    title: <div className="title-text">분개유형</div>,
-                                                    dataIndex: 'journalEntryName',
-                                                    key: 'journalEntryName',
-                                                    align: 'center',
-                                                    render: (text) => {
-                                                        let color;
-                                                        switch (text) {
-                                                            case '외상':
-                                                                color = 'green';
-                                                                break;
-                                                            case '카드':
-                                                                color = 'blue';
-                                                                break;
-                                                            case '현금':
-                                                                color = 'red';
-                                                                break;
-                                                            default:
-                                                                color = 'gray';
-                                                        }
-                                                        return <Tag style={{ marginLeft: '5px' }} color={color}>{text}</Tag>;
-                                                    }
                                                 },
                                                 {
                                                     title: (
@@ -450,12 +454,227 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                             </Tooltip>
                                                         );
                                                     }
-                                                }
+                                                },
+                                                {
+                                                    title: <div className="title-text">담당자</div>,
+                                                    dataIndex: 'voucherManagerCode',
+                                                    key: 'voucherManagerCode',
+                                                    align: 'center',
+                                                    render: (text, record) => <div className="small-text">[{text}] {record.voucherManagerName}</div>
+                                                },
+                                                {
+                                                    title: <div className="title-text">승인여부</div>,
+                                                    dataIndex: 'approvalStatus',
+                                                    key: 'approvalStatus',
+                                                    align: 'center',
+                                                    render: (text) => {
+                                                        let color;
+                                                        let value;
+                                                        switch (text) {
+                                                            case 'APPROVED':
+                                                                color = 'green';
+                                                                value = '승인';
+                                                                break;
+                                                            case 'PENDING':
+                                                                color = 'red';
+                                                                value = '미승인';
+                                                                break;
+                                                            case 'REJECTED':
+                                                                color = 'orange';
+                                                                value = '반려';
+                                                                break;
+                                                            default:
+                                                                color = 'gray';
+                                                                value = text;
+                                                        }
+                                                        return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+                                                    }
+                                                },
                                             ]}
                                             rowKey={(record) => record.voucherNumber}
                                             pagination={false}
                                             size="small"
                                             scroll={{ x: 'max-content' }}
+                                            expandable={{
+                                                expandedRowRender: (record) =>
+                                                    loadingDetail ? (
+                                                        <Spin />
+                                                    ) : (
+                                                        <div>
+                                                            {voucherDetails[record.voucherNumber] ? (
+                                                                <Table
+                                                                    columns={[
+                                                                        {
+                                                                            title: <div className="title-text">전표일자</div>,
+                                                                            dataIndex: 'voucherDate',
+                                                                            key: 'voucherDate',
+                                                                            align: 'center',
+                                                                            render: (text) => text ? <div className="small-text">{text}</div> : '',
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">전표번호</div>,
+                                                                            dataIndex: 'voucherNumber',
+                                                                            key: 'voucherNumber',
+                                                                            align: 'center',
+                                                                            render: (text) => text ? <div className="small-text">{text}</div> : '',
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">구분</div>,
+                                                                            dataIndex: 'voucherType',
+                                                                            key: 'voucherType',
+                                                                            align: 'center',
+                                                                            render: (text) => {
+                                                                                let color;
+                                                                                let value;
+                                                                                switch (text) {
+                                                                                    case 'DEPOSIT':
+                                                                                        color = 'green';
+                                                                                        value = '입금';
+                                                                                        break;
+                                                                                    case 'WITHDRAWAL':
+                                                                                        color = 'red';
+                                                                                        value = '출금';
+                                                                                        break;
+                                                                                    case 'DEBIT':
+                                                                                        color = 'green';
+                                                                                        value = '차변';
+                                                                                        break;
+                                                                                    case 'CREDIT':
+                                                                                        color = 'red';
+                                                                                        value = '대변';
+                                                                                        break;
+                                                                                    default:
+                                                                                        color = 'gray';
+                                                                                        value = text;
+                                                                                }
+                                                                                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">계정과목</div>,
+                                                                            dataIndex: 'accountSubjectName',
+                                                                            key: 'accountSubjectName',
+                                                                            align: 'center',
+                                                                            render: (text) => text ? <div className="small-text">{text}</div> : '',
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">거래처</div>,
+                                                                            dataIndex: 'clientCode',
+                                                                            key: 'clientCode',
+                                                                            align: 'center',
+                                                                            render: (text, record) => <div className="small-text">[{text.padStart(5, '0')}] {record.clientName}</div>
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">거래설명</div>,
+                                                                            dataIndex: 'transactionDescription',
+                                                                            key: 'transactionDescription',
+                                                                            align: 'center',
+                                                                            render: (text) => text ? <div className="small-text">{text}</div> : '',
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">담당자</div>,
+                                                                            dataIndex: 'voucherManagerCode',
+                                                                            key: 'voucherManagerCode',
+                                                                            align: 'center',
+                                                                            render: (text, record) => <div className="small-text">[{text}] {record.voucherManagerName}</div>
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">차변</div>,
+                                                                            dataIndex: 'debitAmount',
+                                                                            key: 'debitAmount',
+                                                                            align: 'center',
+                                                                            render: (text) => text ? (
+                                                                                <div style={{ textAlign: 'right' }} className="small-text">
+                                                                                    {Number(text).toLocaleString()}
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div style={{ textAlign: 'right' }} className="small-text">0</div>
+                                                                            ),
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">대변</div>,
+                                                                            dataIndex: 'creditAmount',
+                                                                            key: 'creditAmount',
+                                                                            align: 'center',
+                                                                            render: (text) => text ? (
+                                                                                <div style={{ textAlign: 'right' }} className="small-text">
+                                                                                    {Number(text).toLocaleString()}
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div style={{ textAlign: 'right' }} className="small-text">0</div>
+                                                                            ),
+                                                                        },
+                                                                    ]}
+                                                                    dataSource={voucherDetails[
+                                                                        record.voucherNumber
+                                                                        ].voucherDtoList.map((item, index) => ({
+                                                                        key: index,
+                                                                        voucherDate: item.voucherDate,
+                                                                        voucherNumber: item.voucherNumber,
+                                                                        voucherType: item.voucherType,
+                                                                        accountSubjectName: item.accountSubjectName,
+                                                                        clientCode: item.clientCode,
+                                                                        clientName: item.clientName,
+                                                                        voucherManagerName: item.voucherManagerName,
+                                                                        voucherManagerCode: item.voucherManagerCode,
+                                                                        transactionDescription: item.transactionDescription,
+                                                                        debitAmount: item.debitAmount > 0 ? item.debitAmount : null,
+                                                                        creditAmount: item.creditAmount > 0 ? item.creditAmount : null,
+                                                                    }))}
+                                                                    pagination={false}
+                                                                    size="small"
+                                                                    rowKey="key"
+                                                                    summary={() => (
+                                                                        <>
+                                                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                                                <Table.Summary.Cell align="center" index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
+                                                                                <Table.Summary.Cell align="center" index={1}/>
+                                                                                <Table.Summary.Cell align="center" index={2}/>
+                                                                                <Table.Summary.Cell align="center" index={3}/>
+                                                                                <Table.Summary.Cell align="center" index={4}/>
+                                                                                <Table.Summary.Cell align="center" index={5}/>
+                                                                                <Table.Summary.Cell align="center" index={6}/>
+                                                                                <Table.Summary.Cell align="right" index={7}><div className="medium-text">{Number(voucherDetails[record.voucherNumber].totalDebit).toLocaleString()}</div></Table.Summary.Cell>
+                                                                                <Table.Summary.Cell align="right" index={8}><div className="medium-text">{Number(voucherDetails[record.voucherNumber].totalCredit).toLocaleString()}</div></Table.Summary.Cell>
+                                                                            </Table.Summary.Row>
+                                                                        </>
+                                                                    )}
+                                                                />
+                                                            ) : (
+                                                                '상세 정보가 없습니다.'
+                                                            )}
+                                                        </div>
+                                                    ),
+                                                expandedRowKeys: expandedRowKeys,
+                                                onExpand: async (expanded, record) => {
+                                                    setExpandedRowKeys(
+                                                        expanded ? [record.voucherNumber] : [] // 하나의 행만 열리도록 설정
+                                                    );
+
+                                                    if (expanded) {
+                                                        if (!voucherDetails[record.voucherNumber]) {
+                                                            setLoadingDetail(true);
+                                                            let voucherId = record.voucherId;
+                                                            try {
+                                                                const response = await apiClient.post(
+                                                                    FINANCIAL_API.SALE_END_PURCHASE_RESOLVED_VOUCHER_ENTRY_API,
+                                                                    {
+                                                                        voucherId,
+                                                                    }
+                                                                );
+                                                                console.log('상세 정보:', response.data);
+                                                                setVoucherDetails((prevDetails) => ({
+                                                                    ...prevDetails,
+                                                                    [record.voucherNumber]: response.data,
+                                                                }));
+                                                            } catch (error) {
+                                                                console.error('상세 정보 가져오기 실패:', error);
+                                                            }
+                                                            setLoadingDetail(false);
+                                                        }
+                                                    }
+                                                },
+                                            }}
                                             summary={() => (
                                                 searchData?.showDTOS && searchData?.showDTOS.length > 0 ? (
                                                     <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
@@ -464,13 +683,16 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                         <Table.Summary.Cell index={2} />
                                                         <Table.Summary.Cell index={3} />
                                                         <Table.Summary.Cell index={4} />
-                                                        <Table.Summary.Cell index={5}> <div className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.quantity, 0)).toLocaleString()} EA</div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={6}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.unitPrice, 0)).toLocaleString()} </div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={7}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.supplyAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={8}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.vatAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={9} />
-                                                        <Table.Summary.Cell index={10} />
+                                                        <Table.Summary.Cell index={5} />
+                                                        <Table.Summary.Cell index={6} />
+                                                        <Table.Summary.Cell index={7}> <div className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.quantity, 0)).toLocaleString()}</div> </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={8}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.unitPrice, 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={9}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.supplyAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={10}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.showDTOS.reduce((acc, curr) => acc + curr.vatAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
                                                         <Table.Summary.Cell index={11} />
+                                                        <Table.Summary.Cell index={12} />
+                                                        <Table.Summary.Cell index={13} />
+                                                        <Table.Summary.Cell index={14} />
                                                     </Table.Summary.Row>
                                                 ) : null
                                             )}
@@ -552,7 +774,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                             value={voucher.unitPrice}
                                                             onChange={(value) => {
                                                                 const formattedValue = value?.toString().replace(/[^0-9]/g, '');
-                                                                setVoucher({ ...voucher, unitPrice: formattedValue });
+                                                                setVoucher({ ...voucher, unitPrice: formattedValue});
                                                             }}
                                                             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                                             parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
@@ -682,7 +904,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                     dataIndex: "quantity",
                                                     key: "quantity",
                                                     align: "center",
-                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()} EA</span> : null,
+                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : null,
                                                 },
                                                 {
                                                     title: <div className="title-text">단가</div>,
@@ -751,7 +973,7 @@ const SalesPurchaseVoucherEntryPage = () => {
                                                             <Table.Summary.Cell index={1}></Table.Summary.Cell>
                                                             <Table.Summary.Cell index={2}></Table.Summary.Cell>
                                                             <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                                                            <Table.Summary.Cell index={4}><div className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.quantity || 0), 0).toLocaleString()} EA</div></Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={4}><div className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.quantity || 0), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                             <Table.Summary.Cell index={5}><div style={{ textAlign: 'right' }} className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.unitPrice || 0), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                             <Table.Summary.Cell index={6}><div style={{ textAlign: 'right' }} className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.supplyAmount || 0), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                             <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{vouchers.reduce((acc, cur) => acc + Number(cur.vatAmount || 0), 0).toLocaleString()}</div></Table.Summary.Cell>
@@ -945,4 +1167,4 @@ const SalesPurchaseVoucherEntryPage = () => {
     );
 };
 
-export default SalesPurchaseVoucherEntryPage;
+export default PendingSalesPurchaseVoucherInputPage;

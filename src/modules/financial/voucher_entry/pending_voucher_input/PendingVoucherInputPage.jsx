@@ -133,6 +133,7 @@ const PendingVoucherInputPage = () => {
             });
 
             setSearchData(response.data); // API로 받은 데이터를 바로 상태로 설정
+            console.log(response.data);
             notify('success', '조회 성공', '전표 목록 데이터 조회 성공.', 'bottomRight');
 
         } catch (err) {
@@ -280,7 +281,7 @@ const PendingVoucherInputPage = () => {
                     <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }} >미결 전표 목록</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >일반전표 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
@@ -321,7 +322,6 @@ const PendingVoucherInputPage = () => {
                                                     title: <div className="title-text">날짜</div>,
                                                     dataIndex: 'voucherDate',
                                                     key: 'voucherDate',
-                                                    width: '10%',
                                                     align: 'center',
                                                     render: (text, record) => <span className="small-text">{text || formattedDate}</span>
                                                 },
@@ -329,7 +329,6 @@ const PendingVoucherInputPage = () => {
                                                     title: <div className="title-text">전표번호</div>,
                                                     dataIndex: 'voucherNumber',
                                                     key: 'voucherNumber',
-                                                    width: '5%',
                                                     align: 'center',
                                                     render: (text, record) => record.total ? null : <span className="small-text">{text}</span>
                                                 },
@@ -337,7 +336,6 @@ const PendingVoucherInputPage = () => {
                                                     title: <div className="title-text">구분</div>,
                                                     dataIndex: 'voucherType',
                                                     key: 'voucherType',
-                                                    width: '10%',
                                                     align: 'center',
                                                     render: (text) => {
                                                         let color;
@@ -370,7 +368,6 @@ const PendingVoucherInputPage = () => {
                                                     title: <div className="title-text">계정과목</div>,
                                                     dataIndex: 'accountSubjectCode',
                                                     key: 'accountSubjectCode',
-                                                    width: '10%',
                                                     align: 'center',
                                                     render: (text, record) => <span className="small-text">[{text.padStart(5, '0')}] {record.accountSubjectName}</span>
                                                 },
@@ -378,7 +375,6 @@ const PendingVoucherInputPage = () => {
                                                     title: <div className="title-text">거래처</div>,
                                                     dataIndex: 'clientCode',
                                                     key: 'clientCode',
-                                                    width: '10%',
                                                     align: 'center',
                                                     render: (text, record) => <span className="small-text">[{text.padStart(5, '0')}] {record.clientName}</span>
                                                 },
@@ -386,12 +382,32 @@ const PendingVoucherInputPage = () => {
                                                     title: <div className="title-text">적요</div>,
                                                     dataIndex: 'transactionDescription',
                                                     key: 'transactionDescription',
-                                                    width: '20%',
                                                     align: 'center',
                                                     render: (text) => <span className="small-text">{text}</span>
                                                 },
                                                 {
-                                                    title: '승인여부',
+                                                    title: <div className="title-text" style={{ textAlign: 'center' }}>차변</div>,
+                                                    dataIndex: 'debitAmount',
+                                                    key: 'debitAmount',
+                                                    align: 'right',
+                                                    render: (text) => <span className="small-text">{text.toLocaleString()}</span>
+                                                },
+                                                {
+                                                    title: <div className="title-text" style={{ textAlign: 'center' }}>대변</div>,
+                                                    dataIndex: 'creditAmount',
+                                                    key: 'creditAmount',
+                                                    align: 'right',
+                                                    render: (text) => <span className="small-text">{text.toLocaleString()}</span>
+                                                },
+                                                {
+                                                    title: <div className="title-text">담당자</div>,
+                                                    dataIndex: 'voucherManagerCode',
+                                                    key: 'voucherManagerCode',
+                                                    align: 'center',
+                                                    render: (text, record) => <div className="small-text">[{text}] {record.voucherManagerName}</div>
+                                                },
+                                                {
+                                                    title: <div className="title-text">승인여부</div>,
                                                     dataIndex: 'approvalStatus',
                                                     key: 'approvalStatus',
                                                     align: 'center',
@@ -407,6 +423,10 @@ const PendingVoucherInputPage = () => {
                                                                 color = 'red';
                                                                 value = '미승인';
                                                                 break;
+                                                            case 'REJECTED':
+                                                                color = 'orange';
+                                                                value = '반려';
+                                                                break;
                                                             default:
                                                                 color = 'gray';
                                                                 value = text;
@@ -414,22 +434,6 @@ const PendingVoucherInputPage = () => {
                                                         return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
                                                     }
                                                 },
-                                                {
-                                                    title: <div className="title-text" style={{ textAlign: 'center' }}>차변</div>,
-                                                    dataIndex: 'debitAmount',
-                                                    key: 'debitAmount',
-                                                    width: '10%',
-                                                    align: 'right',
-                                                    render: (text) => <span className="small-text">{text.toLocaleString()}</span>
-                                                },
-                                                {
-                                                    title: <div className="title-text" style={{ textAlign: 'center' }}>대변</div>,
-                                                    dataIndex: 'creditAmount',
-                                                    key: 'creditAmount',
-                                                    width: '10%',
-                                                    align: 'right',
-                                                    render: (text) => <span className="small-text">{text.toLocaleString()}</span>
-                                                }
                                             ]}
                                             rowKey={(record) => record.id}
                                             pagination={false}
@@ -444,9 +448,10 @@ const PendingVoucherInputPage = () => {
                                                     <Table.Summary.Cell index={3} />
                                                     <Table.Summary.Cell index={4} />
                                                     <Table.Summary.Cell index={5} />
-                                                    <Table.Summary.Cell index={6} />
-                                                    <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalDebit).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={8}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalCredit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalDebit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={7}><div style={{ textAlign: 'right' }} className="medium-text">{Number(searchData.totalCredit).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={8} />
+                                                    <Table.Summary.Cell index={9} />
                                                 </Table.Summary.Row>
                                                 ) : null
                                             )}
@@ -602,7 +607,7 @@ const PendingVoucherInputPage = () => {
                                                 key: "voucherDate",
                                                 width: "10%",
                                                 align: "center",
-                                                render: () => <span className="small-text">{formattedDate}</span>,
+                                                render: () => <div className="small-text">{formattedDate}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">구분</div>,

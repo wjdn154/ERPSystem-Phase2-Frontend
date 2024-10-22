@@ -1,3 +1,5 @@
+import {Tag} from "antd";
+import React from "react";
 
 const equipmentTypeMap = {
     "ASSEMBLY" : "조립 설비",
@@ -20,7 +22,7 @@ export const
         title: <span>설비번호</span>,  // 컬럼 제목
         dataIndex: 'equipmentNum',  // 데이터 인덱스: 이 필드는 데이터 객체의 'equipmentNum' 속성과 연결됩니다.
         key:'equipmentNum',
-        width: '18%',  // 컬럼 너비 설정
+        width: '16%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
@@ -53,22 +55,47 @@ export const
         key:'operationStatus',
         width: '13%',  // 컬럼 너비 설정
         align: 'center',
-        render: (text) => {
-            return operationStatusMap[text] || text;  // 한글로 변환 후 표시
-        }
-    },
+        render: (text) =>  {
+            let color;
+            let value;
+            switch (text) {
+                case 'BEFORE_OPERATION':
+                    color = 'green';
+                    value = '가동 전';
+                    break;
+                case 'OPERATING':
+                    color = 'blue';
+                    value = '가동 중';
+                    break;
+                case 'MAINTENANCE':
+                    color = 'yellow';
+                    value = '유지보수 중';
+                    break;
+                case 'FAILURE':
+                    color = 'red';
+                    value = '고장';
+                    break;
+                case 'REPAIRING':
+                    color = 'orange';
+                    value = '수리 중';
+                    break;
+                default:
+                    color = 'gray'; // 기본 색상
+            }
+            return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+        }},
     {
         title: <span>공장 이름</span>,  // 컬럼 제목
         dataIndex: 'factoryName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'factoryName' 속성과 연결됩니다.
         key:'factoryName',
-        width: '13%',  // 컬럼 너비 설정
+        width: '14%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
         title: <span>작업장 이름</span>,  // 컬럼 제목
         dataIndex: 'workcenterName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'workcenterName' 속성과 연결됩니다.
         key:'workcenterName',
-        width: '14%',  // 컬럼 너비 설정
+        width: '15%',  // 컬럼 너비 설정
         align: 'center',
     },
 ];

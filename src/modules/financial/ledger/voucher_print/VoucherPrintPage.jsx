@@ -122,8 +122,8 @@ const VoucherPrintPage = () => {
 
         try {
             const response = await apiClient.post(FINANCIAL_API.VOUCHER_PRINT_SEARCH_API, searchParams);
-            const data = response.data;
-            setSearchData(data); // 조회된 데이터를 상태로 설정
+            setSearchData(response.data);
+            console.log(response.data);
             notify('success', '조회 성공', '전표 조회 성공.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '전표 조회 중 오류가 발생했습니다.', 'top');
@@ -455,10 +455,10 @@ const VoucherPrintPage = () => {
                                             },
                                             {
                                                 title: <div className="title-text">담당자</div>,
-                                                dataIndex: 'voucherManagerName',
-                                                key: 'voucherManagerName',
+                                                dataIndex: 'voucherManagerCode',
+                                                key: 'voucherManagerCode',
                                                 align: 'center',
-                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
+                                                render: (text, record) => text ? <div className="small-text">[{text}] {record.voucherManagerName}</div> : ''
                                             },
                                             {
                                                 title: <div className="title-text">유형</div>,
@@ -490,6 +490,23 @@ const VoucherPrintPage = () => {
                                         pagination={ false }
                                         size={'small'}
                                         bordered={true}
+                                        summary={() => (
+                                            searchData && searchData.length > 0 ? (
+                                                <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1} />
+                                                    <Table.Summary.Cell index={2} />
+                                                    <Table.Summary.Cell index={3} />
+                                                    <Table.Summary.Cell index={4}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.reduce((acc, curr) => acc + curr.debitAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}> <div style={{ textAlign: 'right' }} className="medium-text"> {Number(searchData.reduce((acc, curr) => acc + curr.creditAmount, 0)).toLocaleString()} </div> </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6} />
+                                                    <Table.Summary.Cell index={7} />
+                                                    <Table.Summary.Cell index={8} />
+                                                    <Table.Summary.Cell index={9} />
+                                                    <Table.Summary.Cell index={10} />
+                                                </Table.Summary.Row>
+                                            ) : null
+                                        )}
                                     />
                                 </Grid>
                             </Paper>

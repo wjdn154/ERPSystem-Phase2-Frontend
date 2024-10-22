@@ -1,11 +1,9 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './WorkcenterUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button, Col, Divider, Form, Input, Modal, notification, Row, Select} from 'antd';
-import TemporarySection from "../../../../components/TemporarySection.jsx";
-import SearchBar from "../../common/SearchBar.jsx";
+import {Button, Col, Divider, Form, Input, Modal, notification, Row, Select, Table} from 'antd';
 import WorkcenterListSection from "./tab1_workcenter_list/WorkcenterListSection.jsx";
 import {workcenterColumns} from "./WorkcenterColumn.jsx";
 import {getRowClassName} from "./WorkcenterUtil.jsx";
@@ -15,22 +13,27 @@ import {useWorkcenter} from "./WorkcenterHook.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {fetchWorkcenter, fetchWorkcenters} from "./WorkcenterApi.jsx";
 
 const WorkcenterManagementPage = ({ initialData }) => {
 
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
-    const [Data, setData] = useState({});
+    // const [data, setData] = useState([]);
+    const [workcenter, setWorkcenter] = useState(null); // 선택된 작업장 데이터 관리
+    const [isModalVisible, setIsModalVisible] = useState(false); // 모달 상태 관리
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
 
     const {
         data,
-        workcenter,
+        setData,
         handleSave,
         handleSelectedRow,
         handleDeleteWorkcenter,
-        isWorkcenterModalVisible,
-        handleClose,
+        // isWorkcenterModalVisible,
+        // handleClose,
         handleInputChange,
         handleAddWorkcenter,
         handleSearch,
@@ -39,6 +42,13 @@ const WorkcenterManagementPage = ({ initialData }) => {
         handleTabChange,
         activeTabKey,
     } = useWorkcenter(initialData);
+
+    useEffect(() => {
+        if (workcenter) {
+            console.log("현재 선택된 작업장 (useEffect 내):", workcenter);
+        }
+    }, [workcenter]);
+
 
     const refreshWorkcenters = async () => {
         const updatedData = await fetchWorkcenters(); // 작업장 목록 새로고침
@@ -64,15 +74,11 @@ const WorkcenterManagementPage = ({ initialData }) => {
                         await apiClient.post(PRODUCTION_API.UPDATE_WORKCENTER_API(values.code), values);
                         notify('success', '등록 성공', '작업장이 수정되었습니다.', 'bottomRight');
                     }
-                    isWorkcenterModalVisible(false); // 모달 닫기
+                    // isWorkcenterModalVisible(false); // 모달 닫기
                     refreshWorkcenters(); // 작업장 목록 새로고침
                 } catch (error) {
                     console.error('Error saving workcenter:', error);
-                    notification.error({
-                        message: '저장 실패',
-                        description: '데이터 저장 중 오류가 발생했습니다.',
-                        placement: 'top',
-                    });
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
                 }
             },
             onCancel() {
@@ -111,32 +117,61 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >작업장 목록</Typography>
 
                                 {/* 기본 데이터 목록 */}
-                                <WorkcenterListSection
-                                    columns={workcenterColumns}
-                                    data={data}
-                                    handleSelectedRow={handleSelectedRow}
-                                    rowClassName={getRowClassName}
-                                />
-                                {/* 모달 컴포넌트 */}
-                                {workcenter && (
-                                    <Modal
-                                        visible={isWorkcenterModalVisible} // 모달 상태에 따라 표시
-                                        onCancel={handleClose} // 모달을 닫는 함수
-                                        footer={null} // 모달의 하단 버튼 제거
-                                    >
-                                        <SelectedWorkcenterSection
-                                            workcenter={workcenter}
-                                            handleClose={handleClose}
-                                            handleInputChange={handleInputChange}
-                                            handleSave={handleSave}
-                                            handleDeleteWorkcenter={handleDeleteWorkcenter}
-                                        />
-                                    </Modal>
-                                )}
+                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Table
+                                        columns={workcenterColumns}
+                                        dataSource={data}
+                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        rowClassName={getRowClassName}
+                                        rowSelection={{
+                                            type: 'radio', // 선택 방식 (radio or checkbox)
+                                            selectedRowKeys: selectedRowKeys, // 선택된 행의 키들
+                                            onChange: (newSelectedRowKeys) => {
+                                                setSelectedRowKeys(newSelectedRowKeys); // 선택된 행의 키 업데이트
+                                            },
+                                        }}
+                                        size="small"
+                                        rowKey="code" // Workcenter에서 고유 CODE 필드를 사용
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: async () => {
+                                                setSelectedRowKeys([record.code]); // 클릭한 행의 키로 상태 업데이트
+                                                const code = record.code;
+                                                try {
+                                                    // 작업장 상세 정보 가져오기 (API 호출)
+                                                    const detail = await fetchWorkcenter(record.code);
+                                                    setWorkcenter(detail); // 선택된 작업장 데이터 설정
+                                                    notify('success', '작업장 조회', '작업장 정보 조회 성공.', 'bottomRight');
+                                                } catch (error) {
+                                                    console.error("작업장 정보 조회 실패:", error);
+                                                    notify('error', '조회 오류', '작업장 정보 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                                // handleSelectedRow(record); // 행 클릭 시 해당 작업장 선택
+                                            },
+                                        })}
+                                    />
+                                </Grid>
                             </Paper>
-
                         </Grow>
                     </Grid>
+                    {/* 선택한 작업장 조회 */}
+
+                    {workcenter && (
+                        <SelectedWorkcenterSection
+                            workcenter={workcenter}
+                            handleInputChange={handleInputChange}
+                            handleSave={handleSave}
+                            handleSelectedRow={handleSelectedRow}
+                            handleDeleteWorkcenter={handleDeleteWorkcenter}
+                            rowClassName={getRowClassName}
+                        />
+
+                            // handleClose={handleClose}
+                        //     open={isWorkcenterModalVisible} // 모달 상태에 따라 표시
+                        //     onCancel={handleClose} // 모달을 닫는 함수
+                        //     footer={null} // 모달의 하단 버튼 제거
+
+                    )}
                 </Grid>
             )}
 
@@ -219,7 +254,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                     <Row gutter={16}>
                                         <Col span={24} style={{ textAlign: 'right' }}>
                                             <Button type="primary" htmlType="submit">
-                                                작업장 등록
+                                                저장
                                             </Button>
                                         </Col>
                                     </Row>
@@ -232,7 +267,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
 
             {activeTabKey === '3' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={6} sx={{ minWidth: '700px !important', maxWidth: '1200px !important' }}>
+                    <Grid item xs={12} md={6} sx={{ minWidth: '1000px !important', maxWidth: '1200px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>오늘의 작업자</Typography>

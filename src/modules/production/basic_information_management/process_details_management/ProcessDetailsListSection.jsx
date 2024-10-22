@@ -17,7 +17,7 @@ const ProcessDetailsListSection = ({ columns, data, handleRowSelection, handleSe
             dataSource={data}
             pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
             // rowSelection={handleSelectedRow} // checkbox or radio btn active
-            size="default"
+            size="small"
             rowKey="code"
             onRow={(record) => ({
                 onClick: () => handleSelectedRow(record), // 행 클릭 시 해당 공정 선택
