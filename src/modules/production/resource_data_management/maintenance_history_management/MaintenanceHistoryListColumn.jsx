@@ -1,3 +1,5 @@
+import {Tag} from "antd";
+import React from "react";
 
 const maintenanceTypeMap =  {
 
@@ -40,16 +42,6 @@ export const
             }
         },
         {
-            title: <span>유지보수 진행 상태</span>,  // 컬럼 제목
-            dataIndex: 'maintenanceStatus',  // 데이터 인덱스: 이 필드는 데이터 객체의 'maintenanceStatus' 속성과 연결됩니다.
-            key:'maintenanceStatus',
-            width: '14%',  // 컬럼 너비 설정
-            align: 'center',
-            render: (text) => {
-                return text === true ? '완료' : '작업중';
-            }
-        },
-        {
             title: <span>유지보수 일자</span>,  // 컬럼 제목
             dataIndex: 'maintenanceDate',  // 데이터 인덱스: 이 필드는 데이터 객체의 'maintenanceDate' 속성과 연결됩니다.
             key:'maintenanceDate',
@@ -60,14 +52,28 @@ export const
             title: <span>설치된 공장</span>,  // 컬럼 제목
             dataIndex: 'factoryName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'factoryName' 속성과 연결됩니다.
             key:'factoryName',
-            width: '12%',  // 컬럼 너비 설정
+            width: '13%',  // 컬럼 너비 설정
             align: 'center',
         },
         {
             title: <span>설치된 작업장</span>,  // 컬럼 제목
             dataIndex: 'workcenterName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'workcenterName' 속성과 연결됩니다.
             key:'workcenterName',
-            width: '12%',  // 컬럼 너비 설정
+            width: '13%',  // 컬럼 너비 설정
             align: 'center',
         },
+        {
+            title: <span>진행 상태</span>,  // 컬럼 제목
+            dataIndex: 'maintenanceStatus',  // 데이터 인덱스: 이 필드는 데이터 객체의 'maintenanceStatus' 속성과 연결됩니다.
+            key:'maintenanceStatus',
+            width: '12%',  // 컬럼 너비 설정
+            align: 'center',
+            render: (text) => {
+                return (
+                    <Tag color={text === true ? 'blue' : 'red'}>
+                        {text === true ? '완료' : '작업중'}
+                    </Tag>
+                )
+            }
+        }
     ];
