@@ -194,6 +194,13 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                     render: (text, record) => <div className="small-text">[{record.clientCode.padStart(5, '0')}] {text}</div>
                                                 },
                                                 {
+                                                    title: <div className="title-text">담당자</div>,
+                                                    dataIndex: 'voucherManagerCode',
+                                                    key: 'voucherManagerCode',
+                                                    align: 'center',
+                                                    render: (text, record) => <div className="small-text">[{text}] {record.voucherManagerName}</div>
+                                                },
+                                                {
                                                     title: <div className="title-text">분개유형</div>,
                                                     dataIndex: 'journalEntryName',
                                                     key: 'journalEntryName',
@@ -360,14 +367,10 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                                         },
                                                                         {
                                                                             title: <div className="title-text">담당자</div>,
-                                                                            dataIndex: 'voucherManagerName',
-                                                                            key: 'voucherManagerName',
+                                                                            dataIndex: 'voucherManagerCode',
+                                                                            key: 'voucherManagerCode',
                                                                             align: 'center',
-                                                                            render: (text, record) => (
-                                                                                <div className="small-text">
-                                                                                    {text}
-                                                                                </div>
-                                                                            ),
+                                                                            render: (text, record) => <div className="small-text">[{text}] {record.voucherManagerName}</div>
                                                                         },
                                                                         {
                                                                             title: <div className="title-text">차변</div>,
@@ -407,11 +410,10 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                                         clientCode: item.clientCode,
                                                                         clientName: item.clientName,
                                                                         voucherManagerName: item.voucherManagerName,
+                                                                        voucherManagerCode: item.voucherManagerCode,
                                                                         transactionDescription: item.transactionDescription,
-                                                                        debitAmount:
-                                                                            item.debitAmount > 0 ? item.debitAmount : null,
-                                                                        creditAmount:
-                                                                            item.creditAmount > 0 ? item.creditAmount : null,
+                                                                        debitAmount: item.debitAmount > 0 ? item.debitAmount : null,
+                                                                        creditAmount: item.creditAmount > 0 ? item.creditAmount : null,
                                                                     }))}
                                                                     pagination={false}
                                                                     size="small"
@@ -484,6 +486,7 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                         <Table.Summary.Cell index={11} />
                                                         <Table.Summary.Cell index={12} />
                                                         <Table.Summary.Cell index={13} />
+                                                        <Table.Summary.Cell index={14} />
                                                     </Table.Summary.Row>
                                                 ) : null
                                             )}

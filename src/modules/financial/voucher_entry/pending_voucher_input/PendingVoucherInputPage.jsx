@@ -401,10 +401,10 @@ const PendingVoucherInputPage = () => {
                                                 },
                                                 {
                                                     title: <div className="title-text">담당자</div>,
-                                                    dataIndex: 'voucherManagerName',
-                                                    key: 'voucherManagerName',
+                                                    dataIndex: 'voucherManagerCode',
+                                                    key: 'voucherManagerCode',
                                                     align: 'center',
-                                                    render: (text, record) => <div className="small-text">{text}</div>
+                                                    render: (text, record) => <div className="small-text">[{text}] {record.voucherManagerName}</div>
                                                 },
                                                 {
                                                     title: <div className="title-text">승인여부</div>,
