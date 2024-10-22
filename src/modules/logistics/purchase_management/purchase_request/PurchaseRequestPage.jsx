@@ -19,6 +19,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
     const [purchaseRequestList, setPurchaseRequestList] = useState(initialData);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [editPurchaseRequest, setEditPurchaseRequest] = useState(false);
     const [detailPurchaseRequest, setDetailPurchaseRequest] = useState(false);
     const [editingRow, setEditingRow] = useState(null);
@@ -46,20 +47,69 @@ const PurchaseRequestPage = ( {initialData} ) => {
         setDisplayValues({
             managerName: `[${detailPurchaseRequest.managerCode}] ${detailPurchaseRequest.managerName}`,
             warehouseName:  `[${detailPurchaseRequest.warehouseCode}] ${detailPurchaseRequest.warehouseName}`,
-            productName: `[${detailPurchaseRequest.purchaseRequestDetails.productCode}] ${detailPurchaseRequest.purchaseRequestDetails.productName}`
+            productName: detailPurchaseRequest.purchaseRequestDetails.map(detail => `[${detail.productCode}] ${detail.productName}`),
+
         }, [detailPurchaseRequest, form]);
 
 
 
     }, [detailPurchaseRequest, form]);
 
+    const calculateSupplyPrice = (quantity, price) => {
+        return quantity * price;
+    };
+
+    const calculateVat = (supplyPrice) => {
+        return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
+    };
+
+    // 수량 또는 단가 변경 시 공급가액과 부가세를 자동 계산하는 함수
+    const updateSupplyAndVat = (quantity, price, recordKey) => {
+        const supplyPrice = calculateSupplyPrice(quantity, price);
+        const vat = calculateVat(supplyPrice);
+
+        updateField('supplyPrice', supplyPrice, recordKey);
+        updateField('vat', vat, recordKey);
+    };
+
+    const updateField = (fieldName, value, recordId) => {
+        const updatedDetails = [...purchaseRequestParam.purchaseRequestDetails];
+        const detailIndex = updatedDetails.findIndex((detail) => detail.id === recordId);
+        if (detailIndex !== -1) {
+            updatedDetails[detailIndex][fieldName] = value;
+
+            // 수량이나 단가가 변경되면 공급가액을 재계산
+            if (fieldName === 'quantity' || fieldName === 'price') {
+                const { quantity, price } = updatedDetails[detailIndex];
+                const supplyPrice = calculateSupplyPrice(quantity, price);
+                const vat = calculateVat(supplyPrice);
+
+                updatedDetails[detailIndex].supplyPrice = supplyPrice;
+                updatedDetails[detailIndex].vat = vat;
+            }
+        }
+        setPurchaseRequestParam((prevParams) => ({
+            ...prevParams,
+            purchaseRequestDetails: updatedDetails,
+        }));
+    };
+
+    const handleRowSelectionChange = (selectedRowKeys) => {
+        setSelectedDetailRowKeys(selectedRowKeys);  // 선택된 행의 키 상태 업데이트
+        console.log('선택된 행 키:', selectedRowKeys[0]);  // 선택된 키 출력
+
+    };
+
+
     const handleTabChange = (key) => {
         setActiveTabKey(key);
     };
 
     // 입력 필드 클릭 시 모달 열기
-    const handleInputClick = (fieldName) => {
+    const handleInputClick = (fieldName, index) => {
         setCurrentField(fieldName);
+        setSelectedDetailRowKeys(index);
+        setEditingRow(index);
         setModalData(null);  // 모달 데이터 초기화
         setInitialModalData(null); // 모달 열기 전에 데이터를 초기화
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
@@ -70,7 +120,8 @@ const PurchaseRequestPage = ( {initialData} ) => {
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
         let apiPath;
-
+        console.log("선택한 행: ")
+        console.log(editingRow)
 
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
@@ -98,8 +149,13 @@ const PurchaseRequestPage = ( {initialData} ) => {
     };
 
     // 모달에서 선택한 값 searchParams에 반영
-    const handleModalSelect = (record) => {
-        console.log(record);
+    const handleModalSelect = (record, index) => {
+        console.log('purchaseRequestParam: ')
+        console.log(purchaseRequestParam);
+        console.log('record: ')
+        console.log(record)
+        console.log('selectedDetailRowKeys: ')
+        console.log(index)
 
         switch (currentField) {
             case 'managerName':
@@ -133,14 +189,39 @@ const PurchaseRequestPage = ( {initialData} ) => {
                 break;
 
             case 'product':
-                setDetailPurchaseRequest((prevRequest) => ({
-                    ...prevRequest,
-                    product: {
-                        id: record.id,
-                        code: record.code,
-                        name: record.name,
-                    },
+                // 제품 선택 시 해당 제품을 상태에 반영
+                const updatedDetails = [...purchaseRequestParam.purchaseRequestDetails];
+                const detailIndex = updatedDetails.findIndex((detail) => detail.id === editingRow);
+                console.log(detailIndex)
+                // if (detailIndex !== -1) {
+                //     // 해당 품목 코드와 이름을 업데이트
+                //     updatedDetails[detailIndex].productCode = record.code;
+                //     updatedDetails[detailIndex].productName = record.name;
+                //     updatedDetails[detailIndex].client.clientId = record.clientId;
+                //     updatedDetails[detailIndex].client.clientCode = record.clientCode;
+                //     updatedDetails[detailIndex].client.clientName = record.clientName;
+                //     updatedDetails[detailIndex].price = record.purchasePrice;
+                //
+                //
+                // }
+                if (detailIndex !== -1) {
+                    // 제품 선택 시 필드 업데이트
+                    updateField('productCode', record.code, editingRow);
+                    updateField('productName', record.name, editingRow);
+                    updateField('price', record.purchasePrice, editingRow);
+
+                    const { quantity } = updatedDetails[detailIndex];
+                    const supplyPrice = calculateSupplyPrice(quantity, record.purchasePrice);
+                    const vat = calculateVat(supplyPrice);
+
+                    updatedDetails[detailIndex].supplyPrice = supplyPrice;
+                    updatedDetails[detailIndex].vat = vat;
+                }
+                setPurchaseRequestParam((prevParams) => ({
+                    ...prevParams,
+                    purchaseRequestDetails: updatedDetails,
                 }));
+
                 break;
         }
 
@@ -182,11 +263,23 @@ const PurchaseRequestPage = ( {initialData} ) => {
     };
 
     // 입력 필드 변경 시 값 업데이트
-    const handleFieldChange = (field, value) => {
-        setEditingValues((prevValues) => ({
-            ...prevValues,
-            [field]: value
-        }));
+    const handleFieldChange = (value, recordKey, fieldName) => {
+        const newDetails = [...purchaseRequestParam.purchaseRequestDetails];
+        const index = newDetails.findIndex(detail => detail.key === recordKey);
+        if (index !== -1) {
+            newDetails[index][fieldName] = value;
+
+            if (fieldName === 'quantity') {
+                const quantity = value;
+                const price = newDetails[index].price;
+                newDetails[index].supplyPrice = quantity * price; // 공급가액 = 수량 * 단가
+                updateSupplyAndVat(quantity, price, recordKey);
+            }
+        }
+        setPurchaseRequestParam({
+            ...purchaseRequestParam,
+            purchaseRequestDetails: newDetails,
+        });
     };
 
     const handleSearch = async () => {
@@ -365,6 +458,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                             onClick: async () => {
                                                 console.log(detailPurchaseRequest)
                                                 setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
+                                                setSelectedDetailRowKeys([]);
                                                 const id = record.id;
                                                 try {
                                                     const response = await apiClient.post(LOGISTICS_API.PURCHASE_REQUEST_DETAIL_API(id));
@@ -487,22 +581,37 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                             {/* 발주 요청 상세 항목 */}
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주 요청 상세 항목</Divider>
                                             <Table
-                                                dataSource={detailPurchaseRequest?.purchaseRequestDetails || []}
+                                                dataSource={purchaseRequestParam?.purchaseRequestDetails || []}
                                                 columns={[
                                                     {
-                                                        title: '품목',
+                                                        title: '품목 코드',
+                                                        dataIndex: 'productCode',
+                                                        key: 'productCode',
+                                                        align: 'center',
+                                                        render: (text, record) => (
+                                                            <Input
+                                                                value={record.productCode}
+                                                                onClick={() => handleInputClick('product', record.id)}
+                                                                onFocus={(e) => e.target.blur()}
+                                                                className="small-text"
+                                                            />
+                                                        ),
+                                                        width: '10%'
+                                                    },
+                                                    {
+                                                        title: '품목명',
                                                         dataIndex: 'productName',
                                                         key: 'productName',
                                                         align: 'center',
                                                         render: (text, record) => (
                                                             <Input
-                                                                value={`[${record.productCode}] ${record.productName}`}
+                                                                value={record.productName}
                                                                 onClick={() => handleInputClick('product')}
-                                                                onFocus={(e) => e.target.blur()} // Input이 focus되지 않도록 설정
+                                                                onFocus={(e) => e.target.blur()}
                                                                 className="small-text"
                                                             />
                                                         ),
-                                                        width: '15%'
+                                                        width: '20%'
                                                     },
                                                     {
                                                         title: '거래처',
@@ -530,7 +639,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                                 className="small-text"
                                                             />
                                                         ),
-                                                        width: '10%'
+                                                        width: '6%'
                                                     },
                                                     {
                                                         title: '단가',
@@ -561,22 +670,22 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                         render: (text, record) => (
                                                             <Input
                                                                 value={text}
-                                                                onChange={(e) => handleFieldChange(e.target.value, record.key, 'productName')}
+                                                                onChange={(e) => handleFieldChange(e.target.value, record.key, 'remarks')}
                                                                 className="small-text"
                                                             />
                                                         ),
                                                     },
                                                 ]}
-                                                rowKey={(record) => record.productCode}
+                                                rowKey={(record, index) => index}
                                                 pagination={false}
                                                 rowSelection={{
                                                     type: 'radio', // 행을 선택할 때 체크박스 사용
-                                                    onChange: (selectedRowKeys, selectedRows) => {
-                                                        console.log('선택된 행 키:', selectedRowKeys);
-                                                        console.log('선택된 행 데이터:', selectedRows);
-                                                        // 여기에 선택된 행에 대한 로직을 추가
-                                                    },
+                                                    selectedRowKeys: selectedDetailRowKeys,
+                                                    onChange: handleRowSelectionChange,
                                                 }}
+                                                onRow={(record) => ({
+                                                    onClick: () => setEditingRow(record.id),  // 행 클릭 시 해당 행의 id를 상태로 저장
+                                                })}
                                             />
 
                                             <Divider />
@@ -729,7 +838,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                         {currentField === 'product' && (
                                                             <>
                                                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                                                    창고 선택
+                                                                    품목 선택
                                                                 </Typography>
                                                                 <Input
                                                                     placeholder="검색"
@@ -755,14 +864,14 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                                         <Table
                                                                             columns={[
                                                                                 {
-                                                                                    title: <div className="title-text">코드</div>,
+                                                                                    title: <div className="title-text">품목 코드</div>,
                                                                                     dataIndex: 'code',
                                                                                     key: 'code',
                                                                                     align: 'center',
                                                                                     render: (text) => <div className="small-text">{text}</div>
                                                                                 },
                                                                                 {
-                                                                                    title: <div className="title-text">이름</div>,
+                                                                                    title: <div className="title-text">품목명</div>,
                                                                                     dataIndex: 'name',
                                                                                     key: 'name',
                                                                                     align: 'center',
@@ -781,13 +890,15 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                                             }}
                                                                             onRow={(record) => ({
                                                                                 style: { cursor: 'pointer' },
-                                                                                onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                                onClick: () => handleModalSelect(record, selectedDetailRowKeys), // 선택 시 처리
                                                                             })}
                                                                         />
                                                                     </>
                                                                 )}
                                                             </>
                                                         )}
+
+
 
 
                                                         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>

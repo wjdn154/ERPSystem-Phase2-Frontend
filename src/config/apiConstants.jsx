@@ -132,6 +132,7 @@ export const LOGISTICS_API = {
     // 구매 관리
     PURCHASE_REQUEST_LIST_API: `${API_BASE_URL}/api/logistics/purchase-requests/`, // 발주 요청 목록 조회 API
     PURCHASE_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchase-requests/${id}`, // 발주 요청 상세 정보 조회 API
+    PURCHASE_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/purchase-orders/`, // 발주 요청 목록 조회 API
 
     //재고 실사 조회
     INVENTORY_INSPECTION_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/?startDate=${startDate}&endDate=${endDate}`,
