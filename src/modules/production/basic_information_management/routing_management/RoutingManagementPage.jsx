@@ -1,140 +1,152 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import { Paper, Box, Grid, Grow } from '@mui/material';
+import {Paper, Box, Grid, Grow, Card} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { processRoutingColumns, tabItems} from './RoutingManagementUtil.jsx';
 import {Typography} from '@mui/material';
-import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
+import {
+    Steps,
+    Space,
+    Tag,
+    Form,
+    Table,
+    Button,
+    Col,
+    Input,
+    Row,
+    Checkbox,
+    Modal,
+    DatePicker,
+    Spin,
+    Select,
+    notification,
+    Tabs
+} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {FINANCIAL_API, LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
+import {
+    CloseCircleOutlined,
+    CloseSquareOutlined, DeleteOutlined,
+    DownSquareOutlined, MinusCircleOutlined, PlusOutlined, ScissorOutlined,
+    SearchOutlined,
+    StopOutlined
+} from "@ant-design/icons";
+import TabPane from "antd/es/tabs/TabPane.js";
 const { Option } = Select;
 const { confirm } = Modal;
+const { Step } = Steps
 
-const RoutingManagementPage = () => {
+const RoutingManagementPage = ({initialData}) => {
+    const notify = useNotificationContext();
+    const [form] = Form.useForm();
     const [activeTabKey, setActiveTabKey] = useState('1');
-    const [data, setData] = useState([]); // 원본데이터
-    const [selectedRouting, setSelectedRouting] = useState(null);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [modalData, setModalData] = useState(null);
+    const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [newRouting, setNewRouting] = useState({});
-    const [isEditing, setIsEditing] = useState(false);
-    const [processOptions, setProcessOptions] = useState([]);
-    const [productOptions, setProductOptions] = useState([]); // 제품 옵션 상태
-
-
-    const [filteredData, setFilteredData] = useState([]); // 필터링된 데이터
-    const [searchText, setSearchText] = useState(''); // 검색어 상태
-    const [activeColumn, setActiveColumn] = useState(null); // 검색 중인 컬럼 상태
-
-    const notify = useNotificationContext(); // 알림 컨텍스트 사용
-    const [form] = Form.useForm(); // 폼 인스턴스 생성
-    const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
-    const [editRouting, setEditRouting] = useState(false); // 거래처 등록 수정 탭 활성화 여부 상태
-    const [fetchRoutingData, setFetchRoutingData] = useState(false); // 거래처 조회한 정보 상태
-    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
-    const [currentField, setCurrentField] = useState(''); // 모달 분기 할 필드 상태
-    const [modalData, setModalData] = useState(null); // 모달 데이터 상태
+    const [currentField, setCurrentField] = useState('');
     const [displayValues, setDisplayValues] = useState({});
+    const [fetchRoutingData, setFetchRoutingData] = useState(null);
+    const [editRouting, setEditRouting] = useState(false);
 
-    // (공유) 검색 필터링 로직
-    const handleFilter = (value, dataIndex) => {
-        const filtered = data.filter((item) =>
-            item[dataIndex] ? item[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : false
-        );
-        setFilteredData(filtered);
-        setSearchText(value);
-    };
+    const handleTabChange = (key) => { setActiveTabKey(key); };
+    const handleModalCancel = () => { setIsModalVisible(false) };  // 모달창 닫기
 
-    // 금액 포맷 함수
-    const formatNumberWithComma = (value) => {
-        if (!value) return '';
-        const cleanValue = value.toString().replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
-        return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
-    // 콤마 제거 함수
-    const removeComma = (value) => {
-        return value ? value.toString().replace(/,/g, '') : value;
-    };
-
-    // 모달창 열기 핸들러
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
-        setModalData(null); // 모달 열기 전에 데이터를 초기화
+        setModalData(null);
+        setInitialModalData(null);
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
         setIsModalVisible(true);  // 모달창 열기
     };
 
-    // 모달창 닫기 핸들러
-    const handleModalCancel = () => setIsModalVisible(false);
-
-    // 공정 모달창 데이터 가져오기 함수
     const fetchModalData = async (fieldName) => {
-        // 해당 필드에 맞는 데이터를 비동기적으로 가져오는 로직 추가
-        if (fieldName === 'processDetails') {
-            try {
-                const response = await apiClient.post(PRODUCTION_API.ROUTING_PREVIEW_PROCESS_DETAILS_API);
-                setModalData(response.data);
-            } catch (error) {
-                console.error('Error fetching modal data:', error);
-                notify('error', '조회 오류', '모달 데이터 조회 중 오류가 발생했습니다.', 'top');
-            }
+        setIsLoading(true);
+        let apiPath;
+        if(fieldName === 'processDetails') apiPath = PRODUCTION_API.ROUTING_SEARCH_PROCESS_DETAILS_API;
+
+        try {
+            const response = await apiClient.post(apiPath);
+            setModalData(response.data);
+            setInitialModalData(response.data);
+            console.log('response.data', response.data);
+        } catch (error) {
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // 모달창 선택 핸들러
+    const handleModalSelect = (record) => {
+        // 선택한 공정 경로를 processDetails에 추가
+        setFetchRoutingData((prevParams) => ({
+            ...prevParams,
+            processDetails: [...prevParams.processDetails, record], // 기존 processDetails 배열에 새 공정을 추가
+        }));
 
-    const handleRowClick = async (record) => {
-        setSelectedRowKeys([record.id]);
-        setEditRouting(true);
-        setRoutingParam(record);
-        form.setFieldsValue(record);
-        notify('success', '경로 조회', '공정 경로 정보 조회에 성공했습니다.', 'bottomRight');
+        setIsModalVisible(false); // 모달창 닫기
     };
 
-    // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
+        // values.id = fetchRoutingData.id;
+        // values.processDetails = fetchRoutingData.processDetails;
+        // values.products = fetchRoutingData.products;
+
+        setFetchRoutingData({
+            ...fetchRoutingData,
+            active: values.active,
+            code: values.code,
+            description: values.description,
+            name: values.name,
+            standard: values.standard,
+        })
+
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
-                values.id = routingParam.id;
-
                 try {
                     if (type === 'register') {
-                        // 공정 단계가 없는 경우 에러 처리
-                        if (!values.routingSteps || values.routingSteps.length === 0) {
-                            notify('error', '저장 실패', '적어도 하나의 공정 단계를 추가해야 합니다.', 'top');
-                            return;
-                        }
-
-                        // routingSteps에 stepOrder 자동 할당
-                        if (values.routingSteps && values.routingSteps.length > 0) {
-                            values.routingSteps = values.routingSteps.map((step, index) => ({
-                                ...step,
-                                stepOrder: index + 1,
-                            }));
-                        }
-
-                        // API 요청
-                        await apiClient.post(PRODUCTION_API.ROUTING_CREATE_API, values);
-                        notify('success', '등록 성공', '새 공정 경로가 성공적으로 추가되었습니다.', 'bottomLeft');
-                        setIsModalVisible(false);
-                        refreshProcessRoutings(); // 데이터 새로고침
+                        // await apiClient.post(PRODUCTION_API.SAVE_WORKCENTER_API, values);
+                        // notify('success', '등록 성공', '새 작업장이 등록되었습니다.', 'bottomRight');
                     } else if (type === 'update') {
-                        // 수정 로직 구현
-                        await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API(selectedRouting.id), values);
-                        notify('success', '수정 성공', '공정 경로가 성공적으로 수정되었습니다.', 'bottomLeft');
-                        setIsModalVisible(false);
-                        refreshProcessRoutings(); // 데이터 새로고침
+                        console.log(fetchRoutingData);
+                        // await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API, {
+                        //     code:"PRC001",
+                        //     cost:500000,
+                        //     defectRate:0.02,
+                        //     description:"Assembly of parts and modules. 부품 및 모듈 조립.",
+                        //     duration:2.5,
+                        //     id:1,
+                        //     isOutsourced:false,
+                        //     isUsed:true,
+                        //     name:"조립"
+                        // });
+                        console.log(fetchRoutingData.processDetails);
+                        await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API, {
+                            id:values.id,
+                            code:values.code,
+                            name:values.name,
+                            // cost:values.cost,
+                            standard:values.standard,
+                            active:values.active,
+                            description:values.description,
+                            // defectRate:values.defectRate,
+                            // duration:values.duration,
+                            // isOutsourced:values.isOutsourced,
+                            // isUsed:values.isUsed,
+                            processDetails:fetchRoutingData.processDetails,
+                            products:fetchRoutingData.products
+                        });
+                        notify('success', '수정 성공', '공정 경로가 수정되었습니다.', 'bottomRight');
                     }
                 } catch (error) {
-                    console.error('Error saving process routing:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
                 }
             },
@@ -145,244 +157,8 @@ const RoutingManagementPage = () => {
                     placement: 'bottomLeft',
                 });
             },
-
-        })
-    }
-
-    // 1. ProcessRouting 전체 조회
-    useEffect(() => {
-        const fetchProcessRoutings = async () => {
-            setIsLoading(true);
-            try {
-                const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
-                const rawData = response.data;
-
-                console.log('processOptions:', processOptions);
-                console.log('productOptions:', productOptions);
-
-                if (!Array.isArray(rawData)) {
-                    throw new Error('API 응답이 배열이 아닙니다.');
-                }
-
-                const formattedData = rawData.map(routing => ({
-                    id: routing.id,
-                    code: routing.code,
-                    name: routing.name,
-                    description: routing.description,
-                    isStandard: routing.isStandard,
-                    isActive: routing.isActive,
-                    routingSteps: routing.routingStepDTOList.map(step => {
-                        const process = processOptions.find(p => p.id === step.id.processId);
-                        return {
-                            stepOrder: step.stepOrder, // 공정순서
-                            processId: step.id.processId, // 공정ID
-                            processName: process ? process.name : '알 수 없는 공정',
-                        };
-                    }),
-                    products: routing.products.map(product => {
-                        const prod = productOptions.find(p => p.id === product.id);
-                        return {
-                            productId: product.id, // 품목ID
-                            productName: prod ? prod.name : '알 수 없는 품목',
-                        };
-                    }),
-                }));
-                setData(formattedData);
-            } catch (error) {
-                console.error('Error fetching process routings:', error);
-                notify('error', '조회 오류', '경로 목록을 불러오는 중 오류가 발생했습니다.', 'top');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        // // processOptions와 productOptions가 모두 로드된 후에 fetchProcessRoutings를 호출
-        // if (processOptions.length > 0 && productOptions.length > 0) {
-        //     fetchProcessRoutings();
-        // }
-    }, [notify, processOptions, productOptions]);
-
-    // 공정 목록 가져오기
-    useEffect(() => {
-        const fetchProcesses = async () => {
-            try {
-                const response = await apiClient.post(PRODUCTION_API.PROCESS_LIST_API); // 공정 목록 API 엔드포인트
-                setProcessOptions(response.data);
-            } catch (error) {
-                console.error('Error fetching processes:', error);
-                notify('error', '조회 오류', '공정 목록을 불러오는 중 오류가 발생했습니다.', 'top');
-            }
-        };
-
-        fetchProcesses();
-    }, [notify]);
-
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await apiClient.post(LOGISTICS_API.PRODUCT_LIST_API); // 제품 목록 API 엔드포인트
-                setProductOptions(response.data); // [{ id: 1, name: '제품 A' }, { id: 2, name: '제품 B' }, ...]
-            } catch (error) {
-                console.error('Error fetching products:', error);
-                notify('error', '조회 오류', '제품 목록을 불러오는 중 오류가 발생했습니다.', 'top');
-            }
-        };
-
-        fetchProducts();
-    }, [notify]);
-
-    // 2. ProcessRouting 생성
-    // const handleAddProcessRouting = async () => {
-    //     try {
-    //         await apiClient.post(PRODUCTION_API.ROUTING_CREATE_API, newRouting);
-    //         notify('success', '조회 성공', '새 공정 경로가 성공적으로 추가되었습니다.', 'bottomLeft');
-    //         setIsModalVisible(false);
-    //         // 데이터 새로고침
-    //         const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
-    //         setData(response.data);
-    //     } catch (error) {
-    //         console.error('Error adding process routing:', error);
-    //         notify('error', '등록 실패', '새 공정 경로 추가 중 오류가 발생했습니다.', 'top');
-    //     }
-    // };
-    //
-    // // 3. ProcessRouting 수정
-    // const handleEditProcessRouting = async () => {
-    //     try {
-    //         await apiClient.post(PRODUCTION_API.ROUTING_UPDATE_API(selectedRouting.id), newRouting);
-    //         message.success('공정 경로가 성공적으로 수정되었습니다.');
-    //         setIsModalVisible(false);
-    //         // 데이터 새로고침
-    //         const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
-    //         setData(response.data);
-    //     } catch (error) {
-    //         console.error('Error updating process routing:', error);
-    //         message.error('공정 경로 수정 중 오류가 발생했습니다.');
-    //     }
-    // };
-
-    // 4. ProcessRouting 삭제
-    // 삭제 핸들러
-    const handleDelete = (id) => {
-        confirm({
-            title: '삭제 확인',
-            content: '정말로 삭제하시겠습니까?',
-            okText: '확인',
-            cancelText: '취소',
-            onOk: async () => {
-                setIsLoading(true);
-                try {
-                    await apiClient.post(PRODUCTION_API.ROUTING_DELETE_API(id));
-                    notify('success', '삭제 성공', '공정 경로가 성공적으로 삭제되었습니다.', 'bottomLeft');
-                    refreshProcessRoutings();
-                } catch (error) {
-                    console.error('Error deleting process routing:', error);
-                    notify('error', '삭제 실패', '공정 경로 삭제 중 오류가 발생했습니다.', 'top');
-                } finally {
-                    setIsLoading(false);
-                }
-            },
         });
     };
-
-    // 5. 공정검색 기능
-    const handleSearchProcessDetails = async (keyword) => {
-        try {
-            const response = await apiClient.post(PRODUCTION_API.ROUTING_SEARCH_PROCESS_DETAILS_API, { keyword });
-            setData(response.data);
-            notify('success', '조회 성공', '공정이 성공적으로 조회되었습니다.', 'bottomLeft');
-
-        } catch (error) {
-            console.error('Error searching process details:', error);
-            notify('error', '조회 실패', '검색 중 오류가 발생했습니다.');
-        }
-    };
-
-    // 6. Modal 열기/닫기
-    const handleOpenModal = (record) => {
-        setSelectedRouting(record);
-        setIsEditing(!!record); // 기록이 있으면 수정 모드, 아니면 생성 모드
-        setNewRouting(record || {}); // 수정 시 기존 값 사용, 생성 시 빈 값
-        setIsModalVisible(true);
-    };
-    const handleCloseModal = () => setIsModalVisible(false);
-
-    // 7. Input 값 변경 처리
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        console.log("Input Change - Name:", name, "Value:", value); // 로그로 입력 값 확인
-        setNewRouting({ ...newRouting, [name]: value });
-    };
-
-    // 데이터 새로고침 함수
-    const refreshProcessRoutings = async () => {
-        setIsLoading(true);
-        try {
-            const response = await apiClient.post(PRODUCTION_API.ROUTING_LIST_API);
-            const rawData = response.data;
-
-            if (!Array.isArray(rawData)) {
-                throw new Error('API 응답이 배열이 아닙니다.');
-            }
-
-            const formattedData = rawData.map(routing => ({
-                id: routing.id,
-                code: routing.code,
-                name: routing.name,
-                description: routing.description,
-                isStandard: routing.isStandard,
-                isActive: routing.isActive,
-                routingSteps: routing.routingSteps.map(step => ({
-                    stepOrder: step.stepOrder,
-                    processRoutingId: step.processRoutingId,
-                    processId: step.processId,
-                    processName: step.processName, // 공정 이름 추가
-                }))
-            }));
-            setData(formattedData);
-        } catch (error) {
-            console.error('Error refreshing process routings:', error);
-            notify('error', '새로고침 오류', '데이터 새로고침 중 오류가 발생했습니다.', 'top');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleTabChange = (key) => {
-        setEditRouting(false);
-        setFetchRoutingData(null);
-        setDisplayValues({});
-
-        form.resetFields(); // 1탭 폼 초기화
-        registrationForm.resetFields(); // 2탭 폼 초기화
-        registrationForm.setFieldValue('isActive', true);
-
-        setActiveTabKey(key);
-    };
-
-    // 공정 단계 순서 자동 재정렬
-    useEffect(() => {
-        const adjustStepOrder = () => {
-            const steps = registrationForm.getFieldValue('routingSteps') || [];
-            const updatedSteps = steps.map((step, index) => ({
-                ...step,
-                stepOrder: index + 1,
-            }));
-            registrationForm.setFieldsValue({ routingSteps: updatedSteps });
-        };
-
-        // // 등록 폼이 렌더링될 때마다 stepOrder를 조정
-        // const unsubscribe = registrationForm.subscribe(({ values }) => {
-        //     if (values.routingSteps) {
-        //         adjustStepOrder();
-        //     }
-        // });
-
-        // cleanup
-        return () => {
-            unsubscribe();
-        };
-    }, [registrationForm]);
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -412,10 +188,62 @@ const RoutingManagementPage = () => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     {/* ProcessRouting 목록 */}
                                     <Table
-                                        dataSource={Array.isArray(filteredData) && filteredData.length > 0 ? filteredData : data} // 검색 필터링 된 데이터 사용
-                                        columns={processRoutingColumns(activeColumn, searchText, setActiveColumn, handleFilter)} // 검색 필터링 상태와 함수 전달
-                                        rowKey="id"
-                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        dataSource={initialData}
+                                        columns={[
+                                            {
+                                                title: <div className="title-text">코드</div>,
+                                                dataIndex: 'code',
+                                                key: 'code',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                            },
+                                            {
+                                                title: <div className="title-text">루트명</div>,
+                                                dataIndex: 'name',
+                                                key: 'name',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                            },
+                                            {
+                                                title: <div className="title-text">표준 여부</div>,
+                                                dataIndex: 'standard',
+                                                key: 'standard',
+                                                align: 'center',
+                                                render: (standard) => (
+                                                    <Tag color={standard ? 'green' : 'red'}>
+                                                        {standard ? '표준' : '비표준'}
+                                                    </Tag>
+                                                ),
+                                            },
+                                            {
+                                                title: <div className="title-text">설명</div>,
+                                                dataIndex: 'description',
+                                                key: 'description',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                            },
+                                            {
+                                                title: <div className="title-text">활성 상태</div>,
+                                                dataIndex: 'active',
+                                                key: 'active',
+                                                align: 'center',
+                                                render: (active) => (
+                                                    <Tag color={active ? 'green' : 'gray'}>
+                                                        {active ? '활성' : '비활성'}
+                                                    </Tag>
+                                                ),
+                                            },
+                                            {
+                                                title: <div className="title-text">제품 목록</div>,
+                                                key: 'products',
+                                                align: 'center',
+                                                render: (record) => <div className="small-text">{record.products && record.products.length > 0
+                                                    ? `${record.products[0].name} 외 ${record.products.length - 1}건`
+                                                    : '제품 없음'}</div>,
+                                            }
+                                        ]}
+                                        rowKey={(record) => record.id}
+                                        pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
                                         size="small"
                                         rowSelection={{
                                             type: 'radio',
@@ -427,53 +255,213 @@ const RoutingManagementPage = () => {
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {
-                                                setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
+                                                setSelectedRowKeys([record.id]);
                                                 const id = record.id;
                                                 try {
                                                     const response = await apiClient.post(PRODUCTION_API.ROUTING_DETAIL_API(id));
                                                     setFetchRoutingData(response.data);
                                                     setEditRouting(true);
+                                                    console.log('response:', response.data);
 
-                                                    notify('success', '경로 조회', '경로 정보 조회 성공.', 'bottomRight')
+                                                    notify('success', '루트 조회', '루트 정보 조회 성공.', 'bottomRight');
                                                 } catch (error) {
-                                                    notify('error', '조회 오류', '경로 조회 중 오류가 발생했습니다.', 'top');
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
-                                            },
+                                            }
                                         })}
-                                        expandable={{
-                                            expandedRowRender: (record) => (
-                                                <div>
-                                                    <Typography variant="subtitle1">라우팅 단계별 공정</Typography>
-                                                    <Table
-                                                        dataSource={record.routingSteps}
-                                                        columns={[
-                                                            { title: '순서', dataIndex: 'stepOrder', key: 'stepOrder' },
-                                                            { title: '공정 이름', dataIndex: 'processName', key: 'processName' },
-                                                        ]}
-                                                        pagination={false}
-                                                        rowKey={(item) => item.stepOrder}
-                                                        size="small"
-                                                    />
-                                                    <Typography variant="subtitle1" style={{ marginTop: '20px' }}>연결된 제품</Typography>
-                                                    <Table
-                                                        dataSource={record.products}
-                                                        columns={[
-                                                            { title: '제품 ID', dataIndex: 'productId', key: 'productId' },
-                                                            { title: '제품 이름', dataIndex: 'productName', key: 'productName' }, // 제품 이름 추가
-                                                        ]}
-                                                        pagination={false}
-                                                        rowKey={(item) => item.productId}
-                                                        size="small"
-                                                    />
-                                                </div>
-                                            ),
-                                            rowExpandable: record => record.routingSteps.length > 0 || record.products.length > 0,
-                                        }}
                                     />
                                 </Grid>
                             </Paper>
                         </Grow>
                     </Grid>
+                    {editRouting && (
+                        <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                            <Grow in={true} timeout={200}>
+                                <Paper elevation={3} sx={{ height: '100%' }}>
+                                    <Typography variant="h6" sx={{ padding: '20px' }}>루트 등록 및 수정</Typography>
+                                    <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                        <Form
+                                            initialValues={fetchRoutingData}
+                                            form={form}
+                                            onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                        >
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>기본 정보</Divider>
+                                            <Row gutter={16}>
+                                                <Col span={6}>
+                                                    <Form.Item name="code" rules={[{ required: true, message: '코드를 입력하세요.' }]}>
+                                                        <Input addonBefore="코드" />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item name="name" rules={[{ required: true, message: '루트명을 입력하세요.' }]}>
+                                                        <Input addonBefore="루트명" />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={12}>
+                                                    <Form.Item name="description" rules={[{ required: true, message: '설명을 입력하세요.' }]}>
+                                                        <Input addonBefore="설명" />
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>상태 정보</Divider>
+                                            <Row gutter={16}>
+                                                <Col span={6}>
+                                                    <Form.Item name="active" valuePropName="checked">
+                                                        <Checkbox>활성 여부</Checkbox>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item name="standard" valuePropName="checked">
+                                                        <Checkbox>표준 여부</Checkbox>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>공정 단계</Divider>
+                                            <Row gutter={16}>
+                                                <Col span={16}>
+                                                    <Steps direction="vertical" current={fetchRoutingData.processDetails.length - 1}>
+                                                        {fetchRoutingData.processDetails.map((step, index) => (
+                                                            <Step
+                                                                key={step.id}
+                                                                title={
+                                                                    <div className="medium-text">
+                                                                        {step.name} (공정 코드: {step.code})
+                                                                        <Button
+                                                                            type="text"
+                                                                            icon={<MinusCircleOutlined style={{ color: 'red' }} />}
+                                                                            style={{ marginLeft: '10px' }}
+                                                                            onClick={async () => {
+                                                                                const updatedSteps = fetchRoutingData.processDetails.filter(
+                                                                                    (item) => item.id !== step.id
+                                                                                );
+                                                                                setFetchRoutingData({
+                                                                                    ...fetchRoutingData,
+                                                                                    processDetails: updatedSteps, // 상태 갱신
+                                                                                });
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                }
+                                                                description={
+                                                                    <>
+                                                                        <div className="small-text"><span className="medium-text">비용: </span>{step.cost.toLocaleString()} 원</div>
+                                                                        <div className="small-text"><span className="medium-text">소요 시간: </span>{step.duration} 시간</div>
+                                                                        <div className="small-text"><span className="medium-text">불량률: </span>{(step.defectRate * 100).toFixed(2)}%</div>
+                                                                        <div className="small-text"><span className="medium-text">설명: </span>{step.description}</div>
+                                                                        <div>
+                                                                            외주 여부: <Tag color={step.isOutsourced ? 'red' : 'green'}>{step.isOutsourced ? '외주' : '내부'}</Tag>
+                                                                        </div>
+                                                                    </>
+                                                                }
+                                                            />
+                                                        ))}
+                                                        {/* 공정 추가 버튼 */}
+                                                        <Step
+                                                            key="add-step"
+                                                            description={
+                                                                <Button
+                                                                    type="dashed"
+                                                                    icon={<PlusOutlined />}
+                                                                    onClick={() => handleInputClick('processDetails')}
+                                                                    style={{
+                                                                        width: '50%',
+                                                                        height: '40px',
+                                                                        borderRadius: '4px',
+                                                                    }}
+                                                                >
+                                                                    공정 경로 추가
+                                                                </Button>
+                                                            }
+                                                        />
+                                                    </Steps>
+                                                </Col>
+                                            </Row>
+
+                                            {/* 제품 목록 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>제품 목록</Divider>
+                                            <Row gutter={16}>
+                                                <Col span={24}>
+                                                    <Form.Item>
+                                                        <Table
+                                                            dataSource={fetchRoutingData.products}
+                                                            columns={[
+                                                                {
+                                                                    title: '제품 코드',
+                                                                    dataIndex: 'code',
+                                                                    key: 'code',
+                                                                    align: 'center',
+                                                                    render: (text) => <div className="small-text">{text}</div>,
+                                                                },
+                                                                {
+                                                                    title: '제품명',
+                                                                    dataIndex: 'name',
+                                                                    key: 'name',
+                                                                    align: 'center',
+                                                                    render: (text) => <div className="small-text">{text}</div>,
+                                                                },
+                                                                {
+                                                                    title: '제품 그룹명',
+                                                                    dataIndex: 'productGroupName',
+                                                                    key: 'productGroupName',
+                                                                    align: 'center',
+                                                                    render: (text) => <div className="small-text">{text || '-'}</div>,
+                                                                },
+                                                                {
+                                                                    title: '규격',
+                                                                    dataIndex: 'standard',
+                                                                    key: 'standard',
+                                                                    align: 'center',
+                                                                    render: (text) => <div className="small-text">{text || '-'}</div>,
+                                                                },
+                                                                {
+                                                                    title: '구매 가격',
+                                                                    dataIndex: 'purchasePrice',
+                                                                    key: 'purchasePrice',
+                                                                    align: 'center',
+                                                                    render: (text) => <div style={{ textAlign: 'right' }} className="small-text">{text ? text.toLocaleString() : '-'}</div>,
+                                                                },
+                                                                {
+                                                                    title: '판매 가격',
+                                                                    dataIndex: 'salesPrice',
+                                                                    key: 'salesPrice',
+                                                                    align: 'center',
+                                                                    render: (text) => <div style={{ textAlign: 'right' }} className="small-text">{text ? text.toLocaleString() : '-'}</div>,
+                                                                },
+                                                                {
+                                                                    title: '제품 유형',
+                                                                    dataIndex: 'productType',
+                                                                    key: 'productType',
+                                                                    align: 'center',
+                                                                    render: (text) => (
+                                                                        <Tag color={text === 'GOODS' ? 'green' : 'blue'}>
+                                                                            {text ? (text === 'GOODS' ? '상품' : '반제품') : '-'}
+                                                                        </Tag>
+                                                                    ),
+                                                                },
+                                                            ]}
+                                                            rowKey="id"
+                                                            pagination={false}
+                                                            size="small"
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+
+                                            <Divider />
+
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                                <Button type="primary" htmlType="submit">
+                                                    저장
+                                                </Button>
+                                            </Box>
+                                        </Form>
+                                    </Grid>
+                                </Paper>
+                            </Grow>
+                        </Grid>
+                    )}
                 </Grid>
             )}
 
@@ -484,203 +472,7 @@ const RoutingManagementPage = () => {
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>Routing 등록</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                        <Form
-                                            layout="vertical"
-                                            onFinish={(values) => { handleFormSubmit(values, 'register') }}
-                                            form={registrationForm}
 
-                                            initialValues={{
-                                                routingSteps: [], // 공정 단계 초기값 설정
-                                            }}
-                                        >
-                                            <Row gutter={16}>
-                                                <Col span={6}>
-                                                    <Form.Item name="code" rules={[{ required: true, message: 'Routing 코드를 입력하세요.' }]}>
-                                                        <Input addonBefore="코드" />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="name" rules={[{ required: true, message: 'Routing 이름을 입력하세요.' }]}>
-                                                        <Input addonBefore="이름" maxLength={12} onChange={(e) => registrationForm.setFieldValue('name')} />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={12}>
-                                                    <Form.Item name="description" rules={[{ required: false }]}>
-                                                        <Input addonBefore="설명" maxLength={14} onChange={(e) => registrationForm.setFieldValue('description')} />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item
-                                                        name="isStandard" rules={[{ required: false }]}
-                                                        label="표준 여부" valuePropName="checked"
-                                                    >
-                                                        <Checkbox>표준 여부</Checkbox>
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item 
-                                                        name="isActive" rules={[{ required: false }]}
-                                                        label="사용 여부" valuePropName="checked"
-                                                    >
-                                                        <Checkbox>사용 여부</Checkbox>
-                                                    </Form.Item>
-                                                </Col>
-
-                                                {/* 공정 단계 헤더 */}
-                                                <Divider orientation="left">공정 단계</Divider>
-                                                {/* 공정 단계 추가 */}
-                                                <Form.List name="routingSteps">
-                                                    {(fields, { add, remove }) => {
-                                                        // 공정 단계 추가 시 stepOrder 자동 설정
-                                                        const handleAdd = () => {
-                                                            const steps = registrationForm.getFieldValue('routingSteps') || [];
-                                                            const maxStepOrder = steps.length > 0 ? Math.max(...steps.map(step => step.stepOrder)) : 0;
-                                                            add({ stepOrder: maxStepOrder + 1 });
-                                                        };
-
-                                                        // 공정 단계 삭제 시 stepOrder 재정렬
-                                                        const handleRemove = (name) => {
-                                                            remove(name);
-                                                            // 상태 업데이트 후 stepOrder 재정렬
-                                                            setTimeout(() => {
-                                                                const steps = registrationForm.getFieldValue('routingSteps') || [];
-                                                                const updatedSteps = steps.map((step, index) => ({
-                                                                    ...step,
-                                                                    stepOrder: index + 1,
-                                                                }));
-                                                                registrationForm.setFieldsValue({ routingSteps: updatedSteps });
-                                                            }, 0);
-                                                        };
-
-                                                        return (
-                                                            <>
-                                                                {fields.map(({ key, name, fieldKey, ...restField }) => (
-                                                                    <Row gutter={16} key={key} align="middle">
-                                                                        <Col span={6}>
-                                                                            <Form.Item
-                                                                                {...restField}
-                                                                                name={[name, 'stepOrder']}
-                                                                                fieldKey={[fieldKey, 'stepOrder']}
-                                                                                label="순서"
-                                                                            >
-                                                                                <Input type="number" min={1} disabled />
-                                                                            </Form.Item>
-                                                                        </Col>
-                                                                        <Col span={12}>
-                                                                            <Form.Item
-                                                                                {...restField}
-                                                                                name={[name, 'processId']}
-                                                                                fieldKey={[fieldKey, 'processId']}
-                                                                                label="공정"
-                                                                                rules={[{ required: true, message: '공정을 선택하세요.' }]}
-                                                                            >
-                                                                                <Select placeholder="공정을 선택하세요">
-                                                                                    {processOptions.map((process) => (
-                                                                                        <Option key={process.id} value={process.id}>
-                                                                                            {process.name}
-                                                                                        </Option>
-                                                                                    ))}
-                                                                                </Select>
-                                                                            </Form.Item>
-                                                                        </Col>
-                                                                        <Col span={6} style={{ display: 'flex', alignItems: 'flex-end', marginTop: '5px' }}>
-                                                                            <Button
-                                                                                type="danger"
-                                                                                onClick={() => remove(name)}
-                                                                            >
-                                                                                삭제
-                                                                            </Button>
-                                                                        </Col>
-                                                                    </Row>
-                                                                ))}
-                                                                <Row gutter={16} style={{ marginTop: '30px' }} justify="start" align="middle">
-                                                                    <Col span={6}>
-                                                                        <Form.Item>
-                                                                            <Button type="dashed" onClick={() => add()} block style={{ minWidth: '80px' }}>
-                                                                                단계 추가
-                                                                            </Button>
-                                                                        </Form.Item>
-                                                                    </Col>
-                                                                    <Col span={12}>
-                                                                        {/* 빈 공간 유지 */}
-                                                                    </Col>
-                                                                    <Col span={6}>
-                                                                        {/* 빈 공간 유지 */}
-                                                                    </Col>
-                                                                </Row>
-                                                            </>
-                                                        );
-                                                    }}
-                                                </Form.List>
-
-                                            </Row>
-                                            {/* 저장 버튼 */}
-                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                                                <Button type="primary" htmlType="submit">
-                                                    저장
-                                                </Button>
-                                            </Box>
-                                            {/* 모달창 */}
-                                            <Modal
-                                                open={isModalVisible}
-                                                onCancel={handleModalCancel}
-                                                width="40vw"
-                                                footer={null}
-                                            >{isLoading ? (
-                                                <Spin />
-                                            ) : (
-                                                <>
-                                                    {currentField === 'processDetails' && (
-                                                      <>
-                                                          <Typography>
-                                                              공정 선택
-                                                          </Typography>
-                                                          {modalData && (
-                                                              <Table
-                                                                  columns={[
-                                                                      { title: '코드', dataIndex: 'code', key: 'code', align:'center' },
-                                                                      { title: '이름', dataIndex: 'name', key: 'name', align:'center' },
-                                                                  ]}
-                                                                  dataSource={modalData}
-                                                                  rowKey={"code"}
-                                                                  size={'small'}
-                                                                  pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                                                  onRow={(record) => ({
-                                                                      style: { cursor: 'pointer' },
-                                                                      onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                                  })}
-                                                              />
-                                                          )}
-                                                      </>
-                                                    )}
-                                                    {currentField === 'processDetails' && (
-                                                        <>
-                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                                                단계 선택
-                                                            </Typography>
-                                                        </>
-                                                    )}
-                                                    {currentField === 'processDetails' && (
-                                                        <>
-                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                                                관련품목 선택
-                                                            </Typography>
-
-                                                        </>
-                                                    )}
-
-                                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                                        <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
-                                                            닫기
-                                                        </Button>
-                                                    </Box>
-
-                                                </>
-                                            )}
-
-                                            </Modal>
-
-                                        </Form>
                                     </Grid>
                             </Paper>
 
@@ -688,7 +480,82 @@ const RoutingManagementPage = () => {
                     </Grid>
                 </Grid>
             )}
-
+            {/* 모달창 */}
+            <Modal
+                open={isModalVisible}
+                onCancel={handleModalCancel}
+                footer={null}
+                width="40vw"
+            >
+                {isLoading ? (
+                    <Spin />  // 로딩 스피너
+                ) : (
+                    <>
+                        {currentField === 'processDetails' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    공정 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.name && item.name.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                <Table
+                                    columns={[
+                                        {
+                                            title: <div className="title-text">코드</div>,
+                                            dataIndex: 'code',
+                                            key: 'code',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>
+                                        },
+                                        {
+                                            title: <div className="title-text">이름</div>,
+                                            dataIndex: 'name',
+                                            key: 'name',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>
+                                        },
+                                    ]}
+                                    dataSource={modalData}
+                                    rowKey="id"
+                                    size={'small'}
+                                    pagination={{
+                                        pageSize: 15,
+                                        position: ['bottomCenter'],
+                                        showSizeChanger: false,
+                                        showTotal: (total) => `총 ${total}개`,
+                                    }}
+                                    onRow={(record) => ({
+                                        style: { cursor: 'pointer' },
+                                        onClick: () => handleModalSelect(record), // 선택 시 처리
+                                    })}
+                                />
+                            </>
+                        )}
+                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
+                                닫기
+                            </Button>
+                        </Box>
+                    </>
+                )}
+            </Modal>
         </Box>
     );
 };
