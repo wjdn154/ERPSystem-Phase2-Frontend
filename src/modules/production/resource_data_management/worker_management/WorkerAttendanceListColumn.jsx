@@ -31,21 +31,21 @@ export const
         title: <span>출근시간</span>,  // 컬럼 제목
         dataIndex: 'checkTime',  // 데이터 인덱스: 이 필드는 데이터 객체의 'employmentStatus' 속성과 연결됩니다.
         key:'checkTime',
-        width: '15%',  // 컬럼 너비 설정
+        width: '16%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
         title: <span>퇴근시간</span>,  // 컬럼 제목
         dataIndex: 'checkoutTime',  // 데이터 인덱스: 이 필드는 데이터 객체의 'employmentType' 속성과 연결됩니다.
         key:'checkoutTime',
-        width: '15%',  // 컬럼 너비 설정
+        width: '16%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
         title: <span>근무상태</span>,  // 컬럼 제목
         dataIndex: 'attendanceStatus',  // 데이터 인덱스: 이 필드는 데이터 객체의 'trainingStatus' 속성과 연결됩니다.
         key:'attendanceStatus',
-        width: '16%',  // 컬럼 너비 설정
+        width: '14%',  // 컬럼 너비 설정
         align: 'center',
         render: (text) => {
             let color;

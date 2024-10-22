@@ -212,11 +212,11 @@ const ClientLedgerPage = () => {
             }
         },
         {
-            title: <div className="title-text">담당자명</div>,
-            dataIndex: 'managerName',
-            key: 'managerName',
+            title: <div className="title-text">담당자</div>,
+            dataIndex: 'managerCode',
+            key: 'managerCode',
             align: 'center',
-            render: (text) => <div className="small-text">{text}</div>
+            render: (text, record) => <div className="small-text">[{text}] {record.managerName}</div>
         },
     ];
 
