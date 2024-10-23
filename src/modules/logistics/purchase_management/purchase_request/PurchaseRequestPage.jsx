@@ -209,6 +209,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                     updateField('productName', record.name, editingRow);
                     updateField('price', record.purchasePrice, editingRow);
 
+
                     const { quantity } = updatedDetails[detailIndex];
                     const supplyPrice = calculateSupplyPrice(quantity, record.purchasePrice);
                     const vat = calculateVat(supplyPrice);
