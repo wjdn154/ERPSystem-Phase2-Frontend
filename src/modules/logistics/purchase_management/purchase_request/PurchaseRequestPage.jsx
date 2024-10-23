@@ -47,7 +47,6 @@ const PurchaseRequestPage = ( {initialData} ) => {
         setDisplayValues({
             managerName: `[${detailPurchaseRequest.managerCode}] ${detailPurchaseRequest.managerName}`,
             warehouseName:  `[${detailPurchaseRequest.warehouseCode}] ${detailPurchaseRequest.warehouseName}`,
-            productName: detailPurchaseRequest.purchaseRequestDetails.map(detail => `[${detail.productCode}] ${detail.productName}`),
 
         }, [detailPurchaseRequest, form]);
 
@@ -487,7 +486,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                             initialValues={detailPurchaseRequest}
                                             form={form}
                                             onFinish={(values) => { handleFormSubmit(values, 'update') }}
-                                        >
+                                            >
                                             {/* 발주 요청 정보 */}
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주 요청 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>

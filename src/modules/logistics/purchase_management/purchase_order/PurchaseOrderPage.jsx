@@ -7,13 +7,14 @@ import dayjs from 'dayjs';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
-import {FINANCIAL_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 
 const { RangePicker } = DatePicker;
 
 const PurchaseOrderPage = ({initialData}) => {
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
+    const [purchaseOrderList, setPurchaseOrderList] = useState(initialData)
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -21,16 +22,19 @@ const PurchaseOrderPage = ({initialData}) => {
     const [modalData, setModalData] = useState(null);
     const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [status, setStatus] = useState({});
+    const [editPurchaseOrder, setEditPurchaseOrder] = useState(false);
+    const [detailPurchaseOrder, setDetailPurchaseOrder] = useState(false);
+    const [purchaseOrderParam, setPurchaseOrderParam] = useState(false);
+    const [form] = Form.useForm();
+    const [displayValues, setDisplayValues] = useState({});
+
 
     const [searchParams, setSearchParams] = useState({
         startDate: null,
         endDate: null,
         clientId: null,
         state: null,
-    });
-    const [displayValues, setDisplayValues] = useState({
-        clientCode: '',
-        clientName: '',
     });
 
     const [searchData, setSearchData] = useState(null);
@@ -57,7 +61,7 @@ const PurchaseOrderPage = ({initialData}) => {
 
     // 등록 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
-        setPurchaseRequestParam((prevState) => ({
+        setPurchaseOrderParam((prevState) => ({
             ...prevState,
             date: dayjs(date),
         }));
@@ -65,9 +69,34 @@ const PurchaseOrderPage = ({initialData}) => {
 
     // 납기 일자 변경 핸들러
     const handleDeliveryDateChange = (date) => {
-        setPurchaseRequestParam((prevState) => ({
+        setPurchaseOrderParam((prevState) => ({
             ...prevState,
             date: dayjs(date),
+        }));
+    };
+
+    useEffect(() => {
+
+        if(!detailPurchaseOrder) return;
+
+        form.setFieldsValue(detailPurchaseOrder);
+        setPurchaseOrderParam(detailPurchaseOrder);
+
+        console.log("Updated searchParams:", searchParams);
+
+        setDisplayValues({
+            managerName: `[${detailPurchaseOrder.managerCode}] ${detailPurchaseOrder.managerName}`,
+            warehouseName:  `[${detailPurchaseOrder.warehouseCode}] ${detailPurchaseOrder.warehouseName}`,
+
+        }, [detailPurchaseOrder, form]);
+
+    }, [detailPurchaseOrder], form);
+
+    const handleStatusChange = (value) => {
+        setStatus(value);
+        setSearchParams((prevParams) => ({
+            ...prevParams,
+            state: value,  // 선택된 상태 값 반영
         }));
     };
 
@@ -79,6 +108,36 @@ const PurchaseOrderPage = ({initialData}) => {
     const handleModalSelect = (record) => {
         // 모달 창 마다가 formattedvalue, setclient param 설정 값이 다름
         switch (currentField) {
+            case 'managerName':
+                setPurchaseOrderParam((prevParams) => ({
+                    ...prevParams,
+                    manager: {
+                        id: record.id,
+                        code: record.employeeNumber,
+                        name: `${record.lastName}${record.firstName}`,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    managerName: `[${record.employeeNumber}] ${record.lastName}${record.firstName}`,
+                }));
+                break;
+
+            case 'warehouseName':
+                setPurchaseOrderParam((prevParams) => ({
+                    ...prevParams,
+                    warehouse: {
+                        id: record.id,
+                        code: record.code,
+                        name: record.name,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    warehouseName: `[${record.code}] ${record.name}`,
+                }));
+                break;
+
             case 'client':
                 setSearchParams((prevParams) => ({
                     ...prevParams,
@@ -99,7 +158,7 @@ const PurchaseOrderPage = ({initialData}) => {
         const { startDate, endDate, clientCode, state } = searchParams;
 
         try {
-            const response = await apiClient.post(LOGISTICS_API.PURCHASE_ORDER_LIST_API, searchParams);
+            const response = await apiClient.post(LOISTICS_API.PURCHASE_ORDER_LIST_API, searchParams);
             const data = response.data;
             setSearchData(data);
             console.log(data)
@@ -116,6 +175,9 @@ const PurchaseOrderPage = ({initialData}) => {
         let apiPath;
 
         if(fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
+        if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
+        if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
+
         try {
             const response = await apiClient.post(apiPath);
 
@@ -238,8 +300,8 @@ const PurchaseOrderPage = ({initialData}) => {
                                 <Typography variant="h6" sx={{ padding: '20px' }}>발주서 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
-                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                                            <Col>
+                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end' }}>
+                                            <Col flex="0 0 300px">
                                                 <Form.Item
                                                     label="조회 기간"
                                                     required
@@ -253,11 +315,11 @@ const PurchaseOrderPage = ({initialData}) => {
                                                             searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
                                                         ]}
                                                         format="YYYY-MM-DD"
-                                                        style={{ width: '250px' }}
+                                                        style={{ width: '100%' }}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col flex="1">
+                                            <Col flex="0 0 200px">
                                                 <Form.Item
                                                     label="거래처"
                                                     required
@@ -272,13 +334,34 @@ const PurchaseOrderPage = ({initialData}) => {
                                                             value={displayValues.client}
                                                             onClick={() => handleInputClick('client')}
                                                             className="search-input"
-                                                            style={{ width: '30%' }}
+                                                            style={{ width: '100%' }}
                                                             suffix={<DownSquareOutlined />}
                                                         />
                                                     </Form.Item>
                                                 </Form.Item>
                                             </Col>
-                                            <Col>
+                                            <Col flex="1">
+                                                <Form.Item
+                                                    label="상태"
+                                                    required
+                                                    tooltip="검색할 상태를 선택하세요"
+                                                >
+                                                    <Select
+                                                        placeholder="상태"
+                                                        style={{ width: '200px' }}
+                                                        value={status.status}
+                                                        onChange={handleStatusChange}
+                                                    >
+                                                        <Select.Option value="WAITING_FOR_PURCHASE">발주 대기</Select.Option>
+                                                        <Select.Option value="PURCHASE_COMPLETED">발주 완료</Select.Option>
+                                                        <Select.Option value="WAITING_FOR_RECEIPT">입고 예정</Select.Option>
+                                                        <Select.Option value="RECEIPT_COMPLETED">입고 완료</Select.Option>
+                                                        <Select.Option value="CANCELED">취소</Select.Option>
+                                                        <Select.Option value="ACCOUNTED">회계 반영 완료</Select.Option>
+                                                    </Select>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col >
                                                 <Form.Item>
                                                     <Button style={{ width: '100px' }} type="primary" onClick={handleSearch} icon={<SearchOutlined />} block>
                                                         검색
@@ -289,7 +372,7 @@ const PurchaseOrderPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={searchData} // 발주서 리스트 데이터
+                                        dataSource={(searchParams.state === null) ? purchaseOrderList : searchData} // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -301,12 +384,159 @@ const PurchaseOrderPage = ({initialData}) => {
                                                 setSelectedRowKeys(newSelectedRowKeys);
                                             }
                                         }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: async () => {
+                                                setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
+                                                const id = record.id;
+                                                try {
+                                                    const response = await apiClient.post(LOGISTICS_API.PURCHASE_ORDER_DETAIL_API(id));
+                                                    setDetailPurchaseOrder(response.data);
+                                                    setEditPurchaseOrder(true);
+
+                                                    console.log(response.data)
+                                                    notify('success', '발주서 조회', '발주서 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                            },
+                                        })}
                                     />
                                 </Grid>
-
                             </Paper>
                         </Grow>
                     </Grid>
+
+                    {editPurchaseOrder && (
+                        <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                            <Grow in={true} timeout={200}>
+                                <Paper elevation={3} sx={{ height: '100%' }}>
+                                    <Typography variant="h6" sx={{ padding: '20px' }}>발주서 상세정보 및 수정</Typography>
+                                    <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                        <Form
+                                            initialValues={detailPurchaseOrder}
+                                            form={form}
+                                            onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                            >
+                                            {/* 발주서 요청 정보 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주서 정보</Divider>
+                                                <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
+                                                    <Col>
+                                                        <Typography>등록 일자</Typography>
+                                                    </Col>
+                                                    <Col>
+                                                        <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                            <DatePicker
+                                                                disabledDate={(current) => current && current.year() !== 2024}
+                                                                value={dayjs(purchaseOrderParam.date)}
+                                                                onChange={handleRegiDateChange}
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col>
+                                                        <Typography>납기 일자</Typography>
+                                                    </Col>
+                                                    <Col>
+                                                        <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '납기 일자를 입력하세요.' }]}>
+                                                            <DatePicker
+                                                                disabledDate={(current) => current && current.year() !== 2024}
+                                                                value={dayjs(purchaseOrderParam.deliveryDate)}
+                                                                onChange={handleDeliveryDateChange}
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                </Row>
+
+                                            <Row gutter={16}>
+                                                <Col span={6}>
+                                                    <Form.Item style={{ marginBottom: 0 }} >
+                                                        <Input
+                                                            addonBefore="담당자"
+                                                            value={displayValues.managerName}
+                                                            onClick={() => handleInputClick('managerName')}
+                                                            onFocus={(e) => e.target.blur()}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item style={{ marginBottom: 0 }} >
+                                                        <Input
+                                                            addonBefore="입고창고"
+                                                            value={displayValues.warehouseName}
+                                                            onClick={() => handleInputClick('warehouseName')}
+                                                            onFocus={(e) => e.target.blur()}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+
+
+
+
+                                                <Col span={4}>
+                                                    <Form.Item name="vatType" valuePropName="checked">
+                                                        <Checkbox>부가세 적용 여부</Checkbox>
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+
+                                            <Row gutter={16}>
+                                                <Col span={6}>
+                                                    <Form.Item name="currency">
+                                                        <Space.Compact>
+                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
+                                                            <Select
+                                                                style={{ width: '70%' }}
+                                                                value={purchaseOrderParam.currency}
+                                                                onChange={(value) => {
+                                                                    setPurchaseOrderParam((prevState) => ({
+                                                                        ...prevState,
+                                                                        currency: value,
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                <Select.Option value="KRW">한국 [원]</Select.Option>
+                                                                <Select.Option value="USD">미국 [달러]</Select.Option>
+                                                                <Select.Option value="EUR">유럽 [유로]</Select.Option>
+                                                                <Select.Option value="JPY">일본 [엔]</Select.Option>
+                                                                <Select.Option value="CNY">중국 [위안]</Select.Option>
+                                                                <Select.Option value="GBP">영국 [파운드]</Select.Option>
+                                                            </Select>
+                                                        </Space.Compact>
+                                                    </Form.Item>
+                                                </Col>
+
+
+                                                {(purchaseOrderParam.currency !== '한국 [원]' && purchaseOrderParam.currency !== 'KRW') && (
+                                                    <Col span={6}>
+                                                        <Form.Item style={{ marginBottom: 0 }} >
+                                                            <Input
+                                                                addonBefore="환율"
+                                                                value={purchaseOrderParam.exchangeRate}
+                                                                onClick={() => handleInputClick('exchangeRate')}
+                                                                onFocus={(e) => e.target.blur()}
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                )}
+
+                                                    <Col span={12}>
+                                                        <Form.Item name="remarks">
+                                                            <Input addonBefore="비고" />
+                                                        </Form.Item>
+                                                    </Col>
+                                            </Row>
+
+
+
+
+
+                                        </Form>
+
+                                    </Grid>
+                                </Paper>
+                            </Grow>
+                        </Grid>
+                    )}
                 </Grid>
             )}
 
@@ -335,6 +565,132 @@ const PurchaseOrderPage = ({initialData}) => {
                     <Spin />  // 로딩 스피너
                 ) : (
                     <>
+                        {/* 담당자 선택 모달 */}
+                        {currentField === 'managerName' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    담당자 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.employeeNumber && item.employeeNumber.toLowerCase().includes(value)) ||
+                                                    (item.firstName && item.lastName &&
+                                                        `${item.lastName}${item.firstName}`.toLowerCase().includes(value.toLowerCase()))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                {modalData &&(
+                                    <>
+                                        <Table
+                                            columns={[
+                                                {
+                                                    title: <div className="title-text">코드</div>,
+                                                    dataIndex: 'employeeNumber',
+                                                    key: 'employeeNumber',
+                                                    align: 'center',
+                                                    render: (text) => <div className="small-text">{text}</div>
+                                                },
+                                                {
+                                                    title: <div className="title-text">이름</div>,
+                                                    key: 'name',
+                                                    align: 'center',
+                                                    render: (_, record) => (
+                                                        <div className="small-text">{`${record.lastName}${record.firstName}`}</div>
+                                                    ),
+                                                },
+                                            ]}
+                                            dataSource={modalData}
+                                            rowKey="id"
+                                            size={'small'}
+                                            pagination={{
+                                                pageSize: 15,
+                                                position: ['bottomCenter'],
+                                                showSizeChanger: false,
+                                                showTotal: (total) => `총 ${total}개`,  // 총 개수 표시
+                                            }}
+                                            onRow={(record) => ({
+                                                style: { cursor: 'pointer' },
+                                                onClick: () => handleModalSelect(record), // 선택 시 처리
+                                            })}
+                                        />
+                                    </>
+                                )}
+                            </>
+                        )}
+                        {currentField === 'warehouseName' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    창고 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.warehouseName && item.warehouseName.toLowerCase().includes(value.toLowerCase()))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                {modalData &&(
+                                    <>
+                                        <Table
+                                            columns={[
+                                                {
+                                                    title: <div className="title-text">코드</div>,
+                                                    dataIndex: 'code',
+                                                    key: 'code',
+                                                    align: 'center',
+                                                    render: (text) => <div className="small-text">{text}</div>
+                                                },
+                                                {
+                                                    title: <div className="title-text">이름</div>,
+                                                    dataIndex: 'name',
+                                                    key: 'name',
+                                                    align: 'center',
+                                                    render: (text) => (<div className="small-text">{text}</div>
+                                                    ),
+                                                },
+                                            ]}
+                                            dataSource={modalData}
+                                            rowKey="id"
+                                            size={'small'}
+                                            pagination={{
+                                                pageSize: 15,
+                                                position: ['bottomCenter'],
+                                                showSizeChanger: false,
+                                                showTotal: (total) => `총 ${total}개`,  // 총 개수 표시
+                                            }}
+                                            onRow={(record) => ({
+                                                style: { cursor: 'pointer' },
+                                                onClick: () => handleModalSelect(record), // 선택 시 처리
+                                            })}
+                                        />
+                                    </>
+                                )}
+                            </>
+                        )}
                         {/* 거래처 선택 모달 */}
                         {currentField === 'client' && (
                             <>
