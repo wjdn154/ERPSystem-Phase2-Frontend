@@ -4,7 +4,7 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import { Typography } from '@mui/material';
 import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
 import {useNotificationContext} from "../../../../../config/NotificationContext.jsx";
-import { PRODUCTION_API } from "../../../../../config/apiConstants.jsx";
+import { LOGISTICS_API, PRODUCTION_API } from "../../../../../config/apiConstants.jsx";
 import apiClient from "../../../../../config/apiClient.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 const SelectedWorkcenterSection = ({
@@ -22,11 +22,67 @@ const SelectedWorkcenterSection = ({
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
     const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
-    const [isEndDateDisable, setIsEndDateDisable] = useState(false); // 거래 종료일 비활성화 여부 상태
-    const [displayValues, setDisplayValues] = useState({});
+    const [displayValues, setDisplayValues] = useState({
+        factory: '',
+        process: '',
+        equipment: ''
+    });
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [fetchWorkcenterData, setFetchWorkcenterData] = useState(false); // 거래처 조회한 정보 상태
     const [workcenterParam, setWorkcenterParam] = useState(false); // 수정 할 거래처 정보 상태
+
+    // 모달창 선택 핸들러
+    const handleModalSelect = (record) => {
+
+        // 모달 창 마다가 formattedvalue, setclient param 설정 값이 다름
+        switch (currentField) {
+            case 'factory':
+                setWorkcenterParam((prevParams) => ({
+                    ...prevParams,
+                    factory: {
+                        id: record.id,
+                        code: record.code,
+                        name: record.name,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    factory: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
+                }));
+                break;
+            case 'process':
+                setWorkcenterParam((prevParams) => ({
+                    ...prevParams,
+                    process: {
+                        id: record.id,
+                        code: record.code,
+                        name: record.name,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    process: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
+                }));
+                break;
+            case 'equipment':
+                setWorkcenterParam((prevParams) => ({
+                    ...prevParams,
+                    equipment: {
+                        id: record.id,
+                        equipmentNum: record.equipmentNum,
+                        equipmentName: record.equipmentName,
+                        modelName: record.modelName,
+                    },
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    equipment: `[${record.equipmentNum.toString().padStart(5, '0')}] ${record.equipmentName}`,
+                }));
+                break;
+        }
+        // 모달창 닫기
+        setIsModalVisible(false);
+    };
 
     // 모달창 열기 핸들러
     const handleInputClick = (fieldName) => {
@@ -44,9 +100,9 @@ const SelectedWorkcenterSection = ({
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
         let apiPath;
-        if(fieldName === 'factory') apiPath = PRODUCTION_API.SEARCH_FACTORIES_API;
-        if(fieldName === 'process') apiPath = PRODUCTION_API.PROCESS_SEARCH_API;
-        // if(fieldName === 'workcenterType') apiPath = FINANCIAL_API.FETCH_LIQUOR_LIST_API;
+        if (fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
+        if(fieldName === 'process') apiPath = PRODUCTION_API.PROCESS_LIST_API;
+        if(fieldName === 'equipment') apiPath = PRODUCTION_API.EQUIPMENT_DATA_API;
 
         try {
             const response = await apiClient.post(apiPath);
@@ -199,7 +255,7 @@ const SelectedWorkcenterSection = ({
                             </Col>
                         </Row>
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                            <Button onClick={handleSave} type="primary" htmlType="submit">
+                            <Button type="primary" htmlType="submit">
                             저장
                             </Button>
                             <Button onClick={handleDelete} style={{ marginLeft: '10px' }} danger>
@@ -219,129 +275,7 @@ const SelectedWorkcenterSection = ({
                                 {currentField === 'process' && (
                                     <>
                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                            은행 선택
-                                        </Typography>
-                                        <Input
-                                            placeholder="검색"
-                                            prefix={<SearchOutlined />}
-                                            onChange={(e) => {
-                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
-                                                if (!value) {
-                                                    setModalData(initialModalData);
-                                                } else {
-                                                    const filtered = initialModalData.filter((item) => {
-                                                        return (
-                                                            (item.code && item.code.toLowerCase().includes(value)) ||
-                                                            (item.name && item.name.toLowerCase().includes(value)) ||
-                                                            (item.businessNumber && item.businessNumber.toLowerCase().includes(value))
-                                                        );
-                                                    });
-                                                    setModalData(filtered);
-                                                }
-                                            }}
-                                            style={{ marginBottom: 16 }}
-                                        />
-                                        {modalData && (
-                                            <Table
-                                                columns={[
-                                                    {
-                                                        title: <div className="title-text">코드</div>,
-                                                        dataIndex: 'code',
-                                                        key: 'code',
-                                                        align: 'center'
-                                                    },
-                                                    {
-                                                        title: <div className="title-text">은행명</div>,
-                                                        dataIndex: 'name',
-                                                        key: 'name',
-                                                        align: 'center'
-                                                    },
-                                                    {
-                                                        title: <div className="title-text">사업자번호</div>,
-                                                        dataIndex: 'businessNumber',
-                                                        key: 'businessNumber',
-                                                        align: 'center'
-                                                    },
-                                                ]}
-                                                dataSource={modalData}
-                                                rowKey="code"
-                                                size={'small'}
-                                                pagination={{
-                                                    pageSize: 15,
-                                                    position: ['bottomCenter'],
-                                                    showSizeChanger: false,
-                                                    showTotal: (total) => `총 ${total}개`,
-                                                }}
-                                                onRow={(record) => ({
-                                                    style: { cursor: 'pointer' },
-                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                })}
-                                            />
-                                        )}
-                                    </>
-                                )}
-                                {currentField === 'employee' && (
-                                    <>
-                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                            자사 담당자 선택
-                                        </Typography>
-                                        <Input
-                                            placeholder="검색"
-                                            prefix={<SearchOutlined />}
-                                            onChange={(e) => {
-                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
-                                                if (!value) {
-                                                    setModalData(initialModalData);
-                                                } else {
-                                                    const filtered = initialModalData.filter((item) => {
-                                                        return (
-                                                            (item.employeeNumber && item.employeeNumber.toLowerCase().includes(value)) ||
-                                                            (item.firstName && item.firstName.toLowerCase().includes(value)) ||
-                                                            (item.lastName && item.lastName.toLowerCase().includes(value))
-                                                        );
-                                                    });
-                                                    setModalData(filtered);
-                                                }
-                                            }}
-                                            style={{ marginBottom: 16 }}
-                                        />
-                                        {modalData && (
-                                            <Table
-                                                columns={[
-                                                    {
-                                                        title: <div className="title-text">사원번호</div>,
-                                                        dataIndex: 'employeeNumber',
-                                                        key: 'employeeNumber',
-                                                        align: 'center'
-                                                    },
-                                                    {
-                                                        title: <div className="title-text">이름</div>,
-                                                        key: 'name',
-                                                        align: 'center',
-                                                        render: (text, record) => `${record.lastName}${record.firstName}`, // firstName과 lastName을 합쳐서 출력
-                                                    },
-                                                ]}
-                                                dataSource={modalData}
-                                                rowKey="id"
-                                                size={'small'}
-                                                pagination={{
-                                                    pageSize: 15,
-                                                    position: ['bottomCenter'],
-                                                    showSizeChanger: false,
-                                                    showTotal: (total) => `총 ${total}개`,
-                                                }}
-                                                onRow={(record) => ({
-                                                    style: { cursor: 'pointer' },
-                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                })}
-                                            />
-                                        )}
-                                    </>
-                                )}
-                                {currentField === 'category' && (
-                                    <>
-                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                            카테고리 선택
+                                            생산공정 선택
                                         </Typography>
                                         <Input
                                             placeholder="검색"
@@ -365,11 +299,141 @@ const SelectedWorkcenterSection = ({
                                         {modalData && (
                                             <Table
                                                 columns={[
-                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                    {
+                                                        title: <div className="title-text">코드</div>,
+                                                        dataIndex: 'code',
+                                                        key: 'code',
+                                                        align: 'center'
+                                                    },
+                                                    {
+                                                        title: <div className="title-text">생산공정명</div>,
+                                                        dataIndex: 'name',
+                                                        key: 'name',
+                                                        align: 'center'
+                                                    },
+                                                ]}
+                                                dataSource={modalData}
+                                                rowKey="code"
+                                                size={'small'}
+                                                pagination={{
+                                                    pageSize: 15,
+                                                    position: ['bottomCenter'],
+                                                    showSizeChanger: false,
+                                                    showTotal: (total) => `총 ${total}개`,
+                                                }}
+                                                onRow={(record) => ({
+                                                    style: { cursor: 'pointer' },
+                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                })}
+                                            />
+                                        )}
+                                    </>
+                                )}
+                                {currentField === 'factory' && (
+                                    <>
+                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                            공장 선택
+                                        </Typography>
+                                        <Input
+                                            placeholder="검색"
+                                            prefix={<SearchOutlined />}
+                                            onChange={(e) => {
+                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                if (!value) {
+                                                    setModalData(initialModalData);
+                                                } else {
+                                                    const filtered = initialModalData.filter((item) => {
+                                                        return (
+                                                            (item.factory && item.factoryCode.toLowerCase().includes(value)) ||
+                                                            (item.factory && item.factoryName.toLowerCase().includes(value))
+                                                        );
+                                                    });
+                                                    setModalData(filtered);
+                                                }
+                                            }}
+                                            style={{ marginBottom: 16 }}
+                                        />
+                                        {modalData && (
+                                            <Table
+                                                columns={[
+                                                    {
+                                                        title: <div className="title-text">코드</div>,
+                                                        dataIndex: 'factoryCode',
+                                                        key: 'factoryCode',
+                                                        align: 'center'
+                                                    },
+                                                    {
+                                                        title: <div className="title-text">이름</div>,
+                                                        key: 'factoryName',
+                                                        align: 'center',
+                                                    },
                                                 ]}
                                                 dataSource={modalData}
                                                 rowKey="id"
+                                                size={'small'}
+                                                pagination={{
+                                                    pageSize: 15,
+                                                    position: ['bottomCenter'],
+                                                    showSizeChanger: false,
+                                                    showTotal: (total) => `총 ${total}개`,
+                                                }}
+                                                onRow={(record) => ({
+                                                    style: { cursor: 'pointer' },
+                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                })}
+                                            />
+                                        )}
+                                    </>
+                                )}
+                                {currentField === 'equipment' && (
+                                    <>
+                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                            설비 선택
+                                        </Typography>
+                                        <Input
+                                            placeholder="검색"
+                                            prefix={<SearchOutlined />}
+                                            onChange={(e) => {
+                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                if (!value) {
+                                                    setModalData(initialModalData);
+                                                } else {
+                                                    const filtered = initialModalData.filter((item) => {
+                                                        return (
+                                                            (item.equipmentNum && item.equipmentNum.toLowerCase().includes(value)) ||
+                                                            (item.equipmentName && item.equipmentName.toLowerCase().includes(value)) ||
+                                                            (item.modelName && item.modelName.toLowerCase().includes(value))
+                                                        );
+                                                    });
+                                                    setModalData(filtered);
+                                                }
+                                            }}
+                                            style={{ marginBottom: 16 }}
+                                        />
+                                        {modalData && (
+                                            <Table
+                                                columns={[
+                                                    {
+                                                        title: <div className="title-text">설비번호</div>,
+                                                        dataIndex: 'equipmentNum',
+                                                        key: 'equipmentNum',
+                                                        align: 'center'
+                                                    },
+                                                    {
+                                                        title: <div className="title-text">설비명</div>,
+                                                        dataIndex: 'equipmentName',
+                                                        key: 'equipmentName',
+                                                        align: 'center'
+                                                    },
+                                                    {
+                                                        title: <div className="title-text">모델명</div>,
+                                                        dataIndex: 'modelName',
+                                                        key: 'modelName',
+                                                        align: 'center'
+                                                    },
+                                                ]}
+                                                dataSource={modalData}
+                                                rowKey="code"
                                                 size={'small'}
                                                 pagination={{
                                                     pageSize: 15,
