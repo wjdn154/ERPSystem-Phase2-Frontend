@@ -14,7 +14,6 @@ import {
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
 
-// 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
     { text: '통합관리', icon: <FeaturedPlayListIcon /> },
     { text: '재무회계', icon: <AttachMoneyIcon /> },
@@ -23,7 +22,6 @@ export const menuItems = [
     { text: '생산관리', icon: <PrecisionManufacturingIcon /> },
 ];
 
-// 서브 메뉴 아이템 객체를 정의, 메인 메뉴별로 다양한 서브 메뉴 항목들을 배열로 관리
 export const subMenuItems = {
     '통합관리': [
         {
@@ -38,6 +36,9 @@ export const subMenuItems = {
         }
     ],
     '재무회계': [
+        {
+            text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/financial'
+        },
         {
             text: '기초정보관리',
             items: [
@@ -117,6 +118,9 @@ export const subMenuItems = {
     ],
     '인사관리': [
         {
+            text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr'
+        },
+        {
             text: '기초 정보 관리',
             items: [
                 { text: '사원 관리', component: 'EmployeeManagementPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
@@ -175,6 +179,9 @@ export const subMenuItems = {
         },
     ],
     '물류관리': [
+        {
+            text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics'
+        },
         {
             text: '기초정보관리',
             items: [
@@ -249,6 +256,9 @@ export const subMenuItems = {
         }
     ],
     '생산관리': [
+        {
+            text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production'
+        },
         {
             text: '기초정보 관리',
             items: [
