@@ -2,7 +2,23 @@ import React, {useState} from 'react';
 import { ActionButtons, showDeleteConfirm } from '../../../common/commonActions.jsx';  // 공통 버튼 및 다이얼로그
 import {Box, Grid, Grow, Paper} from '@mui/material';
 import { Typography } from '@mui/material';
-import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
+import {
+    Space,
+    Tag,
+    Form,
+    Table,
+    Button,
+    Col,
+    Input,
+    Row,
+    Checkbox,
+    Modal,
+    DatePicker,
+    Spin,
+    Select,
+    notification,
+    Divider
+} from 'antd';
 import {useNotificationContext} from "../../../../../config/NotificationContext.jsx";
 import { LOGISTICS_API, PRODUCTION_API } from "../../../../../config/apiConstants.jsx";
 import apiClient from "../../../../../config/apiClient.jsx";
@@ -13,6 +29,7 @@ const SelectedWorkcenterSection = ({
                                      handleSave,
                                      handleDeleteWorkcenter,
                                        handleWorkcenterTypeChange,
+                                       fetchWorkerAssignments,
                                    }) => {
 
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
@@ -30,6 +47,7 @@ const SelectedWorkcenterSection = ({
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [fetchWorkcenterData, setFetchWorkcenterData] = useState(false); // 거래처 조회한 정보 상태
     const [workcenterParam, setWorkcenterParam] = useState(false); // 수정 할 거래처 정보 상태
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
 
     // 모달창 선택 핸들러
     const handleModalSelect = (record) => {
@@ -100,7 +118,8 @@ const SelectedWorkcenterSection = ({
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
         let apiPath;
-        if (fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
+        // if (fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
+        if(fieldName === 'process') apiPath = PRODUCTION_API.SEARCH_FACTORIES_API;
         if(fieldName === 'process') apiPath = PRODUCTION_API.PROCESS_LIST_API;
         if(fieldName === 'equipment') apiPath = PRODUCTION_API.EQUIPMENT_DATA_API;
 
@@ -153,7 +172,7 @@ const SelectedWorkcenterSection = ({
   };
 
   return (
-      <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+      <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1200px !important' }}>
           <Grow in={true} timeout={200}>
               <Paper elevation={3} sx={{ height: '100%' }}>
                   <Typography variant="h6" sx={{ padding: '20px' }} >작업장 등록 및 수정</Typography>
@@ -161,7 +180,7 @@ const SelectedWorkcenterSection = ({
                     <Form
                         initialValues={workcenter}
                         form={form}
-                        onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                        onClick={(values) => { handleFormSubmit(values, 'update') }}
                     >
                         <Row gutter={16}>
                             <Col span={5}>
@@ -251,6 +270,43 @@ const SelectedWorkcenterSection = ({
                             <Col span={15}>
                                 <Form.Item name="description">
                                     <Input addonBefore="설명" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>작업자배정</Divider>
+                        <Row gutter={12}>
+                            <Col span={15}>
+                                <Form.Item>
+                                    <Table
+                                        dataSource={fetchWorkerAssignments.workers}
+                                        columns={[
+                                            {
+                                                title: <div className="title-text">작업지시</div>,
+                                                dataIndex: 'productionOrderName',
+                                                key: 'productionOrderName',
+                                                width: '25%',
+                                                align: 'center',
+                                                render: (text) => <div>{text}</div>,
+                                            },
+                                            {
+                                                title: <div className="title-text">교대유형</div>,
+                                                dataIndex: 'shiftTypeName',
+                                                key: 'shiftTypeName',
+                                                width: '15%',
+                                                align: 'center',
+                                                render: (text) => <div>{text}</div>,
+                                            },
+                                            {
+                                                title: <div className="title-text">작업자(사번)</div>,
+                                                dataIndex: 'workerName',
+                                                key: 'workerName',
+                                                width: '25%',
+                                                align: 'center',
+                                                render: (text, record) => (
+                                                    <div>{text} ({record.employeeNumber})</div>
+                                                ),
+                                            },
+                                    ]}></Table>
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -448,6 +504,7 @@ const SelectedWorkcenterSection = ({
                                             />
                                         )}
                                     </>
+
                                 )}
 
                                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>

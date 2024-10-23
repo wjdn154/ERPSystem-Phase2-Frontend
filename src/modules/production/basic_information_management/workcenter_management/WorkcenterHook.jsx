@@ -80,31 +80,36 @@ export const useWorkcenter = (initialData) => {
         }
     };
 
-    // // 설비 ID로 설비 세부 정보를 가져오는 함수
-    // const fetchEquipmentDetailsByIds = async (equipmentIds) => {
-    //     try {
-    //         const response = await apiClient.post(PRODUCTION_API.EQUIPMENT_LIST_BY_IDS, { ids: equipmentIds });
-    //         return response.data.map((equipment) => ({
-    //             equipmentNum: equipment.equipmentNum,
-    //             equipmentName: equipment.equipmentName,
-    //         }));
-    //     } catch (error) {
-    //         console.error('설비 정보 조회 실패:', error);
-    //         return [];
-    //     }
-    // };
-
-    const fetchEquipmentByWorkcenterCode = async (workcenterCode) => {
+// 여러 설비 ID에 대해 설비 정보를 가져오는 함수
+    const fetchEquipmentDetailsByEachId = async (equipmentIds) => {
         try {
-            const response = await apiClient.post(
-                `${PRODUCTION_API.EQUIPMENT_LIST_BY_WORKCENTER}/${workcenterCode}`
+            const equipmentDetails = await Promise.all(
+                equipmentIds.map(async (id) => {
+                    const equipment = await fetchEquipmentDetails(id);
+                    return equipment
+                        ? { equipmentNum: equipment.equipmentNum, equipmentName: equipment.equipmentName }
+                        : { equipmentNum: '알 수 없음', equipmentName: '알 수 없는 설비' };
+                })
             );
-            return response.data;
+            return equipmentDetails;
         } catch (error) {
-            console.error('설비 목록 조회 실패:', error);
+            console.error('설비 정보를 가져오는 중 오류 발생:', error);
             return [];
         }
     };
+
+
+    // const fetchEquipmentByWorkcenterCode = async (workcenterCode) => {
+    //     try {
+    //         const response = await apiClient.post(
+    //             `${PRODUCTION_API.EQUIPMENT_LIST_BY_WORKCENTER}/${workcenterCode}`
+    //         );
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error('설비 목록 조회 실패:', error);
+    //         return [];
+    //     }
+    // };
 
     // 특정 작업장 삭제 로직
     const handleDeleteWorkcenter = async (code) => {
@@ -133,7 +138,7 @@ export const useWorkcenter = (initialData) => {
         }
     };
 
-    // 행 선택 핸들러 설정
+    // // 행 선택 핸들러 설정
     // const handleRowSelection = {
     //     type: 'radio',
     //     onSelect: async (record) => {
@@ -148,32 +153,33 @@ export const useWorkcenter = (initialData) => {
     //     },
     // };
 
-    // 행 선택 시 상세정보 설정
+// 행 선택 시 상세정보 설정
     const handleSelectedRow = async (selectedRow) => {
-        setSelectedRow(selectedRow);
-        setIsEditing(false);
+        setSelectedRow(selectedRow);  // 선택된 행 상태 업데이트
+        setIsLoading(true);  // 로딩 상태 활성화
 
         try {
+            // API 호출로 작업장 세부 정보 가져오기
             const detail = await fetchWorkcenter(selectedRow.code);
+            console.log('workcenterHook:', detail);  // 데이터 확인용 로그
 
-            const equipmentDetails = await Promise.all(
-                detail.equipmentIds.map((id) => fetchEquipmentDetails(id))
-            );
+            // // 설비 정보 형식 변환
+            // const formattedEquipments = detail.equipmentIds.map((id, index) => {
+            //     const equipmentName = detail.equipmentNames[index] || '이름 없음';
+            //     const modelName = detail.modelNames[index] || '모델명 없음';
+            //     return `[${id}] ${equipmentName} (${modelName})`;  // 설비 고유번호 + 설비명 + 모델명 형식
+            // }).join(', ');
 
-            // [설비고유번호] 설비명 형식으로 변환
-            const formattedEquipments = equipmentDetails
-                .filter((equipment) => equipment) // 유효한 데이터만 남김
-                .map((equipment) => `[${equipment.equipmentNum}] ${equipment.equipmentName}`)
-                .join(', ');
-
-            setWorkcenter({ ...detail, formattedEquipments });
-            // setIsWorkcenterModalVisible(true); // 모달 열기
+            // 작업장 정보와 형식화된 설비 정보를 함께 설정
+            setWorkcenter({ ...detail });
+            // setWorkcenter({ ...detail, formattedEquipments });
         } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);  // 오류 로그
         } finally {
-            setIsLoading(false);
+            setIsLoading(false);  // 로딩 상태 종료
         }
     };
+
 
     // 작업장 유형 변경 핸들러
     const handleWorkcenterTypeChange = (value) => {
@@ -198,35 +204,35 @@ export const useWorkcenter = (initialData) => {
     };
 
 
-    // handleSave
-    const handleSave = async () => {
-        try {
-            const confirmSave = window.confirm("저장하시겠습니까?");
-            if (!confirmSave) return;
-
-            if (isEditing) {
-                await createWorkcenter(workcenter);
-            } else {
-                await updateWorkcenter(workcenter.code, workcenter);
-            }
-
-            // 새로운 작업장 추가 시, 기존 상태에 추가
-            if (isEditing) {
-                setData(prevData => [...prevData, workcenter]);
-                notify('success', '저장 성공', '작업장 데이터 저장 성공.', 'bottomRight')
-            } else {
-                // 업데이트 시, 기존 데이터에서 수정된 데이터 반영
-                setData(prevData =>
-                    prevData.map(item => (item.code === workcenter.code ? workcenter : item))
-                );
-            }
-
-            // handleClose(); // 모달 닫기
-        } catch (error) {
-            console.error("작업장 저장 중 오류 발생:", error);
-            notify('error', '조회 오류', '작업장 저장 중 오류 발생', 'top');
-        }
-    };
+    // // handleSave
+    // const handleSave = async () => {
+    //     try {
+    //         const confirmSave = window.confirm("저장하시겠습니까?");
+    //         if (!confirmSave) return;
+    //
+    //         if (isEditing) {
+    //             await createWorkcenter(workcenter);
+    //         } else {
+    //             await updateWorkcenter(workcenter.code, workcenter);
+    //         }
+    //
+    //         // 새로운 작업장 추가 시, 기존 상태에 추가
+    //         if (isEditing) {
+    //             setData(prevData => [...prevData, workcenter]);
+    //             notify('success', '저장 성공', '작업장 데이터 저장 성공.', 'bottomRight')
+    //         } else {
+    //             // 업데이트 시, 기존 데이터에서 수정된 데이터 반영
+    //             setData(prevData =>
+    //                 prevData.map(item => (item.code === workcenter.code ? workcenter : item))
+    //             );
+    //         }
+    //
+    //         // handleClose(); // 모달 닫기
+    //     } catch (error) {
+    //         console.error("작업장 저장 중 오류 발생:", error);
+    //         notify('error', '조회 오류', '작업장 저장 중 오류 발생', 'top');
+    //     }
+    // };
 
     // // handleClose
     // const handleClose = () => {
@@ -259,7 +265,7 @@ export const useWorkcenter = (initialData) => {
         handleDeleteWorkcenter,
         handleSelectedRow,
         handleInputChange,
-        handleSave,
+        // handleSave,
         // handleClose,
         handleAddWorkcenter,
         handleSearch, // useSearch 훅에서 반환된 handleSearch

@@ -11,14 +11,6 @@ export const workcenterColumns = [
         align: 'center',
     },
     {
-        title: <div className="title-text">이름</div>,
-        dataIndex: 'name',  // DTO의 name 필드에 접근
-        key: 'name',
-        width: '10%',
-        align: 'center',
-
-    },
-    {
         title: <div className="title-text">유형</div>,
         dataIndex: 'workcenterType',  // DTO의 workcenterType 필드에 접근
         key: 'workcenterType',
@@ -64,12 +56,20 @@ export const workcenterColumns = [
         }
     },
     {
-        title: <div className="title-text">설명</div>,
-        dataIndex: 'description',  // DTO의 description 필드에 접근
-        key: 'description',
+        title: <div className="title-text">이름</div>,
+        dataIndex: 'name',  // DTO의 name 필드에 접근
+        key: 'name',
         width: '20%',
         align: 'center',
+
     },
+    // {
+    //     title: <div className="title-text">설명</div>,
+    //     dataIndex: 'description',  // DTO의 description 필드에 접근
+    //     key: 'description',
+    //     width: '20%',
+    //     align: 'center',
+    // },
     {
         title: <div className="title-text">공장</div>,
         key: 'factory',
@@ -113,18 +113,32 @@ export const workcenterColumns = [
         width: '15%',
         align: 'center',
     },
+    // {
+    //     title: <div className="title-text">설비 번호</div>,
+    //     dataIndex: 'equipmentIds',  // 설비 ID 리스트 접근
+    //     key: 'equipmentIds',
+    //     width: '10%',
+    //     align: 'center',
+    //     render: (equipmentIds) => {
+    //         if (!equipmentIds || equipmentIds.length === 0) {
+    //             return '설비 없음';
+    //         }
+    //         // 설비 번호들을 콤마로 구분하여 반환
+    //         return equipmentIds.join(', ');
+    //     }
+    // },
     {
-        title: <div className="title-text">설비 번호</div>,
-        dataIndex: 'equipmentIds',  // 설비 ID 리스트 접근
-        key: 'equipmentIds',
+        title: <div className="title-text">설비 모델명</div>,
+        dataIndex: 'modelNames',  // 설비 ID 리스트 접근
+        key: 'modelNames',
         width: '10%',
         align: 'center',
-        render: (equipmentIds) => {
-            if (!equipmentIds || equipmentIds.length === 0) {
-                return '설비 없음';
+        render: (modelNames) => {
+            if (!modelNames || modelNames.length === 0) {
+                return '설비 미등록';
             }
             // 설비 번호들을 콤마로 구분하여 반환
-            return equipmentIds.join(', ');
+            return modelNames.join(', ');
         }
     },
     {

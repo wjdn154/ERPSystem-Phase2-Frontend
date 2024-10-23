@@ -24,6 +24,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
     const [workcenter, setWorkcenter] = useState(null); // 선택된 작업장 데이터 관리
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 상태 관리
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
 
 
     const {
@@ -55,9 +56,26 @@ const WorkcenterManagementPage = ({ initialData }) => {
         setData(updatedData);
     };
 
+    // 작업장 상세 정보 가져오기
+    const fetchWorkcenterDetail = async (code) => {
+        setIsLoading(true);
+        try {
+            const detail = await fetchWorkcenter(code); // API 호출
+            setWorkcenter(detail); // 선택된 작업장 정보 설정
+            notify('success', '작업장 조회', '작업장 정보 조회 성공.', 'bottomRight');
+        } catch (error) {
+            console.error('작업장 정보 조회 실패:', error);
+            notify('error', '조회 오류', '작업장 정보 조회 중 오류가 발생했습니다.', 'top');
+        } finally {
+            setIsLoading(false); // 로딩 상태 종료
+        }
+    };
+
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
+        console.log('폼 제출 값:', values);  // 전달된 값 확인
+
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
@@ -77,7 +95,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                     // isWorkcenterModalVisible(false); // 모달 닫기
                     refreshWorkcenters(); // 작업장 목록 새로고침
                 } catch (error) {
-                    console.error('Error saving workcenter:', error);
+                    console.error('저장 실패:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
                 }
             },
@@ -111,7 +129,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1200px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >작업장 목록</Typography>
@@ -130,23 +148,27 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                 setSelectedRowKeys(newSelectedRowKeys); // 선택된 행의 키 업데이트
                                             },
                                         }}
-                                        size="small"
                                         rowKey="code" // Workcenter에서 고유 CODE 필드를 사용
+                                        size="small"
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {
                                                 setSelectedRowKeys([record.code]); // 클릭한 행의 키로 상태 업데이트
+                                                console.log('선택된 Row Keys:', selectedRowKeys);
                                                 const code = record.code;
                                                 try {
                                                     // 작업장 상세 정보 가져오기 (API 호출)
                                                     const detail = await fetchWorkcenter(record.code);
+                                                    console.log('작업장 세부 정보:', detail);
+
                                                     setWorkcenter(detail); // 선택된 작업장 데이터 설정
                                                     notify('success', '작업장 조회', '작업장 정보 조회 성공.', 'bottomRight');
                                                 } catch (error) {
                                                     console.error("작업장 정보 조회 실패:", error);
                                                     notify('error', '조회 오류', '작업장 정보 조회 중 오류가 발생했습니다.', 'top');
                                                 }
-                                                // handleSelectedRow(record); // 행 클릭 시 해당 작업장 선택
+                                                console.log('handleSelectedRow(record):', record);
+                                                handleSelectedRow(record); // 행 클릭 시 해당 작업장 선택
                                             },
                                         })}
                                     />
