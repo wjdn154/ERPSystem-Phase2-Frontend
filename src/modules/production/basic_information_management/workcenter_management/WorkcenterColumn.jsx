@@ -1,19 +1,17 @@
 import {Select, Tag} from 'antd';
 import React, {useEffect, useState} from "react";
-import apiClient from "../../../../config/apiClient.jsx";
-import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 
 // 전체 조회 컬럼 (기존 컬럼 유지)
 export const workcenterColumns = [
     {
-        title: <div>코드</div>,
+        title: <div className="title-text">코드</div>,
         dataIndex: 'code',  // DTO의 code 필드에 접근
         key: 'code',
         width: '5%',
         align: 'center',
     },
     {
-        title: <div>이름</div>,
+        title: <div className="title-text">이름</div>,
         dataIndex: 'name',  // DTO의 name 필드에 접근
         key: 'name',
         width: '10%',
@@ -21,7 +19,7 @@ export const workcenterColumns = [
 
     },
     {
-        title: <div>유형</div>,
+        title: <div className="title-text">유형</div>,
         dataIndex: 'workcenterType',  // DTO의 workcenterType 필드에 접근
         key: 'workcenterType',
         width: '10%',
@@ -66,14 +64,14 @@ export const workcenterColumns = [
         }
     },
     {
-        title: <div>설명</div>,
+        title: <div className="title-text">설명</div>,
         dataIndex: 'description',  // DTO의 description 필드에 접근
         key: 'description',
         width: '20%',
         align: 'center',
     },
     {
-        title: <div>공장</div>,
+        title: <div className="title-text">공장</div>,
         key: 'factory',
         render: (text, record) => {
             const { factoryCode, factoryName } = record;
@@ -90,7 +88,7 @@ export const workcenterColumns = [
         align: 'center',
     },
     {
-        title: <div>생산공정</div>,
+        title: <div className="title-text">생산공정</div>,
         key: 'process',
         render: (text, record) => {
             const { processCode, processName } = record;
@@ -107,7 +105,7 @@ export const workcenterColumns = [
         align: 'center',
     },
     {
-        title: <div>작업자</div>,
+        title: <div className="title-text">작업자</div>,
         dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
         key: 'todayWorkers',
         render: (workers) =>
@@ -116,7 +114,7 @@ export const workcenterColumns = [
         align: 'center',
     },
     {
-        title: <div>설비 번호</div>,
+        title: <div className="title-text">설비 번호</div>,
         dataIndex: 'equipmentIds',  // 설비 ID 리스트 접근
         key: 'equipmentIds',
         width: '10%',
@@ -130,7 +128,7 @@ export const workcenterColumns = [
         }
     },
     {
-        title: <div>사용</div>,
+        title: <div className="title-text">사용</div>,
         dataIndex: 'isActive',  // DTO의 isActive 필드에 접근
         key: 'isActive',
         width: '5%',
@@ -147,7 +145,7 @@ export const workcenterColumns = [
 
 export const workcenterDetailColumns = [
     {
-        title: <div>코드</div>,
+        title: <div className="title-text">코드</div>,
         dataIndex: 'code',
         key: 'code',
         width: '5%',
@@ -155,7 +153,7 @@ export const workcenterDetailColumns = [
         editable: true, // 수정 가능
     },
     {
-        title: <div>이름</div>,
+        title: <div className="title-text">이름</div>,
         dataIndex: 'name',
         key: 'name',
         width: '15%',
@@ -163,7 +161,7 @@ export const workcenterDetailColumns = [
         editable: true, // 수정 가능
     },
     {
-        title: <div>유형</div>,
+        title: <div className="title-text">유형</div>,
         dataIndex: 'workcenterType',
         key: 'workcenterType',
         width: '10%',
@@ -186,7 +184,7 @@ export const workcenterDetailColumns = [
         editable: true, // 드롭다운으로 선택 가능
     },
     {
-        title: <div>설명</div>,
+        title: <div className="title-text">설명</div>,
         dataIndex: 'description',
         key: 'description',
         width: '25%',
@@ -194,7 +192,7 @@ export const workcenterDetailColumns = [
         editable: true, // 수정 가능
     },
     {
-        title: <div>공장</div>,
+        title: <div className="title-text">공장</div>,
         key: 'factory',
         render: (text, record) => {
             const { factoryCode, factoryName } = record;
@@ -211,7 +209,7 @@ export const workcenterDetailColumns = [
         align: 'center',
     },
     {
-        title: <div>생산공정</div>,
+        title: <div className="title-text">생산공정</div>,
         key: 'process',
         render: (text, record) => {
             const { processCode, processName } = record;
@@ -228,7 +226,7 @@ export const workcenterDetailColumns = [
         align: 'center',
     },
     {
-        title: <div>작업자</div>,
+        title: <div className="title-text">작업자</div>,
         dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
         key: 'todayWorkers',
         render: (workers) =>
@@ -237,7 +235,7 @@ export const workcenterDetailColumns = [
         align: 'center',
     },
     {
-        title: <div>설비 번호</div>,
+        title: <div className="title-text">설비 번호</div>,
         dataIndex: 'equipmentIds', // 설비 ID 목록 접근
         key: 'equipmentIds',
         align: 'center',
@@ -248,7 +246,7 @@ export const workcenterDetailColumns = [
                 : '설비 없음',
     },
     {
-        title: <div>사용</div>,
+        title: <div className="title-text">사용</div>,
         dataIndex: 'isActive',
         key: 'isActive',
         width: '5%',

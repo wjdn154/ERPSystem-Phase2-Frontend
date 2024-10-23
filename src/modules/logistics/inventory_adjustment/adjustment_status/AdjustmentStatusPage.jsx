@@ -10,7 +10,7 @@ import {SearchOutlined} from '@ant-design/icons';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import {tabItems} from './AdjustmentStatusUtil.jsx';
 
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 
 const AdjustmentStatusPage = () => {
     const notify = useNotificationContext();
@@ -59,14 +59,16 @@ const AdjustmentStatusPage = () => {
     };
 
     return (
-        <Box sx={{ margin: '20px' }}>
+        <Box sx={{margin: '20px'}}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
                         title="재고조정현황"
                         description={(
                             <Typography>
-                                재고조정현황 페이지는 <span>재고 조정 작업의 전체적인 진행 상태와 결과</span>를 확인하는 곳임. 이 페이지에서는 <span>재고 실사와 그에 따른 조정 작업의 이력</span>을 조회하고, 각 조정 작업의 <span>진행 상황과 완료 여부</span>를 확인할 수 있음. 실사 후 조정된 재고 내역을 통해 <span>실시간 재고 정보</span>를 최신 상태로 유지할 수 있음.
+                                재고조정현황 페이지는 <span>재고 조정 작업의 전체적인 진행 상태와 결과</span>를 확인하는 곳임. 이 페이지에서는 <span>재고 실사와 그에 따른 조정 작업의 이력</span>을
+                                조회하고, 각 조정 작업의 <span>진행 상황과 완료 여부</span>를 확인할 수 있음. 실사 후 조정된 재고 내역을
+                                통해 <span>실시간 재고 정보</span>를 최신 상태로 유지할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -77,16 +79,20 @@ const AdjustmentStatusPage = () => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '1200px !important', maxWidth: '700px !important' }}>
+                <Grid sx={{padding: '0px 20px 0px 20px'}} container spacing={3}>
+                    <Grid item xs={12} md={12} sx={{minWidth: '1200px !important', maxWidth: '700px !important'}}>
                         <Grow in={true} timeout={200}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>재고조정 현황 조회</Typography>
+                            <Paper elevation={3} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{padding: '20px'}}>재고조정 현황 조회</Typography>
 
                                 {/* 날짜 선택 및 검색 버튼 */}
-                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                     <Form layout="vertical">
-                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                                        <Row gutter={16} style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-end',
+                                            justifyContent: 'space-between'
+                                        }}>
                                             <Col>
                                                 <Form.Item
                                                     label="조회 기간"
@@ -100,13 +106,14 @@ const AdjustmentStatusPage = () => {
                                                             searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
                                                         ]}
                                                         format="YYYY-MM-DD"
-                                                        style={{ width: '300px' }}
+                                                        style={{width: '300px'}}
                                                     />
                                                 </Form.Item>
                                             </Col>
                                             <Col>
                                                 <Form.Item>
-                                                    <Button style={{ width: '100px' }} type="primary" onClick={handleSearch} icon={<SearchOutlined />} block>
+                                                    <Button style={{width: '100px'}} type="primary"
+                                                            onClick={handleSearch} icon={<SearchOutlined/>} block>
                                                         검색
                                                     </Button>
                                                 </Form.Item>
@@ -116,9 +123,7 @@ const AdjustmentStatusPage = () => {
                                 </Grid>
 
                                 {/* 재고 조정 현황 테이블 */}
-                                {loading ? (
-                                    <Spin size="large"/>  // 로딩 스피너
-                                ) : (
+                                <Grid sx={{margin: '20px'}}>
                                     <Table
                                         columns={[
                                             {
@@ -144,7 +149,8 @@ const AdjustmentStatusPage = () => {
                                                     <div className="small-text">
                                                         {record.productName} [{record.standard}]
                                                     </div>
-                                                )                                                       },
+                                                )
+                                            },
                                             {
                                                 title: <div className="title-text">창고명</div>,
                                                 dataIndex: 'warehouseName',
@@ -185,7 +191,7 @@ const AdjustmentStatusPage = () => {
                                         rowKey="id"
                                         pagination={{pageSize: 10, position: ['bottomCenter']}}
                                     />
-                                )}
+                                </Grid>
                             </Paper>
                         </Grow>
                     </Grid>
