@@ -68,7 +68,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                     if (type === 'register') {
                         // API 요청: 새 작업장 등록
                         await apiClient.post(PRODUCTION_API.SAVE_WORKCENTER_API, values);
-                        notify('success', '등록 성공', '새 작업장이 등록되었습니다.', 'bottomRight');
+                        notify('success', '등록 성공', '작업장이 등록되었습니다.', 'bottomRight');
                     } else if (type === 'update') {
                         // API 요청: 기존 작업장 수정
                         await apiClient.post(PRODUCTION_API.UPDATE_WORKCENTER_API(values.code), values);
@@ -164,6 +164,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                             handleSelectedRow={handleSelectedRow}
                             handleDeleteWorkcenter={handleDeleteWorkcenter}
                             rowClassName={getRowClassName}
+                            handleFormSubmit={handleFormSubmit}
                         />
 
                             // handleClose={handleClose}

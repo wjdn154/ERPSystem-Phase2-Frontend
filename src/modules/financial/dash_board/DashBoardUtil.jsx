@@ -20,5 +20,32 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
+        {
+            key: '3',
+            label: '계정과목 관리',
+            children: (
+                <Typography>
+                    계정과목은 기업의 거래를 기록하고 분류하는 데 사용됩니다. 모든 회계 작업의 기초로서 중요한 역할을 합니다.
+                </Typography>
+            ),
+        },
+        {
+            key: '4',
+            label: '계정과목 관리',
+            children: (
+                <Typography>
+                    계정과목은 기업의 거래를 기록하고 분류하는 데 사용됩니다. 모든 회계 작업의 기초로서 중요한 역할을 합니다.
+                </Typography>
+            ),
+        },
+        {
+            key: '5',
+            label: '계정과목 관리',
+            children: (
+                <Typography>
+                    계정과목은 기업의 거래를 기록하고 분류하는 데 사용됩니다. 모든 회계 작업의 기초로서 중요한 역할을 합니다.
+                </Typography>
+            ),
+        },
     ];
 };
