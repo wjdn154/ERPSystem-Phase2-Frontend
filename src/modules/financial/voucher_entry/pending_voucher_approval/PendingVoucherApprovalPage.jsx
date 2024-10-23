@@ -170,6 +170,13 @@ const PendingVoucherApprovalPage = () => {
                                                     render: (text, record) => <span className="small-text">[{text.padStart(5, '0')}] {record.clientName}</span>
                                                 },
                                                 {
+                                                    title: '담당자',
+                                                    dataIndex: 'voucherManagerCode',
+                                                    key: 'voucherManagerCode',
+                                                    align: 'center',
+                                                    render: (text, record) => <div className="small-text">[{text}] {record.voucherManagerName}</div>
+                                                },
+                                                {
                                                     title: '적요',
                                                     dataIndex: 'transactionDescription',
                                                     key: 'transactionDescription',
@@ -231,12 +238,9 @@ const PendingVoucherApprovalPage = () => {
                                                         <Table.Summary.Cell index={4} />
                                                         <Table.Summary.Cell index={5} />
                                                         <Table.Summary.Cell index={6} />
-                                                        <Table.Summary.Cell index={7}>
-                                                            <div className="medium-text">{Number(searchData.totalDebit || 0).toLocaleString()}</div>
-                                                        </Table.Summary.Cell>
-                                                        <Table.Summary.Cell index={8}>
-                                                            <div className="medium-text">{Number(searchData.totalCredit || 0).toLocaleString()}</div>
-                                                        </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={7} />
+                                                        <Table.Summary.Cell index={8}><div className="medium-text">{Number(searchData.totalDebit || 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={9}><div className="medium-text">{Number(searchData.totalCredit || 0).toLocaleString()}</div></Table.Summary.Cell>
                                                     </Table.Summary.Row>
                                                 ) : null
                                             )}

@@ -356,6 +356,7 @@ const ClientAccountLedgerPage = () => {
                                                     // API 호출 시 updatedParams 사용
                                                     const response = await apiClient.post(FINANCIAL_API.CLIENT_AND_ACCOUNT_SUBJECT_LEDGER_DETAIL_API, { ...updatedParams });
                                                     setClientAndAccountLedgerDetailData(response.data);
+                                                    console.log(response.data);
                                                     notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
