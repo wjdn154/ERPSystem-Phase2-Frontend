@@ -8,11 +8,12 @@ export const useNotificationContext = () => useContext(NotificationContext);
 export const NotificationProvider = ({ children }) => {
     const [api, contextHolder] = notification.useNotification();
 
-    const notify = (type, message, description, placement = 'top') => {
+    const notify = (type, message, description, placement = 'bottomRight') => {
         api[type]({
             message,
             description,
             placement,
+            duration: 1,
         });
     };
 

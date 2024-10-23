@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './InspectionStatusUtil.jsx';
+import {tabItems} from './InspectionStatusUtil.jsx';
 import {Button, Col, DatePicker, Form, Row, Spin, Table} from 'antd';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from "dayjs";
@@ -9,7 +9,7 @@ import {SearchOutlined} from "@ant-design/icons";
 import apiClient from "../../../../config/apiClient.jsx";
 import {LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 
 const InspectionStatusPage = () => {
     const notify = useNotificationContext();
@@ -57,14 +57,16 @@ const InspectionStatusPage = () => {
     };
 
     return (
-        <Box sx={{ margin: '20px' }}>
+        <Box sx={{margin: '20px'}}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
                         title="재고실사현황"
                         description={(
                             <Typography>
-                                재고실사현황 페이지는 <span>재고 실사의 진행 상태와 실사 완료 여부</span>를 관리하는 곳임. 이 페이지에서는 <span>실사 진행 상황을 실시간으로 추적</span>할 수 있으며, 실사 중인 항목의 상태를 <span>조정하거나 검토</span>할 수 있음. 재고 실사의 <span>진행 단계</span>를 한눈에 파악하여 일정에 따라 실사를 완료할 수 있도록 함.
+                                재고실사현황 페이지는 <span>재고 실사의 진행 상태와 실사 완료 여부</span>를 관리하는 곳임. 이 페이지에서는 <span>실사 진행 상황을 실시간으로 추적</span>할
+                                수 있으며, 실사 중인 항목의 상태를 <span>조정하거나 검토</span>할 수 있음. 재고 실사의 <span>진행 단계</span>를 한눈에 파악하여
+                                일정에 따라 실사를 완료할 수 있도록 함.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -75,16 +77,20 @@ const InspectionStatusPage = () => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '1200px !important', maxWidth: '700px !important' }}>
+                <Grid sx={{padding: '0px 20px 0px 20px'}} container spacing={3}>
+                    <Grid item xs={12} md={5} sx={{minWidth: '1200px !important', maxWidth: '700px !important'}}>
                         <Grow in={true} timeout={200}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>재고실사 현황 조회</Typography>
+                            <Paper elevation={3} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{padding: '20px'}}>재고실사 현황 조회</Typography>
 
                                 {/* 날짜 선택 및 검색 버튼 */}
-                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                     <Form layout="vertical">
-                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                                        <Row gutter={16} style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-end',
+                                            justifyContent: 'space-between'
+                                        }}>
                                             <Col>
                                                 <Form.Item
                                                     label="조회 기간"
@@ -98,13 +104,14 @@ const InspectionStatusPage = () => {
                                                             searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
                                                         ]}
                                                         format="YYYY-MM-DD"
-                                                        style={{ width: '300px' }}
+                                                        style={{width: '300px'}}
                                                     />
                                                 </Form.Item>
                                             </Col>
                                             <Col>
                                                 <Form.Item>
-                                                    <Button style={{ width: '100px' }} type="primary" onClick={handleSearch} icon={<SearchOutlined />} block>
+                                                    <Button style={{width: '100px'}} type="primary"
+                                                            onClick={handleSearch} icon={<SearchOutlined/>} block>
                                                         검색
                                                     </Button>
                                                 </Form.Item>
@@ -112,11 +119,7 @@ const InspectionStatusPage = () => {
                                         </Row>
                                     </Form>
                                 </Grid>
-
-                                {/* 재고 조정 현황 테이블 */}
-                                {loading ? (
-                                    <Spin size="large"/>  // 로딩 스피너
-                                ) : (
+                                <Grid sx={{margin: '20px'}}>
                                     <Table
                                         columns={[
                                             {
@@ -163,7 +166,7 @@ const InspectionStatusPage = () => {
                                         rowKey="id"
                                         pagination={{pageSize: 10, position: ['bottomCenter']}}
                                     />
-                                )}
+                                </Grid>
                             </Paper>
                         </Grow>
                     </Grid>

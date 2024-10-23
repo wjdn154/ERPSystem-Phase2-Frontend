@@ -379,7 +379,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 title: <div className="title-text">주소</div>,
                                                 key: 'address',
                                                 align: 'center',
-                                                render: (_, record) => <span style={{ fontSize: '0.7rem' }}>{`${record.roadAddress}, ${record.detailedAddress}`}</span>,
+                                                render: (_, record) => <div className="small-text">{`${record.roadAddress}, ${record.detailedAddress}`}</div>,
                                                 width: '20%'
                                             },
                                             {
@@ -387,7 +387,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 dataIndex: 'phoneNumber',
                                                 key: 'phoneNumber',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
@@ -419,7 +419,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 dataIndex: 'transactionStartDate',
                                                 key: 'transactionStartDate',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
@@ -427,7 +427,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 dataIndex: 'transactionEndDate',
                                                 key: 'transactionEndDate',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
@@ -435,7 +435,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 dataIndex: 'remarks',
                                                 key: 'remarks',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '20%'
                                             }
                                         ]}

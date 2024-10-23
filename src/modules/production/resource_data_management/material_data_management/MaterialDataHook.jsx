@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState, useRef} from "react";
 import axios from "axios";
+const { confirm } = Modal;
 import {
     fetchMaterialDetail,
     fetchMaterialDataList,
@@ -12,7 +13,7 @@ import {
     fetchHazardousMaterialList,
     updateMaterialHazardousList
 } from "./MaterialDataApi.jsx";
-import {notification} from "antd";
+import {Modal, notification} from "antd";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 export const materialDataHook = (initialData) => {
@@ -125,11 +126,10 @@ export const materialDataHook = (initialData) => {
     const handleSave = async () => {
         try {
 
-            if (!confirmSave) return;
             console.log("저장버튼 클릭 시 hazardousMaterial : ",materialDataDetail);
             await saveMaterialData(materialDataDetail);
             const savedData = await fetchMaterialDataList();  //등록 후 새로운 리스트 반환
-            window.alert("저장되었습니다.");
+            notify('success', '자재 등록', '자재 등록 성공', 'bottomRight')
             setIsInsertModalVisible(false);
             setData(savedData);
         } catch (error) {
@@ -146,38 +146,7 @@ export const materialDataHook = (initialData) => {
         setIsInsertModalVisible(false);
     }
 
-    //자재 등록, 수정 alert
-    const alertMaterial = () => {
 
-        if (!materialDataDetail.materialCode) {
-            alert("자재 코드를 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.materialName) {
-            alert("자재 명을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.materialType) {
-            alert("자재유형을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.stockQuantity) {
-            alert("재고 수량을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.purchasePrice) {
-            alert("구매 가격을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeCode) {
-            alert("거래처 코드를 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeName) {
-            alert("커래처 명을 입력하세요.");
-            return;
-        }
-    }
     //등록 모달창 ok 눌렀을 때 실행되는 함수
     const handleInsertOk = async () => {
 
@@ -210,10 +179,7 @@ export const materialDataHook = (initialData) => {
             notify('success', '자재 수정', '자재 수정 성공', 'bottomRight')
             setIsUpdateModalVisible(false);
         } catch (error) {
-            notification.error({
-                message: '수정 실패',
-                description: '수정 중 오류가 발생했습니다.',
-            });
+            notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
     }
 
@@ -224,18 +190,27 @@ export const materialDataHook = (initialData) => {
     //삭제 버튼 선택 클릭 시 실행되는 함수
     const handleDelete = async () => {
 
-        if(!confirmDelete) return;
-
-        if(materialDataDetail && materialDataDetail.id){
-            try{
-                await deleteMaterialData(materialDataDetail.id);
-                const deletedData = await fetchMaterialDataList();
-                window.alert('삭제 완료되었습니다.');
-                setData(deletedData);
-            }catch (error){
-                notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
+        confirm({
+            title: '삭제 확인',
+            content: '정말로 삭제하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                if(materialDataDetail && materialDataDetail.id){
+                    try{
+                       await deleteMaterialData(materialDataDetail.id);
+                        const deletedData = await fetchMaterialDataList();
+                        notify('success', '삭제 성공', '자재 삭제 성공.', 'bottomRight');
+                        setData(deletedData);
+                        // 선택된 행 초기화 및 상세보기 숨기기
+                        setSelectedRow(null);
+                    }catch (error){
+                        notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
+                    }
+                }
             }
-        }
+        })
+
     }
 
     //탭 누를 시 화면 전환

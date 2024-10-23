@@ -67,9 +67,26 @@ export const
         width: '11%',  // 컬럼 너비 설정
         align: 'center',
         render: (text) => {
-            return employmentStatusMap[text] || text;  // 한글로 변환 후 표시
-        }
-    },
+            let color;
+            let value;
+            switch (text) {
+                case 'ACTIVE':
+                    color = 'blue';
+                    value = '재직 중';
+                    break;
+                case 'ON_LEAVE':
+                    color = 'green';
+                    value = '휴직 중';
+                    break;
+                case 'RESIGNED':
+                    color = 'orange';
+                    value = '퇴직';
+                    break;
+                default:
+                    color = 'gray'; // 기본 색상
+            }
+            return <Tag style={{marginLeft: '5px'}} color={color}>{value}</Tag>;
+        }},
     {
         title: <span>고용유형</span>,  // 컬럼 제목
         dataIndex: 'employmentType',  // 데이터 인덱스: 이 필드는 데이터 객체의 'employmentType' 속성과 연결됩니다.
