@@ -141,8 +141,6 @@ const EmployeeManagementPage = ({ initialData }) => {
     };
 
     const handleFormSubmit = async (values, type) => {
-        console.log('Form Values:', values); // 폼 값 확인
-        console.log('Employee Param:', employeeParam);
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
@@ -158,8 +156,8 @@ const EmployeeManagementPage = ({ initialData }) => {
                     firstName: firstName,
                     lastName: lastName,
                     phoneNumber: values.phoneNumber,
-                    employmentStatus: values.employmentStatus,
-                    employmentType: values.employmentType,
+                    employmentStatus: employeeParam.employmentStatus,
+                    employmentType: employeeParam.employmentType,
                     email: values.email,
                     address: values.address,
                     isHouseholdHead: employeeParam.isHouseholdHead, // 체크박스 값 처리
@@ -176,9 +174,16 @@ const EmployeeManagementPage = ({ initialData }) => {
                 };
                 console.log('Formatted Values:', formattedValues); // 최종 전송되는 값 확인
 
+                //FormData 객체 생성
+                const formData = new FormData();
+                formData.append("formattedValues", JSON.stringify(formattedValues));  // JSON으로 변환 후 추가
+                if (selectedFile) {  // 파일이 존재할 때만 추가
+                    formData.append("imageFile", selectedFile);
+                }
+
                 try {
                     const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_EMPLOYEE_DATA_API(employeeParam.id, formattedValues) : EMPLOYEE_API.SAVE_EMPLOYEE_DATA_API;
-                    const response = await apiClient.post(API_PATH, formattedValues, {
+                    const response = await apiClient.post(API_PATH, formData, {
                         headers: { 'Content-Type': 'application/json' },
                     });
                     const updatedData = response.data;
@@ -224,15 +229,10 @@ const EmployeeManagementPage = ({ initialData }) => {
         setDisplayValues({});
         form.resetFields();
         registrationForm.resetFields(); // 2탭 폼 초기화
-        registrationForm.setFieldValue('isActive', true);
+        registrationForm.setFieldValue('isHouseholdHead', true);
         setActiveTabKey(key);
     };
-    // FormData 객체 생성
-    //const formData = new FormData();
-    //formData.append("employeeData", JSON.stringify(employeeData));  // JSON으로 변환 후 추가
-    //if (selectedFile) {  // 파일이 존재할 때만 추가
-    //    formData.append("imageFile", selectedFile);
-    //}
+
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -298,7 +298,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
-                                                title: <div className="small-text">부서번호</div>,
+                                                title: <div className="title-text">부서번호</div>,
                                                 dataIndex: 'departmentCode',
                                                 key: 'departmentCode',
                                                 align: 'center',
@@ -331,14 +331,14 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 },
                                             },
                                             {
-                                                title: <div className="small-text">사원번호</div>,
+                                                title: <div className="title-text">사원번호</div>,
                                                 dataIndex: 'employeeNumber',
                                                 key: 'employeeNumber',
                                                 align: 'center',
                                                 render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
-                                                title: <div className="small-text">사원이름</div>,
+                                                title: <div className="title-text">사원이름</div>,
                                                 dataIndex: 'fullName',
                                                 key: 'fullName',
                                                 align: 'center',
@@ -349,7 +349,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 ),
                                             },
                                             {
-                                                title: <div className="small-text">고용상태</div>,
+                                                title: <div className="title-text">고용상태</div>,
                                                 dataIndex: 'employmentStatus',
                                                 key: 'employmentStatus',
                                                 align: 'center',
@@ -376,7 +376,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 },
                                             },
                                             {
-                                                title: <div className="small-text">고용유형</div>,
+                                                title: <div className="title-text">고용유형</div>,
                                                 dataIndex: 'employmentType',
                                                 key: 'employmentType',
                                                 align: 'center',
@@ -409,21 +409,21 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 },
                                             },
                                             {
-                                                title: <div className="small-text">직위</div>,
+                                                title: <div className="title-text">직위</div>,
                                                 dataIndex: 'positionName',
                                                 key: 'positionName',
                                                 align: 'center',
                                                 render: (text) => <div className={"small-text"}>{text}</div>,
                                             },
                                             {
-                                                title: <div className="small-text">직책</div>,
+                                                title: <div className="title-text">직책</div>,
                                                 dataIndex: 'titleName',
                                                 key: 'titleName',
                                                 align: 'center',
                                                 render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
-                                                title: <div className="small-text">이메일</div>,
+                                                title: <div className="title-text">이메일</div>,
                                                 dataIndex: 'email',
                                                 key: 'email',
                                                 align: 'center',
@@ -654,7 +654,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={4}>
-                                                    <Form.Item name="isActive" valuePropName="checked">
+                                                    <Form.Item name="isHouseholdHead" valuePropName="checked">
                                                         <Checkbox>세대주 여부</Checkbox>
                                                     </Form.Item>
                                                 </Col>
@@ -807,13 +807,11 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name="firstName" rules={[{ required: true, message: '성을 입력하세요.' }]}>
-                                                    <Input addonBefore="성" />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item name="lastName" rules={[{ required: true, message: '이름을 입력하세요.' }]}>
-                                                    <Input addonBefore="이름" />
+                                                <Form.Item
+                                                    name="fullName"
+                                                    rules={[{ required: true, message: '성명을 입력하세요.' }]}
+                                                >
+                                                    <Input addonBefore="성명" placeholder="성을 포함한 성명을 입력하세요" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
@@ -939,26 +937,43 @@ const EmployeeManagementPage = ({ initialData }) => {
                                         {/* 금융 정보 */}
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>금융 정보</Divider>
                                         <Row gutter={16}>
-                                            <Col span={6}>
-                                                <Form.Item name="bankAccountName" rules={[{ required: true, message: '은행명을 입력하세요.' }]}>
+                                            <Col span={4}>
+                                                <Form.Item>
                                                     <Input
                                                         addonBefore="은행명"
+                                                        value={displayValues.bank}
+                                                        onClick={() => handleInputClick('bank')}
+                                                        onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
-                                                <Form.Item name="bankAccountNumber" rules={[{ required: true, message: '계좌번호를 입력하세요.' }]}>
-                                                    <Input addonBefore="계좌번호" />
+                                            <Col span={12}>
+                                                <Form.Item name={['bankAccountDTO', 'accountNumber']} rules={[{ required: true, message: '계좌번호를 입력하세요.' }]}>
+                                                    <Input
+                                                        addonBefore="계좌번호"
+                                                        value={employeeParam.bankAccountDTO?.accountNumber || ''} // 계좌번호 입력 필드
+                                                        onChange={(e) => {
+                                                            const accountNumber = e.target.value;
+                                                            setEmployeeParam((prevParams) => ({
+                                                                ...prevParams,
+                                                                bankAccountDTO: {
+                                                                    ...prevParams.bankAccountDTO,
+                                                                    accountNumber: accountNumber, // 입력한 계좌번호 업데이트
+                                                                },
+                                                            }));
+                                                        }}
+                                                    />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={4}>
-                                                <Form.Item name="isActive" valuePropName="checked">
+                                                <Form.Item name="isHouseholdHead" valuePropName="checked">
                                                     <Checkbox>세대주 여부</Checkbox>
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                         {/* 이미지 업로드 */}
-                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>이미지 업로드</Divider>
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>[프로필 사진] 이미지 업로드</Divider>
                                         <Row gutter={16}>
                                             <Col span={12}>
                                                 <Form.Item name="imageFile">
