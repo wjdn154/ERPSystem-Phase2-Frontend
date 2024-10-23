@@ -3,7 +3,7 @@ import {Box, Grid, Typography} from '@mui/material';
 import WelcomeSection from '../../../components/WelcomeSection.jsx';
 import { tabItems } from './DashBoardUtil.jsx';
 
-const ProductionDashboardPage = ({ initialData }) => {
+const LogisticsDashboardPage = ({ initialData }) => {
     const [activeTabKey, setActiveTabKey] = useState('1');
 
     const handleTabChange = (key) => {
@@ -15,10 +15,10 @@ const ProductionDashboardPage = ({ initialData }) => {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <WelcomeSection
-                        title="생산관리 대시보드"
+                        title="물류관리 대시보드"
                         description={(
                             <Typography>
-                                생산관리 대시보드는 생산 프로세스를 효율적으로 관리하고 모니터링하는 데 사용됩니다.
+                                물류
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -31,7 +31,7 @@ const ProductionDashboardPage = ({ initialData }) => {
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12}>
-                        <Typography>생산관리 기본 콘텐츠입니다.</Typography>
+                        <Typography>물류관리 기본 콘텐츠입니다.</Typography>
                     </Grid>
                 </Grid>
             )}
@@ -39,7 +39,7 @@ const ProductionDashboardPage = ({ initialData }) => {
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12}>
-                        <Typography>다른 생산관리 탭의 콘텐츠입니다.</Typography>
+                        <Typography>다른 물류관리 탭의 콘텐츠입니다.</Typography>
                     </Grid>
                 </Grid>
             )}
@@ -47,4 +47,4 @@ const ProductionDashboardPage = ({ initialData }) => {
     );
 };
 
-export default ProductionDashboardPage;
+export default LogisticsDashboardPage;
