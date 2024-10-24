@@ -228,6 +228,7 @@ export const PRODUCTION_API = {
     PRODUCTION_REQUEST_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/delete/${id}`, // 생산 요청 삭제 API
 
     // 작업지시
+    MPS_LIST_API: `${API_BASE_URL}/api/production/mps/search`, // 전체 MPS 목록 조회 API
     SHIFT_TYPE_LIST_API: `${API_BASE_URL}/api/production/shiftType`, // 전체 교대유형 목록 조회 API
     SHIFT_TYPE_DETAIL_API: (id) => `${API_BASE_URL}/api/production/shiftType/${id}`, // 특정 교대유형 조회 API
     SHIFT_TYPE_CREATE_API: `${API_BASE_URL}/api/production/shiftType/new`, // 교대유형 생성 API
@@ -246,10 +247,12 @@ export const PRODUCTION_API = {
 
     PRODUCTION_ORDER_LIST_API: `${API_BASE_URL}/api/production/productionOrder`, // 전체 작업 지시 목록 조회 API
     PRODUCTION_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}`, // 특정 작업 지시 조회 API
-    PRODUCTION_ORDER_CREATE_API: `${API_BASE_URL}/api/production/productionOrder/create`, // 작업 지시 생성 API
+    PRODUCTION_ORDER_SAVE_API: `${API_BASE_URL}/api/production/productionOrder/save`, // 작업 지시 생성 API
     PRODUCTION_ORDER_ASSIGN_WORKERS_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}/assignWorkers`, // 작업 지시 작업자 배정 API
     PRODUCTION_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/production/productionOrder/update/${id}`, // 작업 지시 수정 API
     PRODUCTION_ORDER_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionOrder/delete/${id}`, // 작업 지시 삭제 API
+    PRODUCTION_ORDER_CLOSE_API: `${API_BASE_URL}/api/production/productionOrder/closure`, // 작업 지시 마감 API
+
 
     // 생산실적
 
