@@ -84,9 +84,6 @@ export const workcenterColumns = [
         title: <div className="title-text">생산공정</div>,
         key: 'process',
         render: (text, record) => {
-
-            console.log("Record 데이터:", record); // 데이터 확인
-
             const processCode = record.processCode;
             const processName = record.processName;
 

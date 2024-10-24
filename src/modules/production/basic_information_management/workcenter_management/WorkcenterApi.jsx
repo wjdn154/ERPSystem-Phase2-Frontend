@@ -7,7 +7,6 @@ import error from "eslint-plugin-react/lib/util/error.js";
 export const fetchWorkcenters = async () => {
     try {
         const response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API);
-        console.log("fetchWorkcenters 작업장목록 데이터:", response.data);
         return response.data;
     } catch (error) {
             console.error("작업장 목록 조회 중 오류 발생:", error);

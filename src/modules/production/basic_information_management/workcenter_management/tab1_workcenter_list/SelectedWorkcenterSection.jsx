@@ -185,7 +185,7 @@ const SelectedWorkcenterSection = ({
                         <Row gutter={16}>
                             <Col span={5}>
                                 <Form.Item name="code" rules={[{ required: true, message: '작업장 코드를 입력하세요.' }]}>
-                                    <Input addonBefore="작업장 코드" />
+                                    <Input addonBefore="작업장 코드"/>
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
@@ -198,6 +198,7 @@ const SelectedWorkcenterSection = ({
                                     <Space.Compact>
                                         <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="작업장유형" disabled />
                                         <Select
+                                            name="workcenterType"
                                             style={{ width: '60%' }}
                                             value={workcenterParam.workcenterType}
                                             onChange={(value) => {
@@ -207,16 +208,16 @@ const SelectedWorkcenterSection = ({
                                                 }));
                                             }}
                                         >
-                                            <Option value="Press">프레스</Option>
-                                            <Option value="Welding">용접</Option>
-                                            <Option value="Paint">도장</Option>
-                                            <Option value="Machining">정밀 가공</Option>
-                                            <Option value="Assembly">조립</Option>
-                                            <Option value="Quality Inspection">품질 검사</Option>
-                                            <Option value="Casting">주조</Option>
-                                            <Option value="Forging">단조</Option>
-                                            <Option value="Heat Treatment">열처리</Option>
-                                            <Option value="Plastic Molding">플라스틱 성형</Option>
+                                            <Select.Option value="Press">프레스</Select.Option>
+                                            <Select.Option value="Welding">용접</Select.Option>
+                                            <Select.Option value="Paint">도장</Select.Option>
+                                            <Select.Option value="Machining">정밀 가공</Select.Option>
+                                            <Select.Option value="Assembly">조립</Select.Option>
+                                            <Select.Option value="Quality Inspection">품질 검사</Select.Option>
+                                            <Select.Option value="Casting">주조</Select.Option>
+                                            <Select.Option value="Forging">단조</Select.Option>
+                                            <Select.Option value="Heat Treatment">열처리</Select.Option>
+                                            <Select.Option value="Plastic Molding">플라스틱 성형</Select.Option>
                                         </Select>
                                     </Space.Compact>
                                 </Form.Item>
@@ -230,7 +231,7 @@ const SelectedWorkcenterSection = ({
                         {/* 공장, 생산공정, 설비 등록 (모달 선택) */}
                         <Row gutter={16}>
                             <Col span={5}>
-                                <Form.Item>
+                                <Form.Item name="factoryName">
                                     <Input
                                         addonBefore="공장"
                                         placeholder="공장 선택"
@@ -242,7 +243,9 @@ const SelectedWorkcenterSection = ({
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item>
+                                <Form.Item
+                                    name="processName"
+                                >
                                     <Input
                                         addonBefore="생산공정"
                                         placeholder="생산공정 선택"
@@ -254,7 +257,9 @@ const SelectedWorkcenterSection = ({
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item>
+                                <Form.Item
+                                    name="modelNames"
+                                >
                                     <Input
                                         addonBefore="설비"
                                         placeholder="설비 선택"
