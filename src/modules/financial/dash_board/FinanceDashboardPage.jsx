@@ -6,17 +6,11 @@ import ReactECharts from 'echarts-for-react';
 import apiClient from "../../../config/apiClient.jsx";
 import axios from "axios";
 
-const S3_FILE_URL = process.env.AWS_S3_BASE_URL + '/data.json';
+const S3_FILE_URL = `${import.meta.env.VITE_AWS_S3_BASE_URL}/data.json`;
 
 const FinanceDashboardPage = ({ initialData }) => {
     const [activeTabKey, setActiveTabKey] = useState('1');
-    const [chartData, setChartData] = useState(
-        // financialStatementOption : null,
-        // salesExpenseReportOption : null,
-        // accountDetailsOption : null,
-        // receivablesPayablesOption : null,
-        // budgetVsActualOption : null
-    );
+    const [chartData, setChartData] = useState();
 
     const handleTabChange = (key) => {
         setActiveTabKey(key);
