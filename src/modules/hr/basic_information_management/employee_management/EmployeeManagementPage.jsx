@@ -10,6 +10,7 @@ import { useNotificationContext } from "../../../../config/NotificationContext.j
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 import defaultImage from "../../../../assets/img/uploads/defaultImage.png";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload.js";
+import {value} from "lodash/seq.js";
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -29,6 +30,7 @@ const EmployeeManagementPage = ({ initialData }) => {
     const [currentField, setCurrentField] = useState(''); // 모달 분기할 필드 상태
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
     const [departments, setDepartments] = useState([]); // 부서 데이터 상태
+    const [positions, setPositions] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
     const [displayValues, setDisplayValues] = useState({});
     const [initialModalData, setInitialModalData] = useState(null);
@@ -51,6 +53,21 @@ const EmployeeManagementPage = ({ initialData }) => {
         fetchDepartments(); // 컴포넌트 로드 시 부서 목록 가져오기
     }, []);
 
+    const fetchPositions = async () => {
+        try{
+            const response = await apiClient.post(EMPLOYEE_API.POSITION_DATA_API);
+            setPositions(response.data);
+        } catch(error){
+            notification.error({
+                message: '직위 목록 조회 실패',
+                description: '직위 목록을 불러오는 중 오류가 발생했습니다.',
+            })
+        }
+    }
+    useEffect(() => {
+        fetchPositions();
+    }, []);
+
     useEffect(() => {
         if (!fetchEmployeeData) return; // 선택된 사원 데이터가 없으면 종료
         console.log('Fetched Employee Data:', fetchEmployeeData); // Employee 데이터 확인
@@ -69,6 +86,7 @@ const EmployeeManagementPage = ({ initialData }) => {
             bank: fetchEmployeeData.bankAccountDTO
                 ? `[${fetchEmployeeData.bankAccountDTO.code.toString().padStart(5, '0')}] ${fetchEmployeeData.bankAccountDTO.name}`
                 : '은행 정보 없음', // 은행 정보가 없는 경우 처리
+            position:`[${fetchEmployeeData.positionCode}] ${fetchEmployeeData.positionName}`,
         });
     }, [fetchEmployeeData, form]);
 
@@ -91,6 +109,7 @@ const EmployeeManagementPage = ({ initialData }) => {
         let apiPath;
         if(fieldName === 'department') apiPath = EMPLOYEE_API.DEPARTMENT_DATA_API;
         if(fieldName === 'bank') apiPath = FINANCIAL_API.FETCH_BANK_LIST_API;
+        if(fieldName === 'position') apiPath = EMPLOYEE_API.POSITION_DATA_API;
 
         try {
             const response = await apiClient.post(apiPath);
@@ -118,6 +137,20 @@ const EmployeeManagementPage = ({ initialData }) => {
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 department: `[${record.departmentCode}] ${record.departmentName}`,
+            }));
+            break;
+            case 'position':
+                setEmployeeParam((prevParams) => ({
+                    ...prevParams,
+                    position: {
+                        id: record.id,
+                        positionCode: record.positionCode || '',
+                        positionName: record.positionName || '',
+                    },
+            }));
+            setDisplayValues((prevValues) => ({
+                ...prevValues,
+                position:`[${record.positionCode}] ${record.positionName}`,
             }));
             break;
             case 'bank':
@@ -160,19 +193,34 @@ const EmployeeManagementPage = ({ initialData }) => {
                     employmentType: employeeParam.employmentType,
                     email: values.email,
                     address: values.address,
-                    isHouseholdHead: employeeParam.isHouseholdHead, // 체크박스 값 처리
-                    profilePicture: values.profilePicture, // 프로필 URL
-                    departmentCode: employeeParam.departmentCode,
+                    householdHead: employeeParam.householdHead, // 체크박스 값 처리
+                    profilePicture: employeeParam.profilePicture, // 프로필 URL
+                    departmentId: employeeParam.departmentId,
                     departmentName: employeeParam.departmentName,
-                    positionName: values.positionName, // 직위 ID
-                    titleName: values.titleName, // 직책 ID
+                    departmentCode: employeeParam.departmentCode,
+                    positionId: employeeParam.positionId,
+                    positionCode: employeeParam.positionCode,
+                    positionName: employeeParam.positionName,
+                    titleId: employeeParam.titleId,
+                    titleName: values.titleName,
                     bankId: employeeParam.bankAccountDTO.bankId,
                     accountNumber: employeeParam.bankAccountDTO.accountNumber, // 입력된 계좌번호
                     name: employeeParam.bankAccountDTO.name,
                     code: employeeParam.bankAccountDTO.code,
 
                 };
-                console.log('Formatted Values:', formattedValues); // 최종 전송되는 값 확인
+                // console.log(" sss:"  +values);
+                // console.log(values);
+                // if(type === 'register'){
+                //     formattedValues = {
+                //         ...formattedValues,
+                //         registrationNumber: values.registrationNumber,
+                //         hireDate: values.hireDate,
+                //         departmentId: values.departmentId,
+                //         positionId: values.positionId,
+                //         jobTitleId: values.jobTitleId,
+                //     }
+                // }
 
                 //FormData 객체 생성
                 const formData = new FormData();
@@ -182,12 +230,12 @@ const EmployeeManagementPage = ({ initialData }) => {
                 }
 
                 try {
-                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_EMPLOYEE_DATA_API(employeeParam.id, formattedValues) : EMPLOYEE_API.SAVE_EMPLOYEE_DATA_API;
-                    const response = await apiClient.post(API_PATH, formData, {
-                        headers: { 'Content-Type': 'application/json' },
+                    console.log(formattedValues);
+                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_EMPLOYEE_DATA_API(employeeParam.id ) : EMPLOYEE_API.SAVE_EMPLOYEE_DATA_API;
+                    const response = await apiClient.post(API_PATH,formData,{
+                         headers: { 'Content-Type': 'multipart/form-data' },
                     });
                     const updatedData = response.data;
-                    console.log(updatedData);
 
                     if (type === 'update') {
                         setEmployeeList((prevList) =>
@@ -472,39 +520,75 @@ const EmployeeManagementPage = ({ initialData }) => {
                                             form={form}
                                             onFinish={(values) => { handleFormSubmit(values, 'update'); }}
                                         >
+
                                             {/* 기본 정보 */}
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>기본 정보</Divider>
-                                            <Row gutter={16}>
-                                                <Col span={6}>
-                                                    <Form.Item name="hireDate" rules={[{ required: true, message: '입사 일자를 입력하세요.' }]}>
-                                                        <Input addonBefore="입사 일자"
-                                                        disabled={'hireDate'}/>
+                                            <Row gutter={8}>
+                                                <Col span={3.5}>
+                                                    <Form.Item>
+                                                        <div style={{ marginBottom: '1px' }}>
+                                                            <img
+                                                                src={selectedFile
+                                                                    ? URL.createObjectURL(selectedFile)
+                                                                    : fetchEmployeeData?.profilePicture
+                                                                        ? fetchEmployeeData?.profilePicture
+                                                                        : '/src/assets/img/uploads/defaultImage.png'}
+                                                                alt="미리보기 이미지"
+                                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                            />
+                                                        </div>
                                                     </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="employeeNumber" rules={[{ required: true, message: '사원번호를 입력하세요.' }]}>
-                                                        <Input addonBefore="사원번호"
-                                                        disabled={'employeeNumber'}/>
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="employeeName" rules={[{ required: true, message: '성명을 입력하세요.' }]}>
-                                                        <Input
-                                                            addonBefore="성명"
-                                                            onChange={(e) => {
-                                                                const [lastName = '', firstName = ''] = e.target.value.split(' ');
-                                                                form.setFieldsValue({ lastName, firstName });
+
+                                                    <Form.Item name="imageFile">
+                                                        <Upload
+                                                            beforeUpload={() => false}
+                                                            onChange={(info) => {
+                                                                const file = info.fileList[info.fileList.length - 1]?.originFileObj;
+                                                                setSelectedFile(file);
                                                             }}
-                                                        />
+                                                            fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []}
+                                                        >
+                                                            <Button icon={<CloudUploadIcon />}>파일 선택</Button>
+                                                        </Upload>
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="dateOfBirth" rules={[{ required: true, message: '생년월일을 입력하세요.' }]}>
-                                                        <Input addonBefore="생년월일"
-                                                        disabled={'dateOfBirth'}/>
-                                                    </Form.Item>
+
+                                                {/* 나머지 입력 필드를 2개씩 위아래로 배치 */}
+                                                <Col span={18}>
+                                                    <Row gutter={18} style={{ marginTop: '10px' }}> {/* 두 번째 줄 */}
+                                                        <Col span={12}>
+                                                            <Form.Item name="employeeName" rules={[{ required: true, message: '성명을 입력하세요.' }]}>
+                                                                <Input
+                                                                    addonBefore="성명"
+                                                                    onChange={(e) => {
+                                                                        const [lastName = '', firstName = ''] = e.target.value.split(' ');
+                                                                        form.setFieldsValue({ lastName, firstName });
+                                                                    }}
+                                                                />
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col span={12}>
+                                                            <Form.Item name="registrationNumber" rules={[{ required: true, message: '생년월일을 입력하세요.' }]}>
+                                                                <Input addonBefore="주민등록번호" disabled={'registrationNumber'}/>
+                                                            </Form.Item>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row gutter={18}>
+                                                        <Col span={12}>
+                                                            <Form.Item name="hireDate" rules={[{ required: true, message: '입사일자를 입력하세요.' }]}>
+                                                                <Input addonBefore="입사일자" disabled={'hireDate'}/>
+                                                            </Form.Item>
+                                                        </Col>
+                                                        <Col span={12}>
+                                                            <Form.Item name="employeeNumber">
+                                                                <Input addonAfter="사원번호" disabled={'employeeNumber'} placeholder ="입사일자에 맞춰 사원번호 자동 지정"/>
+                                                            </Form.Item>
+                                                        </Col>
+                                                    </Row>
+
                                                 </Col>
                                             </Row>
+                                            <Divider />
                                             {/* 연락처 정보 */}
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
                                                 연락처 정보
@@ -558,13 +642,19 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                             </Select>
                                                         </Space.Compact>
                                                     </Form.Item>
-
                                                 </Col>
-                                                <Col span={12}>
-                                                    <Form.Item name="positionName" rules={[{ required: true, message: '직위를 입력하세요.' }]}>
-                                                        <Input addonBefore="직위" />
+                                                <Col span={4}>
+                                                    <Form.Item>
+                                                        <Input
+                                                            addonBefore="직위"
+                                                            value={displayValues.position}
+                                                            onClick={() => handleInputClick('position')}
+                                                            onFocus={(e) => e.target.blur()}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
                                                     </Form.Item>
                                                 </Col>
+
                                                 <Col span={12}>
                                                     <Form.Item name="titleName" rules={[{ required: true, message: '직책을 입력하세요.' }]}>
                                                         <Input addonBefore="직책" />
@@ -659,39 +749,6 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-                                            {/* 이미지 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>이미지</Divider>
-                                            <Row gutter={16}>
-                                                <Col span={12}>
-                                                    <Form.Item>
-                                                        <div style={{ marginBottom: '20px' }}>
-                                                            <img
-                                                                src={selectedFile
-                                                                    ? URL.createObjectURL(selectedFile)
-                                                                    : fetchEmployeeData?.imagePath
-                                                                        ? fetchEmployeeData?.imagePath
-                                                                        : '/src/img/uploads/defaultImage.png'}
-                                                                alt="미리보기 이미지"
-                                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                                                            />
-                                                        </div>
-                                                    </Form.Item>
-
-                                                    <Form.Item name="imageFile">
-                                                        <Upload
-                                                            beforeUpload={() => false}
-                                                            onChange={(info) => {
-                                                                const file = info.fileList[info.fileList.length - 1]?.originFileObj;
-                                                                setSelectedFile(file);
-                                                            }}
-                                                            fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []}
-                                                        >
-                                                            <Button icon={<CloudUploadIcon />}>파일 선택</Button>
-                                                        </Upload>
-                                                    </Form.Item>
-                                                </Col>
-                                            </Row>
-                                            <Divider />
                                             {/* 저장 버튼 */}
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                                 <Button type="primary" htmlType="submit">
@@ -768,6 +825,65 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                             )}
                                                         </>
                                                     )}
+                                                    {currentField === 'position' && (
+                                                        <>
+                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                직위 선택
+                                                            </Typography>
+                                                            <Input
+                                                                placeholder="검색"
+                                                                prefix={<SearchOutlined />}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                    if (!value) {
+                                                                        setModalData(initialModalData);
+                                                                    } else {
+                                                                        const filtered = initialModalData.filter((item) => {
+                                                                            return (
+                                                                                (item.positionCode && item.positionCode.toLowerCase().includes(value)) ||
+                                                                                (item.positionName && item.name.toLowerCase().includes(value))
+                                                                            );
+                                                                        });
+                                                                        setModalData(filtered);
+                                                                    }
+                                                                }}
+                                                                style={{ marginBottom: 16 }}
+                                                            />
+                                                            {modalData && (
+                                                                <Table
+                                                                    columns={[
+                                                                        {
+                                                                            title: <div className="title-text">직위코드</div>,
+                                                                            dataIndex: 'positionCode',
+                                                                            key: 'positionCode',
+                                                                            align: 'center',
+                                                                            render: (text) => <div className="small-text">{text}</div>
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">직위명</div>,
+                                                                            dataIndex: 'positionName',
+                                                                            key: 'positionName',
+                                                                            align: 'center',
+                                                                            render: (text) => <div className="small-text">{text}</div>
+                                                                        },
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="positionCode"
+                                                                    size={'small'}
+                                                                    pagination={{
+                                                                        pageSize: 15,
+                                                                        position: ['bottomCenter'],
+                                                                        showSizeChanger: false,
+                                                                        showTotal: (total) => `총 ${total}개`,
+                                                                    }}
+                                                                    onRow={(record) => ({
+                                                                        style: { cursor: 'pointer' },
+                                                                        onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                    })}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
 
                                                     <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
                                                         <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
@@ -795,34 +911,76 @@ const EmployeeManagementPage = ({ initialData }) => {
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form
                                         layout="vertical"
-                                        onFinish={(values) => { handleFormSubmit(values, 'register') }}
+                                        onFinish={(values) => {
+                                            console.log("values : " +values);
+                                            handleFormSubmit(values, 'register') }}
                                         form={registrationForm}
                                     >
                                         {/* 기본 정보 */}
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>기본 정보</Divider>
-                                        <Row gutter={16}>
-                                            <Col span={6}>
-                                                <Form.Item name="hireDate" rules={[{ required: true, message: '입사 일자를 입력하세요.' }]}>
-                                                    <Input addonBefore="입사 일자" />
+                                        <Row gutter={8}>
+                                            <Col span={3.5}>
+                                                <Form.Item>
+                                                    <div style={{ marginBottom: '1px' }}>
+                                                        <img
+                                                            src={selectedFile
+                                                                ? URL.createObjectURL(selectedFile)
+                                                                : fetchEmployeeData?.profilePicture
+                                                                    ? fetchEmployeeData?.profilePicture
+                                                                    : '/src/assets/img/uploads/defaultImage.png'}
+                                                            alt="미리보기 이미지"
+                                                            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                        />
+                                                    </div>
+                                                </Form.Item>
+
+                                                <Form.Item name="imageFile">
+                                                    <Upload
+                                                        beforeUpload={() => false}
+                                                        onChange={(info) => {
+                                                            const file = info.fileList[info.fileList.length - 1]?.originFileObj;
+                                                            setSelectedFile(file);
+                                                        }}
+                                                        fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []}
+                                                    >
+                                                        <Button icon={<CloudUploadIcon />}>파일 선택</Button>
+                                                    </Upload>
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
-                                                <Form.Item
-                                                    name="fullName"
-                                                    rules={[{ required: true, message: '성명을 입력하세요.' }]}
-                                                >
-                                                    <Input addonBefore="성명" placeholder="성을 포함한 성명을 입력하세요" />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item name="dateOfBirth" rules={[{ required: true, message: '생년월일을 입력하세요.' }]}>
-                                                    <Input addonBefore="생년월일" />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={6}>
-                                                <Form.Item name="profilePicture" rules={[{ required: true, message: '프로필 사진을 입력하세요.' }]}>
-                                                    <Input addonBefore="프로필 사진" />
-                                                </Form.Item>
+
+                                            {/* 나머지 입력 필드를 2개씩 위아래로 배치 */}
+                                            <Col span={18}>
+                                                <Row gutter={18} style={{ marginTop: '10px' }}> {/* 두 번째 줄 */}
+                                                    <Col span={12}>
+                                                        <Form.Item name="employeeName" rules={[{ required: true, message: '성명을 입력하세요.' }]}>
+                                                            <Input
+                                                                addonBefore="성명"
+                                                                onChange={(e) => {
+                                                                    const [lastName = '', firstName = ''] = e.target.value.split(' ');
+                                                                    form.setFieldsValue({ lastName, firstName });
+                                                                }}
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col span={12}>
+                                                        <Form.Item name="registrationNumber" rules={[{ required: true, message: '주민등록번호를 입력하세요.' }]}>
+                                                            <Input addonBefore="주민등록번호"/>
+                                                        </Form.Item>
+                                                    </Col>
+                                                </Row>
+                                                <Row gutter={18}>
+                                                    <Col span={12}>
+                                                        <Form.Item name="hireDate" rules={[{ required: true, message: '입사일자를 입력하세요.' }]}>
+                                                            <Input addonBefore="입사일자"/>
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col span={12}>
+                                                        <Form.Item name="employeeNumber">
+                                                            <Input addonBefore="사원번호" disabled={'employeeNumber'} placeholder ="입사일자에 맞춰 사원번호 지정"/>
+                                                        </Form.Item>
+                                                    </Col>
+                                                </Row>
+
                                             </Col>
                                         </Row>
                                         {/* 연락처 정보 */}
@@ -972,32 +1130,32 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                        {/* 이미지 업로드 */}
-                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>[프로필 사진] 이미지 업로드</Divider>
-                                        <Row gutter={16}>
-                                            <Col span={12}>
-                                                <Form.Item name="imageFile">
-                                                    {/* 이미지 미리보기 */}
-                                                    <div style={{ marginBottom: '20px' }}>
-                                                        <img
-                                                            src={selectedFile ? URL.createObjectURL(selectedFile) : defaultImage}
-                                                            alt="미리보기 이미지"
-                                                            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                                                        />
-                                                    </div>
-                                                    <Upload
-                                                        beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
-                                                        onChange={(info) => {
-                                                            const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
-                                                            setSelectedFile(file); // 선택된 파일을 상태로 설정
-                                                        }}
-                                                        fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []} // 파일 리스트 설정
-                                                    >
-                                                        <Button icon={<CloudUploadIcon />}>파일 선택</Button>
-                                                    </Upload>
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
+                                        {/*/!* 이미지 업로드 *!/*/}
+                                        {/*<Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>[프로필 사진] 이미지 업로드</Divider>*/}
+                                        {/*<Row gutter={16}>*/}
+                                        {/*    <Col span={12}>*/}
+                                        {/*        <Form.Item name="imageFile">*/}
+                                        {/*            /!* 이미지 미리보기 *!/*/}
+                                        {/*            <div style={{ marginBottom: '20px' }}>*/}
+                                        {/*                <img*/}
+                                        {/*                    src={selectedFile ? URL.createObjectURL(selectedFile) : defaultImage}*/}
+                                        {/*                    alt="미리보기 이미지"*/}
+                                        {/*                    style={{ width: '100px', height: '100px', objectFit: 'cover' }}*/}
+                                        {/*                />*/}
+                                        {/*            </div>*/}
+                                        {/*            <Upload*/}
+                                        {/*                beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환*/}
+                                        {/*                onChange={(info) => {*/}
+                                        {/*                    const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용*/}
+                                        {/*                    setSelectedFile(file); // 선택된 파일을 상태로 설정*/}
+                                        {/*                }}*/}
+                                        {/*                fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []} // 파일 리스트 설정*/}
+                                        {/*            >*/}
+                                        {/*                <Button icon={<CloudUploadIcon />}>파일 선택</Button>*/}
+                                        {/*            </Upload>*/}
+                                        {/*        </Form.Item>*/}
+                                        {/*    </Col>*/}
+                                        {/*</Row>*/}
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                             <Button type="primary" htmlType="submit">
                                                 저장
@@ -1014,29 +1172,6 @@ const EmployeeManagementPage = ({ initialData }) => {
                                             <Spin />  // 로딩 스피너
                                         ) : (
                                             <>
-                                                {currentField === 'department' && (
-                                                    <>
-                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                                            부서 선택
-                                                        </Typography>
-                                                        {modalData && (
-                                                            <Table
-                                                                columns={[
-                                                                    { title: '부서코드', dataIndex: 'departmentCode', key: 'departmentCode', align: 'center', render: (text) => <div className="small-text">{text}</div> },
-                                                                    { title: '부서명', dataIndex: 'departmentName', key: 'departmentName', align: 'center', render: (text) => <div className="small-text">{text}</div> },
-                                                                ]}
-                                                                dataSource={modalData}
-                                                                rowKey="departmentCode"
-                                                                size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                                                onRow={(record) => ({
-                                                                    style: { cursor: 'pointer' },
-                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                                })}
-                                                            />
-                                                        )}
-                                                    </>
-                                                )}
                                                 {currentField === 'bank' && (
                                                     <>
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
