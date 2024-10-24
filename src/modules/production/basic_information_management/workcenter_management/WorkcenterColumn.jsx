@@ -91,11 +91,11 @@ export const workcenterColumns = [
         title: <div className="title-text">생산공정</div>,
         key: 'process',
         render: (text, record) => {
-            const { processCode, processName } = record;
+            const { code, name } = record;
 
             // 코드와 공장명 둘 다 있는 경우 조합
-            if (processCode && processName) {
-                return `[${processCode}] ${processName}`;
+            if (code && name) {
+                return `[${code}] ${name}`;
             }
 
             // 값이 없는 경우 대체 텍스트
