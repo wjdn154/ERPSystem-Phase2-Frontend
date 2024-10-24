@@ -167,8 +167,8 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                     console.error("작업장 정보 조회 실패:", error);
                                                     notify('error', '조회 오류', '작업장 정보 조회 중 오류가 발생했습니다.', 'top');
                                                 }
-                                                console.log('handleSelectedRow(record):', record);
-                                                handleSelectedRow(record); // 행 클릭 시 해당 작업장 선택
+                                                console.log('handleSelectedRow(record):', JSON.stringify(record, null, 2));                                                // handleSelectedRow(record); // 행 클릭 시 해당 작업장 선택
+                                                handleFormSubmit(record);
                                             },
                                         })}
                                     />

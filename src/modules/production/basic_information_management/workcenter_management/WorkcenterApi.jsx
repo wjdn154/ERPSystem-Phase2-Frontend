@@ -1,35 +1,17 @@
 import axios from 'axios';
 import { PRODUCTION_API } from '../../../../config/apiConstants.jsx';
 import apiClient from "../../../../config/apiClient.jsx";
-
-// 작업장 목록 조회 함수
-// export const fetchWorkcenters = async () => {
-//     try {
-//         const response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API);
-//         console.log("작업장목록 데이터:", response.data); // 응답 데이터 확인용 로그
-//         return response.data;
-//     } catch (error) {
-//         console.error("작업장 정보를 가져오는 중 오류 발생:", error);
-//         throw error;
-//     }
-// };
+import error from "eslint-plugin-react/lib/util/error.js";
 
 // 작업장 목록 조회 함수
 export const fetchWorkcenters = async () => {
     try {
         const response = await apiClient.post(PRODUCTION_API.WORKCENTER_LIST_API);
-        console.log("새 작업장목록 데이터:", response.data);
-
-        // 설비 모델명만 반환 (콤마로 구분)
-        const formattedData = response.data.map((workcenter) => ({
-            ...workcenter,
-            equipmentModels: workcenter.modelNames.join(', '),
-        }));
-
-        return formattedData;
+        console.log("fetchWorkcenters 작업장목록 데이터:", response.data);
+        return response.data;
     } catch (error) {
-        console.error("작업장 정보를 가져오는 중 오류 발생:", error);
-        throw error;
+            console.error("작업장 목록 조회 중 오류 발생:", error);
+            throw error;
     }
 };
 

@@ -180,7 +180,7 @@ const SelectedWorkcenterSection = ({
                     <Form
                         initialValues={workcenter}
                         form={form}
-                        onClick={(values) => { handleFormSubmit(values, 'update') }}
+                        onFinish={(values) => { handleFormSubmit(values, 'update') }}
                     >
                         <Row gutter={16}>
                             <Col span={5}>
@@ -278,7 +278,7 @@ const SelectedWorkcenterSection = ({
                             <Col span={15}>
                                 <Form.Item>
                                     <Table
-                                        dataSource={fetchWorkerAssignments.workers}
+                                        // dataSource={fetchWorkerAssignments.workers}
                                         columns={[
                                             {
                                                 title: <div className="title-text">작업지시</div>,
