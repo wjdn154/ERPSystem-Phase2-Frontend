@@ -7,7 +7,7 @@ import {
     createProcessDetail,
     searchProcessDetails,
 } from './ProcessDetailsApi.jsx';
-import { filterProcessDetails  } from '../../../production/basic_information_management/process_details_management/ProcessDetailsUtil.jsx';
+import { filterProcessDetails  } from './ProcessDetailsUtil.jsx';
 
 import {Modal} from "antd";
 

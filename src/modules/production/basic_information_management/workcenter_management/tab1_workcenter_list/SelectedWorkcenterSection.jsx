@@ -256,7 +256,11 @@ const SelectedWorkcenterSection = ({
                     <Form
                         initialValues={workcenter}
                         form={form}
-                        onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                        // onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                        onFinish={(values) => {
+                            console.log('Form 제출 값:', values);  // 폼 데이터 확인
+                            handleFormSubmit(values, 'update');
+                        }}
                     >
                         <Row gutter={16}>
                             <Col span={5}>
@@ -402,9 +406,9 @@ const SelectedWorkcenterSection = ({
                             <Button type="primary" htmlType="submit">
                             저장
                             </Button>
-                            <Button onClick={handleDelete} style={{ marginLeft: '10px' }} danger>
-                            삭제
-                            </Button>
+                            {/*<Button onClick={handleDelete} style={{ marginLeft: '10px' }} danger>*/}
+                            {/*삭제*/}
+                            {/*</Button>*/}
                         </Box>
                         {/* 모달창 */}
                         <Modal
