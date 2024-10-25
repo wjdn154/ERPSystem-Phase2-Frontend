@@ -299,7 +299,7 @@ const ProductManagementPage = ( {initialData} ) => {
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
-
+        console.log('values: ', values)
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
@@ -722,7 +722,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                     ? URL.createObjectURL(selectedFile)
                                                                     : detailProductData?.imagePath
                                                                         ? detailProductData?.imagePath
-                                                                        : '/src/img/uploads/defaultImage.png'}
+                                                                        : '/src/assets/img/uploads/defaultImage.png'}
                                                                 alt="미리보기 이미지"
                                                                 style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                                             />
