@@ -160,7 +160,7 @@ const MonthlyWorkReportPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important' }}>
+                    <Grid item xs={12} md={11} sx={{ minWidth: '1000px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }}>생산월보 조회</Typography>
@@ -270,6 +270,7 @@ const MonthlyWorkReportPage = () => {
                                             },
                                             ...dynamicColumns]}
                                         scroll={{ x: 'max-content' }}
+                                        size={ 'small'}
                                         pagination={ false }
                                         bordered={ true }
                                         style={{ marginTop: '20px', marginBottom: '50px' }}
