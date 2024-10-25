@@ -293,7 +293,7 @@ export const subMenuItems = {
         {
             text: '작업 지시 관리',
             items: [
-                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.SHIFT_TYPE_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
+                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
                 { text: '작업 지시 관리', component: 'ProductionOrderPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
                 { text: '작업배정이력 관리', component: 'AssignmentHistoryPage', apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_MONTHLY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
             ]
