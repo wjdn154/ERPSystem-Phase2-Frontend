@@ -144,47 +144,43 @@ const EquipmentDataPage = ({initialData}) => {
             {/* 설비정보 리스트 영역 */}
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={9} md={9}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <EquipmentDataListSection
-                                    columns={equipmentDataListColumn}
-                                    data={data}
-                                    equipmentDataDetail={equipmentDataDetail}
-                                    setEquipmentDataDetail={setEquipmentDataDetail}
-                                    handleRowSelection={handleRowSelection}
-                                    handleSelectedRow={handleSelectedRow}
-                                    insertEquipmentModal={insertEquipmentModal}
-                                    handleInsertOk={handleInsertOk}
-                                    handleInsertCancel={handleInsertCancel}
-                                    isInsertModalVisible={isInsertModalVisible}
-                                    handleInputChange={handleInputChange}
-                                    handleOpenInsertModal={handleOpenInsertModal}
+                            <EquipmentDataListSection
+                                columns={equipmentDataListColumn}
+                                data={data}
+                                equipmentDataDetail={equipmentDataDetail}
+                                setEquipmentDataDetail={setEquipmentDataDetail}
+                                handleRowSelection={handleRowSelection}
+                                handleSelectedRow={handleSelectedRow}
+                                insertEquipmentModal={insertEquipmentModal}
+                                handleInsertOk={handleInsertOk}
+                                handleInsertCancel={handleInsertCancel}
+                                isInsertModalVisible={isInsertModalVisible}
+                                handleInputChange={handleInputChange}
+                                handleOpenInsertModal={handleOpenInsertModal}
 
-                                />
-                            </div>
+                            />
                         </Grow>
                     </Grid>
-                        <Grid item xs={9} md={9}>
-                            {equipmentDataDetail && (
-                                <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
-                                    <div>
-                                        <EquipmentDataDetailSection
-                                            data={data}
-                                            equipmentDataDetail={equipmentDataDetail}
-                                            handleInputChange={handleInputChange}
-                                            setEquipmentDataDetail={setEquipmentDataDetail}
-                                            handleDelete={handleDelete}
-                                            isUpdateModalVisible={isUpdateModalVisible}
-                                            showModal={showModal}
-                                            handleUpdateOk={handleUpdateOk}
-                                            handleUpdateCancel={handleUpdateCancel}
-                                            handleCostInput={handleCostInput}
-                                            handleUpdate={handleUpdate}
-                                        />
-                                    </div>
-                                </Grow>
-                            )}
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                        {equipmentDataDetail && (
+                            <Grow in={showDetail} timeout={200} key={equipmentDataDetail.id}>
+                                <EquipmentDataDetailSection
+                                    data={data}
+                                    equipmentDataDetail={equipmentDataDetail}
+                                    handleInputChange={handleInputChange}
+                                    setEquipmentDataDetail={setEquipmentDataDetail}
+                                    handleDelete={handleDelete}
+                                    isUpdateModalVisible={isUpdateModalVisible}
+                                    showModal={showModal}
+                                    handleUpdateOk={handleUpdateOk}
+                                    handleUpdateCancel={handleUpdateCancel}
+                                    handleCostInput={handleCostInput}
+                                    handleUpdate={handleUpdate}
+                                />
+                            </Grow>
+                        )}
                         </Grid>
                     </Grid>
             )}
