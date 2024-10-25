@@ -30,7 +30,6 @@ const SelectedWorkcenterSection = ({
                                      handleSave,
                                      handleDeleteWorkcenter,
                                        handleWorkcenterTypeChange,
-                                       fetchWorkerAssignments,
                                    }) => {
 
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
@@ -48,7 +47,7 @@ const SelectedWorkcenterSection = ({
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [fetchWorkcenterData, setFetchWorkcenterData] = useState(false); // 거래처 조회한 정보 상태
     const [workcenterParam, setWorkcenterParam] = useState(false); // 수정 할 거래처 정보 상태
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
+    const [workerAssignments, setWorkerAssignments] = useState([]); // 초기값 빈 배열
 
 
     // selected 로
@@ -68,10 +67,30 @@ const SelectedWorkcenterSection = ({
 
                 // 표시할 값 설정
                 setDisplayValues({
-                    workcenterType: fetchedWorkcenter.workcenterType,
-                    factory: fetchedWorkcenter.factory?.factoryName || '미등록',
-                    process: `[${fetchedWorkcenter.process?.processCode.toString().padStart(5, '0')}] ${fetchedWorkcenter.process?.processName || '미등록'}`,
-                    equipment: `[${fetchedWorkcenter.equipment?.equipmentNum.toString().padStart(5, '0')}] ${fetchedWorkcenter.equipment?.equipmentName || '미등록'}`,
+                    workcenterType: fetchedWorkcenter.workcenterType || '미등록',  // 작업장 유형
+
+                    factory: fetchedWorkcenter.factoryCode && fetchedWorkcenter.factoryName
+                        ? `[${String(fetchedWorkcenter.factoryCode).padStart(5, '0')}] ${fetchedWorkcenter.factoryName}`
+                        : '미등록',  // 공정 정보
+                    process: fetchedWorkcenter.processCode && fetchedWorkcenter.processName
+                        ? `[${String(fetchedWorkcenter.processCode).padStart(5, '0')}] ${fetchedWorkcenter.processName}`
+                        : '미등록',  // 공정 정보
+
+                    // 설비 정보가 여러 개일 경우 쉼표로 구분해서 표시
+                    equipment: fetchedWorkcenter.equipmentNames && fetchedWorkcenter.equipmentNames.length > 0
+                        ? fetchedWorkcenter.equipmentNames.join(', ')
+                        : '미등록',
+
+                    // 모델명도 여러 개일 경우 쉼표로 구분해서 표시
+                    models: fetchedWorkcenter.modelNames && fetchedWorkcenter.modelNames.length > 0
+                        ? fetchedWorkcenter.modelNames.join(', ')
+                        : '미등록',
+
+                    // 오늘 작업자 수와 작업자 이름들을 처리
+                    todayWorkerCount: fetchedWorkcenter.todayWorkerCount || '0명',
+                    todayWorkers: fetchedWorkcenter.todayWorkers && fetchedWorkcenter.todayWorkers.length > 0
+                        ? fetchedWorkcenter.todayWorkers.join(', ')
+                        : '배정된 작업자 없음',
                 });
             } catch (error) {
                 console.error('작업장 데이터 가져오기 실패:', error);
@@ -81,9 +100,41 @@ const SelectedWorkcenterSection = ({
         fetchWorkcenterData(); // 비동기 데이터 호출 함수 실행
     }, [workcenter, form]);
 
+    const fetchWorkerAssignments = async (workcenterCode) => {
+        try {
+            const response = await apiClient.post(PRODUCTION_API.WORKER_ASSIGNMENT_WORKCENTER_DETAIL_API(workcenterCode));
+
+            if (response.status === 200) {
+                setWorkerAssignments(response.data);
+            } else {
+                console.warn('fetchWorkerAssignments API 응답 오류: ', response.data);
+                setWorkerAssignments([]); // 비정상 응답 시 빈 배열 설정
+            }
+
+        } catch (error) {
+            console.error('작업장별 작업자 배정 조회 오류:', error);
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+            setWorkerAssignments([]); // 오류 발생 시 빈 배열 설정
+
+        }
+    }
+
+    // 작업장 코드가 변경될 때마다 작업자 배정 데이터 가져오기
+    useEffect(() => {
+        if (workcenter && workcenter.code) {
+            fetchWorkerAssignments(workcenter.code); // 작업장 코드로 데이터 로드
+        }
+    }, [workcenter]);
+
+    useEffect(() => {
+        console.log('workerAssignments 상태:', workerAssignments);
+    }, [workerAssignments]);
+
+
 
     // 모달창 선택 핸들러
     const handleModalSelect = (record) => {
+        let updatedDisplayValues = { ...displayValues };
 
         // 모달 창 마다가 formattedvalue, setclient param 설정 값이 다름
         switch (currentField) {
@@ -100,6 +151,7 @@ const SelectedWorkcenterSection = ({
                     ...prevValues,
                     factory: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
                 }));
+                form.setFieldsValue({ factoryName: record.name });
                 break;
             case 'process':
                 setWorkcenterParam((prevParams) => ({
@@ -114,6 +166,7 @@ const SelectedWorkcenterSection = ({
                     ...prevValues,
                     process: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
                 }));
+                form.setFieldsValue({ processName: record.name });
                 break;
             case 'equipment':
                 setWorkcenterParam((prevParams) => ({
@@ -129,8 +182,11 @@ const SelectedWorkcenterSection = ({
                     ...prevValues,
                     equipment: `[${record.equipmentNum.toString().padStart(5, '0')}] ${record.equipmentName}`,
                 }));
+                form.setFieldsValue({ equipmentName: `[${record.equipmentNum.toString().padStart(5, '0')}] ${record.equipmentName}`,});
                 break;
         }
+        setDisplayValues(updatedDisplayValues); // 상태 업데이트
+
         // 모달창 닫기
         setIsModalVisible(false);
     };
@@ -151,49 +207,36 @@ const SelectedWorkcenterSection = ({
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
         let apiPath;
-        // if (fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
-        if(fieldName === 'process') apiPath = PRODUCTION_API.SEARCH_FACTORIES_API;
+        if (fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
+        // if(fieldName === 'process') apiPath = PRODUCTION_API.SEARCH_FACTORIES_API;
         if(fieldName === 'process') apiPath = PRODUCTION_API.PROCESS_LIST_API;
         if(fieldName === 'equipment') apiPath = PRODUCTION_API.EQUIPMENT_DATA_API;
 
         try {
             const response = await apiClient.post(apiPath);
-            setModalData(response.data);
-            setInitialModalData(response.data);
-            console.log('response.data', response.data);
+            console.log('API 응답 데이터:', response.data);  // 응답 데이터 확인
+
+            let resultData;
+            // 공장 데이터만 필터링 적용
+            if (fieldName === 'factory') {
+                resultData = response.data.filter(
+                    (item) => item.warehouseType === 'FACTORY' || item.warehouseType === 'OUTSOURCING_FACTORY'
+                );
+            }
+
+            console.log('최종 데이터:', resultData);  // 최종 데이터 확인
+
+
+            setModalData(resultData);
+            setInitialModalData(resultData);
+
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+            console.error('공장 데이터 조회 실패:', error);
+
         } finally {
             setIsLoading(false);
         }
-    };
-
-    // 작업장 유형을 한국어로 매핑하는 함수
-    const typeToKorean = {
-        Press: '프레스',
-        Welding: '용접',
-        Paint: '도장',
-        Machining: '정밀 가공',
-        Assembly: '조립',
-        'Quality Inspection': '품질 검사',
-        Casting: '주조',
-        Forging: '단조',
-        'Heat Treatment': '열처리',
-        'Plastic Molding': '플라스틱 성형'
-    };
-
-    // 작업장 유형을 영어로 매핑하는 함수 (드롭다운 선택 후 원래 값으로 되돌릴 때 사용)
-    const koreanToType = {
-        '프레스': 'Press',
-        '용접': 'Welding',
-        '도장': 'Paint',
-        '정밀 가공': 'Machining',
-        '조립': 'Assembly',
-        '품질 검사': 'Quality Inspection',
-        '주조': 'Casting',
-        '단조': 'Forging',
-        '열처리': 'Heat Treatment',
-        '플라스틱 성형': 'Plastic Molding'
     };
 
     // 삭제 확인 다이얼로그 호출
@@ -291,7 +334,7 @@ const SelectedWorkcenterSection = ({
                             </Col>
                             <Col span={5}>
                                 <Form.Item
-                                    name="modelNames"
+                                    name="equipment" // TODO setFieldValues 랑 통일시키기
                                 >
                                     <Input
                                         addonBefore="설비"
@@ -316,7 +359,7 @@ const SelectedWorkcenterSection = ({
                             <Col span={15}>
                                 <Form.Item>
                                     <Table
-                                        // dataSource={fetchWorkerAssignments.workers}
+                                        dataSource={workerAssignments || []} // 안전하게 빈 배열로 설정
                                         columns={[
                                             {
                                                 title: <div className="title-text">작업지시</div>,
@@ -438,8 +481,11 @@ const SelectedWorkcenterSection = ({
                                                 } else {
                                                     const filtered = initialModalData.filter((item) => {
                                                         return (
-                                                            (item.factory && item.factoryCode.toLowerCase().includes(value)) ||
-                                                            (item.factory && item.factoryName.toLowerCase().includes(value))
+                                                            // (item.factory && item.factoryCode.toLowerCase().includes(value)) ||
+                                                            // (item.factory && item.factoryName.toLowerCase().includes(value))
+
+                                                            (item.factoryCode && item.code.toLowerCase().includes(value)) ||
+                                                            (item.factoryName && item.name.toLowerCase().includes(value))
                                                         );
                                                     });
                                                     setModalData(filtered);
@@ -527,7 +573,7 @@ const SelectedWorkcenterSection = ({
                                                     },
                                                 ]}
                                                 dataSource={modalData}
-                                                rowKey="code"
+                                                rowKey={(record) => record.equipmentNum || record.id} // 고유 필드를 사용해 rowKey 설정
                                                 size={'small'}
                                                 pagination={{
                                                     pageSize: 15,

@@ -58,26 +58,3 @@ export const deleteWorkcenter = async (code) => {
         throw new Error(errorMessage);
     }
 };
-
-// const fetchEquipmentData = async (equipmentIds) => {
-//     try {
-//         const response = await apiClient.post(
-//             PRODUCTION_API.EQUIPMENT_LIST_BY_IDS,
-//             { equipmentIds }
-//         );
-//
-//         // 설비 ID를 키로, 번호와 이름을 값으로 매핑
-//         return response.data.reduce((acc, equipment) => {
-//             acc[equipment.id] = {
-//                 equipmentNum: equipment.equipmentNum,
-//                 equipmentName: equipment.equipmentName,
-//             };
-//             return acc;
-//         }, {});
-//     } catch (error) {
-//         console.error("설비 데이터 로딩 중 오류:", error);
-//         return {};
-//     }
-// };
-//
-// return { data, equipmentMapping };
