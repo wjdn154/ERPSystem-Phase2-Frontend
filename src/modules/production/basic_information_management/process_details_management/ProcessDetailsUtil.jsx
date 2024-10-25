@@ -35,6 +35,18 @@ export const filterProcessDetails = (details, searchTerm) => {
     return details.filter(detail => detail.name.includes(searchTerm));
 };
 
+// 금액 포맷 함수
+export const formatNumberWithComma = (value) => {
+    if (!value) return '';
+    const cleanValue = value.toString().replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
+    return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+// 콤마 제거 함수
+export const removeComma = (value) => {
+    return value ? value.toString().replace(/,/g, '') : value;
+};
+
 export const processDetailsColumn = [
     {
         title: <div className="title-text">코드</div>,
@@ -62,20 +74,23 @@ export const processDetailsColumn = [
                     {isOutsourced ? '외주' : '생산'}
                 </Tag>
             );
-        }        },
+        }
+    },
     {
         title: <div className="title-text">소요 시간</div>,
         dataIndex: 'duration',  // DTO의 duration 필드에 접근
         key: 'duration',
         width: '10%',
         align: 'center',
+        render: (duration) => `${duration}시간`,
     },
     {
-        title: <div className="title-text">공정 비용(천원)</div>,
+        title: <div className="title-text">공정 비용</div>,
         dataIndex: 'cost',  // DTO의 cost 필드에 접근
         key: 'cost',
         width: '15%',
         align: 'center',
+        render: (cost) => formatNumberWithComma(cost),
     },
     {
         title: <div className="title-text">불량률(%)</div>,
@@ -83,6 +98,13 @@ export const processDetailsColumn = [
         key: 'defectRate',
         width: '10%',
         align: 'center',
+        render: (defectRate) => {
+            if (defectRate != null) {
+                const value = defectRate * 100;
+                return `${value}%`;
+            }
+            return '기록없음';
+        }
     },
     {
         title: <div className="title-text">사용여부</div>,
