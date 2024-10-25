@@ -365,7 +365,7 @@ const SelectedWorkcenterSection = ({
                                                 title: <div className="title-text">작업지시</div>,
                                                 dataIndex: 'productionOrderName',
                                                 key: 'productionOrderName',
-                                                width: '25%',
+                                                width: '30%',
                                                 align: 'center',
                                                 render: (text) => <div>{text}</div>,
                                             },
@@ -386,6 +386,13 @@ const SelectedWorkcenterSection = ({
                                                 render: (text, record) => (
                                                     <div>{text} ({record.employeeNumber})</div>
                                                 ),
+                                            },
+                                            {
+                                                title: <div className="title-text">배정일자</div>,
+                                                dataIndex: 'assignmentDate',
+                                                key: 'assignmentDate',
+                                                width: '15%',
+                                                align: 'center',
                                             },
                                     ]}></Table>
                                 </Form.Item>
