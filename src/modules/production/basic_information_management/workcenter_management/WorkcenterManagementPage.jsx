@@ -30,24 +30,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [displayValues, setDisplayValues] = useState({});
 
-    // selected 로
-    useEffect(() => {
-        if (!workcenter) return;
-
-        form.setFieldsValue(fetchWorkcenter(workcenter));
-        setWorkcenterParam(fetchWorkcenter);
-
-        setDisplayValues({
-
-            workcenterType: `${fetchWorkcenter().workcenterType}`,
-
-            factory: `${fetchWorkcenter().workcenter.factory.factoryName}`,
-            process: ``,
-            equipment: ``,
-        })
-
-
-    }, []);
 
     const {
         data,
@@ -65,22 +47,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
         handleTabChange,
         activeTabKey,
     } = useWorkcenter(initialData);
-
-    useEffect(() => {
-        if (workcenter) {
-            console.log("현재 선택된 작업장 (useEffect 내):", workcenter);
-        }
-    }, [workcenter]);
-
-    useEffect(() => {
-        console.log('선택된 Row Keys가 변경되었습니다:', selectedRowKeys);
-    }, [selectedRowKeys]);
-
-    const refreshWorkcenters = async () => {
-        const updatedData = await fetchWorkcenters(); // 작업장 목록 새로고침
-        setData(updatedData);
-    };
-
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
@@ -102,8 +68,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                         await apiClient.post(PRODUCTION_API.UPDATE_WORKCENTER_API(values.code), values);
                         notify('success', '등록 성공', '작업장이 수정되었습니다.', 'bottomRight');
                     }
-                    // isWorkcenterModalVisible(false); // 모달 닫기
-                    refreshWorkcenters(); // 작업장 목록 새로고침
+                    // refreshWorkcenters(); // 작업장 목록 새로고침
                 } catch (error) {
                     console.error('저장 실패:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -164,14 +129,10 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {
-                                                console.log('클릭한 Record:', record);
-
                                                 setSelectedRowKeys([record.code]); // 클릭한 행의 키로 상태 업데이트
-                                                console.log('선택된 Row Keys:', [record.code]);
                                                 try {
                                                     // 작업장 상세 정보 가져오기 (API 호출)
                                                     const detail = await fetchWorkcenter(record.code);
-                                                    console.log('작업장 세부 정보:', detail);
 
                                                     setWorkcenter(detail); // 선택된 작업장 데이터 설정
                                                     setWorkcenterParam(detail);
@@ -188,10 +149,11 @@ const WorkcenterManagementPage = ({ initialData }) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    {/* 선택한 작업장 조회 */}
 
+                    {/* 선택한 작업장 조회 */}
                     {workcenter && (
                         <SelectedWorkcenterSection
+                            key={workcenter.code}  // 선택된 작업장마다 고유 key 부여 <= 선택한 행 작업장의 상세조회 창 바뀜
                             workcenter={workcenter}
                             handleInputChange={handleInputChange}
                             handleSave={handleSave}
@@ -200,12 +162,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
                             rowClassName={getRowClassName}
                             handleFormSubmit={handleFormSubmit}
                         />
-
-                            // handleClose={handleClose}
-                        //     open={isWorkcenterModalVisible} // 모달 상태에 따라 표시
-                        //     onCancel={handleClose} // 모달을 닫는 함수
-                        //     footer={null} // 모달의 하단 버튼 제거
-
                     )}
                 </Grid>
             )}

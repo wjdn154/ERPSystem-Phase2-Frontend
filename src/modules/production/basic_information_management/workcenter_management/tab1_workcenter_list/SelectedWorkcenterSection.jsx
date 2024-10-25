@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { ActionButtons, showDeleteConfirm } from '../../../common/commonActions.jsx';  // 공통 버튼 및 다이얼로그
 import {Box, Grid, Grow, Paper} from '@mui/material';
 import { Typography } from '@mui/material';
@@ -23,6 +23,7 @@ import {useNotificationContext} from "../../../../../config/NotificationContext.
 import { LOGISTICS_API, PRODUCTION_API } from "../../../../../config/apiConstants.jsx";
 import apiClient from "../../../../../config/apiClient.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
+import {fetchWorkcenter} from "../WorkcenterApi.jsx";
 const SelectedWorkcenterSection = ({
                                      workcenter,
                                      handleInputChange,
@@ -42,12 +43,44 @@ const SelectedWorkcenterSection = ({
     const [displayValues, setDisplayValues] = useState({
         factory: '',
         process: '',
-        equipment: ''
+        equipment: '',
     });
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [fetchWorkcenterData, setFetchWorkcenterData] = useState(false); // 거래처 조회한 정보 상태
     const [workcenterParam, setWorkcenterParam] = useState(false); // 수정 할 거래처 정보 상태
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
+
+
+    // selected 로
+    useEffect(() => {
+        const fetchWorkcenterData = async () => {
+            if (!workcenter) return;
+
+            try {
+                const fetchedWorkcenter = await fetchWorkcenter(workcenter.code); // API 호출 후 데이터 가져오기
+                console.log('가져온 작업장 데이터:', fetchedWorkcenter);
+
+                // 폼 필드에 값 설정
+                form.setFieldsValue(fetchedWorkcenter);
+
+                // 선택된 작업장 정보를 상태에 저장
+                setWorkcenterParam(fetchedWorkcenter);
+
+                // 표시할 값 설정
+                setDisplayValues({
+                    workcenterType: fetchedWorkcenter.workcenterType,
+                    factory: fetchedWorkcenter.factory?.factoryName || '미등록',
+                    process: `[${fetchedWorkcenter.process?.processCode.toString().padStart(5, '0')}] ${fetchedWorkcenter.process?.processName || '미등록'}`,
+                    equipment: `[${fetchedWorkcenter.equipment?.equipmentNum.toString().padStart(5, '0')}] ${fetchedWorkcenter.equipment?.equipmentName || '미등록'}`,
+                });
+            } catch (error) {
+                console.error('작업장 데이터 가져오기 실패:', error);
+            }
+        };
+
+        fetchWorkcenterData(); // 비동기 데이터 호출 함수 실행
+    }, [workcenter, form]);
+
 
     // 모달창 선택 핸들러
     const handleModalSelect = (record) => {

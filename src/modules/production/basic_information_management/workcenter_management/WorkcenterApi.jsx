@@ -18,7 +18,6 @@ export const fetchWorkcenters = async () => {
 export const fetchWorkcenter = async (code) => {
     try {
         const response = await apiClient.post(PRODUCTION_API.WORKCENTER_DETAILS_API(code));
-        console.log("ID로 상세 정보 조회 데이터 로그: ", response.data)
         return response.data;
     } catch (error) {
         console.error("작업장 상세 정보를 가져오는 중 오류 발생:", error);
