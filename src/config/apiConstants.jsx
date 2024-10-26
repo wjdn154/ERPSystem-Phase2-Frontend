@@ -119,6 +119,10 @@ export const EMPLOYEE_API = {
     SAVE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/check-in`,
     DELETE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/del`,
     UPDATE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/update`,
+//  인사관리 - 휴가
+    LEAVE_DATA_API: `${API_BASE_URL}/api/hr/leaves/list`,
+    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/{id}`,
+    SAVE_LEAVE_API:`${API_BASE_URL}/api/hr/leaves/createLeaves`,
 
 
 }

@@ -112,7 +112,7 @@ const AttendanceManagementPage = ({initialData}) => {
     const handleModalSelect = (record) => {
         switch (currentField) {
             case 'attendance':
-                setEmployeeParam((prevParams) => (prevParams));
+                setAttendanceParam((prevParams) => (prevParams));
                 setDisplayValues((prevValues) => ({prevValues}));
                 break;
         }
