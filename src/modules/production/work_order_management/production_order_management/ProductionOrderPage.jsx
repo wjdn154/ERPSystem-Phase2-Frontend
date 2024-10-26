@@ -99,27 +99,14 @@ const ProductionOrderPage = () => {
         setActiveStepDetails(clickedStep); // 클릭된 스텝 정보를 상태에 저장
     };
 
-    const generateQuantities = (totalQuantity) => {
-        const defectiveRate = Math.random() * 0.08 + 0.02;
-        const defectiveQuantity = Math.floor(totalQuantity * defectiveRate);
-        const acceptableQuantity = totalQuantity - defectiveQuantity;
-        return { acceptableQuantity, defectiveQuantity };
-    };
-
-    const calculateWorkDate = (quantity, startDate = dayjs()) => {
-        const workDurationHours = quantity / 100;
-        const workEndDate = startDate.add(workDurationHours, 'hour');
-        return workEndDate;
-    };
-
     const handleSave = async (values) => {
         try {
             const updatedSaveParams = {
                 ...saveParams,
                 name: values.orderName,
                 remarks: values.orderDescription,
-                startDateTime: values.startTime ? dayjs(values.startTime).toISOString() : null,
-                endDateTime: values.endTime ? dayjs(values.endTime).toISOString() : null,
+                startDateTime: values.startTime ? dayjs(values.startTime).format("YYYY-MM-DDTHH:mm:ss") : null,
+                endDateTime: values.endTime ? dayjs(values.endTime).format("YYYY-MM-DDTHH:mm:ss") : null,
                 workers: selectedWorkers.length,
                 confirmed: values.confirmed || false
             };
@@ -135,32 +122,6 @@ const ProductionOrderPage = () => {
             notify('error', '오류 발생', '작업 지시 저장 중 오류가 발생했습니다.');
         }
     };
-
-    const handleCloseOrder = async () => {
-        const { acceptableQuantity, defectiveQuantity } = generateQuantities(updatedSaveParamsState.productionQuantity);
-        const workEndDate = calculateWorkDate(updatedSaveParamsState.productionQuantity);
-
-        const closureParams = {
-            productionOrderId: productionOrderId,
-            workers: updatedSaveParamsState.workers,
-            quantity: updatedSaveParamsState.productionQuantity,
-            defectiveQuantity:defectiveQuantity,
-            acceptableQuantity:acceptableQuantity,
-            workDate:dayjs(workEndDate).toISOString(),
-            actualStartDateTime: updatedSaveParamsState.startDateTime,
-            actualEndDateTime: updatedSaveParamsState.endDateTime
-
-        };
-
-        try {
-            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_ORDER_CLOSE_API, closureParams);
-            console.log(response);
-            notify('success', '작업 마감 성공', '작업이 성공적으로 마감되었습니다.');
-        } catch (error) {
-            console.log(error);
-            notify('error', '오류 발생', '작업 지시 마감 처리 중 오류가 발생했습니다.');
-        }
-};
 
 
     return (
@@ -466,6 +427,12 @@ const ProductionOrderPage = () => {
                                                 layout="vertical"
                                                 style={{ marginTop: '20px' }}
                                                 onFinish={async (values) => {
+
+                                                    if(dayjs(values.startTime).isAfter(dayjs(values.endTime))) {
+                                                        notify('error', '입력 오류', '시작일이 종료일보다 늦을 수 없습니다.');
+                                                        return;
+                                                    }
+
                                                     if (selectedWorkers.length === 0) {
                                                         notify('warning', '입력 오류', '작업장을 눌러 작업자를 선택하세요.');
                                                         return;
@@ -533,30 +500,14 @@ const ProductionOrderPage = () => {
                                                         </Form.Item>
                                                     </Col>
 
-                                                    <Col span={4}>
-                                                        <Form.Item
-                                                            name="confirmed"
-                                                            valuePropName="checked"
-                                                        >
-                                                            <Checkbox>확정 여부</Checkbox>
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col span={4}>
+                                                    <Col span={4} offset={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                                         <Form.Item>
                                                             <Button type="primary" htmlType="submit" style={{ width: '100px' }}>
                                                                 작업 저장
                                                             </Button>
                                                         </Form.Item>
                                                     </Col>
-                                                    <Col span={4}>
-                                                        <Form.Item>
-                                                            <Button danger disabled={!submit} onClick={handleCloseOrder} style={{ width: '100px' }}>
-                                                                마감 처리
-                                                            </Button>
-                                                        </Form.Item>
-                                                    </Col>
                                                 </Row>
-
                                             </Form>
                                         </Grid>
                                 </Paper>

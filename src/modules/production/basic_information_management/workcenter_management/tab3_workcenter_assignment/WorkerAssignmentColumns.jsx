@@ -1,6 +1,8 @@
+import React from "react";
+
 export const workerAssignmentColumns = [
     {
-        title: <div>작업장</div>,
+        title: <div className="title-text">작업장</div>,
         dataIndex: 'workcenterName',
         key: 'workcenterName',
         width: '20%',
@@ -10,7 +12,7 @@ export const workerAssignmentColumns = [
         ),
     },
     {
-        title: <div>작업자(사번)</div>,
+        title: <div className="title-text">작업자(사번)</div>,
         dataIndex: 'workerName',
         key: 'workerName',
         width: '25%',
@@ -20,7 +22,7 @@ export const workerAssignmentColumns = [
         ),
     },
     {
-        title: <div>배정일자</div>,
+        title: <div className="title-text">배정일자</div>,
         dataIndex: 'assignmentDate',
         key: 'assignmentDate',
         width: '15%',
@@ -30,7 +32,7 @@ export const workerAssignmentColumns = [
         ),
     },
     {
-        title: <div>교대유형</div>,
+        title: <div className="title-text">교대유형</div>,
         dataIndex: 'shiftTypeName',
         key: 'shiftTypeName',
         width: '15%',
@@ -38,7 +40,7 @@ export const workerAssignmentColumns = [
         render: (text) => <div>{text}</div>,
     },
     {
-        title: <div>작업지시</div>,
+        title: <div className="title-text">작업지시</div>,
         dataIndex: 'productionOrderName',
         key: 'productionOrderName',
         width: '25%',

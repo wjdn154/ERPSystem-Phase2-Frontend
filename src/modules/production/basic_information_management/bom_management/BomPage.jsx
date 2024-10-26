@@ -142,16 +142,6 @@ export const BomPage = () => {
                                 <Grid sx={{ margin: '20px' }}>
 
                                 </Grid>
-                                {/*/!* BOM 검색 바 *!/*/}
-                                {/*<Row gutter={16} style={{ marginBottom: '16px' }}>*/}
-                                {/*    <Col span={8}>*/}
-                                {/*        <Input.Search*/}
-                                {/*            placeholder="BOM 검색"*/}
-                                {/*            enterButton*/}
-                                {/*        />*/}
-                                {/*    </Col>*/}
-                                {/*</Row>*/}
-                                {/* SBOM 목록 */}
                                 <Table
                                     dataSource={data}
                                     columns={sbomColumns}
@@ -162,7 +152,7 @@ export const BomPage = () => {
                                         selectedRowKeys,
                                         onChange: (newSelectedRowKeys) => setSelectedSBom(newSelectedRowKeys),
                                     }}
-                                    pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
+                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                     size={'small'}
                                 />
 
