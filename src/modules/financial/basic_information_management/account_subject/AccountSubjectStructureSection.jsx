@@ -10,16 +10,16 @@ const AccountSubjectStructureSection = ({ data }) => {
     // 컬럼 정의
     const columns = [
         {
-            title: '체계명',
+            title: <div className="title-text">체계명</div>,
             dataIndex: 'name',
             key: 'name',
-            render: (text) => <span style={{ fontSize: '0.8rem' }}>{text}</span>,
+            render: (text) => <span className="small-text">{text}</span>,
         },
         {
-            title: '체계범위',
+            title: <div className="title-text">체계범위</div>,
             dataIndex: 'range',
             key: 'range',
-            render: (text) => <span style={{ fontSize: '0.8rem' }}>{text}</span>,
+            render: (text) => <span className="small-text">{text}</span>,
         },
     ];
 

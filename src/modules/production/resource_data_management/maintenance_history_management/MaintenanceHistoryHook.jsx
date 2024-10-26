@@ -1,5 +1,7 @@
 import {useEffect, useMemo, useState, useRef} from "react";
 import axios from "axios";
+const { confirm } = Modal;
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {
     fetchMaintenanceHistoryList,
     fetchMaintenanceHistoryDetail,
@@ -7,6 +9,8 @@ import {
     updateMaintenanceHistoryDetail,
     deleteMaintenanceHistoryDetail} from "./MaintenanceHistoryApi.jsx"
 import {fetchEquipmentDataDetail} from "../equipment_data_management/EquipmentDataApi.jsx";
+import {deleteMaterialData, fetchMaterialDataList} from "../material_data_management/MaterialDataApi.jsx";
+import {Modal} from "antd";
 
 export const maintenanceHistoryHook = (initialData) => {
 
@@ -18,19 +22,7 @@ export const maintenanceHistoryHook = (initialData) => {
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
     const [activeTabKey, setActiveTabKey] = useState('1'); // tabs state
 
-    const workcenterCodeRef = useRef(null);
-    const factoryCodeRef = useRef(null);
-    const equipmentNumRef = useRef(null);
-    const equipmentNameRef = useRef(null);
-    const maintenanceManagerRef = useRef(null);
-    const maintenanceTypeRef = useRef(null);
-    const maintenanceCostRef = useRef(null);
-    const maintenanceStatusRef = useRef(null);
-    const maintenanceDateRef = useRef(null);
-    const nextScheduleDateRef = useRef(null);
-    const titleRef = useRef(null);
-    const maintenanceDetailRef = useRef(null);
-
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const maintenanceMemoizedData = useMemo(() => data, [data]);
 
     //데이터가 변경될 때마다 컴포넌트를 새로 렌더링
@@ -109,17 +101,14 @@ export const maintenanceHistoryHook = (initialData) => {
     // 저장 버튼 클릭 시 실행되는 함수
     const handleSave = async () => {
         try {
-            const confirmSave = window.confirm("저장하시겠습니까?");
-
-            if (!confirmSave) return;
             console.log("저장버튼 클릭 시 equipmentDataDetail : ",maintenanceDataDetail);
             await saveMaintenanceHistoryDetail(maintenanceDataDetail);
             const savedData = await fetchMaintenanceHistoryList();
-            window.alert("저장되었습니다.");
+            notify('success', '유지보수 이력 등록', '유지보수 이력 등록 성공', 'bottomRight')
             setIsInsertModalVisible(false);
             setData(savedData);
         } catch (error) {
-            console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
+            notify('error', '등록 실패', '데이터 등록 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -140,74 +129,6 @@ export const maintenanceHistoryHook = (initialData) => {
     const handleInsertCancel = () => {
         setIsInsertModalVisible(false);
     }
-    const handleInsertOk = async () => {
-        if (!maintenanceDataDetail.workcenterCode) {
-            alert("작업장 코드를 입력하세요.");
-            setTimeout(() => workcenterCodeRef.current?.focus(), 0); // 경고창 닫힌 후 해당 input으로 포커스 이동
-            return;
-        }
-        if (!maintenanceDataDetail.factoryCode) {
-            alert("공장 코드를 입력하세요.");
-            setTimeout(() => factoryCodeRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.equipmentNum) {
-            alert("설비 번호를 입력하세요.");
-            setTimeout(() => equipmentNumRef.current?.focus(), 0);
-            return;
-        }
-
-        if (!maintenanceDataDetail.maintenanceManager) {
-            alert("관리 담당자를 입력하세요.");
-            setTimeout(() => maintenanceManagerRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceType) {
-            alert("유형을 입력하세요.");
-            setTimeout(() => maintenanceTypeRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceCost) {
-            alert("유지보수 비용을 입력하세요.");
-            setTimeout(() => maintenanceCostRef.current?.focus(), 0);
-            return;
-        }
-        if (maintenanceDataDetail.maintenanceStatus === undefined || maintenanceDataDetail.maintenanceStatus === null || maintenanceDataDetail.maintenanceStatus === '') {
-            alert("유지보수 진행 상태를 입력하세요.");
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceDate) {
-            alert("유지보수 일자를 입력하세요.");
-            return;
-        }
-        if (!maintenanceDataDetail.nextScheduleDate) {
-            alert("다음 유지보수 예정일을 입력하세요.");
-            return;
-        }
-        if (!maintenanceDataDetail.title) {
-            alert("제목을 입력하세요.");
-            setTimeout(() => titleRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceDetail) {
-            alert("내용을 입력하세요.");
-            setTimeout(() => maintenanceDetailRef.current?.focus(), 0);
-            return;
-        }
-        // 설비번호 존재 확인
-        // if (!response.ok) {
-        //     const errorMessage = await response.text(); // 백엔드에서 보낸 에러 메시지를 읽음
-        //     alert(errorMessage); // 에러 메시지를 alert 창으로 표시
-        //     return;
-        // }
-
-        const dataToSend = {
-            ...workerDetail,
-            maintenanceStatus: Boolean(workerDetail.maintenanceStatus),   //Boolean으로 변환
-        };
-        await handleSave(dataToSend);
-    }
-
 
     //수정 버튼 클릭 시 모달창 띄우는 함수
     const showModal = () => {
@@ -215,56 +136,6 @@ export const maintenanceHistoryHook = (initialData) => {
     };
 
     const handleUpdateOk = async () => {
-        if (!maintenanceDataDetail.workcenterCode) {
-            alert("작업장 코드를 입력하세요.");
-            setTimeout(() => workcenterCodeRef.current?.focus(), 0); // 경고창 닫힌 후 해당 input으로 포커스 이동
-            return;
-        }
-        if (!maintenanceDataDetail.factoryCode) {
-            alert("공장 코드를 입력하세요.");
-            setTimeout(() => factoryCodeRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceManager) {
-            alert("관리 담당자를 입력하세요.");
-            setTimeout(() => maintenanceManagerRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceType) {
-            alert("유형을 입력하세요.");
-            setTimeout(() => maintenanceTypeRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceCost) {
-            alert("유지보수 비용을 입력하세요.");
-            setTimeout(() => maintenanceCostRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceStatus) {
-            alert("유지보수 진행 상태를 입력하세요.");
-            return;
-        }if (!maintenanceDataDetail.maintenanceDate) {
-            alert("유지보수 일자를 입력하세요.");
-            return;
-        }
-        if (!maintenanceDataDetail.nextScheduleDate) {
-            alert("다음 유지보수 예정일을 입력하세요.");
-            return;
-        }
-        if (!maintenanceDataDetail.title) {
-            alert("제목을 입력하세요.");
-            setTimeout(() => titleRef.current?.focus(), 0);
-            return;
-        }
-        if (!maintenanceDataDetail.maintenanceDetail) {
-            alert("내용을 입력하세요.");
-            setTimeout(() => maintenanceDetailRef.current?.focus(), 0);
-            return;
-        }
-
-
-        await handleUpdate();
-        // 여기서 수정 작업을 진행하거나 저장할 수 있습니다.
     };
 
     const handleUpdateCancel = () => {
@@ -273,32 +144,42 @@ export const maintenanceHistoryHook = (initialData) => {
 
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
+
         try {
-            const confirmSave = window.confirm("수정하시겠습니까?");
             console.log("수정버튼 클릭시 id : ",maintenanceDataDetail.id);
             console.log("수정버튼 클릭 시 equipmentDataDetail : ",maintenanceDataDetail);
 
             await updateMaintenanceHistoryDetail(maintenanceDataDetail.id, maintenanceDataDetail);
             const updatedData = await fetchMaintenanceHistoryList();
-            window.alert("수정완료되었습니다.");
-            setIsUpdateModalVisible(false);
+            notify('success', '유지보수 이력 수정', '유지보수 이력 수정 성공', 'bottomRight')
             setData(updatedData);
+            console.log("업데이트 된 유지보수 이력 리스트", updatedData);
         } catch (error) {
-            console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
+            notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
     }
 
     //삭제 버튼 선택 클릭 시 실행되는 함수
     const handleDelete = async () => {
-        const confirmDelete = window.confirm("정말로 삭제 하시겠습니까?");
-        try{
-            await deleteMaintenanceHistoryDetail(maintenanceDataDetail.id);
-            const deletedData = await fetchMaintenanceHistoryList();
-            window.alert('삭제 완료되었습니다.');
-            setData(deletedData);
-        }catch (error){
-            console.error("API에서 데이터를 삭제하는 중 오류 발생:", error);
-        }
+        confirm({
+            title: '삭제 확인',
+            content: '정말로 삭제하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                try{
+                    await deleteMaintenanceHistoryDetail(maintenanceDataDetail.id);
+                    const deletedData = await fetchMaintenanceHistoryList();
+                    notify('success', '삭제 성공', '유지보수 이력 삭제 성공.', 'bottomRight');
+                    setData(deletedData);
+                    // 선택된 행 초기화 및 상세보기 숨기기
+                    setSelectedRow(null);
+                }catch (error){
+                    notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
+                }
+            }
+        })
+
     }
 
 
@@ -318,7 +199,6 @@ export const maintenanceHistoryHook = (initialData) => {
         handleUpdateOk,
         handleUpdateCancel,
         insertMaintenanceModal,
-        handleInsertOk,
         isInsertModalVisible,
         isUpdateModalVisible,
         handleInsertCancel,

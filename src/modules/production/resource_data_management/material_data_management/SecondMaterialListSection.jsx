@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Grid,Paper,Typography}  from "@mui/material";
-import {Button, Table as AntTable, Modal, Input, Select, DatePicker} from "antd";
-import {secondMaterialListColumn, materialHazardousListColumn, materialProductListColumn} from "./SecondMaterialListColumn.jsx"
+import {Button, Table as AntTable, Modal as AntModal, Input, Select, DatePicker} from "antd";
+import {secondMaterialListColumn, materialHazardousListColumn, materialProductListColumn, productCodeColumn} from "./SecondMaterialListColumn.jsx"
 const {Option} = Select;
 
 const SecondMaterialListSection = ({
@@ -42,7 +42,7 @@ const SecondMaterialListSection = ({
     return (
         <Grid container spacing={2}>
             {/*자재 목록 왼쪽에 배치*/}
-            <Grid item xs={4}>
+            <Grid item xs={5}>
                 <Paper elevation={3} sx={{height: '100%', p: 2, mr: 2}}>
 
                     <AntTable
@@ -67,7 +67,7 @@ const SecondMaterialListSection = ({
             </Grid>
 
             {/*품목과 유해물질 리스트를 위아래로 배치*/}
-            <Grid item xs={8}>
+            <Grid item xs={7}>
                 <Grid container spacing={2} direction={'column'}>
                     {/*품목 리스트*/}
                     <Grid item>
@@ -91,7 +91,7 @@ const SecondMaterialListSection = ({
                                         type="primary">추가</Button>
                                 <Button onClick={handleDeleteProduct} type="danger">제거</Button>
                             </div>
-                            <Modal
+                            <AntModal
                                 title="품목 추가"
                                 open={isInsertProductModalVisible}
                                 onOk={handleProductInsertOk}
@@ -104,16 +104,43 @@ const SecondMaterialListSection = ({
                                            readOnly/>
                                     <Input value={materialDataDetail.product?.productCode || ''}
                                            style={{marginRight: '30px', flex: 1}}
-                                           onChange={(e) => handleInputChange(e, 'productCode')}/>
+                                           //onClick={handleProductCodeClick}
+                                           readOnly/>
+
                                     <Input value={"품목 명"}
                                            style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
                                            readOnly/>
                                     <Input value={materialDataDetail.product?.productName || ''} style={{flex: 1}}
                                            onChange={(e) => handleInputChange(e, 'productName')}/>
                                 </div>
-                            </Modal>
+
+                                {/*<AntModal*/}
+                                {/*    title={"품목 코드 선택"}*/}
+                                {/*    open={isProductCodeModalVisible}*/}
+                                {/*    onOk={handleProductCodeSelectOk}*/}
+                                {/*    onCancel={handleProductCodeModalCancel}*/}
+                                {/*    width={600}*/}
+                                {/*>*/}
+                                {/*    <AntTable*/}
+                                {/*        style={{padding: '20px'}}*/}
+                                {/*        columns={productCodeColumn}*/}
+                                {/*        dataSource={productCodeData}*/}
+                                {/*        pagination={{pageSize: 5, position: ['bottomCenter'], showSizeChanger: false}}*/}
+                                {/*        rowSelection={handleProductRowSelection}*/}
+                                {/*        size="small"*/}
+                                {/*        rowKey="id"*/}
+                                {/*        onRow={(record) => ({*/}
+                                {/*            onClick: () => onProductCodeRowClick(record),*/}
+                                {/*            style: {cursor: 'pointer'},*/}
+                                {/*        })}*/}
+                                {/*    >*/}
+
+                                {/*    </AntTable>*/}
+                                {/*</AntModal>*/}
+                            </AntModal>
                         </Paper>
                     </Grid>
+
 
                     {/*유해물질 리스트*/}
                     <Grid item>
@@ -133,7 +160,7 @@ const SecondMaterialListSection = ({
                                         type="primary">추가</Button>
                                 <Button onClick={handleDelete} type="danger">제거</Button>
                             </div>
-                            <Modal
+                            <AntModal
                                 title="유해물질 추가"
                                 open={isInsertHazardousModalVisible}
                                 onOk={handleHazardousInsertOk}
@@ -153,7 +180,7 @@ const SecondMaterialListSection = ({
                                     <Input value={materialDataDetail.hazardousMaterial?.hazardousMaterialName || ''} style={{flex: 1}}
                                            onChange={(e) => handleInputChange(e, 'hazardousMaterialName')}/>
                                 </div>
-                            </Modal>
+                            </AntModal>
                         </Paper>
                     </Grid>
 

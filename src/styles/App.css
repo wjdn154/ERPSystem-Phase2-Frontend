@@ -131,6 +131,13 @@
 
 /* Form 영역 시작 */
 
+.search-input {
+  font-size: 0.8rem;
+}
+
+.search-input:hover {
+  border-left: 1px solid #4096FF !important;
+}
 
 input.ant-input[readonly] {
   background-color: #FAFAFA !important;
@@ -192,9 +199,43 @@ input.ant-input[readonly] {
  /*antd 테이블 영역 시작 */
 
 /* 모든 테이블 제목에 적용 */
-.summary-row {
-  background-color: rgba(0, 0, 0, 0.03);
+.child-table-row {
+    background-color: red !important;
 }
+
+.highlight-row {
+  background-color: #e6f7ff !important;
+}
+
+.ant-table-cell-fix-left {
+  background-color: #F7F7F7 !important;
+  border-right: 1px solid #e8e8e8 !important;
+}
+
+.summary-row .ant-table-cell {
+  background-color: #F7F7F7;
+}
+
+
+.title-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.small-text {
+  font-size: 0.8rem;
+}
+
+.medium-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.large-text {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 .ant-table-thead th {
 }
 
@@ -303,7 +344,6 @@ input.ant-input[readonly] {
 .ant-btn-danger:hover > span {
 }
 /* 버튼 영역 끝  */
-
 
 
 

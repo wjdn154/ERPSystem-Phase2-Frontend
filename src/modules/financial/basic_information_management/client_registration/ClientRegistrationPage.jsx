@@ -6,12 +6,13 @@ import { Typography } from '@mui/material';
 import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification } from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {EMPLOYEE_API, FINANCIAL_API, USERS_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, FINANCIAL_API} from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from 'dayjs';
 import { Divider } from 'antd';
 import {setAuth} from "../../../../config/redux/authSlice.jsx";
 import {jwtDecode} from "jwt-decode";
+import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 const { Option } = Select;
 const { confirm } = Modal;
 
@@ -28,6 +29,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [currentField, setCurrentField] = useState(''); // 모달 분기 할 필드 상태
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
+    const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
     const [isEndDateDisable, setIsEndDateDisable] = useState(false); // 거래 종료일 비활성화 여부 상태
     const [displayValues, setDisplayValues] = useState({});
@@ -40,10 +42,10 @@ const ClientRegistrationPage = ( {initialData} ) => {
         setClientParam(fetchClientData);
 
         setDisplayValues({
-            bank: `[${fetchClientData.bankAccount.bank.code}] ${fetchClientData.bankAccount.bank.name}`,
-            employee: `[${fetchClientData.employee.employeeNumber}] ${fetchClientData.employee.lastName}${fetchClientData.employee.firstName}`,
-            liquor: `[${fetchClientData.liquor.id}] ${fetchClientData.liquor.name}`,
-            category: `[${fetchClientData.category.code}] ${fetchClientData.category.name}`,
+            bank: `[${fetchClientData.bankAccount.bank.code.toString().padStart(5, '0')}] ${fetchClientData.bankAccount.bank.name}`,
+            employee: `[${fetchClientData.employee.employeeNumber.toString().padStart(5, '0')}] ${fetchClientData.employee.lastName}${fetchClientData.employee.firstName}`,
+            liquor: `[${fetchClientData.liquor.id.toString().padStart(5, '0')}] ${fetchClientData.liquor.name}`,
+            category: `[${fetchClientData.category.code.toString().padStart(5, '0')}] ${fetchClientData.category.name}`,
         });
 
     }, [fetchClientData, form]);
@@ -51,7 +53,8 @@ const ClientRegistrationPage = ( {initialData} ) => {
     // 모달창 열기 핸들러
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
-        setModalData(null); // 모달 열기 전에 데이터를 초기화
+        setModalData(null);
+        setInitialModalData(null);
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
         setIsModalVisible(true);  // 모달창 열기
     };
@@ -71,6 +74,8 @@ const ClientRegistrationPage = ( {initialData} ) => {
         try {
             const response = await apiClient.post(apiPath);
             setModalData(response.data);
+            setInitialModalData(response.data);
+            console.log('response.data', response.data);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -97,7 +102,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    bank: `[${record.code}] ${record.name}`,
+                    bank: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
                 }));
             break;
             case 'employee':
@@ -112,7 +117,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    employee: `[${record.employeeNumber}] ${record.lastName}${record.firstName}`,
+                    employee: `[${record.employeeNumber.toString().padStart(5, '0')}] ${record.lastName}${record.firstName}`,
                 }));
             break;
             case 'liquor':
@@ -126,7 +131,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    liquor: `[${record.id}] ${record.name}`,
+                    liquor: `[${record.id.toString().padStart(5, '0')}] ${record.name}`,
                 }));
             break;
             case 'category':
@@ -140,12 +145,10 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    category: `[${record.id}] ${record.name}`,
+                    category: `[${record.id.toString().padStart(5, '0')}] ${record.name}`,
                 }));
             break;
         }
-
-
         // 모달창 닫기
         setIsModalVisible(false);
     };
@@ -221,8 +224,8 @@ const ClientRegistrationPage = ( {initialData} ) => {
                     });
                     setDisplayValues({});
                     type === 'update'
-                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomLeft')
-                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomLeft'), registrationForm.resetFields());
+                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomRight')
+                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomRight'), registrationForm.resetFields());
 
                 } catch (error) {
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -232,7 +235,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                 notification.warning({
                     message: '저장 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
+                    placement: 'bottomRight',
                 });
             },
         });
@@ -357,38 +360,38 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                         dataSource={clientList}
                                         columns={[
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>대표자명</span>,
+                                                title: <div className="title-text">대표자명</div>,
                                                 dataIndex: 'representativeName',
                                                 key: 'representativeName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>상호명</span>,
+                                                title: <div className="title-text">상호명</div>,
                                                 dataIndex: 'printClientName',
                                                 key: 'printClientName',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '15%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>주소</span>,
+                                                title: <div className="title-text">주소</div>,
                                                 key: 'address',
                                                 align: 'center',
-                                                render: (_, record) => <span style={{ fontSize: '0.7rem' }}>{`${record.roadAddress}, ${record.detailedAddress}`}</span>,
+                                                render: (_, record) => <div className="small-text">{`${record.roadAddress}, ${record.detailedAddress}`}</div>,
                                                 width: '20%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>전화번호</span>,
+                                                title: <div className="title-text">전화번호</div>,
                                                 dataIndex: 'phoneNumber',
                                                 key: 'phoneNumber',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>사업종류</span>,
+                                                title: <div className="title-text">사업종류</div>,
                                                 dataIndex: 'businessType',
                                                 key: 'businessType',
                                                 align: 'center',
@@ -412,27 +415,27 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>거래 시작일</span>,
+                                                title: <div className="title-text">거래 시작일</div>,
                                                 dataIndex: 'transactionStartDate',
                                                 key: 'transactionStartDate',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>거래 종료일</span>,
+                                                title: <div className="title-text">거래 종료일</div>,
                                                 dataIndex: 'transactionEndDate',
                                                 key: 'transactionEndDate',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '10%'
                                             },
                                             {
-                                                title: <span style={{ fontSize: '0.8rem' }}>비고</span>,
+                                                title: <div className="title-text">비고</div>,
                                                 dataIndex: 'remarks',
                                                 key: 'remarks',
                                                 align: 'center',
-                                                render: (text) => <span style={{ fontSize: '0.7rem' }}>{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                                 width: '20%'
                                             }
                                         ]}
@@ -555,6 +558,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         value={displayValues.bank}
                                                         onClick={() => handleInputClick('bank')}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -599,6 +603,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         onClick={() => handleInputClick('employee')}
                                                         value={displayValues.employee}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -612,6 +617,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 시작일을 입력하세요.' }]}>
                                                     <DatePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
                                                         value={clientParam.transactionStartDate && dayjs(clientParam.transactionStartDate).isValid() ? dayjs(clientParam.transactionStartDate) : null}
                                                         onChange={(date) => {
                                                             if (date) {
@@ -629,6 +635,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col span={4}>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 종료일을 입력하세요.' }]}>
                                                     <DatePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
                                                         value={clientParam.transactionEndDate && dayjs(clientParam.transactionEndDate).isValid() ? dayjs(clientParam.transactionEndDate) : null}
                                                         onChange={handleEndDateChange}
                                                         disabled={isEndDateDisable}
@@ -651,6 +658,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         onClick={() => handleInputClick('liquor')}
                                                         value={displayValues.liquor}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -661,6 +669,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         onClick={() => handleInputClick('category')}
                                                         value={displayValues.category}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -719,17 +728,60 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             은행 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                            (item.name && item.name.toLowerCase().includes(value)) ||
+                                                                            (item.businessNumber && item.businessNumber.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
-                                                                columns={[
-                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                    { title: '은행명', dataIndex: 'name', key: 'name', align: 'center' },
-                                                                    { title: '사업자번호', dataIndex: 'businessNumber', key: 'businessNumber', align: 'center' },
+                                                                 columns={[
+                                                                    {
+                                                                        title: <div className="title-text">코드</div>,
+                                                                        dataIndex: 'code',
+                                                                        key: 'code',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">은행명</div>,
+                                                                        dataIndex: 'name',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">사업자번호</div>,
+                                                                        dataIndex: 'businessNumber',
+                                                                        key: 'businessNumber',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="code"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                 pagination={{
+                                                                     pageSize: 15,
+                                                                     position: ['bottomCenter'],
+                                                                     showSizeChanger: false,
+                                                                     showTotal: (total) => `총 ${total}개`,
+                                                                 }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -743,21 +795,52 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             자사 담당자 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.employeeNumber && item.employeeNumber.toLowerCase().includes(value)) ||
+                                                                            (item.firstName && item.firstName.toLowerCase().includes(value)) ||
+                                                                            (item.lastName && item.lastName.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '사원번호', dataIndex: 'employeeNumber', key: 'employeeNumber', align: 'center' },
                                                                     {
-                                                                        title: '이름',
+                                                                        title: <div className="title-text">사원번호</div>,
+                                                                        dataIndex: 'employeeNumber',
+                                                                        key: 'employeeNumber',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">이름</div>,
                                                                         key: 'name',
                                                                         align: 'center',
-                                                                        render: (text, record) => `${record.lastName}${record.firstName}`, // firstName과 lastName을 합쳐서 출력
+                                                                        render: (text, record) => <div className="small-text">{record.lastName}{record.firstName}</div>,
                                                                     },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="id"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -771,16 +854,52 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             주류코드 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                            (item.name && item.name.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    {
+                                                                        title: <div className="title-text">코드</div>,
+                                                                        dataIndex: 'code',
+                                                                        key: 'code',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">이름</div>,
+                                                                        dataIndex: 'name',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="id"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -794,16 +913,52 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             카테고리 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                            (item.name && item.name.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    {
+                                                                        title: <div className="title-text">코드</div>,
+                                                                        dataIndex: 'code',
+                                                                        key: 'code',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">이름</div>,
+                                                                        dataIndex: 'name',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="id"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -925,6 +1080,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         value={displayValues.bank}
                                                         onClick={() => handleInputClick('bank')}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -970,6 +1126,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         onClick={() => handleInputClick('employee')}
                                                         value={displayValues.employee}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -984,6 +1141,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 시작일을 입력하세요.' }]}>
                                                     <DatePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
                                                         value={dayjs(clientParam.transactionStartDate)}
                                                         onChange={handleStartDateChange}
                                                     />
@@ -995,6 +1153,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                             <Col span={4}>
                                                 <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '거래 종료일을 입력하세요.' }]}>
                                                     <DatePicker
+                                                        disabledDate={(current) => current && current.year() !== 2024}
                                                         value={dayjs(clientParam.transactionEndDate)}
                                                         onChange={handleEndDateChange}
                                                         disabled={isEndDateDisable}
@@ -1017,6 +1176,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         onClick={() => handleInputClick('liquor')}
                                                         value={displayValues.liquor}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -1027,6 +1187,7 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         onClick={() => handleInputClick('category')}
                                                         value={displayValues.category}
                                                         onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -1085,17 +1246,57 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             은행 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                            (item.name && item.name.toLowerCase().includes(value)) ||
+                                                                            (item.businessNumber && item.businessNumber.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                    { title: '은행명', dataIndex: 'name', key: 'name', align: 'center' },
-                                                                    { title: '사업자번호', dataIndex: 'businessNumber', key: 'businessNumber', align: 'center' },
+                                                                    {
+                                                                        title: <div className="title-text">코드</div>,
+                                                                        dataIndex: 'code',
+                                                                        key: 'code',
+                                                                        align: 'center'
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">은행명</div>,
+                                                                        dataIndex: 'name',
+                                                                        key: 'name',
+                                                                        align: 'center'
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">사업자번호</div>,
+                                                                        dataIndex: 'businessNumber',
+                                                                        key: 'businessNumber',
+                                                                        align: 'center'
+                                                                    },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="code"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -1109,12 +1310,37 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             자사 담당자 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.employeeNumber && item.employeeNumber.toLowerCase().includes(value)) ||
+                                                                            (item.firstName && item.firstName.toLowerCase().includes(value)) ||
+                                                                            (item.lastName && item.lastName.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '사원번호', dataIndex: 'employeeNumber', key: 'employeeNumber', align: 'center' },
                                                                     {
-                                                                        title: '이름',
+                                                                        title: <div className="title-text">사원번호</div>,
+                                                                        dataIndex: 'employeeNumber',
+                                                                        key: 'employeeNumber',
+                                                                        align: 'center'
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">이름</div>,
                                                                         key: 'name',
                                                                         align: 'center',
                                                                         render: (text, record) => `${record.lastName}${record.firstName}`, // firstName과 lastName을 합쳐서 출력
@@ -1123,7 +1349,12 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                                 dataSource={modalData}
                                                                 rowKey="id"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -1137,16 +1368,52 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             주류코드 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                            (item.name && item.name.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
-                                                                    { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                    { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    {
+                                                                        title: <div className="title-text">코드</div>,
+                                                                        dataIndex: 'code',
+                                                                        key: 'code',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>,
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">이름</div>,
+                                                                        dataIndex: 'name',
+                                                                        key: 'name',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>,
+                                                                    },
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="id"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -1160,6 +1427,25 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                         <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                                             카테고리 선택
                                                         </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                                            (item.name && item.name.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
                                                         {modalData && (
                                                             <Table
                                                                 columns={[
@@ -1169,7 +1455,12 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                                                 dataSource={modalData}
                                                                 rowKey="id"
                                                                 size={'small'}
-                                                                pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
                                                                 onRow={(record) => ({
                                                                     style: { cursor: 'pointer' },
                                                                     onClick: () => handleModalSelect(record), // 선택 시 처리

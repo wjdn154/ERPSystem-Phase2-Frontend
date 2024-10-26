@@ -1,4 +1,5 @@
 import React from "react";
+import {Tag} from "antd";
 
 const attendanceStatusMap={
     "PRESENT" : "출근",
@@ -24,24 +25,28 @@ export const
         dataIndex: 'attendanceDate',  // 데이터 인덱스: 이 필드는 데이터 객체의 'jobTitleName' 속성과 연결됩니다.
         key:'attendanceDate',
         width: '16%',  // 컬럼 너비 설정
+        align: 'center',
     },
     {
         title: <span>출근시간</span>,  // 컬럼 제목
         dataIndex: 'checkTime',  // 데이터 인덱스: 이 필드는 데이터 객체의 'employmentStatus' 속성과 연결됩니다.
         key:'checkTime',
-        width: '15%',  // 컬럼 너비 설정
+        width: '16%',  // 컬럼 너비 설정
+        align: 'center',
     },
     {
         title: <span>퇴근시간</span>,  // 컬럼 제목
         dataIndex: 'checkoutTime',  // 데이터 인덱스: 이 필드는 데이터 객체의 'employmentType' 속성과 연결됩니다.
         key:'checkoutTime',
-        width: '15%',  // 컬럼 너비 설정
+        width: '16%',  // 컬럼 너비 설정
+        align: 'center',
     },
     {
         title: <span>근무상태</span>,  // 컬럼 제목
         dataIndex: 'attendanceStatus',  // 데이터 인덱스: 이 필드는 데이터 객체의 'trainingStatus' 속성과 연결됩니다.
         key:'attendanceStatus',
-        width: '16%',  // 컬럼 너비 설정
+        width: '14%',  // 컬럼 너비 설정
+        align: 'center',
         render: (text) => {
             let color;
             switch (text){
@@ -54,10 +59,10 @@ export const
                 default: color = 'black';
             }
             return (
-                <span style={{ color: color}}>
+            <Tag color={color}>
                 {attendanceStatusMap[text] || text}
-                </span>
-            );
+            </Tag>
+            )
         }
     },
     {
@@ -65,11 +70,13 @@ export const
         dataIndex: 'assignmentDate',  // 데이터 인덱스: 이 필드는 데이터 객체의 'positionName' 속성과 연결됩니다.
         key:'assignmentDate',
         width: '18%',  // 컬럼 너비 설정
+        align: 'center',
     },
     {
         title: <span>배치된 작업장</span>,  // 컬럼 제목
         dataIndex: 'workcenterName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'departmentName' 속성과 연결됩니다.
         key:'workcenterName',
         width: '20%',  // 컬럼 너비 설정
+        align: 'center',
     }
 ];

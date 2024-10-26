@@ -77,8 +77,7 @@ import FinanceDashboardPage from "../../financial/dash_board/FinanceDashboardPag
 import BomPage from "../../production/basic_information_management/bom_management/BomPage.jsx";
 import SystemEnvironmentSettingsPage
     from "../../financial/basic_information_management/system_environment_settings/SystemEnvironmentSettingsPage.jsx";
-import SalesPurchaseVoucherEntryPage
-    from "../../financial/voucher_entry/sales_purchase_voucher_entry/SalesPurchaseVoucherEntryPage.jsx";
+import PendingSalesPurchaseVoucherInputPage from "../../financial/voucher_entry/pending_sales_purchase_voucher_input/PendingSalesPurchaseVoucherInputPage.jsx";
 import CashBookPage from "../../financial/ledger/cash_book/CashBookPage.jsx";
 import TrialBalancePage from "../../financial/closing_financial_statements/trial_balance/TrialBalancePage.jsx";
 import FinancialPositionPage
@@ -128,7 +127,7 @@ import JobPostingManagementPage
     from "../../hr/recruitment_management/job_posting_management/JobPostingManagementPage.jsx";
 import PensionManagementPage from "../../hr/retirement_management/pension_management/PensionManagementPage.jsx";
 import CustomErrorPage from "../custom_error/CustomErrorPage.jsx";
-import ItemManagementPage from "../../logistics/basic_information_management/item_management/ItemManagementPage.jsx";
+import ProductManagementPage from "../../logistics/basic_information_management/product_management/ProductManagementPage.jsx";
 import ItemGroupManagementPage
     from "../../logistics/basic_information_management/item_group_management/ItemGroupManagementPage.jsx";
 import WarehouseRegistrationPage from "../../logistics/basic_information_management/warehouse_registration/WarehouseRegistrationPage.jsx";
@@ -204,6 +203,8 @@ import OutsourcingOrderPage
     from "../../production/outsourcing_management/outsourcing_order_management/OutsourcingOrderPage.jsx";
 import OutsourcingInspectionPage
     from "../../production/outsourcing_management/outsourcing_inspection_management/OutsourcingInspectionPage.jsx";
+import PendingSalesPurchaseVoucherApprovalPage
+    from "../../financial/voucher_entry/pending_sales_purchase_voucher_approval/PendingSalesPurchaseVoucherApprovalPage.jsx";
 
 // 필요한 페이지 컴포넌트들
 
@@ -211,7 +212,7 @@ import OutsourcingInspectionPage
 const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage,
     WorkerPage, IntegrationDashboardPage,FinanceDashboardPage, ProductionDashboardPage, HRDashboardPage, LogisticsDashboardPage, PendingVoucherInputPage,
     UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, CompanyInfoEditPage, VoucherListPage,
-    SalesPurchaseVoucherEntryPage, ElectronicTaxInvoicePage, ClientLedgerPage, ClientAccountLedgerPage, AccountLedgerPage, CashBookPage, DailyMonthlyReportPage,
+    PendingSalesPurchaseVoucherInputPage, PendingSalesPurchaseVoucherApprovalPage, ElectronicTaxInvoicePage, ClientLedgerPage, ClientAccountLedgerPage, AccountLedgerPage, CashBookPage, DailyMonthlyReportPage,
     JournalPage, GeneralLedgerPage, SalesPurchaseLedgerPage, TaxInvoiceStatusPage, VoucherPrintPage, ClosingDataEntryPage, TrialBalancePage, FinancialPositionPage, IncomeStatementPage, CostStatementPage, ProfitDistributionStatementPage,
     CashFlowStatementPage, EquityChangesStatementPage, ClosingAnnexStatementPage, PreviousFinancialPositionPage, PreviousIncomeStatementPage,
     PreviousCostStatementPage, PreviousProfitDistributionPage, ClientInitialCarryoverPage, ClosingCarryoverPage, FixedAssetRegistrationPage,
@@ -221,7 +222,7 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     ApplicantManagementPage, ApplicationManagementPage, InterviewManagementPage, JobOfferManagementPage, SalarySettlementPage, DeductionManagementPage,
     PaymentItemManagementPage, SocialInsurancePage, PayStatementPage, RetirementBenefitEstimationPage, RetirementSettlementPage, PensionManagementPage,
     WithholdingTaxDeclarationPage, LocalIncomeTaxDeclarationPage, PaymentStatementIssuancePage, BusinessIncomeManagementPage, OtherIncomeManagementPage,
-    ItemManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShipmentPage,
+    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShipmentPage,
     PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,

@@ -1,166 +1,160 @@
-import { Select } from 'antd';
+import {Select, Tag} from 'antd';
+import React, {useEffect, useState} from "react";
 
 // 전체 조회 컬럼 (기존 컬럼 유지)
 export const workcenterColumns = [
     {
-        title: <span>코드</span>,
+        title: <div className="title-text">코드</div>,
         dataIndex: 'code',  // DTO의 code 필드에 접근
         key: 'code',
         width: '5%',
+        align: 'center',
     },
     {
-        title: <span>이름</span>,
-        dataIndex: 'name',  // DTO의 name 필드에 접근
-        key: 'name',
-        width: '15%',
-    },
-    {
-        title: <span>유형</span>,
+        title: <div className="title-text">유형</div>,
         dataIndex: 'workcenterType',  // DTO의 workcenterType 필드에 접근
         key: 'workcenterType',
         width: '10%',
+        align: 'center',
+
         render: (workcenterType) => {
             const typeToKorean = {
-                PRESS: "프레스",
-                WELDING: "용접",
-                PAINT: "도장",
-                MACHINING: "정밀 가공",
-                ASSEMBLY: "조립",
-                QUALITY_INSPECTION: "품질 검사",
-                CASTING: "주조",
-                FORGING: "단조",
-                HEAT_TREATMENT: "열처리",
-                PLASTIC_MOLDING: "플라스틱 성형"
+                "Press": "프레스",
+                "Welding": "용접",
+                "Paint": "도장",
+                "Machining": "정밀 가공",
+                "Assembly": "조립",
+                "Quality Inspection": "품질 검사",
+                "Casting": "주조",
+                "Forging": "단조",
+                "Heat Treatment": "열처리",
+                "Plastic Molding": "플라스틱 성형"
             };
-            return typeToKorean[workcenterType] || '-'; // 대응되는 한국어가 없을 경우 '-' 표시
+
+            const typeToColor = {
+                "Press": "blue",
+                "Welding": "green",
+                "Paint": "orange",
+                "Machining": "volcano",
+                "Assembly": "purple",
+                "Quality Inspection": "geekblue",
+                "Casting": "red",
+                "Forging": "gold",
+                "Heat Treatment": "cyan",
+                "Plastic Molding": "lime"
+            };
+
+            // workcenterType 값이 typeToKorean에 없으면 기본 '-'
+            const label = typeToKorean[workcenterType] || '기타';
+            const color = typeToColor[workcenterType] || 'gray';
+
+            return (
+                <Tag color={color}>
+                    {label}
+                </Tag>
+            );
         }
     },
     {
-        title: <span>설명</span>,
-        dataIndex: 'description',  // DTO의 description 필드에 접근
-        key: 'description',
-        width: '25%',
+        title: <div className="title-text">이름</div>,
+        dataIndex: 'name',  // DTO의 name 필드에 접근
+        key: 'name',
+        width: '20%',
+        align: 'center',
+
     },
     {
-        title: <span>공장코드</span>,
-        dataIndex: ['factoryCode', 'code'],  // DTO의 factoryCode의 code 필드에 접근
-        key: 'factoryCode',
-        width: '10%',
-        render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
+        title: <div className="title-text">공장</div>,
+        key: 'factory',
+        render: (text, record) => {
+            const { factoryCode, factoryName } = record;
+
+            // 코드와 공장명 둘 다 있는 경우 조합
+            if (factoryCode && factoryName) {
+                return `[${factoryCode}] ${factoryName}`;
+            }
+
+            // 값이 없는 경우 대체 텍스트
+            return '-';
+        },
+        width: '15%',
+        align: 'center',
     },
     {
-        title: <span>생산공정</span>,
-        dataIndex: ['processCode', 'code'],  // DTO의 processCode의 code 필드에 접근
-        key: 'processCode',
-        width: '10%',
-        render: (text) => text || '-', // null 또는 undefined일 경우 대체 문자열
+        title: <div className="title-text">생산공정</div>,
+        key: 'process',
+        render: (text, record) => {
+            const processCode = record.processCode;
+            const processName = record.processName;
+
+            // 코드와 공장명 둘 다 있는 경우 조합
+            if (processCode && processName) {
+                return `[${processCode}] ${processName}`;
+            }
+
+            // 값이 없는 경우 대체 텍스트
+            return '공정 미등록';
+        },
+        width: '15%',
+        align: 'center',
     },
     {
-        title: <span>작업자</span>,
-        dataIndex: 'workerAssignments',  // DTO의 workerAssignments 필드에 접근
-        key: 'workerAssignments',
-        width: '10%',
-        render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-', // 작업자 할당 리스트의 길이 표시
+        title: <div className="title-text">작업자</div>,
+        dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
+        key: 'todayWorkers',
+        width: '15%',
+        align: 'center',
+        render: (workers) => {
+            if (!Array.isArray(workers) || workers.length === 0) {
+                return '배정없음'; // 모델명이 없을 때
+            }
+
+            const modelCount = workers.length;
+
+            if (modelCount === 1) {
+                return workers[0]; // 모델명이 하나일 때
+            } else {
+                // 여러 개일 경우 첫 번째 모델명 + 외 N건
+                return `${workers[0]} 외 ${modelCount - 1}명`;
+            }
+        }
     },
     {
-        title: <span>설비</span>,
-        dataIndex: 'equipmentList',  // DTO의 equipmentList 필드에 접근
-        key: 'equipmentList',
-        width: '10%',
-        render: (equipmentList) => equipmentList ? equipmentList.length : '-', // 장비 리스트의 길이 표시
+        title: <div className="title-text">설비 모델</div>,
+        dataIndex: 'modelNames',  // 설비 ID 리스트 접근
+        key: 'modelNames',
+        width: '20%',
+        align: 'center',
+        render: (modelNames) => {
+            if (!Array.isArray(modelNames) || modelNames.length === 0) {
+                return '설비 미등록'; // 모델명이 없을 때
+            }
+
+            const modelCount = modelNames.length;
+
+            if (modelCount === 1) {
+                return modelNames[0]; // 모델명이 하나일 때
+            } else {
+                // 여러 개일 경우 첫 번째 모델명 + 외 N건
+                return `${modelNames[0]} 외 ${modelCount - 1}대`;
+            }
+        }
     },
     {
-        title: <span>사용</span>,
+        title: <div className="title-text">사용</div>,
         dataIndex: 'isActive',  // DTO의 isActive 필드에 접근
         key: 'isActive',
         width: '5%',
-        render: (text) => text ? 'Y' : 'N', // Boolean 값을 'Y' 또는 'N'으로 표시
+        align: 'center',
+        render: (isActive) => {
+            return (
+                <Tag color={isActive ? 'green' : 'red'}>
+                    {isActive ? '사용중' : '미사용'}
+                </Tag>
+            );
+        }
     },
 ];
 
-export const workcenterDetailColumns = [
-    {
-        title: <span>코드</span>,
-        dataIndex: 'code',
-        key: 'code',
-        width: '5%',
-        editable: true, // 수정 가능
-    },
-    {
-        title: <span>이름</span>,
-        dataIndex: 'name',
-        key: 'name',
-        width: '15%',
-        editable: true, // 수정 가능
-    },
-    {
-        title: <span>유형</span>,
-        dataIndex: 'workcenterType',
-        key: 'workcenterType',
-        width: '10%',
-        render: (workcenterType) => {
-            const typeToKorean = {
-                PRESS: "프레스",
-                WELDING: "용접",
-                PAINT: "도장",
-                MACHINING: "정밀 가공",
-                ASSEMBLY: "조립",
-                QUALITY_INSPECTION: "품질 검사",
-                CASTING: "주조",
-                FORGING: "단조",
-                HEAT_TREATMENT: "열처리",
-                PLASTIC_MOLDING: "플라스틱 성형"
-            };
-            return typeToKorean[workcenterType] || '-';
-        },
-        editable: true, // 드롭다운으로 선택 가능
-    },
-    {
-        title: <span>설명</span>,
-        dataIndex: 'description',
-        key: 'description',
-        width: '25%',
-        editable: true, // 수정 가능
-    },
-    {
-        title: <span>공장명</span>,
-        dataIndex: 'factoryName',
-        key: 'factoryName',
-        width: '10%',
-        editable: false, // 수정 불가
-        render: (text) => text || '-',
-    },
-    {
-        title: <span>생산공정명</span>,
-        dataIndex: 'processName',
-        key: 'processName',
-        width: '10%',
-        editable: false, // 수정 불가
-        render: (text) => text || '-',
-    },
-    {
-        title: <span>작업자</span>,
-        dataIndex: 'workerAssignments',
-        key: 'workerAssignments',
-        width: '10%',
-        editable: false, // 수정 불가
-        render: (workerAssignments) => workerAssignments ? workerAssignments.length : '-',
-    },
-    {
-        title: <span>설비</span>,
-        dataIndex: 'equipmentList',
-        key: 'equipmentList',
-        width: '10%',
-        editable: false, // 수정 불가
-        render: (equipmentList) => equipmentList ? equipmentList.length : '-',
-    },
-    {
-        title: <span>사용</span>,
-        dataIndex: 'isActive',
-        key: 'isActive',
-        width: '5%',
-        render: (text) => text ? 'Y' : 'N',
-        editable: true, // 수정 가능
-    },
-];
+
 

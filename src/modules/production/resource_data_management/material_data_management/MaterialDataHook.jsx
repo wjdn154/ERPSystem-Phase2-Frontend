@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState, useRef} from "react";
 import axios from "axios";
+const { confirm } = Modal;
 import {
     fetchMaterialDetail,
     fetchMaterialDataList,
@@ -12,6 +13,8 @@ import {
     fetchHazardousMaterialList,
     updateMaterialHazardousList
 } from "./MaterialDataApi.jsx";
+import {Modal, notification} from "antd";
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 export const materialDataHook = (initialData) => {
 
@@ -29,6 +32,7 @@ export const materialDataHook = (initialData) => {
     const [filteredProductData, setFilteredProductData] = useState([]);
     const [filterHazardousData, setFilterHazardousData] = useState([]);
     const [selectedProductCode, setSelectedProductCode] = useState(null);
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
 
     //데이터가 변경될 때마다 컴포넌트를 새로 렌더링
     useEffect(() => {
@@ -121,17 +125,15 @@ export const materialDataHook = (initialData) => {
     // 저장 버튼 클릭 시 실행되는 함수
     const handleSave = async () => {
         try {
-            const confirmSave = window.confirm("저장하시겠습니까?");
 
-            if (!confirmSave) return;
             console.log("저장버튼 클릭 시 hazardousMaterial : ",materialDataDetail);
             await saveMaterialData(materialDataDetail);
             const savedData = await fetchMaterialDataList();  //등록 후 새로운 리스트 반환
-            window.alert("저장되었습니다.");
+            notify('success', '자재 등록', '자재 등록 성공', 'bottomRight')
             setIsInsertModalVisible(false);
             setData(savedData);
         } catch (error) {
-            console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
+            notify('error', '등록 실패', '데이터 등록 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -144,38 +146,7 @@ export const materialDataHook = (initialData) => {
         setIsInsertModalVisible(false);
     }
 
-    //자재 등록, 수정 alert
-    const alertMaterial = () => {
 
-        if (!materialDataDetail.materialCode) {
-            alert("자재 코드를 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.materialName) {
-            alert("자재 명을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.materialType) {
-            alert("자재유형을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.stockQuantity) {
-            alert("재고 수량을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.purchasePrice) {
-            alert("구매 가격을 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeCode) {
-            alert("거래처 코드를 입력하세요.");
-            return;
-        }
-        if (!materialDataDetail.representativeName) {
-            alert("커래처 명을 입력하세요.");
-            return;
-        }
-    }
     //등록 모달창 ok 눌렀을 때 실행되는 함수
     const handleInsertOk = async () => {
 
@@ -200,16 +171,15 @@ export const materialDataHook = (initialData) => {
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
-            const confirmSave = window.confirm("수정하시겠습니까?");
             console.log("수정버튼 클릭시 id ,materialDataDetail : ",materialDataDetail.id, materialDataDetail);
 
             await updateMaterialData(materialDataDetail.id, materialDataDetail);
             const updatedData = await fetchMaterialDataList();
             setData(updatedData);
-            window.alert("수정완료되었습니다.");
+            notify('success', '자재 수정', '자재 수정 성공', 'bottomRight')
             setIsUpdateModalVisible(false);
         } catch (error) {
-            console.error("API에서 데이터를 수정하는 중 오류 발생:", error);
+            notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
     }
 
@@ -219,20 +189,28 @@ export const materialDataHook = (initialData) => {
 
     //삭제 버튼 선택 클릭 시 실행되는 함수
     const handleDelete = async () => {
-        const confirmDelete = window.confirm("정말로 삭제 하시겠습니까?");
 
-        if(!confirmDelete) return;
-
-        if(materialDataDetail && materialDataDetail.id){
-            try{
-                await deleteMaterialData(materialDataDetail.id);
-                const deletedData = await fetchMaterialDataList();
-                window.alert('삭제 완료되었습니다.');
-                setData(deletedData);
-            }catch (error){
-                console.error("API에서 자재 데이터를 삭제하는 중 오류 발생:", error);
+        confirm({
+            title: '삭제 확인',
+            content: '정말로 삭제하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                if(materialDataDetail && materialDataDetail.id){
+                    try{
+                       await deleteMaterialData(materialDataDetail.id);
+                        const deletedData = await fetchMaterialDataList();
+                        notify('success', '삭제 성공', '자재 삭제 성공.', 'bottomRight');
+                        setData(deletedData);
+                        // 선택된 행 초기화 및 상세보기 숨기기
+                        setSelectedRow(null);
+                    }catch (error){
+                        notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
+                    }
+                }
             }
-        }
+        })
+
     }
 
     //탭 누를 시 화면 전환
@@ -270,7 +248,7 @@ export const materialDataHook = (initialData) => {
                 window.alert('품목이 삭제되었습니다.');
                 // 여기서 삭제 후 품목 리스트를 다시 불러옵니다.
             } catch (error) {
-                console.error("품목 삭제 중 오류 발생:", error);
+                notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
             }
         } else {
             window.alert('삭제할 품목을 선택해주세요.');
@@ -295,7 +273,7 @@ export const materialDataHook = (initialData) => {
             setIsInsertModalVisible(false);
             setFilteredProductData(savedData);
         } catch (error) {
-            console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
+            notify('error', '등록 실패', '데이터 등록 중 오류가 발생했습니다.', 'top');
         }
     };
     //등록 모달창 ok 눌렀을 때 실행되는 함수
@@ -306,17 +284,16 @@ export const materialDataHook = (initialData) => {
     // 저장 버튼 클릭 시 실행되는 함수
     const handleHazardousSave = async () => {
         try {
-            const confirmSave = window.confirm("저장하시겠습니까?");
 
             if (!confirmSave) return;
             console.log("저장버튼 클릭 시 materialHazardous : ",materialDataDetail.hazardousMaterial);
             await updateMaterialHazardousList(materialDataDetail.id, materialDataDetail.hazardousMaterial);
             const savedData = await fetchHazardousMaterialList();  //등록 후 새로운 리스트 반환
-            window.alert("저장되었습니다.");
+            notify('success', '유해물질 등록', '유해물질 등록 성공', 'bottomRight')
             setIsInsertModalVisible(false);
             setFilterHazardousData(savedData);
         } catch (error) {
-            console.error("API에서 데이터를 저장하는 중 오류 발생:", error);
+            notify('error', '등록 실패', '데이터 등록 중 오류가 발생했습니다.', 'top');
         }
     };
 

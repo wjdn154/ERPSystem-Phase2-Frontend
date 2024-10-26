@@ -1,20 +1,26 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import { Box, Grid, Grow } from '@mui/material';
+import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import {sbomColumns, tabItems} from './BomUtil.jsx';
+import {sbomColumns, greenBomColumns, tabItems} from './BomUtil.jsx';
 import {Typography} from '@mui/material';
-import {Button, Col, Input, message, Modal, Row, Table} from 'antd';
+import {Space, Button, DatePicker, Form, Input, Modal, Spin, Table, Tag, Tooltip, Col, Row} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
+import dayjs from "dayjs";
+import {BookOutlined, DownSquareOutlined, InfoCircleOutlined, SearchOutlined} from "@ant-design/icons";
+const { RangePicker } = DatePicker;
 
 export const BomPage = () => {
+    const notify = useNotificationContext();
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [data, setData] = useState([]); // BOM 데이터 목록
     const [selectedSBom, setSelectedSBom] = useState(null); // 선택된 BOM
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 열림 여부
     const [newSBom, setNewSBom] = useState({}); // 새로 추가하거나 수정할 BOM 데이터
+    const [newGreenBom, setNewGreenBom] = useState({}); // 새로 추가하거나 수정할 BOM 데이터
     const [isEditing, setIsEditing] = useState(false); // 수정 모드 여부
 
     // 1. SBom 전체 조회
@@ -23,9 +29,10 @@ export const BomPage = () => {
             try {
                 const response = await apiClient.post(PRODUCTION_API.S_BOM_LIST_API);
                 setData(response.data);
+                notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
             } catch (error) {
-                console.error('Error fetching SBOMs:', error);
-                message.error('BOM 목록을 불러오는 중 오류가 발생했습니다.');
+                console.error('Error refreshing SBOMs:', error);
+                notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
             }
         };
 
@@ -37,7 +44,7 @@ export const BomPage = () => {
         const notify = useNotificationContext(); // context에서 notify 함수 가져오기
         try {
             await apiClient.post(PRODUCTION_API.S_BOM_CREATE_API, newSBom);
-            notify('success', '성공', '새 BOM이 성공적으로 추가되었습니다.', 'top'); // 성공 메시지
+            notify('success', '성공', '새 BOM이 추가되었습니다.', 'bottomRight'); // 성공 메시지
             setIsModalVisible(false);
             refreshSBoms();
         } catch (error) {
@@ -51,12 +58,12 @@ export const BomPage = () => {
     const handleEditSBom = async () => {
         try {
             await apiClient.post(PRODUCTION_API.S_BOM_UPDATE_API(selectedSBom.id), newSBom);
-            message.success('BOM이 성공적으로 수정되었습니다.');
+            notify('success', '성공', 'BOM이 수정되었습니다.', 'bottomRight'); // 성공 메시지
             setIsModalVisible(false);
             refreshSBoms();
         } catch (error) {
             console.error('Error updating SBOM:', error);
-            message.error('BOM 수정 중 오류가 발생했습니다.');
+            notify('error', '조회 오류', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -64,11 +71,11 @@ export const BomPage = () => {
     const handleDeleteSBom = async (id) => {
         try {
             await apiClient.post(PRODUCTION_API.S_BOM_DELETE_API(id));
-            message.success('BOM이 성공적으로 삭제되었습니다.');
+            notify('success', '성공', 'BOM이 삭제되었습니다.', 'bottomRight'); // 성공 메시지
             refreshSBoms();
         } catch (error) {
             console.error('Error deleting SBOM:', error);
-            message.error('BOM 삭제 중 오류가 발생했습니다.');
+            notify('error', '삭제 오류', '데이터 삭제 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -93,9 +100,10 @@ export const BomPage = () => {
         try {
             const response = await apiClient.post(PRODUCTION_API.S_BOM_LIST_API);
             setData(response.data);
+            notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
         } catch (error) {
             console.error('Error refreshing SBOMs:', error);
-            message.error('데이터 새로고침 중 오류가 발생했습니다.');
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -127,29 +135,31 @@ export const BomPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12}>
+                    <Grid item xs={12} md={8} sx={{ minWidth: '610px' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                {/* BOM 검색 바 */}
-                                <Row gutter={16} style={{ marginBottom: '16px' }}>
-                                    <Col span={8}>
-                                        <Input.Search
-                                            placeholder="BOM 검색"
-                                            enterButton
-                                        />
-                                    </Col>
-                                </Row>
-                                {/* SBOM 목록 */}
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >표준 BOM 조회</Typography>
+                                <Grid sx={{ margin: '20px' }}>
+
+                                </Grid>
                                 <Table
                                     dataSource={data}
                                     columns={sbomColumns}
                                     rowKey="id"
+                                    rowSelection={{
+                                        type: 'radio',
+
+                                        selectedRowKeys,
+                                        onChange: (newSelectedRowKeys) => setSelectedSBom(newSelectedRowKeys),
+                                    }}
+                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                    size={'small'}
                                 />
 
-                                {/* 새 BOM 등록 버튼 */}
-                                <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
-                                    등록
-                                </Button>
+                                {/*/!* 새 BOM 등록 버튼 *!/*/}
+                                {/*<Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>*/}
+                                {/*    등록*/}
+                                {/*</Button>*/}
 
                                 {/* 모달 컴포넌트 */}
                                 <Modal
@@ -178,15 +188,11 @@ export const BomPage = () => {
                                         onChange={handleInputChange}
                                         style={{ marginTop: '10px' }}
                                     />
-
-                                    <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
-                                        수정
-                                    </Button>
                                     <Button type="primary" onClick={() => handleOpenModal(null)} style={{ marginTop: '16px' }}>
                                         삭제
                                     </Button>
                                 </Modal>
-                            </div>
+                            </Paper>
                         </Grow>
                     </Grid>
                 </Grid>
@@ -194,11 +200,27 @@ export const BomPage = () => {
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={8} sx={{ minWidth: '610px' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
+                            <Grow in={true} timeout={200}>
+                                <Paper elevation={3} sx={{ height: '100%' }}>
+                                    <Typography variant="h6" sx={{ padding: '20px' }} >친환경 BOM 조회</Typography>
+                                    <Grid sx={{ margin: '20px' }}>
+                                        <Table
+                                            dataSource={data}
+                                            columns={sbomColumns}
+                                            rowKey="id"
+                                            rowSelection={{
+                                                type: 'radio',
+                                                selectedRowKeys,
+                                                onChange: (newSelectedRowKeys) => setSelectedSBom(newSelectedRowKeys),
+                                            }}
+                                            pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
+                                            size={'small'}
+                                        />
+                                    </Grid>
+                                </Paper>
+                            </Grow>
                         </Grow>
                     </Grid>
                 </Grid>

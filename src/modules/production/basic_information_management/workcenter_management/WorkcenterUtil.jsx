@@ -19,6 +19,15 @@ export const tabItems = () => {
         },
         {
             key: '2',
+            label: '작업장 등록',
+            children: (
+                <Typography>
+                    새로운 작업장을 등록하는 탭으로, 위치, 담당자 정보, 설비 정보 등을 입력 가능함.
+                </Typography>
+            ),
+        },
+        {
+            key: '3',
             label: '오늘의 작업자 명단',
             children: (
                 <Typography>

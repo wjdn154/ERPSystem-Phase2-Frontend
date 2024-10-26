@@ -5,18 +5,15 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 import {
-    DEPARTMENT_API,
     EMPLOYEE_API,
     FINANCIAL_API,
     LOGISTICS_API,
     PRODUCTION_API,
-    USERS_API
 } from "./apiConstants.jsx";
 
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
 
-// 메인 메뉴 아이템 배열을 정의, 각 메뉴는 텍스트와 아이콘으로 구성
 export const menuItems = [
     { text: '통합관리', icon: <FeaturedPlayListIcon /> },
     { text: '재무회계', icon: <AttachMoneyIcon /> },
@@ -25,7 +22,6 @@ export const menuItems = [
     { text: '생산관리', icon: <PrecisionManufacturingIcon /> },
 ];
 
-// 서브 메뉴 아이템 객체를 정의, 메인 메뉴별로 다양한 서브 메뉴 항목들을 배열로 관리
 export const subMenuItems = {
     '통합관리': [
         {
@@ -35,28 +31,29 @@ export const subMenuItems = {
             text: '기초정보관리',
             items: [
                 { text: '회사정보수정', component: 'CompanyInfoEditPage', apiPath: undefined, url: '/integration/basic-info/company-edit', requiredPermission: 'adminPermission', permissionLevel: 'ADMIN' }, // 관리자 권한
-                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: USERS_API.USERS_PERMISSION_API(Cookies.get('jwt') ? jwtDecode(Cookies.get('jwt')).sub : null), url: '/integration/basic-info/user-management' }, // 사용자 관리 권한
+                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: EMPLOYEE_API.USERS_PERMISSION_API(Cookies.get('jwt') ? jwtDecode(Cookies.get('jwt')).sub : null), url: '/integration/basic-info/user-management' }, // 사용자 관리 권한
             ]
         }
     ],
     '재무회계': [
-        {
-            text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/finance', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL'
-        },
+        // {
+        //     text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/financial'
+        // },
         {
             text: '기초정보관리',
             items: [
                 { text: '거래처등록', component: 'ClientRegistrationPage', apiPath: FINANCIAL_API.FETCH_CLIENT_LIST_API, url: '/finance/basic-info/client-registration', requiredPermission: 'clientRegistrationPermission', permissionLevel: 'GENERAL' },  // 거래처등록 권한
                 { text: '계정과목및적요등록', component: 'AccountSubjectPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/finance/basic-info/account-subject', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL' },  // 계정과목 및 적요 등록 권한
-                { text: '환경등록', component: 'SystemEnvironmentSettingsPage', apiPath: undefined, url: '/finance/basic-info/environment', requiredPermission: 'environmentPermission', permissionLevel: 'GENERAL' },  // 환경등록 권한
+                { text: '환경등록', component: 'SystemEnvironmentSettingsPage', apiPath: FINANCIAL_API.JOURNAL_ENTRY_TYPE_API, url: '/finance/basic-info/environment', requiredPermission: 'environmentPermission', permissionLevel: 'GENERAL' },  // 환경등록 권한
             ]
         },
         {
             text: '전표관리',
             items: [
-                { text: '미결전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 미결전표입력 권한
-                { text: '미결전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
-                { text: '매입매출전표입력', component: 'SalesPurchaseVoucherEntryPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
+                { text: '일반전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 미결전표입력 권한
+                { text: '일반전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '매입매출전표입력', component: 'PendingSalesPurchaseVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
+                { text: '미결매입매출전표승인', component: 'PendingSalesPurchaseVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-sales-purchase-voucher-approval', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'ADMIN' },
                 { text: '전자세금계산서발행', component: 'ElectronicTaxInvoicePage', apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한
             ]
         },
@@ -120,15 +117,15 @@ export const subMenuItems = {
         },
     ],
     '인사관리': [
-        {
-            text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL'
-        },
+        // {
+        //     text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr'
+        // },
         {
             text: '기초 정보 관리',
             items: [
                 { text: '사원 관리', component: 'EmployeeManagementPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
-                { text: '사용자 관리', component: 'UserManagementPage', apiPath: USERS_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한
-                { text: '부서 관리', component: 'DepartmentManagementPage', apiPath: DEPARTMENT_API.DEPARTMENT_DATA_API, url: '/hr/basic-info/department-management', requiredPermission: 'departmentManagementPermission', permissionLevel: 'GENERAL' },  // 부서 관리 권한
+                { text: '사용자 관리', component: 'UserManagementPage', apiPath: EMPLOYEE_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한
+                { text: '부서 관리', component: 'DepartmentManagementPage', apiPath: EMPLOYEE_API.DEPARTMENT_DATA_API, url: '/hr/basic-info/department-management', requiredPermission: 'departmentManagementPermission', permissionLevel: 'GENERAL' },  // 부서 관리 권한
                 { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: undefined, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
                 { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: undefined, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
                 { text: '퇴사자 관리', component: 'RetirementManagementPage', apiPath: undefined, url: '/hr/basic-info/retirement-management', requiredPermission: 'retirementManagementPermission', permissionLevel: 'GENERAL' },  // 퇴사자 관리 권한
@@ -182,14 +179,13 @@ export const subMenuItems = {
         },
     ],
     '물류관리': [
-        {
-            text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL'
-        },
+        // {
+        //     text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics'
+        // },
         {
             text: '기초정보관리',
             items: [
-                { text: '품목 관리', component: 'ItemManagementPage', apiPath: undefined, url: '/logistics/basic-info/item-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
-                { text: '품목 그룹 관리', component: 'ItemGroupManagementPage', apiPath: undefined, url: '/logistics/basic-info/item-group-management', requiredPermission: 'itemGroupManagementPermission', permissionLevel: 'GENERAL' },  // 품목 그룹 관리 권한
+                { text: '품목 등록', component: 'ProductManagementPage', apiPath: LOGISTICS_API.PRODUCT_LIST_API, url: '/logistics/basic-info/product-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
                 { text: '창고등록', component: 'WarehouseRegistrationPage', apiPath: undefined, url: '/logistics/basic-info/warehouse-registration', requiredPermission: 'warehouseRegistrationPermission', permissionLevel: 'GENERAL' },  // 창고등록 권한
             ]
         },
@@ -206,10 +202,8 @@ export const subMenuItems = {
         {
             text: '구매 관리',
             items: [
-                { text: '발주 요청', component: 'PurchaseRequestPage', apiPath: undefined, url: '/logistics/purchase/purchase-request', requiredPermission: 'purchaseRequestPermission', permissionLevel: 'GENERAL' },  // 발주 요청 권한
-                { text: '발주 계획', component: 'PurchasePlanPage', apiPath: undefined, url: '/logistics/purchase/purchase-plan', requiredPermission: 'purchasePlanPermission', permissionLevel: 'GENERAL' },  // 발주 계획 권한
-                { text: '단가 요청', component: 'PriceRequestPage', apiPath: undefined, url: '/logistics/purchase/price-request', requiredPermission: 'priceRequestPermission', permissionLevel: 'GENERAL' },  // 단가 요청 권한
-                { text: '발주서', component: 'PurchaseOrderPage', apiPath: undefined, url: '/logistics/purchase/purchase-order', requiredPermission: 'purchaseOrderPermission', permissionLevel: 'GENERAL' },  // 발주서 권한
+                { text: '발주 요청', component: 'PurchaseRequestPage', apiPath: LOGISTICS_API.PURCHASE_REQUEST_LIST_API, url: '/logistics/purchase/purchase-request', requiredPermission: 'purchaseRequestPermission', permissionLevel: 'GENERAL' },  // 발주 요청 권한
+                { text: '발주서', component: 'PurchaseOrderPage', apiPath: LOGISTICS_API.PURCHASE_ORDER_LIST_API, url: '/logistics/purchase/purchase-order', requiredPermission: 'purchaseOrderPermission', permissionLevel: 'GENERAL' },  // 발주서 권한
                 { text: '구매', component: 'PurchasePage', apiPath: undefined, url: '/logistics/purchase/purchase', requiredPermission: 'purchasePermission', permissionLevel: 'GENERAL' },  // 구매 권한
                 { text: '입고지시서', component: 'ReceivingInstructionPage', apiPath: undefined, url: '/logistics/purchase/inbound-order', requiredPermission: 'inboundOrderPermission', permissionLevel: 'GENERAL' },  // 입고지시서 권한
             ]
@@ -262,9 +256,9 @@ export const subMenuItems = {
         }
     ],
     '생산관리': [
-        {
-            text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production', requiredPermission: 'mpsPermission', permissionLevel: 'GENERAL'
-        },
+        // {
+        //     text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production'
+        // },
         {
             text: '기초정보 관리',
             items: [
@@ -299,7 +293,7 @@ export const subMenuItems = {
         {
             text: '작업 지시 관리',
             items: [
-                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.SHIFT_TYPE_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
+                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
                 { text: '작업 지시 관리', component: 'ProductionOrderPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
                 { text: '작업배정이력 관리', component: 'AssignmentHistoryPage', apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_MONTHLY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
             ]

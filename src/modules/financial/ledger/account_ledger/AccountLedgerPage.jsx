@@ -3,12 +3,13 @@ import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './AccountLedgerUtil.jsx';
 import {Typography} from '@mui/material';
-import {Table, Button, DatePicker, Input, Modal, Spin} from 'antd';
+import {Table, Button, DatePicker, Input, Modal, Spin, Tag, Form, Space} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import dayjs from "dayjs";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {FINANCIAL_API} from "../../../../config/apiConstants.jsx";
+import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 
@@ -21,7 +22,9 @@ const AccountLedgerPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentField, setCurrentField] = useState('');
+    const [initialModalData, setInitialModalData] = useState(null);
     const [modalData, setModalData] = useState(null);
+    const [isFocusedAccount, setIsFocusedAccount] = useState(null);
     const [searchParams, setSearchParams] = useState({
         startDate: null,
         endDate: null,
@@ -44,6 +47,7 @@ const AccountLedgerPage = () => {
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
         setModalData(null); // 모달 열기 전에 데이터를 초기화
+        setInitialModalData(null); // 모달 열기 전에 데이터를 초기화
         fetchModalData();  // 모달 데이터 가져오기 호출
         setIsModalVisible(true);  // 모달창 열기
     };
@@ -93,13 +97,13 @@ const AccountLedgerPage = () => {
         const { startDate, endDate, startAccountCode, endAccountCode } = searchParams;
         // 입력값 검증
         if (!startDate || !endDate || !startAccountCode || !endAccountCode) {
-            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomLeft');
+            notify('warning', '입력 오류', '모든 필드를 입력해 주세요.', 'bottomRight');
             return;
         }
 
         // 계정과목 코드 순서 검증
         if (Number(startAccountCode) > Number(endAccountCode)) {
-            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomLeft');
+            notify('warning', '입력 오류', '계정과목 시작 코드는 종료 코드보다 작아야 합니다.', 'bottomRight');
             return;
         }
 
@@ -108,7 +112,7 @@ const AccountLedgerPage = () => {
             const data = response.data;
             setSearchData(data);
         } catch (error) {
-            notify('error', '조회 오류', '총계정원장 조회 중 오류가 발생했습니다.', 'top');
+            notify('error', '조회 오류', '계정별 원장 조회 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -120,6 +124,7 @@ const AccountLedgerPage = () => {
             const searchText = null;
             const response = await apiClient.post(FINANCIAL_API.ACCOUNT_SUBJECTS_SEARCH_API, { searchText });
             setModalData(response.data);
+            setInitialModalData(response.data);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -153,45 +158,75 @@ const AccountLedgerPage = () => {
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >계정별 원장 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                    <Grid sx={{ display: 'flex' }}>
-                                        <Input
-                                            name="accountCode"
-                                            placeholder="계정과목 시작 코드"
-                                            value={displayValues.startAccountCode}
-                                            onClick={() => handleInputClick('startAccountCode')}
-                                            style={{
-                                                width: '50%',
-                                                marginRight: '10px',
-                                                cursor: 'pointer',
-                                                caretColor: 'transparent',
-                                            }}
-                                        />
-                                        <Input
-                                            name="accountCode"
-                                            placeholder="계정과목 끝 코드"
-                                            value={displayValues.endAccountCode}
-                                            onClick={() => handleInputClick('endAccountCode')}
-                                            style={{
-                                                width: '50%',
-                                                cursor: 'pointer',
-                                                caretColor: 'transparent',
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid sx={{ marginTop: '20px' }}>
-                                        <RangePicker
-                                            onChange={handleDateChange}
-                                            style={{ width: '80%', marginRight: '10px' }}
-                                            defaultValue={[
-                                                searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
-                                                searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
-                                            ]}
-                                            format="YYYY-MM-DD"
-                                        />
-                                        <Button type="primary" onClick={handleSearch} style={{ width: 'calc(20% - 10px)' }}>
-                                            검색
-                                        </Button>
-                                    </Grid>
+                                    <Form layout="vertical">
+                                        <Form.Item
+                                            name="accountCodeRange"
+                                            label="계정과목 코드 범위"
+                                            required
+                                            tooltip="검색할 계정과목의 시작 코드와 끝 코드를 선택하세요"
+                                        >
+                                            <Space.Compact style={{ width: '100%' }}>
+                                                <Form.Item
+                                                    noStyle
+                                                    rules={[{ required: true, message: '시작 코드를 선택하세요' }]}
+                                                >
+                                                    <Input
+                                                        placeholder="시작 코드"
+                                                        value={displayValues.startAccountCode}
+                                                        onClick={() => handleInputClick('startAccountCode')}
+                                                        className="search-input"
+                                                        style={{ width: '45%' }}
+                                                        suffix={<DownSquareOutlined />}
+                                                    />
+                                                </Form.Item>
+                                                <Input
+                                                    style={{ width: '10%', textAlign: 'center', borderLeft: 0, pointerEvents: 'none', fontSize: '0.8rem', backgroundColor: '#fff' }}
+                                                    placeholder="~"
+                                                    disabled
+                                                />
+                                                <Form.Item
+                                                    noStyle
+                                                    rules={[{ required: true, message: '끝 코드를 선택하세요' }]}
+                                                >
+                                                    <Input
+                                                        placeholder="끝 코드"
+                                                        value={displayValues.endAccountCode}
+                                                        onClick={() => handleInputClick('endAccountCode')}
+                                                        onFocus={() => setIsFocusedAccount(true)}
+                                                        onBlur={() => setIsFocusedAccount(false)}
+                                                        className="search-input"
+                                                        style={{
+                                                            width: '45%',
+                                                            borderLeft: isFocusedAccount ? '1px solid #4096FF' : '1px solid #fff',
+                                                        }}
+                                                        suffix={<DownSquareOutlined />}
+                                                    />
+                                                </Form.Item>
+                                            </Space.Compact>
+                                        </Form.Item>
+                                        <Form.Item
+                                            label="조회 기간"
+                                            required
+                                            tooltip="검색할 기간의 시작일과 종료일을 선택하세요"
+                                        >
+                                            <RangePicker
+                                                disabledDate={(current) => current && current.year() !== 2024}
+                                                onChange={handleDateChange}
+                                                defaultValue={[
+                                                    searchParams.startDate ? dayjs(searchParams.startDate, 'YYYY-MM-DD') : null,
+                                                    searchParams.endDate ? dayjs(searchParams.endDate, 'YYYY-MM-DD') : null,
+                                                ]}
+                                                format="YYYY-MM-DD"
+                                                style={{ width: '100%' }}
+                                            />
+                                        </Form.Item>
+
+                                        <Form.Item>
+                                            <Button type="primary" onClick={handleSearch}  icon={<SearchOutlined />} block>
+                                                검색
+                                            </Button>
+                                        </Form.Item>
+                                    </Form>
                                 </Grid>
 
                                 <Grid sx={{ margin: '20px' }}>
@@ -199,11 +234,11 @@ const AccountLedgerPage = () => {
                                         dataSource={searchData}
                                         columns={[
                                             {
-                                                title: '계정과목',
+                                                title: <div className="title-text">계정과목</div>,
                                                 dataIndex: 'accountCode',
                                                 key: 'accountId',
                                                 align: 'center',
-                                                render: (text, record) => <span style={{ fontSize: '0.8rem' }}>[{text}] {record.accountName}</span>,
+                                                render: (text, record) => <div className="small-text">[{text.padStart(5, '0')}] {record.accountName}</div>,
                                             },
                                         ]}
                                         rowKey="accountId"
@@ -229,7 +264,7 @@ const AccountLedgerPage = () => {
                                                     // API 호출 시 updatedParams 사용
                                                     const response = await apiClient.post(FINANCIAL_API.ACCOUNT_SUBJECT_LEDGER_DETAIL_API, { ...updatedParams });
                                                     setSearchDetailData(response.data);
-                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomLeft');
+                                                    notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -270,7 +305,7 @@ const AccountLedgerPage = () => {
                                                     })),
                                                     {
                                                         voucherDate: '',
-                                                        transactionDescription: '[월계]',
+                                                        transactionDescription: '[월 계]',
                                                         clientCode: '',
                                                         clientName: '',
                                                         debitAmount: entry.monthlyTotalDebitAmount,
@@ -285,7 +320,7 @@ const AccountLedgerPage = () => {
                                                     },
                                                     {
                                                         voucherDate: '',
-                                                        transactionDescription: '[누계]',
+                                                        transactionDescription: '[누 계]',
                                                         clientCode: '',
                                                         clientName: '',
                                                         debitAmount: entry.cumulativeTotalDebitAmount,
@@ -302,82 +337,111 @@ const AccountLedgerPage = () => {
                                             ]}
                                             columns={[
                                                 {
-                                                    title: '일자',
+                                                    title: <div className="title-text">일자</div>,
                                                     dataIndex: 'voucherDate',
                                                     key: 'voucherDate',
                                                     align: 'center',
-                                                    render: (text) => text ? <span style={{fontSize: '0.8rem'}}>{new Date(text).toLocaleDateString()}</span> : ''
+                                                    render: (text) => text ? <div className="small-text">{new Date(text).toLocaleDateString()}</div> : ''
                                                 },
                                                 {
-                                                    title: '적요',
+                                                    title: <div className="title-text">적요</div>,
                                                     dataIndex: 'transactionDescription',
                                                     key: 'transactionDescription',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem', fontWeight: 500 }}>{text}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                        <div className="medium-text">{text}</div> :
+                                                        <div className="small-text">{text}</div>
                                                 },
                                                 {
-                                                    title: '거래처',
+                                                    title: <div className="title-text">거래처</div>,
                                                     dataIndex: 'clientCode',
                                                     key: 'clientCode',
                                                     align: 'center',
-                                                    render: (text, record) => text ? <span style={{fontSize: '0.8rem'}}>[{text}] {record.clientName}</span> : ''
+                                                    render: (text, record) => text ? <div className="small-text">[{text.padStart(5, '0')}] {record.clientName}</div> : ''
                                                 },
                                                 {
-                                                    title: '차변',
+                                                    title: <div className="title-text">차변</div>,
                                                     dataIndex: 'debitAmount',
                                                     key: 'debitAmount',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                        <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> :
+                                                        <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 },
                                                 {
-                                                    title: '대변',
+                                                    title: <div className="title-text">대변</div>,
                                                     dataIndex: 'creditAmount',
                                                     key: 'creditAmount',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                        <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> :
+                                                        <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 },
                                                 {
-                                                    title: '잔액',
+                                                    title: <div className="title-text">잔액</div>,
                                                     dataIndex: 'cashAmount',
                                                     key: 'cashAmount',
                                                     align: 'center',
                                                     render: (text, record) => record.isSummary ?
-                                                        <Typography style={{ fontSize: '0.9rem' }}>{Number(text).toLocaleString()}</Typography> :
-                                                        <span style={{fontSize: '0.8rem'}}>{Number(text).toLocaleString()}</span>
+                                                        <div className="medium-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div> :
+                                                        <div className="small-text" style={{ textAlign: 'right' }}>{Number(text).toLocaleString()}</div>
                                                 },
                                                 {
-                                                    title: '전표번호',
+                                                    title: <div className="title-text">전표번호</div>,
                                                     dataIndex: 'voucherNumber',
                                                     key: 'voucherNumber',
                                                     align: 'center',
-                                                    render: (text) => <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    render: (text) => <div className="small-text">{text}</div>
                                                 },
                                                 {
-                                                    title: '등록일시',
+                                                    title: <div className="title-text">등록일시</div>,
                                                     dataIndex: 'voucherRegistrationTime',
                                                     key: 'voucherRegistrationTime',
                                                     align: 'center',
-                                                    render: (text) => text ? <span style={{fontSize: '0.8rem'}}>{new Date(text).toLocaleString()}</span> : ''
+                                                    render: (text) => text ? <div className="small-text">{new Date(text).toLocaleString()}</div> : ''
                                                 },
                                                 {
-                                                    title: '부서명',
+                                                    title: <div className="title-text">부서명</div>,
                                                     dataIndex: 'departmentName',
                                                     key: 'departmentName',
                                                     align: 'center',
-                                                    render: (text) => <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    render: (text, record) => {
+                                                        if (text) {
+                                                            let color;
+                                                            let value = text; // 기본적으로 text 값 사용
+
+                                                            switch (text) {
+                                                                case '재무부':
+                                                                    color = 'red';
+                                                                    value = '재무';
+                                                                    break;
+                                                                case '인사부':
+                                                                    color = 'green';
+                                                                    value = '인사';
+                                                                    break;
+                                                                case '생산부':
+                                                                    color = 'blue';
+                                                                    value = '생산';
+                                                                    break;
+                                                                case '물류부':
+                                                                    color = 'orange';
+                                                                    value = '물류';
+                                                                    break;
+                                                                default:
+                                                                    color = 'gray'; // 기본 색상
+                                                            }
+
+                                                            return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+                                                        }
+                                                        return '';
+                                                    }
                                                 },
                                                 {
-                                                    title: '담당자',
-                                                    dataIndex: 'voucherManagerName',
-                                                    key: 'voucherManagerName',
+                                                    title: <div className="title-text">담당자</div>,
+                                                    dataIndex: 'voucherManagerCode',
+                                                    key: 'voucherManagerCode',
                                                     align: 'center',
-                                                    render: (text) => <span style={{fontSize: '0.8rem'}}>{text}</span>
+                                                    render: (text, record) => text ? <div className="small-text">[{text}] {record.voucherManagerName}</div> : ''
                                                 }
                                             ]}
                                             pagination={ false }
@@ -423,15 +487,51 @@ const AccountLedgerPage = () => {
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     계정과목 시작 코드 선택
                                 </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.name && item.name.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
                                 <Table
                                     columns={[
-                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                        { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                        {
+                                            title: <div className="title-text">코드</div>,
+                                            dataIndex: 'code',
+                                            key: 'code',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>
+                                        },
+                                        {
+                                            title: <div className="title-text">이름</div>,
+                                            dataIndex: 'name',
+                                            key: 'name',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>
+                                        },
                                     ]}
                                     dataSource={modalData}
                                     rowKey="id"
                                     size={'small'}
-                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                    pagination={{
+                                        pageSize: 15,
+                                        position: ['bottomCenter'],
+                                        showSizeChanger: false,
+                                        showTotal: (total) => `총 ${total}개`,
+                                    }}
                                     onRow={(record) => ({
                                         style: { cursor: 'pointer' },
                                         onClick: () => handleModalSelect(record), // 선택 시 처리
@@ -444,15 +544,49 @@ const AccountLedgerPage = () => {
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     계정과목 끝 코드 선택
                                 </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.code && item.code.toLowerCase().includes(value)) ||
+                                                    (item.name && item.name.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
                                 <Table
                                     columns={[
-                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                        { title: '이름', dataIndex: 'name', key: 'name', align: 'center' },
+                                        {
+                                            title: <div className="title-text">코드</div>,
+                                            dataIndex: 'code',
+                                            key: 'code',
+                                            align: 'center'
+                                        },
+                                        {
+                                            title: <div className="title-text">이름</div>,
+                                            dataIndex: 'name',
+                                            key: 'name',
+                                            align: 'center'
+                                        },
                                     ]}
                                     dataSource={modalData}
                                     rowKey="id"
                                     size={'small'}
-                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                    pagination={{
+                                        pageSize: 15,
+                                        position: ['bottomCenter'],
+                                        showSizeChanger: false,
+                                        showTotal: (total) => `총 ${total}개`,
+                                    }}
                                     onRow={(record) => ({
                                         style: { cursor: 'pointer' },
                                         onClick: () => handleModalSelect(record), // 선택 시 처리

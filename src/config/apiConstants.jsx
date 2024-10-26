@@ -16,6 +16,10 @@ export const COMMON_API = {
 
 // 재무회계
 export const FINANCIAL_API = {
+    // 환경설정
+    JOURNAL_ENTRY_TYPE_API: `${API_BASE_URL}/api/financial/journal_entry_type_setup/show`, // 분개유형 목록 조회 API
+    JOURNAL_ENTRY_TYPE_UPDATE_API: `${API_BASE_URL}/api/financial/journal_entry_type_setup/update`, // 분개유형 수정 API
+
     // 계정과목 관련 API
     ACCOUNT_SUBJECTS_API: `${API_BASE_URL}/api/financial/accountSubjects/`, // 계정과목 목록 조회 API
     ACCOUNT_SUBJECTS_SEARCH_API: `${API_BASE_URL}/api/financial/accountSubjects/search`, // 계정과목 검색 API
@@ -40,6 +44,19 @@ export const FINANCIAL_API = {
     // 전표 관련 API
     UNRESOLVED_VOUCHER_SEARCH_API: `${API_BASE_URL}/api/financial/general-voucher-entry/showUnresolvedVoucher`, // 미결 전표 조회 API
     SAVE_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/unresolvedVoucherEntry`, // 미결 전표 저장 API
+    SALE_END_PURCHASE_RESOLVED_VOUCHER_SEARCH_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/shows`, // 매입매출 전표 조회 API
+    SALE_END_PURCHASE_RESOLVED_VOUCHER_APPROVE_SEARCH_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/approveSearch`, // 매입매출 전표 승인 조회 API
+    SALE_END_PURCHASE_RESOLVED_VOUCHER_ENTRY_SEARCH_API: `${API_BASE_URL}/api/financial/sale-and-purchase-resolved-voucher/show/entryShow`,
+    SALE_END_PURCHASE_RESOLVED_VOUCHER_ENTRY_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/entryShow`,
+    VAT_TYPE_SEARCH_API: `${API_BASE_URL}/api/financial/vatType/show`, // 부가세유형 목록 조회 API
+    APPROVAL_UNRESOLVED_VOUCHER_API: `${API_BASE_URL}/api/financial/general-voucher-entry/approvalUnresolvedVoucher`,  // 미결 전표 승인 API
+    UNRESOLVED_VOUCHER_APPROVAL_SEARCH_API: `${API_BASE_URL}/api/financial/general-voucher-entry/approvalSearch`,  // 미결 전표 승인탭 조회 API
+    VOUCHER_PRINT_SEARCH_API: `${API_BASE_URL}/api/financial/ledger/VoucherPrint/show`,  // 전표 출력 조회 API
+    VAT_AMOUNT_QUANTITY_PRICE_API: `${API_BASE_URL}/api/financial/vatType/vatAmount/quantityPrice`, // 수량, 단가로 부가세 계산 API
+    VAT_AMOUNT_SUPPLY_AMOUNT_API: `${API_BASE_URL}/api/financial/vatType/vatAmount/supplyAmount`, // 공급가액으로 부가세 계산 API
+    SALE_AND_PURCHASE_UNRESOLVED_VOUCHER_ENTRY_API: `${API_BASE_URL}/api/financial/sale-and-purchase-unresolved-voucher/entry`, // 매입매출 미결전표 등록 API
+    SALE_AND_PURCHASE_UNRESOLVED_VOUCHER_APPROVE_API: `${API_BASE_URL}/api/financial/sale-end-purchase-unresolved-voucher/approve`, // 매입매출 미결전표 승인 API
+    VAT_TYPE_ID_API: `${API_BASE_URL}/api/financial/vatType/vatType/id`, // 부가세유형 ID로 조회 API
 
     // 거래처 및 계정과목별 원장 API
     CLIENT_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/clientLedger/show`, // 거래처원장 목록 조회 API
@@ -61,6 +78,12 @@ export const FINANCIAL_API = {
 
     // 매입매출장 관련 API
     PURCHASE_SALES_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/SalesAndPurchase/show`, // 매입매출장 목록 조회 API
+
+    // 전자세금계산서 관련 API
+    TAX_INVOICE_LEDGER_API: `${API_BASE_URL}/api/financial/ledger/taxInvoice/show`, // 전자세금계산서 목록 조회 API
+
+    // 결산/재무제표 관련 API
+    FINANCIAL_STATEMENTS_API: `${API_BASE_URL}/api/financial/ledger/financialStatements/show`, // 재무상태표 조회 API
 };
 
 // 인사관리 - 사원
@@ -71,9 +94,7 @@ export const EMPLOYEE_API = {
     SAVE_EMPLOYEE_DATA_API: `${API_BASE_URL}/api/hr/employee/createEmployee`, // 사원 등록 API
     UPDATE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/hr/employee/updateEmployee/${id}`, // 사원 수정 API
     DELETE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/hr/employee/del/${id}`,
-};
 // 인사관리 - 사용자
-export const USERS_API = {
     USERS_PERMISSION_API: (username) => `${API_BASE_URL}/api/hr/users/permission/${username}`, // 사용자 권한 조회 API
     UPDATE_USERS_PERMISSION_API: `${API_BASE_URL}/api/hr/users/permission/update`,
     USERS_DATA_API: `${API_BASE_URL}/api/hr/users/all`,
@@ -81,19 +102,53 @@ export const USERS_API = {
     SAVE_USERS_DATA_API: `${API_BASE_URL}/api/hr/users/create`,
     UPDATE_USERS_DATA_API: (id)=> `${API_BASE_URL}/api/hr/users/put/${id}`,
     DELETE_USERS_DATA_API: (id) =>`${API_BASE_URL}/api/hr/users/del/${id}`,
-}
 // 인사관리 - 부서
-export const DEPARTMENT_API = {
     DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/all`,
+    SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
+    DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
+    DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
 }
 // 물류관리
 export const LOGISTICS_API = {
-    WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse`, // 창고 목록 조회 API
-    WAREHOUSE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/${id}`, // 창고 상세 조회 API
-    WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics//warehouse/updateWarehouse/${id}`,
-
-    //품목
+    WAREHOUSE_LIST_API: `${API_BASE_URL}/api/logistics/warehouse/`, // 창고 목록 조회 API
+    PRODUCT_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/product-groups/`, //품목 그룹 목록 조회 API
+    PRODUCT_GROUP_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/product-groups/update/${id}`, // 품목 그룹 수정 API
+    PRODUCT_GROUP_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/product-groups/delete/${id}`, // 품목 그룹 삭제 API
+    PRODUCT_GROUP_CREATE_API: `${API_BASE_URL}/api/logistics/product-groups/save`, //품목 그룹 등록 API
     PRODUCT_LIST_API: `${API_BASE_URL}/api/logistics/products/`,   //품목 목록 조회 API
+    PRODUCT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/products/${id}`, // 품목 상세 조회 API
+    PRODUCT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/products/update/${id}`,
+    PRODUCT_CREATE_API: `${API_BASE_URL}/api/logistics/products/save`,
+    WAREHOUSE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/${id}`, // 창고 상세 조회 API
+    WAREHOUSE_CREATE_API: `${API_BASE_URL}/api/logistics/warehouse/createWarehouse`, // 창고 생성 API
+    WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/updateWarehouse/${id}`, // 창고 수정 API
+    WAREHOUSE_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/deleteWarehouse/${id}`, // 창고 삭제 API
+    HIERARCHY_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/`, // 계층 그룹 목록 조회 API
+    HIERARCHY_GROUP_WAREHOUSES_API: (groupId) => `${API_BASE_URL}/api/logistics/hierarchyGroup/${groupId}/warehouses`, // 계층 그룹의 창고 조회 API
+    HIERARCHY_GROUP_SAVE_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/saveHierarchyGroup`, // 계층 그룹 저장 API
+    HIERARCHY_GROUP_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/hierarchyGroup/test/update/${id}`, // 계층 그룹 수정 API
+    HIERARCHY_GROUP_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/hierarchyGroup/deleteHierarchyGroup/${id}`, // 계층 그룹 삭제 API
+    // 구매 관리
+    PURCHASE_REQUEST_LIST_API: `${API_BASE_URL}/api/logistics/purchase-requests/`, // 발주 요청 목록 조회 API
+    PURCHASE_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchase-requests/${id}`, // 발주 요청 상세 정보 조회 API
+    PURCHASE_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/purchase-orders/`, // 발주 요청 목록 조회 API
+    PURCHASE_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchase-orders/${id}`, // 발주서 상세 정보 조회 API
+
+    //재고 실사 조회
+    INVENTORY_INSPECTION_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/?startDate=${startDate}&endDate=${endDate}`,
+    INVENTORY_INSPECTION_DETAILS_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/details?startDate=${startDate}&endDate=${endDate}`,
+    INVENTORY_INSPECTION_CREATE_API: `${API_BASE_URL}/api/logistics/inventory/inspection/create`, // 재고 실사 생성 API
+    INVENTORY_INSPECTION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/inventory/inspection/${id}`, // 재고 실사 상세 조회 API
+    INVENTORY_INSPECTION_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/inventory/inspection/update/${id}`, // 재고 실사 수정 API
+    INVENTORY_INSPECTION_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/inventory/inspection/delete/${id}`, // 재고 실사 삭제 API
+    INVENTORY_INSPECTION_ADJUST_REQUEST_API: (id) => `${API_BASE_URL}/api/logistics/inventory/inspection/adjustRequest/${id}`, // 재고 실사 조정 요청 API
+
+    SHIPMENT_CREATE_API: `${API_BASE_URL}/api/logistics/shipment/create`, // 출하 생성 API
+    SHIPMENT_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipment/?startDate=${startDate}&endDate=${endDate}`, // 출하 목록 조회 API
+    SHIPMENT_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/shipment/${id}`, // 출하 상세 조회 API
+    SHIPMENT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/shipment/update/${id}`, // 출하 수정 API
+    SHIPMENT_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/shipment/delete/${id}`, // 출하 삭제 API
+    SHIPMENT_ITEMS_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipment/items?startDate=${startDate}&endDate=${endDate}`, // 출하 품목 조회 API
 };
 // 생산관리
 export const PRODUCTION_API = {
@@ -116,7 +171,7 @@ export const PRODUCTION_API = {
     ROUTING_LIST_API: `${API_BASE_URL}/api/production/processRouting`, // 전체 processRouting 목록 조회 API
     ROUTING_DETAIL_API: (id) => `${API_BASE_URL}/api/production/processRouting/${id}`, // 특정 processRouting 조회 API
     ROUTING_CREATE_API: `${API_BASE_URL}/api/production/processRouting/new`, // processRouting 생성 API
-    ROUTING_UPDATE_API: (id) => `${API_BASE_URL}/api/production/processRouting/update/${id}`, // processRouting 수정 API
+    ROUTING_UPDATE_API: `${API_BASE_URL}/api/production/processRouting/update`, // processRouting 수정 API
     ROUTING_DELETE_API: (id) => `${API_BASE_URL}/api/production/processRouting/delete/${id}`, // processRouting 삭제 API
     ROUTING_SEARCH_PROCESS_DETAILS_API: `${API_BASE_URL}/api/production/processRouting/searchProcessDetails`, // 생산공정 검색 API
     ROUTING_SEARCH_PRODUCTS_API: `${API_BASE_URL}/api/production/processRouting/searchProducts`, // 제품 검색 API
@@ -173,14 +228,17 @@ export const PRODUCTION_API = {
     PRODUCTION_REQUEST_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/delete/${id}`, // 생산 요청 삭제 API
 
     // 작업지시
+    MPS_LIST_API: `${API_BASE_URL}/api/production/mps/search`, // 전체 MPS 목록 조회 API
     SHIFT_TYPE_LIST_API: `${API_BASE_URL}/api/production/shiftType`, // 전체 교대유형 목록 조회 API
     SHIFT_TYPE_DETAIL_API: (id) => `${API_BASE_URL}/api/production/shiftType/${id}`, // 특정 교대유형 조회 API
     SHIFT_TYPE_CREATE_API: `${API_BASE_URL}/api/production/shiftType/new`, // 교대유형 생성 API
     SHIFT_TYPE_UPDATE_API: `${API_BASE_URL}/api/production/shiftType/update`, // 교대유형 수정 API
     SHIFT_TYPE_DELETE_API: (id) => `${API_BASE_URL}/api/production/shiftType/delete/${id}`, // 교대유형 삭제 API
+    PRODUCTION_ORDER_LIST_API: `${API_BASE_URL}/api/production/productionOrder/all`, // 전체 작업 지시 목록 조회 API
 
     WORKER_ASSIGNMENT_WORKCENTER_COUNT_API: `${API_BASE_URL}/api/production/workerAssignment/workcenters/count`, // 전체 작업장별 배정된 인원수 조회 API
     WORKER_ASSIGNMENT_WORKCENTER_DETAIL_API: (workcenterCode) => `${API_BASE_URL}/api/production/workerAssignment/workcenter/${workcenterCode}`, // 특정 작업장 배정된 작업자 명단 조회 API
+    WORKER_ASSIGNMENT_DATES_API: `${API_BASE_URL}/api/production/workerAssignment/dates`, // 특정 날짜에 작업자 배정 상태 확인 API
     WORKER_ASSIGNMENT_CHECK_API: `${API_BASE_URL}/api/production/workerAssignment/check`, // 특정 날짜에 작업자 배정 상태 확인 API
     WORKER_ASSIGNMENT_DAILY_API: `${API_BASE_URL}/api/production/workerAssignment/daily`, // 일별 모든 작업장의 작업자 배정 이력 조회 API
     WORKER_ASSIGNMENT_MONTHLY_API: `${API_BASE_URL}/api/production/workerAssignment/monthly`, // 월별 모든 작업장의 작업자 배정 이력 조회 API
@@ -188,12 +246,16 @@ export const PRODUCTION_API = {
     WORKER_ASSIGNMENT_PRODUCTION_ORDER_SUMMARY_API: (productionOrderId) => `${API_BASE_URL}/api/production/workerAssignment/productionOrder/${productionOrderId}/summary`, // 작업지시별 작업자 명단 조회 API
     WORKER_ASSIGNMENT_WORKER_HISTORY_API: (workerId) => `${API_BASE_URL}/api/production/workerAssignment/worker/${workerId}/assignments`, // 작업자별 배치이력 조회 API
 
-    PRODUCTION_ORDER_LIST_API: `${API_BASE_URL}/api/production/productionOrder`, // 전체 작업 지시 목록 조회 API
     PRODUCTION_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}`, // 특정 작업 지시 조회 API
-    PRODUCTION_ORDER_CREATE_API: `${API_BASE_URL}/api/production/productionOrder/create`, // 작업 지시 생성 API
+    PRODUCTION_ORDER_SAVE_API: `${API_BASE_URL}/api/production/productionOrder/save`, // 작업 지시 생성 API
     PRODUCTION_ORDER_ASSIGN_WORKERS_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}/assignWorkers`, // 작업 지시 작업자 배정 API
     PRODUCTION_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/production/productionOrder/update/${id}`, // 작업 지시 수정 API
     PRODUCTION_ORDER_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionOrder/delete/${id}`, // 작업 지시 삭제 API
+    PRODUCTION_ORDER_CLOSE_API: `${API_BASE_URL}/api/production/productionOrder/closure`, // 작업 지시 마감 API
+    PRODUCTION_ORDER_CONFIRM_API: (id) => `${API_BASE_URL}/api/production/productionOrder/confirm/${id}`, // 작업 지시 확정 API
+
+    WORK_PERFORMANCE_DAILY_REPORT_API: `${API_BASE_URL}/api/production/workPerformance/dailyReport`, // 생산실적 일일보고 API
+    WORK_PERFORMANCE_MONTHLY_REPORT_API: `${API_BASE_URL}/api/production/workPerformance/monthlyReport`, // 생산실적 월간보고 API
 
     // 생산실적
 

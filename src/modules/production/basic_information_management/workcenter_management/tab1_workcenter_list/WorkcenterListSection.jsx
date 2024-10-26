@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table } from 'antd';
+import {Grid} from "@mui/material";
 
 const WorkcenterListSection = ({ columns, data, handleRowSelection, handleSelectedRow, rowClassName }) => {
   if (!data) {
@@ -7,12 +8,12 @@ const WorkcenterListSection = ({ columns, data, handleRowSelection, handleSelect
   }
 
   return (
-      <div style={{ padding: '20px' }}>
-        <Table
+      <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+          <Table
             columns={columns}
             dataSource={data}
             pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-            rowSelection={handleRowSelection} // checkbox or radio btn 활성화
+            rowSelection={handleSelectedRow} // checkbox or radio btn 활성화
             size="small"
             rowKey="code" // Workcenter에서 고유 CODE 필드를 사용
             onRow={(record) => ({
@@ -21,7 +22,7 @@ const WorkcenterListSection = ({ columns, data, handleRowSelection, handleSelect
             })}
             rowClassName={rowClassName}
         />
-      </div>
+      </Grid>
   );
 };
 

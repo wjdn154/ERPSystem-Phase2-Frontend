@@ -1,204 +1,192 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Grid,Paper,Typography, Box}  from "@mui/material";
-const { Option } = Select;
-import {Form, Row, Col, Input, Button, Select, Modal, DatePicker} from 'antd';
+import {Form, Row, Col, Input, Button, Select, Modal, DatePicker, Divider, Space, Spin, Table} from 'antd';
 import moment from 'moment';
+import apiClient from "../../../../config/apiClient.jsx";
+import {LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {SearchOutlined} from "@ant-design/icons";
+const { Option } = Select;
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 const MaintenanceHistoryDetailSection = ({
                                         data,
                                         maintenanceDataDetail,
+                                        setMaintenanceDataDetail,
                                         handleInputChange,
                                         handleDelete,
                                         showModal,
                                         handleUpdateOk,
                                         handleUpdateCancel,
                                         isUpdateModalVisible,
-                                    }) => (
+                                        handleUpdate
+                                    }) =>{
+
+
+    return(
     <Paper elevation={3} sx={{p: 2}}>
         <Typography variant="h6" marginBottom={'20px'}>설비 유지보수 상세 정보</Typography>
         <Box sx={{padding: '20px'}}>
             <Form layout="vertical">
+                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>설비 정보</Divider>
                 <Row gutter={16}>
-                    <Col span={24}>
+                    <Col span={6}>
                         <Form.Item>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"설치된 작업장"}
-                                       style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.workcenterName} style={{marginRight: '50px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e.target.value, 'workcenterName')} readOnly/>
-                                <Input value={"설치된 공장"}
-                                       style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.factoryName} style={{flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'factoryName')} readOnly/>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"설비 번호"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.equipmentNum}
-                                       style={{marginRight:'50px', marginTop: '20px', flex: 1, backgroundColor: '#F5F5F5'}}
-                                       onChange={(e) => handleInputChange(e, 'equipmentNum')} readOnly/>
-                                <Input value={"설비 명"} style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.equipmentName} style={{ marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'equipmentName')} readOnly/>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"유형"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.maintenanceType} style={{marginRight: '50px',marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'maintenanceType')} readOnly/>
-                                <Input value={"관리 담당자"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.maintenanceManager}
-                                       style={{marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'maintenanceManager')} readOnly/>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"진행 상태"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.maintenanceStatus}
-                                       style={{marginRight:'50px', marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'maintenanceStatus')} readOnly/>
-                                <Input value={"유지보수 비용"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.maintenanceCost}
-                                       style={{marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'maintenanceCost')} readOnly/>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"유지보수 일자"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.maintenanceDate}
-                                       style={{marginRight:'50px', marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'maintenanceDate')} readOnly/>
-                                <Input value={"다음 유지보수 예정일"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.nextScheduleDate}
-                                       style={{marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'nextScheduleDate')} readOnly/>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"제목"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 0.29, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.title} style={{marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'title')} readOnly/>
-                            </div>
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <Input value={"내용"}
-                                       style={{marginRight: '10px', marginTop: '20px', flex: 0.29, backgroundColor: '#f6a6a6'}} readOnly/>
-                                <Input value={maintenanceDataDetail.maintenanceDetail}
-                                       style={{marginTop: '20px', flex: 1}}
-                                       onChange={(e) => handleInputChange(e, 'maintenanceDetail')} readOnly/>
-                            </div>
+                            <Input
+                                addonBefore="설비 번호"
+                                value={maintenanceDataDetail.equipmentNum}
+                                onChange={(e) => handleInputChange(e, 'equipmentNum')}
+                                readOnly
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="설비 명"
+                                value={maintenanceDataDetail.equipmentName}
+                                onChange={(e) => handleInputChange(e, 'equipmentName')}
+                                readOnly
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="설치된 작업장"
+                                value={maintenanceDataDetail.workcenterName}
+                                onClick={() => handleInputClick('workcenter')}
+                                readOnly
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="설치된 공장"
+                                value={maintenanceDataDetail.factoryName}
+                                onClick={() => handleInputClick('factory')}
+                                readOnly
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>유지보수 정보</Divider>
+                <Row gutter={16}>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="관리 담당자"
+                                value={maintenanceDataDetail.maintenanceManager}
+                                onChange={(e) => handleInputChange(e, 'maintenanceManager')}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="유지보수 비용"
+                                value={maintenanceDataDetail.maintenanceCost}
+                                onChange={(e) => handleInputChange(e, 'maintenanceCost')}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Space.Compact>
+                            <Input style={{ width: '30%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="유형" disabled />
+                            <Select
+                                style={{ width: '70%' }}
+                                value={maintenanceDataDetail.maintenanceType}
+                                onChange={(value) =>
+                                    handleInputChange({ target: { value: value } }, 'maintenanceType')
+                                }
+                            >
+                                <Option value={"EMERGENCY_REPAIR"}>긴급 수리</Option>
+                                <Option value={"REGULAR_INSPECTION"}>정기점검</Option>
+                                <Option value={"FAILURE_REPAIR"}>고장 수리</Option>
+                            </Select>
+                        </Space.Compact>
+                    </Col>
+                    <Col span={6}>
+                        <Space.Compact>
+                            <Input style={{ width: '50%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="진행 상태" disabled />
+                            <Select
+                                style={{ width: '50%' }}
+                                value={maintenanceDataDetail.maintenanceStatus}
+                                onChange={(value) =>
+                                    handleInputChange({ target: { value: value } }, 'maintenanceStatus')
+                                }
+                            >
+                                <Option value={true}>완료</Option>
+                                <Option value={false}>작업 중</Option>
+                            </Select>
+                        </Space.Compact>
+                    </Col>
+                </Row>
+                <Row gutter={16}>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input.Group compact>
+                                <Input
+                                    style={{ width: '40%' }}
+                                    value="유지보수 일자"
+                                    readOnly
+                                />
+                                <DatePicker
+                                    disabledDate={(current) => current && current.year() !== 2024}
+                                    value={maintenanceDataDetail?.maintenanceDate ? moment(maintenanceDataDetail.maintenanceDate, 'YYYY-MM-DD') : null}
+                                    onChange={(date, dateString) => handleInputChange({ target: { value: dateString } }, 'maintenanceDate')}
+                                    format="YYYY-MM-DD"
+                                    style={{ width: '60%' }}
+                                />
+                            </Input.Group>
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Input.Group compact>
+                            <Input
+                                style={{ width: '55%' }}
+                                value="다음 유지보수 예정일"
+                                readOnly
+                            />
+                            <DatePicker
+                                disabledDate={(current) => current && current.year() !== 2024}
+                                value={maintenanceDataDetail?.nextScheduleDate ? moment(maintenanceDataDetail.nextScheduleDate, 'YYYY-MM-DD') : null}
+                                onChange={(date, dateString) => handleInputChange({ target: { value: dateString } }, 'nextScheduleDate')}
+                                format="YYYY-MM-DD"
+                                style={{ width: '45%' }}
+                            />
+                        </Input.Group>
+                    </Col>
+                </Row>
+                <Row gutter={16}>
+                    <Col span={6}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="제목"
+                                value={maintenanceDataDetail.title}
+                                onChange={(e) => handleInputChange(e, 'title')}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={18}>
+                        <Form.Item>
+                            <Input
+                                addonBefore="상세 내용"
+                                value={maintenanceDataDetail.maintenanceDetail}
+                                onChange={(e) => handleInputChange(e, 'maintenanceDetail')}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
             </Form>
         </Box>
         <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: '20px'}}>
-            <Button onClick={showModal} type="primary" style={{marginRight: '10px'}}>수정</Button>
+            <Button onClick={handleUpdate} type="primary" style={{marginRight: '10px'}}>수정</Button>
             <Button onClick={handleDelete} type="danger">삭제</Button>
         </div>
 
-
-        <Modal
-            title="해당 설비의 유지보수 정보 수정"
-            open={isUpdateModalVisible}
-            onOk={handleUpdateOk}
-            onCancel={handleUpdateCancel}
-            width={800} // 너비를 800px로 설정
-        >
-
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"설치된 작업장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={maintenanceDataDetail?.workcenterCode} style={{marginRight: '30px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'workcenterCode')} readOnly/>
-                <Input value={"설치된 공장 코드"} style={{marginRight: '10px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={maintenanceDataDetail?.factoryCode || ''} style={{flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'factoryCode')} readOnlyn/>
-
-            </div>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"설비 번호"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={maintenanceDataDetail?.equipmentNum} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'equipmentNum')} readOnly/>
-            </div>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"유형"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Select
-                    value={maintenanceDataDetail?.maintenanceType}
-                    onChange={(value) => handleInputChange({target: {value}}, 'maintenanceType')}
-                    style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
-                >
-                    <Option value={"EMERGENCY_REPAIR"}>긴급 수리</Option>
-                    <Option value={"REGULAR_INSPECTION"}>정기점검</Option>
-                    <Option value={"FAILURE_REPAIR"}>고장 수리</Option>
-                </Select>
-                <Input value={"관리 담당자"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={maintenanceDataDetail?.maintenanceManager} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'maintenanceManager')}/>
-            </div>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"진행 상태"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Select
-                    value={maintenanceDataDetail?.maintenanceStatus}
-                    onChange={(value) => handleInputChange({target: {value:value}}, 'maintenanceStatus')}
-                    style={{marginRight: '30px', marginTop: '20px', flex: 1.2}}
-                >
-                    <Option value={true}>완료</Option>
-                    <Option value={false}>작업 중</Option>
-                </Select>
-                <Input value={"유지보수 비용"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={maintenanceDataDetail?.maintenanceCost} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'maintenanceCost')}/>
-            </div>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"유지보수 일자"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <DatePicker
-                    value={maintenanceDataDetail?.maintenanceDate ? moment(maintenanceDataDetail.maintenanceDate, 'YYYY-MM-DD') : null}
-                    style={{marginRight: '30px', marginTop: '20px', flex: 1}}
-                    onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'maintenanceDate')}
-                />
-                <Input value={"다음 유지보수 예정일"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 1, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <DatePicker
-                    value={maintenanceDataDetail?.nextScheduleDate ? moment(maintenanceDataDetail.nextScheduleDate, 'YYYY-MM-DD') : null}
-                    onChange={(date, dateString) => handleInputChange({target: {value: dateString}}, 'nextScheduleDate')}
-                    style={{width: '100%', marginTop: '20px', flex: 1}}
-                />
-            </div>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"제목"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={maintenanceDataDetail?.title} style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'title')}/>
-            </div>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <Input value={"내용"}
-                       style={{marginRight: '10px', marginTop: '20px', flex: 0.28, backgroundColor: '#f6a6a6'}}
-                       readOnly/>
-                <Input value={maintenanceDataDetail?.maintenanceDetail}
-                       style={{marginTop: '20px', flex: 1}}
-                       onChange={(e) => handleInputChange(e, 'maintenanceDetail')}/>
-            </div>
-        </Modal>
     </Paper>
-);
+)};
 
 
 export default MaintenanceHistoryDetailSection ;
