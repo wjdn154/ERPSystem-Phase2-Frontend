@@ -93,9 +93,9 @@ export const
     },
     {
         title: <div className="title-text">전력소모량(Wh)</div>,
-        dataIndex: 'wattPerHour',  // 데이터 인덱스: 이 필드는 데이터 객체의 'workcenterName' 속성과 연결됩니다.
-        key:'wattPerHour',
+        dataIndex: 'kWh',  // 데이터 인덱스: 이 필드는 데이터 객체의 'workcenterName' 속성과 연결됩니다.
+        key:'kWh',
         align: 'center',
-        render: (text) => text ? `${text}Wh` : '기록없음',
+        render: (text) => text ? `${text}kWh` : '기록없음',
     },
 ];
