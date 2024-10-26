@@ -29,7 +29,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
 export default function DashboardPage() {
     return (
         <main className="flex-1 overflow-y-auto p-4">
-            <div className="max-w-8xl my-10 mx-40">
+            <div className="max-w-8xl my-10 mx-20">
                 {/* Dashboard widgets */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <DashboardWidget icon={AttachMoneyIcon} title="총 매출" value="₩34,192,000" color="bg-blue-500" />
