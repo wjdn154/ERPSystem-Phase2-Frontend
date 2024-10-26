@@ -112,18 +112,25 @@ const ProductionRequestPage = () => {
         })
     }
 
-    // 생산 의뢰 리스트 조회
     const fetchProductionRequests = async () => {
         setIsLoading(true);
         try {
             const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_LIST_API);
-            setProductionRequests(response.data);
+            console.log("응답 데이터:", response.data); // 응답 데이터 확인
+            if (response.data && response.data.length > 0) {
+                setProductionRequests(response.data); // 응답 데이터가 있으면 상태 갱신
+            } else {
+                console.warn("데이터가 없습니다.");
+                setProductionRequests([]); // 빈 배열로 설정
+            }
         } catch (error) {
+            console.error("조회 오류:", error);
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
             setIsLoading(false);
         }
     };
+
 
     useEffect(() => {
         fetchProductionRequests()
@@ -134,7 +141,7 @@ const ProductionRequestPage = () => {
     const fetchProductionRequestDetail = async (id) => {
         setIsLoading(true);
         try {
-            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_DETAIL_API);
+            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_DETAIL_API(id));
             setCurrentRequest(response.data);
             notify('success', '조회 성공', '상세 데이터가 조회되었습니다.', 'bottomRight')
         } catch (error) {
@@ -408,19 +415,18 @@ const ProductionRequestPage = () => {
                                                 setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
 
                                                 try {
-                                                    const updatedParams = {
-                                                        ...searchDetailParams,
-                                                        clientId: record.clientId,
-                                                    };
-                                                    // API 호출 시 updatedParams 사용
-                                                    const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_DETAIL_API, {...updatedParams});
-                                                    setProductionRequestDetail(response.data);
+                                                    // ID를 API 경로에 포함해 호출
+                                                    const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_DETAIL_API(record.id));
+                                                    setProductionRequestDetail(response.data); // 상세 정보 상태에 저장
+                                                    console.log("setProductionRequestDetail(response.data); ", response.data )
                                                     notify('success', '조회 성공', '데이터를 성공적으로 조회했습니다.', 'bottomRight');
                                                 } catch (error) {
+                                                    console.error('API 호출 오류:', error);
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
                                             }
                                         })}
+
                                     />
                                 </Grid>
                             </Paper>
