@@ -9,6 +9,8 @@ import { EMPLOYEE_API } from '../../../../config/apiConstants.jsx';
 import { useNotificationContext } from "../../../../config/NotificationContext.jsx";
 const { Option } = Select;
 const { confirm } = Modal;
+import { Divider } from 'antd';
+
 
 const DepartmentManagementPage = ({ initialData }) => {
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
@@ -27,19 +29,18 @@ const DepartmentManagementPage = ({ initialData }) => {
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
     const [displayValues, setDisplayValues] = useState({});
 
-    // 부서 데이터를 API에서 가져오는 함수
+    // 부서 목록 가져오는 함수
     const fetchDepartments = async () => {
-        setIsLoading(true);
         try {
             const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_API); // 부서 목록 API 호출
-            setDepartments(response.data); // 부서 목록 저장
+            //setDepartments(response.data); // 부서 목록 저장
+            setDepartmentList(response.data)
+            console.log("부서 API", response.data);
         } catch (error) {
             notification.error({
-                message: '부서 목록 조회 실패',
+                message: ' 목록 조회 실패',
                 description: '부서 목록을 불러오는 중 오류가 발생했습니다.',
             });
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -50,12 +51,10 @@ const DepartmentManagementPage = ({ initialData }) => {
 
     useEffect(() => {
         if (!fetchDepartmentData) return;
-        form.setFieldsValue(fetchDepartmentData);
-        setDepartmentParam(fetchDepartmentData);
+        console.log('Fetched Department Data:', fetchDepartmentData);
 
-        setDisplayValues({
-            department: `[${fetchDepartmentData.departmentCode}] ${fetchDepartmentData.departmentName}`,
-        });
+        // 선택된 부서 데이터를 수정 폼에 설정
+        form.setFieldsValue(fetchDepartmentData);
     }, [fetchDepartmentData, form]);
 
     const handleInputClick = (fieldName) => {
@@ -70,6 +69,7 @@ const DepartmentManagementPage = ({ initialData }) => {
         setIsLoading(true);
         let apiPath;
         if (fieldName === 'department') apiPath = EMPLOYEE_API.DEPARTMENT_DATA_API;
+        if (fieldName === 'employee') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API
 
         try {
             const response = await apiClient.post(apiPath);
@@ -111,17 +111,22 @@ const DepartmentManagementPage = ({ initialData }) => {
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
+                setIsLoading(true);
                 // 날짜 형식 변경 및 필요 데이터 구성
                 const formattedValues = {
                     departmentCode: values.departmentCode,
                     departmentName: values.departmentName,
-                    departmentLocation: values.departmentLocation,
+                    departmentLocation: values.location,
+                    id: fetchDepartmentData?.id,
+                    employeeid: departmentParam.employeeDepartmentDTOS?.employeeid,
+                    employeeNumber: departmentParam.employeeDepartmentDTOS.employeeNumber,
+                    firstName: departmentParam.employeeDepartmentDTOS.firstName,
                 };
                 console.log(values);
                 console.log(formattedValues);
 
                 try {
-                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_DEPARTMENT_DATA_API : EMPLOYEE_API.SAVE_DEPARTMENT_DATA_API;
+                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_DEPARTMENT_DATA_API(departmentParam.id): EMPLOYEE_API.SAVE_DEPARTMENT_DATA_API;
                     const response = await apiClient.post(API_PATH, formattedValues);
                     const updatedData = response.data;
 
@@ -130,16 +135,20 @@ const DepartmentManagementPage = ({ initialData }) => {
                             department.id === updatedData.id ? { ...department, ...updatedData } : department
                         )
                     );
+                    // 성공 시 알림과 상태 초기화
+                    notify('success', type === 'update' ? '부서 수정' : '부서 저장', '부서 정보 저장 성공.', 'bottomLeft');
                     setEditDepartment(false);
                     setFetchDepartmentData(null);
                     setDepartmentParam({});
                     setDisplayValues({});
-                    type === 'update'
-                        ? notify('success', '부서 수정', '부서 정보 수정 성공.', 'bottomLeft')
-                        : (notify('success', '부서 저장', '부서 정보 저장 성공.', 'bottomLeft'), form.resetFields());
+                    form.resetFields(); // 폼 초기화
+
                 } catch (error) {
                     console.error('Error details:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                } finally {
+                    // 로딩 상태 비활성화
+                    setIsLoading(false);
                 }
             },
             onCancel() {
@@ -163,6 +172,13 @@ const DepartmentManagementPage = ({ initialData }) => {
         registrationForm.setFieldValue('isActive', true);
     };
 
+    const handleRowClick = (record) => {
+        setFetchDepartmentData(record); // 클릭한 부서 데이터를 설정
+        setEditDepartment(true); // 수정 모드 활성화
+    };
+
+
+
     return (
         <Box sx={{ margin: '20px' }}>
             <Grid container spacing={3}>
@@ -183,6 +199,71 @@ const DepartmentManagementPage = ({ initialData }) => {
                     />
                 </Grid>
             </Grid>
+            {activeTabKey === '1' && (
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                        <Grow in={true} timeout={200}>
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>부서 목록</Typography>
+                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Table
+                                        dataSource={departmentList}
+                                        columns={[
+                                            {
+                                                title: <div className="title-text">부서코드</div>,
+                                                dataIndex: 'departmentCode',
+                                                key: 'departmentCode',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                            },
+                                            {
+                                                title: <div className="title-text">부서명</div>,
+                                                dataIndex: 'departmentName',
+                                                key: 'departmentName',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                            },
+                                            {
+                                                title: <div className="title-text">부서위치</div>,
+                                                dataIndex: 'location',
+                                                key: 'location',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text">{text}</div>,
+                                            },
+                                        ]}
+                                        rowKey={(record) => record.id}
+                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        size="small"
+                                        rowSelection={{
+                                            type: 'radio',
+                                            selectedRowKeys,
+                                            onChange: (newSelectedRowKeys) => {
+                                                setSelectedRowKeys(newSelectedRowKeys);
+                                            }
+                                        }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: async () => {
+                                                setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
+                                                const id = record.id;
+                                                try {
+                                                    const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_API);
+                                                    setDepartmentList(response.data);
+                                                    setEditDepartment(true);
+                                                    notify('success', '부서 조회', '부서 정보 조회 성공.', 'bottomRight');
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                            },
+                                        })}
+                                    />
+                                </Grid>
+                            </Paper>
+                        </Grow>
+                    </Grid>
+                </Grid>
+            )}
+
             {editDepartment && (
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
@@ -211,71 +292,18 @@ const DepartmentManagementPage = ({ initialData }) => {
                                             </Form.Item>
                                         </Col>
                                     </Row>
+                                    {/* 저장 버튼 */}
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                        <Button type="primary" htmlType="submit">
+                                            저장
+                                        </Button>
+                                    </Box>
                                 </Form>
                             </Grid>
                         </Paper>
                     </Grow>
                 </Grid>
             )}
-
-            {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
-                        <Grow in={true} timeout={200}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>부서 목록</Typography>
-                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                    <Table
-                                        dataSource={departmentList}
-                                        rowKey={(record) => record.departmentCode}
-                                        columns={[
-                                            {
-                                                title: <div className="title-text">부서코드</div>,
-                                                dataIndex: 'departmentCode',
-                                                key: 'departmentCode',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text">{text}</div>,
-                                                width: '10%'
-                                            },
-                                            {
-                                                title: <div className="title-text">부서명</div>,
-                                                dataIndex: 'departmentName',
-                                                key: 'departmentName',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text">{text}</div>,
-                                                width: '10%'
-                                            },
-                                            {
-                                                title: <div className="title-text">부서위치</div>,
-                                                dataIndex: 'location',
-                                                key: 'location',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text">{text}</div>,
-                                                width: '10%'
-                                            },
-                                        ]}
-                                        onRow={(record) => ({
-                                            key: record.departmentCode,
-                                            style: { cursor: 'pointer' },
-                                            onClick: async () => {
-                                                const id = record.id;
-                                                try {
-                                                    const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_API);
-                                                    setDepartmentList(response.data);
-                                                    notify('success', '부서 조회', '부서 정보 조회 성공.', 'bottomRight');
-                                                } catch (error) {
-                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
-                                                }
-                                            },
-                                        })}
-                                    />
-                                </Grid>
-                            </Paper>
-                        </Grow>
-                    </Grid>
-                </Grid>
-            )}
-
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12} md={12} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>

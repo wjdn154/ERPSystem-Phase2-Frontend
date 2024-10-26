@@ -10,7 +10,6 @@ import { useNotificationContext } from "../../../../config/NotificationContext.j
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 import defaultImage from "../../../../assets/img/uploads/defaultImage.png";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload.js";
-import {value} from "lodash/seq.js";
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -31,19 +30,36 @@ const EmployeeManagementPage = ({ initialData }) => {
     const [modalData, setModalData] = useState(null); // 모달 데이터 상태
     const [departments, setDepartments] = useState([]); // 부서 데이터 상태
     const [positions, setPositions] = useState([]);
+    const [jobTitles, setJobTitles] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
     const [displayValues, setDisplayValues] = useState({});
     const [initialModalData, setInitialModalData] = useState(null);
 
+    const fetchJobTitles = async () => {
+        try{
+            const response = await apiClient.post(EMPLOYEE_API.JOB_TITLE_DATA_API);
+            setJobTitles(response.data);
+        } catch(error){
+            notification.error({
+                message: '직책 목록 조회 실패',
+                description: '직책 목록을 불러오는 중 오류가 발생했습니다.',
+            });
+        }
+    };
+
+    useEffect(()=>{
+        fetchJobTitles();
+    }, []);
 
     // 부서 목록 가져오는 함수
     const fetchDepartments = async () => {
         try {
             const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_API); // 부서 목록 API 호출
             setDepartments(response.data); // 부서 목록 저장
+            console.log("부서 API", response.data);
         } catch (error) {
             notification.error({
-                message: '부서 목록 조회 실패',
+                message: ' 목록 조회 실패',
                 description: '부서 목록을 불러오는 중 오류가 발생했습니다.',
             });
         }
@@ -86,7 +102,8 @@ const EmployeeManagementPage = ({ initialData }) => {
             bank: fetchEmployeeData.bankAccountDTO
                 ? `[${fetchEmployeeData.bankAccountDTO.code.toString().padStart(5, '0')}] ${fetchEmployeeData.bankAccountDTO.name}`
                 : '은행 정보 없음', // 은행 정보가 없는 경우 처리
-            position:`[${fetchEmployeeData.positionCode}] ${fetchEmployeeData.positionName}`,
+            position: `[${fetchEmployeeData.positionCode}] ${fetchEmployeeData.positionName}`,
+            jobTitle: `[${fetchEmployeeData.titleCode}] ${fetchEmployeeData.titleName}`,
         });
     }, [fetchEmployeeData, form]);
 
@@ -110,6 +127,7 @@ const EmployeeManagementPage = ({ initialData }) => {
         if(fieldName === 'department') apiPath = EMPLOYEE_API.DEPARTMENT_DATA_API;
         if(fieldName === 'bank') apiPath = FINANCIAL_API.FETCH_BANK_LIST_API;
         if(fieldName === 'position') apiPath = EMPLOYEE_API.POSITION_DATA_API;
+        if(fieldName === 'jobTitle') apiPath = EMPLOYEE_API.JOB_TITLE_DATA_API;
 
         try {
             const response = await apiClient.post(apiPath);
@@ -153,6 +171,20 @@ const EmployeeManagementPage = ({ initialData }) => {
                 position:`[${record.positionCode}] ${record.positionName}`,
             }));
             break;
+            case 'jobTitle':
+                setEmployeeParam((prevParams)=>({
+                    ...prevParams,
+                    jobTitle: {
+                        id: record.id,
+                        titleCode: record.titleCode || '',
+                        titleName: record.titleName || '',
+                    },
+                }));
+                setDisplayValues((prevValues)=> ({
+                    ...prevValues,
+                    jobTitle: `[${record.titleCode}] ${record.titleName}`,
+                }));
+            break;
             case 'bank':
                 setEmployeeParam((prevParams) => ({
                     ...prevParams,
@@ -174,6 +206,8 @@ const EmployeeManagementPage = ({ initialData }) => {
     };
 
     const handleFormSubmit = async (values, type) => {
+        console.log('employeeParam: ', employeeParam)
+
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
@@ -183,9 +217,13 @@ const EmployeeManagementPage = ({ initialData }) => {
                 const employeeName = values.employeeName || '';
                 const lastName = employeeName.slice(0, 1); // 첫 글자를 성으로 설정
                 const firstName = employeeName.slice(1); // 나머지 글자를 이름으로 설정
+                const departmentName = Array.isArray(employeeParam.departmentName) && employeeParam.departmentName.length > 0
+                    ? employeeParam.departmentName[employeeParam.departmentName.length - 1]
+                    : employeeParam.departmentName;
 
+                console.log("employeeParam",employeeParam);
+                console.log("values",values);
                 const formattedValues = {
-
                     firstName: firstName,
                     lastName: lastName,
                     phoneNumber: values.phoneNumber,
@@ -193,35 +231,29 @@ const EmployeeManagementPage = ({ initialData }) => {
                     employmentType: employeeParam.employmentType,
                     email: values.email,
                     address: values.address,
-                    householdHead: employeeParam.householdHead, // 체크박스 값 처리
+                    householdHead: values.householdHead, // 체크박스 값 처리
+                    hireDate: values.hireDate,
                     profilePicture: employeeParam.profilePicture, // 프로필 URL
+                    registrationNumber: values.registrationNumber,
                     departmentId: employeeParam.departmentId,
                     departmentName: employeeParam.departmentName,
                     departmentCode: employeeParam.departmentCode,
-                    positionId: employeeParam.positionId,
-                    positionCode: employeeParam.positionCode,
-                    positionName: employeeParam.positionName,
-                    titleId: employeeParam.titleId,
-                    titleName: values.titleName,
+                    positionId: employeeParam.position ? employeeParam.position.id : employeeParam.positionId,
+                    positionCode: employeeParam.position ? employeeParam.position.positionCode : employeeParam.positionCode,
+                    positionName: employeeParam.position ? employeeParam.position.positionName : employeeParam.positionName,
+                    titleId: employeeParam.jobTitle ? employeeParam.jobTitle.id : employeeParam.titleId,
+                    titleName: employeeParam.jobTitle ? employeeParam.jobTitle.titleName : employeeParam.titleName,
+                    titleCode: employeeParam.jobTitle ? employeeParam.jobTitle.titleCode : employeeParam.titleCode,
                     bankId: employeeParam.bankAccountDTO.bankId,
                     accountNumber: employeeParam.bankAccountDTO.accountNumber, // 입력된 계좌번호
                     name: employeeParam.bankAccountDTO.name,
                     code: employeeParam.bankAccountDTO.code,
 
                 };
-                // console.log(" sss:"  +values);
-                // console.log(values);
-                // if(type === 'register'){
-                //     formattedValues = {
-                //         ...formattedValues,
-                //         registrationNumber: values.registrationNumber,
-                //         hireDate: values.hireDate,
-                //         departmentId: values.departmentId,
-                //         positionId: values.positionId,
-                //         jobTitleId: values.jobTitleId,
-                //     }
-                // }
-
+                 // console.log(" sss:"  +values);
+                 // console.log(values);
+                console.log("employeeParam2",employeeParam);
+                console.log("values2",values);
                 //FormData 객체 생성
                 const formData = new FormData();
                 formData.append("formattedValues", JSON.stringify(formattedValues));  // JSON으로 변환 후 추가
@@ -230,7 +262,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                 }
 
                 try {
-                    console.log(formattedValues);
+                    //console.log(formattedValues);
                     const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_EMPLOYEE_DATA_API(employeeParam.id ) : EMPLOYEE_API.SAVE_EMPLOYEE_DATA_API;
                     const response = await apiClient.post(API_PATH,formData,{
                          headers: { 'Content-Type': 'multipart/form-data' },
@@ -497,7 +529,6 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                     const response = await apiClient.get(EMPLOYEE_API.EMPLOYEE_DATA_DETAIL_API(id));
                                                     setFetchEmployeeData(response.data);
                                                     setEditEmployee(true);
-
                                                     notify('success', '사원 조회', '사원 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -630,7 +661,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     setEmployeeParam((prevState) => ({
                                                                         ...prevState,
                                                                         departmentCode: value, // 부서 코드 설정
-                                                                        departmentName: option.children, // 부서명 설정
+                                                                        departmentName: option.children[3], // 부서명 설정
                                                                     }));
                                                                 }}
                                                             >
@@ -655,9 +686,15 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                     </Form.Item>
                                                 </Col>
 
-                                                <Col span={12}>
-                                                    <Form.Item name="titleName" rules={[{ required: true, message: '직책을 입력하세요.' }]}>
-                                                        <Input addonBefore="직책" />
+                                                <Col span={4}>
+                                                    <Form.Item>
+                                                        <Input
+                                                            addonBefore="직책"
+                                                            value={displayValues.jobTitle}
+                                                            onClick={() => handleInputClick('jobTitle')}
+                                                            onFocus={(e) => e.target.blur()}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
@@ -841,7 +878,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                         const filtered = initialModalData.filter((item) => {
                                                                             return (
                                                                                 (item.positionCode && item.positionCode.toLowerCase().includes(value)) ||
-                                                                                (item.positionName && item.name.toLowerCase().includes(value))
+                                                                                (item.positionName && item.positionName.toLowerCase().includes(value))
                                                                             );
                                                                         });
                                                                         setModalData(filtered);
@@ -869,6 +906,65 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     ]}
                                                                     dataSource={modalData}
                                                                     rowKey="positionCode"
+                                                                    size={'small'}
+                                                                    pagination={{
+                                                                        pageSize: 15,
+                                                                        position: ['bottomCenter'],
+                                                                        showSizeChanger: false,
+                                                                        showTotal: (total) => `총 ${total}개`,
+                                                                    }}
+                                                                    onRow={(record) => ({
+                                                                        style: { cursor: 'pointer' },
+                                                                        onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                    })}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
+                                                    {currentField === 'jobTitle' && (
+                                                        <>
+                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                                직책 선택
+                                                            </Typography>
+                                                            <Input
+                                                                placeholder="검색"
+                                                                prefix={<SearchOutlined />}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                    if (!value) {
+                                                                        setModalData(initialModalData);
+                                                                    } else {
+                                                                        const filtered = initialModalData.filter((item) => {
+                                                                            return (
+                                                                                (item.titleCode && item.titleCode.toLowerCase().includes(value)) ||
+                                                                                (item.titleName && item.titleName.toLowerCase().includes(value))
+                                                                            );
+                                                                        });
+                                                                        setModalData(filtered);
+                                                                    }
+                                                                }}
+                                                                style={{ marginBottom: 16 }}
+                                                            />
+                                                            {modalData && (
+                                                                <Table
+                                                                    columns={[
+                                                                        {
+                                                                            title: <div className="title-text">직책코드</div>,
+                                                                            dataIndex: 'titleCode',
+                                                                            key: 'titleCode',
+                                                                            align: 'center',
+                                                                            render: (text) => <div className="small-text">{text}</div>
+                                                                        },
+                                                                        {
+                                                                            title: <div className="title-text">직책명</div>,
+                                                                            dataIndex: 'titleName',
+                                                                            key: 'titleName',
+                                                                            align: 'center',
+                                                                            render: (text) => <div className="small-text">{text}</div>
+                                                                        },
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="titleCode"
                                                                     size={'small'}
                                                                     pagination={{
                                                                         pageSize: 15,
@@ -912,7 +1008,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                     <Form
                                         layout="vertical"
                                         onFinish={(values) => {
-                                            console.log("values : " +values);
+                                            console.log("저장직전 : " ,values);
                                             handleFormSubmit(values, 'register') }}
                                         form={registrationForm}
                                     >
@@ -1017,15 +1113,24 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                             style={{ width: '60%' }}
                                                             value={employeeParam.departmentCode}
                                                             onChange={(value, option) => {
+                                                                console.log("Selected Value:", value);
+                                                                console.log("Selected Option:", option);
+
                                                                 setEmployeeParam((prevState) => ({
                                                                     ...prevState,
+                                                                    departmentId: option.id, // `data-*` 속성을 사용해 부서 ID 설정
                                                                     departmentCode: value, // 부서 코드 설정
-                                                                    departmentName: option.children, // 부서명 설정
+                                                                    departmentName: option.departmentname, // 부서명 설정
                                                                 }));
                                                             }}
                                                         >
                                                             {departments.map((dept) => (
-                                                                <Option key={dept.departmentCode} value={dept.departmentCode}>
+                                                                <Option
+                                                                    key={dept.departmentCode}
+                                                                    value={dept.departmentCode}  // departmentCode만 `value`로 전달
+                                                                    id={dept.id}
+                                                                    departmentname={dept.departmentName}
+                                                                >
                                                                     [{dept.departmentCode}] {dept.departmentName}
                                                                 </Option>
                                                             ))}
@@ -1033,14 +1138,26 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                     </Space.Compact>
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={12}>
-                                                <Form.Item name="positionName" rules={[{ required: true, message: '직위를 입력하세요.' }]}>
-                                                    <Input addonBefore="직위" />
+                                            <Col span={4}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="직위"
+                                                        value={displayValues.position}
+                                                        onClick={() => handleInputClick('position')}
+                                                        onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
+                                                    />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={12}>
-                                                <Form.Item name="titleName" rules={[{ required: true, message: '직책을 입력하세요.' }]}>
-                                                    <Input addonBefore="직책" />
+                                            <Col span={4}>
+                                                <Form.Item>
+                                                    <Input
+                                                        addonBefore="직책"
+                                                        value={displayValues.jobTitle}
+                                                        onClick={() => handleInputClick('jobTitle')}
+                                                        onFocus={(e) => e.target.blur()}
+                                                        suffix={<DownSquareOutlined />}
+                                                    />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
@@ -1130,32 +1247,6 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                        {/*/!* 이미지 업로드 *!/*/}
-                                        {/*<Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>[프로필 사진] 이미지 업로드</Divider>*/}
-                                        {/*<Row gutter={16}>*/}
-                                        {/*    <Col span={12}>*/}
-                                        {/*        <Form.Item name="imageFile">*/}
-                                        {/*            /!* 이미지 미리보기 *!/*/}
-                                        {/*            <div style={{ marginBottom: '20px' }}>*/}
-                                        {/*                <img*/}
-                                        {/*                    src={selectedFile ? URL.createObjectURL(selectedFile) : defaultImage}*/}
-                                        {/*                    alt="미리보기 이미지"*/}
-                                        {/*                    style={{ width: '100px', height: '100px', objectFit: 'cover' }}*/}
-                                        {/*                />*/}
-                                        {/*            </div>*/}
-                                        {/*            <Upload*/}
-                                        {/*                beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환*/}
-                                        {/*                onChange={(info) => {*/}
-                                        {/*                    const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용*/}
-                                        {/*                    setSelectedFile(file); // 선택된 파일을 상태로 설정*/}
-                                        {/*                }}*/}
-                                        {/*                fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []} // 파일 리스트 설정*/}
-                                        {/*            >*/}
-                                        {/*                <Button icon={<CloudUploadIcon />}>파일 선택</Button>*/}
-                                        {/*            </Upload>*/}
-                                        {/*        </Form.Item>*/}
-                                        {/*    </Col>*/}
-                                        {/*</Row>*/}
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                             <Button type="primary" htmlType="submit">
                                                 저장
@@ -1216,6 +1307,124 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                 ]}
                                                                 dataSource={modalData}
                                                                 rowKey="code"
+                                                                size={'small'}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'position' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            직위 선택
+                                                        </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.positionCode && item.positionCode.toLowerCase().includes(value)) ||
+                                                                            (item.positionName && item.positionName.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    {
+                                                                        title: <div className="title-text">직위코드</div>,
+                                                                        dataIndex: 'positionCode',
+                                                                        key: 'positionCode',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">직위명</div>,
+                                                                        dataIndex: 'positionName',
+                                                                        key: 'positionName',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="positionCode"
+                                                                size={'small'}
+                                                                pagination={{
+                                                                    pageSize: 15,
+                                                                    position: ['bottomCenter'],
+                                                                    showSizeChanger: false,
+                                                                    showTotal: (total) => `총 ${total}개`,
+                                                                }}
+                                                                onRow={(record) => ({
+                                                                    style: { cursor: 'pointer' },
+                                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
+                                                                })}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                                {currentField === 'jobTitle' && (
+                                                    <>
+                                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                            직책 선택
+                                                        </Typography>
+                                                        <Input
+                                                            placeholder="검색"
+                                                            prefix={<SearchOutlined />}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                if (!value) {
+                                                                    setModalData(initialModalData);
+                                                                } else {
+                                                                    const filtered = initialModalData.filter((item) => {
+                                                                        return (
+                                                                            (item.titleCode && item.titleCode.toLowerCase().includes(value)) ||
+                                                                            (item.titleName && item.titleName.toLowerCase().includes(value))
+                                                                        );
+                                                                    });
+                                                                    setModalData(filtered);
+                                                                }
+                                                            }}
+                                                            style={{ marginBottom: 16 }}
+                                                        />
+                                                        {modalData && (
+                                                            <Table
+                                                                columns={[
+                                                                    {
+                                                                        title: <div className="title-text">직책코드</div>,
+                                                                        dataIndex: 'titleCode',
+                                                                        key: 'titleCode',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                    {
+                                                                        title: <div className="title-text">직책명</div>,
+                                                                        dataIndex: 'titleName',
+                                                                        key: 'titleName',
+                                                                        align: 'center',
+                                                                        render: (text) => <div className="small-text">{text}</div>
+                                                                    },
+                                                                ]}
+                                                                dataSource={modalData}
+                                                                rowKey="titleCode"
                                                                 size={'small'}
                                                                 pagination={{
                                                                     pageSize: 15,
