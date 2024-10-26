@@ -7,6 +7,7 @@ import {useNotificationContext} from "../../../../config/NotificationContext.jsx
 import {SearchOutlined} from "@ant-design/icons";
 import {LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
+import {formatNumberWithComma, removeComma} from "./ProcessDetailsUtil.jsx";
 
 const SelectedProcessDetailsSection = ({
                                            processDetailsData,
@@ -164,8 +165,17 @@ const growRef = useRef(null); // Grow 컴포넌트의 ref 생성
 
                             <Row gutter={16}>
                                 <Col span={8}>
-                                    <Form.Item name="cost" rules={[{ required: true }]}>
-                                        <Input type="number" addonBefore="공정비용"/>
+                                    <Form.Item name="cost" rules={[{ required: true, message: '수행비용을 입력해주세요.' }]}>
+                                        <Input
+                                            type="text"
+                                            addonBefore="수행비용"
+                                            value={form.getFieldValue('cost')} // 입력 값 그대로 유지
+                                            onChange={(e) => {
+                                                const rawValue = removeComma(e.target.value); // 콤마 제거된 순수 숫자
+                                                const formattedValue = formatNumberWithComma(rawValue); // 콤마가 적용된 값
+                                                form.setFieldsValue({ cost: formattedValue }); // 포맷된 값 설정
+                                            }}
+                                        />
                                     </Form.Item>
                                 </Col>
                                 <Col span={8}>

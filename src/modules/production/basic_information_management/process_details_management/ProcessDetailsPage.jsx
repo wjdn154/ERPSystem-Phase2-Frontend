@@ -50,13 +50,6 @@ const ProcessDetailsPage = ({ initialData }) => {
         setActiveTabKey(key);
     };
 
-    // 금액 포맷 함수
-    const formatNumberWithComma = (value) => {
-        if (!value) return '';
-        const cleanValue = value.toString().replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
-        return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
     // 콤마 제거 함수
     const removeComma = (value) => {
         return value ? value.toString().replace(/,/g, '') : value;
@@ -208,7 +201,6 @@ const ProcessDetailsPage = ({ initialData }) => {
                             handleDeleteProcessDetail={handleDeleteProcessDetail}
                             rowClassName={getRowClassName}
                             handleFormSubmit={handleFormSubmit}
-                            formatNumberWithComma={formatNumberWithComma}
                         />
                     )}
                 </Grid>
