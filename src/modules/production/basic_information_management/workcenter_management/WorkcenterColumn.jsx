@@ -11,14 +11,6 @@ export const workcenterColumns = [
         align: 'center',
     },
     {
-        title: <div className="title-text">이름</div>,
-        dataIndex: 'name',  // DTO의 name 필드에 접근
-        key: 'name',
-        width: '10%',
-        align: 'center',
-
-    },
-    {
         title: <div className="title-text">유형</div>,
         dataIndex: 'workcenterType',  // DTO의 workcenterType 필드에 접근
         key: 'workcenterType',
@@ -64,11 +56,12 @@ export const workcenterColumns = [
         }
     },
     {
-        title: <div className="title-text">설명</div>,
-        dataIndex: 'description',  // DTO의 description 필드에 접근
-        key: 'description',
+        title: <div className="title-text">이름</div>,
+        dataIndex: 'name',  // DTO의 name 필드에 접근
+        key: 'name',
         width: '20%',
         align: 'center',
+
     },
     {
         title: <div className="title-text">공장</div>,
@@ -91,15 +84,16 @@ export const workcenterColumns = [
         title: <div className="title-text">생산공정</div>,
         key: 'process',
         render: (text, record) => {
-            const { code, name } = record;
+            const processCode = record.processCode;
+            const processName = record.processName;
 
             // 코드와 공장명 둘 다 있는 경우 조합
-            if (code && name) {
-                return `[${code}] ${name}`;
+            if (processCode && processName) {
+                return `[${processCode}] ${processName}`;
             }
 
             // 값이 없는 경우 대체 텍스트
-            return '-';
+            return '공정 미등록';
         },
         width: '15%',
         align: 'center',
@@ -108,23 +102,42 @@ export const workcenterColumns = [
         title: <div className="title-text">작업자</div>,
         dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
         key: 'todayWorkers',
-        render: (workers) =>
-            workers && workers.length > 0 ? workers.join(', ') : '배정없음',  // 쉼표로 구분된 문자열
         width: '15%',
         align: 'center',
+        render: (workers) => {
+            if (!Array.isArray(workers) || workers.length === 0) {
+                return '배정없음'; // 모델명이 없을 때
+            }
+
+            const modelCount = workers.length;
+
+            if (modelCount === 1) {
+                return workers[0]; // 모델명이 하나일 때
+            } else {
+                // 여러 개일 경우 첫 번째 모델명 + 외 N건
+                return `${workers[0]} 외 ${modelCount - 1}명`;
+            }
+        }
     },
     {
-        title: <div className="title-text">설비 번호</div>,
-        dataIndex: 'equipmentIds',  // 설비 ID 리스트 접근
-        key: 'equipmentIds',
-        width: '10%',
+        title: <div className="title-text">설비 모델</div>,
+        dataIndex: 'modelNames',  // 설비 ID 리스트 접근
+        key: 'modelNames',
+        width: '20%',
         align: 'center',
-        render: (equipmentIds) => {
-            if (!equipmentIds || equipmentIds.length === 0) {
-                return '설비 없음';
+        render: (modelNames) => {
+            if (!Array.isArray(modelNames) || modelNames.length === 0) {
+                return '설비 미등록'; // 모델명이 없을 때
             }
-            // 설비 번호들을 콤마로 구분하여 반환
-            return equipmentIds.join(', ');
+
+            const modelCount = modelNames.length;
+
+            if (modelCount === 1) {
+                return modelNames[0]; // 모델명이 하나일 때
+            } else {
+                // 여러 개일 경우 첫 번째 모델명 + 외 N건
+                return `${modelNames[0]} 외 ${modelCount - 1}대`;
+            }
         }
     },
     {
@@ -140,137 +153,6 @@ export const workcenterColumns = [
                 </Tag>
             );
         }
-    },
-];
-
-export const workcenterDetailColumns = [
-    {
-        title: <div className="title-text">코드</div>,
-        dataIndex: 'code',
-        key: 'code',
-        width: '5%',
-        align: 'center',
-        editable: true, // 수정 가능
-    },
-    {
-        title: <div className="title-text">이름</div>,
-        dataIndex: 'name',
-        key: 'name',
-        width: '15%',
-        align: 'center',
-        editable: true, // 수정 가능
-    },
-    {
-        title: <div className="title-text">유형</div>,
-        dataIndex: 'workcenterType',
-        key: 'workcenterType',
-        width: '10%',
-        align: 'center',
-        render: (workcenterType) => {
-            const typeToKorean = {
-                Press: "프레스",
-                Welding: "용접",
-                Paint: "도장",
-                Machining: "정밀 가공",
-                Assembly: "조립",
-                'Quality Inspection': "품질 검사",
-                Casting: "주조",
-                Forging: "단조",
-                'Heat Treatment': "열처리",
-                'Plastic Molding': "플라스틱 성형"
-            };
-            return typeToKorean[workcenterType] || '-';
-        },
-        editable: true, // 드롭다운으로 선택 가능
-    },
-    {
-        title: <div className="title-text">설명</div>,
-        dataIndex: 'description',
-        key: 'description',
-        width: '25%',
-        align: 'center',
-        editable: true, // 수정 가능
-    },
-    {
-        title: <div className="title-text">공장</div>,
-        key: 'factory',
-        render: (text, record) => {
-            const { factoryCode, factoryName } = record;
-
-            // 코드와 공장명 둘 다 있는 경우 조합
-            if (factoryCode && factoryName) {
-                return `[${factoryCode}] ${factoryName}`;
-            }
-
-            // 값이 없는 경우 대체 텍스트
-            return '-';
-        },
-        width: '15%',
-        align: 'center',
-    },
-    {
-        title: <div className="title-text">생산공정</div>,
-        key: 'process',
-        render: (text, record) => {
-            const { processCode, processName } = record;
-
-            // 코드와 공장명 둘 다 있는 경우 조합
-            if (processCode && processName) {
-                return `[${processCode}] ${processName}`;
-            }
-
-            // 값이 없는 경우 대체 텍스트
-            return '-';
-        },
-        width: '15%',
-        align: 'center',
-    },
-    {
-        title: <div className="title-text">작업자</div>,
-        dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
-        key: 'todayWorkers',
-        render: (workers) =>
-            workers && workers.length > 0 ? workers.join(', ') : '배정없음',  // 쉼표로 구분된 문자열
-        width: '15%',
-        align: 'center',
-    },
-    {
-        title: <div className="title-text">설비 번호</div>,
-        dataIndex: 'equipmentIds', // 설비 ID 목록 접근
-        key: 'equipmentIds',
-        align: 'center',
-        width: '20%',
-        render: (equipmentIds) =>
-            equipmentIds && equipmentIds.length > 0
-                ? equipmentIds.map(id => `EQ-${id}`).join(', ')
-                : '설비 없음',
-    },
-    {
-        title: <div className="title-text">사용</div>,
-        dataIndex: 'isActive',
-        key: 'isActive',
-        width: '5%',
-        align: 'center',
-        render: (_, record) => (
-            <Select
-                value={record.isActive ? '사용중' : '미사용'} // 드롭다운의 현재 값
-                onChange={(value) => {
-                    // 선택된 값에 따라 isActive를 true 또는 false로 설정
-                    const isActive = value === '사용중';
-                    // 값이 변경되었을 때 상태 업데이트
-                    record.isActive = isActive;
-                    // 업데이트한 레코드를 setWorkcenter로 저장
-                    setWorkcenter({
-                        ...record,
-                        isActive: isActive
-                    });
-                }}
-            >
-                <Option value="사용중">사용중</Option>
-                <Option value="미사용">미사용</Option>
-            </Select>
-        ),
-        editable: true
     },
 ];
 

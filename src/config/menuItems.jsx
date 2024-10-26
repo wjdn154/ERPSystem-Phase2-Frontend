@@ -36,9 +36,9 @@ export const subMenuItems = {
         }
     ],
     '재무회계': [
-        {
-            text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/financial'
-        },
+        // {
+        //     text: '대시보드', component: 'FinanceDashboardPage', apiPath: undefined, url: '/financial'
+        // },
         {
             text: '기초정보관리',
             items: [
@@ -117,9 +117,9 @@ export const subMenuItems = {
         },
     ],
     '인사관리': [
-        {
-            text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr'
-        },
+        // {
+        //     text: '대시보드', component: 'HRDashboardPage', apiPath: undefined, url: '/hr'
+        // },
         {
             text: '기초 정보 관리',
             items: [
@@ -179,9 +179,9 @@ export const subMenuItems = {
         },
     ],
     '물류관리': [
-        {
-            text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics'
-        },
+        // {
+        //     text: '대시보드', component: 'LogisticsDashboardPage', apiPath: undefined, url: '/logistics'
+        // },
         {
             text: '기초정보관리',
             items: [
@@ -256,9 +256,9 @@ export const subMenuItems = {
         }
     ],
     '생산관리': [
-        {
-            text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production'
-        },
+        // {
+        //     text: '대시보드', component: 'ProductionDashboardPage', apiPath: undefined, url: '/production'
+        // },
         {
             text: '기초정보 관리',
             items: [
@@ -293,7 +293,7 @@ export const subMenuItems = {
         {
             text: '작업 지시 관리',
             items: [
-                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.SHIFT_TYPE_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
+                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
                 { text: '작업 지시 관리', component: 'ProductionOrderPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
                 { text: '작업배정이력 관리', component: 'AssignmentHistoryPage', apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_MONTHLY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
             ]

@@ -59,7 +59,6 @@ const ProductionRequestPage = () => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [productionRequests, setProductionRequests] = useState(null);
     const [productionRequestDetail, setProductionRequestDetail] = useState(null);
-    // const [fetchProductionRequestDetail, setFetchProductionRequestDetail] = useState(false); // 의뢰 조회한 정보 상태
     const [productionRequestParam, setProductionRequestParam] = useState(false); //
 
     const handleTabChange = (key) => {
@@ -88,7 +87,7 @@ const ProductionRequestPage = () => {
 
         setModalData(null); // 모달 열기 전에 데이터를 초기화
         setInitialModalData(null);
-        // fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
+        fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
         fetchProductionRequests(fieldName);
         setIsModalVisible(true);  // 모달창 열기
     };

@@ -22,8 +22,13 @@ const WorkcenterManagementPage = ({ initialData }) => {
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
     // const [data, setData] = useState([]);
     const [workcenter, setWorkcenter] = useState(null); // 선택된 작업장 데이터 관리
+    const [workcenterParam, setWorkcenterParam] = useState({
+        workcenterType:'',
+    }); // 선택된 작업장 데이터 관리
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 상태 관리
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+    const [displayValues, setDisplayValues] = useState({});
 
 
     const {
@@ -43,21 +48,10 @@ const WorkcenterManagementPage = ({ initialData }) => {
         activeTabKey,
     } = useWorkcenter(initialData);
 
-    useEffect(() => {
-        if (workcenter) {
-            console.log("현재 선택된 작업장 (useEffect 내):", workcenter);
-        }
-    }, [workcenter]);
-
-
-    const refreshWorkcenters = async () => {
-        const updatedData = await fetchWorkcenters(); // 작업장 목록 새로고침
-        setData(updatedData);
-    };
-
-
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
+        console.log('handleFormSubmit 호출됨. 폼 제출 값:', values);  // 전달된 값 확인
+
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
@@ -74,10 +68,9 @@ const WorkcenterManagementPage = ({ initialData }) => {
                         await apiClient.post(PRODUCTION_API.UPDATE_WORKCENTER_API(values.code), values);
                         notify('success', '등록 성공', '작업장이 수정되었습니다.', 'bottomRight');
                     }
-                    // isWorkcenterModalVisible(false); // 모달 닫기
-                    refreshWorkcenters(); // 작업장 목록 새로고침
+                    // refreshWorkcenters(); // 작업장 목록 새로고침
                 } catch (error) {
-                    console.error('Error saving workcenter:', error);
+                    console.error('저장 실패:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
                 }
             },
@@ -111,7 +104,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1200px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >작업장 목록</Typography>
@@ -127,26 +120,28 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                             type: 'radio', // 선택 방식 (radio or checkbox)
                                             selectedRowKeys: selectedRowKeys, // 선택된 행의 키들
                                             onChange: (newSelectedRowKeys) => {
+                                                console.log('새로운 Row Keys:', newSelectedRowKeys); // 디버그용 로그
                                                 setSelectedRowKeys(newSelectedRowKeys); // 선택된 행의 키 업데이트
                                             },
                                         }}
-                                        size="small"
                                         rowKey="code" // Workcenter에서 고유 CODE 필드를 사용
+                                        size="small"
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {
                                                 setSelectedRowKeys([record.code]); // 클릭한 행의 키로 상태 업데이트
-                                                const code = record.code;
                                                 try {
                                                     // 작업장 상세 정보 가져오기 (API 호출)
                                                     const detail = await fetchWorkcenter(record.code);
+
                                                     setWorkcenter(detail); // 선택된 작업장 데이터 설정
+                                                    setWorkcenterParam(detail);
                                                     notify('success', '작업장 조회', '작업장 정보 조회 성공.', 'bottomRight');
                                                 } catch (error) {
                                                     console.error("작업장 정보 조회 실패:", error);
                                                     notify('error', '조회 오류', '작업장 정보 조회 중 오류가 발생했습니다.', 'top');
                                                 }
-                                                // handleSelectedRow(record); // 행 클릭 시 해당 작업장 선택
+                                                // handleFormSubmit(record);
                                             },
                                         })}
                                     />
@@ -154,10 +149,11 @@ const WorkcenterManagementPage = ({ initialData }) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    {/* 선택한 작업장 조회 */}
 
+                    {/* 선택한 작업장 조회 */}
                     {workcenter && (
                         <SelectedWorkcenterSection
+                            key={workcenter.code}  // 선택된 작업장마다 고유 key 부여 <= 선택한 행 작업장의 상세조회 창 바뀜
                             workcenter={workcenter}
                             handleInputChange={handleInputChange}
                             handleSave={handleSave}
@@ -166,12 +162,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
                             rowClassName={getRowClassName}
                             handleFormSubmit={handleFormSubmit}
                         />
-
-                            // handleClose={handleClose}
-                        //     open={isWorkcenterModalVisible} // 모달 상태에 따라 표시
-                        //     onCancel={handleClose} // 모달을 닫는 함수
-                        //     footer={null} // 모달의 하단 버튼 제거
-
                     )}
                 </Grid>
             )}
@@ -219,11 +209,11 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                 rules={[{ required: true, message: '작업장 유형을 선택해주세요.' }]}
                                             >
                                                 <Select placeholder="작업장 유형 선택">
-                                                    <Option value="Press">프레스</Option>
-                                                    <Option value="Assembly">조립</Option>
-                                                    <Option value="Welding">용접</Option>
-                                                    <Option value="Machining">가공</Option>
-                                                    <Option value="Quality Inspection">품질 검사</Option>
+                                                    <Select.Option value="Press">프레스</Select.Option>
+                                                    <Select.Option value="Assembly">조립</Select.Option>
+                                                    <Select.Option value="Welding">용접</Select.Option>
+                                                    <Select.Option value="Machining">가공</Select.Option>
+                                                    <Select.Option value="Quality Inspection">품질 검사</Select.Option>
                                                 </Select>
                                             </Form.Item>
                                         </Col>
@@ -245,6 +235,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                 label="설비 선택"
                                             >
                                                 <Select
+
                                                     mode="tags"
                                                     style={{ width: '100%' }}
                                                     placeholder="설치된 설비를 선택하세요."

@@ -12,7 +12,6 @@ import dayjs from 'dayjs';
 import { Divider, Tooltip } from 'antd';
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {SearchOutlined, EditOutlined, CheckOutlined, DeleteOutlined} from "@ant-design/icons";
-import image from "../../../../assets/img/uploads/원목책상사진.png"
 import defaultImage from '../../../../assets/img/uploads/defaultImage.png';
 
 const { Option } = Select;
@@ -1000,7 +999,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                                             </>
                                                         )}
 
-                                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                                                             {currentField === 'productGroup' && (
                                                                 <>
                                                                     <Button onClick={handleAddNewRow} variant="contained" type="primary" sx={{ mr: 1 }}>
@@ -1276,7 +1275,7 @@ const ProductManagementPage = ( {initialData} ) => {
                                                                                                 </>
                                                                                             )}
                                                                                         </div>
-                                                                                    </div>
+                                                                                     </div>
                                                                                 ),
                                                                             },
                                                                         ]}

@@ -336,7 +336,7 @@ const TaxInvoiceStatusPage = () => {
                                         rowKey="clientCode"
                                         scroll={{ x: 'max-content' }}
                                         pagination={ false }
-                                        bordered={true}
+                                        bordered={ true }
                                         style={{ marginBottom: '100px' }}
                                         size={'small'}
                                         rowClassName={(record) => { return record.clientCode === '합계' ? 'summary-row' : ''; }}
