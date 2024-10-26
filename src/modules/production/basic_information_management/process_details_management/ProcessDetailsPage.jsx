@@ -56,9 +56,14 @@ const ProcessDetailsPage = ({ initialData }) => {
     };
 
     const handleFormSubmit = async (values, type) => {
-        confirm({
+        console.log('폼 제출 값:', values); // 객체 내용 확인
+        if (typeof values !== 'object') {
+            console.error('Error: values가 객체가 아님', values);
+            return;
+        }
+        Modal.confirm({
             title: '저장 확인',
-//            content: `저장할 데이터: ${JSON.stringify(values, null, 2)}`, // 객체를 문자열로 변환
+            // content: `저장할 데이터: ${JSON.stringify(values, null, 2)}`, // 객체를 JSON 문자열로 변환
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
@@ -159,10 +164,6 @@ const ProcessDetailsPage = ({ initialData }) => {
                                                 setSelectedRowKeys(newSelectedRowKeys); // 선택된 행의 키 업데이트
                                             },
                                         }}
-                                        // onRow={(record) => ({
-                                        //     onClick: () => handleSelectedRow(record), // 행 클릭 시 해당 공정 선택
-                                        //     style: { cursor: 'pointer' },
-                                        // })}
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {

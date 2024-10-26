@@ -140,6 +140,7 @@ const growRef = useRef(null); // Grow 컴포넌트의 ref 생성
                             form={form}
                             // initialValues={processDetailsData}
                             // onFinish={handleSave}
+
                             onFinish={(values) => handleFormSubmit(values, processDetailsData ? 'update' : 'create')}
                             layout="vertical"
                         >
@@ -205,9 +206,9 @@ const growRef = useRef(null); // Grow 컴포넌트의 ref 생성
                                 <Button type="primary" htmlType="submit">
                                     저장
                                 </Button>
-                                {/*<Button onClick={handleDelete} style={{ marginLeft: '10px' }} danger>*/}
-                                {/*삭제*/}
-                                {/*</Button>*/}
+                                <Button type="default" onClick={handleDelete} style={{ marginLeft: '10px' }} danger>
+                                삭제
+                                </Button>
                             </Box>
 
                             <Modal

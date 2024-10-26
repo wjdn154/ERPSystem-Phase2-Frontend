@@ -52,7 +52,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
     const handleFormSubmit = async (values, type) => {
         console.log('handleFormSubmit 호출됨. 폼 제출 값:', values);  // 전달된 값 확인
 
-        confirm({
+        Modal.confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
