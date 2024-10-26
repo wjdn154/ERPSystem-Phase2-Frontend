@@ -5,11 +5,9 @@ import {Typography} from '@mui/material';
 import {Button, Col, Form, Modal, notification, Row, Table} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useProcessDetails} from "./ProcessDetailsHook.jsx";
-import ProcessDetailsListSection from "./ProcessDetailsListSection.jsx";
 import SelectedProcessDetailsSection from "./SelectedProcessDetailsSection.jsx";
 import {getRowClassName, tabItems, processDetailsColumn} from "./ProcessDetailsUtil.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
-import {fetchWorkcenter} from "../workcenter_management/WorkcenterApi.jsx";
 import {fetchProcessDetail} from "./ProcessDetailsApi.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
@@ -24,14 +22,13 @@ const ProcessDetailsPage = ({ initialData }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [displayValues, setDisplayValues] = useState({});
-    const [processDetailsData, setProcessDetailsData] = useState(null); // 선택된 작업장 데이터 관리
+    const [processDetailsData, setProcessDetailsData] = useState(null); // 선택된 데이터 관리
     const [processDetailsParam, setProcessDetailsParam] = useState({
 
-    }); // 선택된 작업장 데이터 관리
+    });
 
     const {
         data,
-        processDetail,
         handleSave,
         handleSelectedRow,
         handleDeleteProcessDetail,
@@ -53,26 +50,61 @@ const ProcessDetailsPage = ({ initialData }) => {
         setActiveTabKey(key);
     };
 
-    // 폼 제출 핸들러
-    const handleFormSubmit = async (values, type) => {
-        console.log('handleFormSubmit 호출됨. 폼 제출 값:', values);  // 전달된 값 확인
+    // 금액 포맷 함수
+    const formatNumberWithComma = (value) => {
+        if (!value) return '';
+        const cleanValue = value.toString().replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
+        return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
 
+    // 콤마 제거 함수
+    const removeComma = (value) => {
+        return value ? value.toString().replace(/,/g, '') : value;
+    };
+
+    const handleFormSubmit = async (values, type) => {
         confirm({
             title: '저장 확인',
+//            content: `저장할 데이터: ${JSON.stringify(values, null, 2)}`, // 객체를 문자열로 변환
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
                 try {
-                    if (type === 'register') {
-                        // API 요청: 새 작업장 등록
-                        await apiClient.post(PRODUCTION_API.SAVE_PROCESS_API, values);
-                        notify('success', '등록 성공', '공정이 등록되었습니다.', 'bottomRight');
-                    } else if (type === 'update') {
-                        // API 요청: 기존 작업장 수정
-                        await apiClient.post(PRODUCTION_API.UPDATE_PROCESS_API(values.code), values);
-                        notify('success', '등록 성공', '공정이 수정되었습니다.', 'bottomRight');
-                    }
+                    // API 경로 선택 (저장 / 업데이트)
+                    const API_PATH = type === 'update'
+                        ? PRODUCTION_API.UPDATE_PROCESS_API(values.code)
+                        : PRODUCTION_API.SAVE_PROCESS_API;
+
+                    // 불필요한 값 정리 및 변환
+                    const preparedValues = {
+                        ...values,
+                        defectRate: parseFloat(values.defectRate),  // 불량률을 숫자로 변환
+                        cost: parseInt(values.cost, 10),  // 비용을 정수로 변환
+                        isOutsourced: values.isOutsourced || false,  // 외주 여부 기본값 처리
+                        isUsed: values.isUsed || true,  // 사용 여부 기본값 처리
+                    };
+
+                    // API 호출 및 데이터 처리
+                    const response = await apiClient.post(API_PATH, preparedValues);
+                    const updatedProcessDetail = response.data;
+
+                    // 성공 알림 및 상태 업데이트
+                    setProcessDetailsData((prev) => ({
+                        ...prev,
+                        ...updatedProcessDetail,
+                    }));
+
+                    notify(
+                        'success',
+                        type === 'update' ? '공정 수정 성공' : '공정 저장 성공',
+                        '공정 정보가 성공적으로 처리되었습니다.',
+                        'bottomRight'
+                    );
+
+                    // 폼 초기화 (필요한 경우)
+                    form.resetFields();
+
                 } catch (error) {
                     console.error('저장 실패:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -82,11 +114,16 @@ const ProcessDetailsPage = ({ initialData }) => {
                 notification.warning({
                     message: '저장 취소',
                     description: '저장이 취소되었습니다.',
-                    placement: 'bottomLeft',
+                    placement: 'bottomRight',
                 });
             },
         });
     };
+
+
+    // console.log('ProcessDetailsPage processDetail:', processDetail);
+    console.log('ProcessDetailsPage processDetailsData:', processDetailsData);
+    // console.log('ProcessDetailsPage selectedProcessDetail:', selectedProcessDetail);
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -137,12 +174,14 @@ const ProcessDetailsPage = ({ initialData }) => {
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {
                                                 setSelectedRowKeys([record.code]); // 클릭한 행의 키로 상태 업데이트
+                                                console.log('selectedRowKeys: ', selectedRowKeys);
                                                 try {
                                                     // 공정 상세 정보 가져오기 (API 호출)
                                                     const detail = await fetchProcessDetail([record.code]);
+                                                    console.log('onRow fetchProcessDetail 응답 데이터:', detail);
 
                                                     setProcessDetailsData(detail); // 선택된 작업장 데이터 설정
-                                                    setProcessDetailsParam(detail);
+                                                    // setProcessDetailsParam(detail);
                                                     notify('success', '조회', '생산공정 정보 조회 성공.', 'bottomRight');
                                                 } catch (error) {
                                                     console.error("생산공정 정보 조회 실패:", error);
@@ -159,15 +198,17 @@ const ProcessDetailsPage = ({ initialData }) => {
                     {/* 생산공정 등록 및 수정 */}
                     {processDetailsData && (
                         <SelectedProcessDetailsSection
-                            key={processDetailsData.code}
-                            processDetail={processDetailsData}
+                            // key={processDetailsData.code}
+                            processDetailsData={processDetailsData}
+                            setProcessDetailsData={setProcessDetailsData} // 상태 변경 함수 전달
                             handleInputChange={handleInputChange}
                             handleClose={() => setProcessDetailsData(null)} // 닫기 핸들러
-                            // handleSave={handleSave}
+                            handleSave={handleSave}
                             handleSelectedRow={handleSelectedRow}
                             handleDeleteProcessDetail={handleDeleteProcessDetail}
                             rowClassName={getRowClassName}
                             handleFormSubmit={handleFormSubmit}
+                            formatNumberWithComma={formatNumberWithComma}
                         />
                     )}
                 </Grid>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, notification, Divider } from 'antd';
 
 import { ActionButtons, showDeleteConfirm} from "../../common/commonActions.jsx";
@@ -9,10 +9,15 @@ import {LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx
 import apiClient from "../../../../config/apiClient.jsx";
 
 const SelectedProcessDetailsSection = ({
-                                           // processDetail,
+                                           processDetailsData,
+                                           setProcessDetailsData,
                                            handleInputChange,
                                            handleSave,
                                            handleDeleteProcessDetail,
+                                           handleSelectedRow,
+                                           handleClose,
+                                           rowClassName,
+                                           handleFormSubmit,
                                        }) => {
 
 const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부 상태
@@ -22,31 +27,30 @@ const [modalData, setModalData] = useState(null); // 모달 데이터 상태
 const [initialModalData, setInitialModalData] = useState(null);
 const [isEndDateDisable, setIsEndDateDisable] = useState(false); // 거래 종료일 비활성화 여부 상태
 const [displayValues, setDisplayValues] = useState({});
-const [processDetail, setProcessDetail] = useState({});
 const notify = useNotificationContext(); // 알림 컨텍스트 사용
 const [form] = Form.useForm(); // 폼 인스턴스 생성
 const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+// const [processDetailsData, setProcessDetailsData] = useState(null); // 선택된 생산공정 데이터 관리
 const [processDetailParam, setProcessDetailParam] = useState(false);
-
+const formRef = useRef(null); // Form에 대한 ref 생성
+const growRef = useRef(null); // Grow 컴포넌트의 ref 생성
 
     // 삭제 확인 다이얼로그 호출
     const handleDelete = () => {
         showDeleteConfirm(
             '이 작업은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?',
-            () => handleDeleteProcessDetail(processDetail.code)
+            () => handleDeleteProcessDetail(processDetailsData.code)
         );
     };
 
     // 선택된 공정이 변경될 때마다 `form`에 값을 반영
     useEffect(() => {
-        if (processDetail) {
-            form.setFieldsValue(processDetail); // 선택된 공정 데이터를 폼에 설정
-        }
-    }, [processDetail, form]);
+        if (processDetailsData) {
+            console.log('SelectedProcessDetailsSection - 데이터 설정:', processDetailsData);
 
-    const handleFormSubmit = (values) => {
-        console.log("handleFormSubmit", values);
-    }
+            form.setFieldsValue(processDetailsData); // 선택된 공정 데이터를 폼에 설정
+        }
+    }, [processDetailsData, form]);
 
     const handleModalCancel = () => setIsModalVisible(false);
 
@@ -70,11 +74,11 @@ const [processDetailParam, setProcessDetailParam] = useState(false);
         }
     };
 
-// 모달창 선택 핸들러
+    // 모달창 선택 핸들러
     const handleModalSelect = (record) => {
         switch (currentField) {
             case 'workcenter':
-                setProcessDetail((prevDetail) => ({
+                setProcessDetailsData((prevDetail) => ({
                     ...prevDetail,
                     workcenter: {
                         code: record.code,
@@ -88,7 +92,7 @@ const [processDetailParam, setProcessDetailParam] = useState(false);
                 break;
 
             case 'factory':
-                setProcessDetail((prevDetail) => ({
+                setProcessDetailsData((prevDetail) => ({
                     ...prevDetail,
                     factory: {
                         code: record.code,
@@ -109,55 +113,92 @@ const [processDetailParam, setProcessDetailParam] = useState(false);
         setIsModalVisible(false);
     };
 
+    // 모달창 열기 핸들러
+    const handleInputClick = (fieldName) => {
+        setCurrentField(fieldName);
+        setModalData(null);
+        setInitialModalData(null);
+        fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
+        setIsModalVisible(true);  // 모달창 열기
+    };
+
+
+    // console.log('SelectedProcessDetailsSection processDetail:', processDetail);
+    console.log('SelectedProcessDetailsSection processDetailsData:', processDetailsData);
+
     return (
         <Grid item xs={12} md={12} sx={{ minWidth: '700px !important', maxWidth: '1200px !important',}}>
             <Grow in={true} timeout={200}>
                 <Paper elevation={3} sx={{ height: '100%' }}>
                     <Typography variant="h6" sx={{ padding: '20px' }} >공정 등록 및 수정</Typography>
-                    <Grow sx={{ padding: '0px 20px 0px 20px' }}>
-                        {/* 공정 상세 정보를 표시하는 Form */}
+                    {/*<Grow sx={{ padding: '0px 20px 0px 20px' }}>*/}
+                    <Box sx={{ padding: '0px 20px 0px 20px' }}>
+
+                    {/* 공정 상세 정보를 표시하는 Form */}
                         <Form
                             form={form}
-                            initialValues={processDetail}
-                            onFinish={handleSave}
+                            // initialValues={processDetailsData}
+                            // onFinish={handleSave}
+                            onFinish={(values) => handleFormSubmit(values, processDetailsData ? 'update' : 'create')}
                             layout="vertical"
                         >
-                            <Divider orientation="left" style={{ fontWeight: 600 }}>기초 정보</Divider>
                             <Row gutter={16}>
                                 <Col span={8}>
-                                    <Form.Item name="code" label="공정코드" rules={[{ required: true }]}>
-                                        <Input readOnly />
+                                    <Form.Item name="code" rules={[{ required: true }]}>
+                                        <Input
+                                            addonBefore="공정코드"    
+                                            readOnly />
                                     </Form.Item>
                                 </Col>
                                 <Col span={8}>
-                                    <Form.Item name="name" label="공정명" rules={[{ required: true }]}>
-                                        <Input />
+                                    <Form.Item name="name" rules={[{ required: true }]}>
+                                        <Input addonBefore="공정명"/>
                                     </Form.Item>
                                 </Col>
                                 <Col span={8}>
-                                    <Form.Item name="duration" label="소요시간" rules={[{ required: true }]}>
-                                        <Input type="number" />
+                                    <Form.Item name="duration" rules={[{ required: true }]}>
+                                        <Input type="number" addonBefore="소요시간"/>
                                     </Form.Item>
                                 </Col>
                             </Row>
 
-                            <Divider orientation="left" style={{ fontWeight: 600 }}>추가 정보</Divider>
                             <Row gutter={16}>
                                 <Col span={8}>
-                                    <Form.Item name="cost" label="비용" rules={[{ required: true }]}>
-                                        <Input type="number" />
+                                    <Form.Item name="cost" rules={[{ required: true }]}>
+                                        <Input type="number" addonBefore="공정비용"/>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={8}>
+                                    <Form.Item name="defectRate" rules={[{ required: true }]}>
+                                        <Input type="number" step="0.01" addonBefore="불량률(%)" />
                                     </Form.Item>
                                 </Col>
                                 <Col span={8}>
                                     <Form.Item name="isOutsourced" valuePropName="checked">
-                                        <Checkbox>외주여부</Checkbox>
+                                        <Checkbox>외주 여부</Checkbox>
                                     </Form.Item>
                                 </Col>
                             </Row>
-                            <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button type="primary" htmlType="submit">저장</Button>
-                                <Button onClick={handleModalCancel}>취소</Button>
-                            </Space>
+                            <Row gutter={16}>
+                                <Col span={16}>
+                                    <Form.Item name="description" rules={[{ required: false }]}>
+                                        <Input.TextArea rows={2} placeholder="공정에 대한 설명을 입력하세요." />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={8}>
+                                    <Form.Item name="isUsed" valuePropName="checked" initialValue={true}>
+                                        <Checkbox>사용 여부</Checkbox>
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                <Button type="primary" htmlType="submit">
+                                    저장
+                                </Button>
+                                {/*<Button onClick={handleDelete} style={{ marginLeft: '10px' }} danger>*/}
+                                {/*삭제*/}
+                                {/*</Button>*/}
+                            </Box>
 
                             <Modal
                                 open={isModalVisible}
@@ -182,8 +223,8 @@ const [processDetailParam, setProcessDetailParam] = useState(false);
                                 />
                             </Modal>
                         </Form>
-
-                    </Grow>
+                    </Box>
+                    {/*</Grow>*/}
                 </Paper>
             </Grow>
         </Grid>

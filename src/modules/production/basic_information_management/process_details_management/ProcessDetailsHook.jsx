@@ -102,7 +102,7 @@ export const useProcessDetails = (initialData) => {
     const handleSelectedRow = async (record) => {
         try {
             const detail = await fetchProcessDetail(record.code); // API 호출
-            console.log("선택된 공정 데이터:", detail);
+            console.log("handleSelectedRow 선택된 공정 데이터:", detail);
 
             if (detail) {
                 setSelectedRow(detail); // 상태에 데이터 저장
@@ -128,9 +128,9 @@ export const useProcessDetails = (initialData) => {
             }
         }
 
-        if (key === 'isOutsourced' || key === 'isUsed') {
-            value = value === 'Y' ? true : false;
-        }
+        // if (key === 'isOutsourced' || key === 'isUsed') {
+        //     value = value === 'Y' ? true : false;
+        // }
 
 
         setProcessDetail({
