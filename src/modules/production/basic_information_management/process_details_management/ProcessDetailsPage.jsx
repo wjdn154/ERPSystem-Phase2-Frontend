@@ -11,6 +11,7 @@ import {useNotificationContext} from "../../../../config/NotificationContext.jsx
 import {fetchProcessDetail} from "./ProcessDetailsApi.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {fetchProcessDetails } from "./ProcessDetailsApi.jsx";
 
 const ProcessDetailsPage = ({ initialData }) => {
 
@@ -23,12 +24,12 @@ const ProcessDetailsPage = ({ initialData }) => {
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [displayValues, setDisplayValues] = useState({});
     const [processDetailsData, setProcessDetailsData] = useState(null); // 선택된 데이터 관리
-    const [processDetailsParam, setProcessDetailsParam] = useState({
-
-    });
+    const [processDetailsParam, setProcessDetailsParam] = useState({});
+    const [processList, setProcessList] = useState([]);
 
     const {
         data,
+        setData,
         handleSave,
         handleSelectedRow,
         handleDeleteProcessDetail,
@@ -39,7 +40,20 @@ const ProcessDetailsPage = ({ initialData }) => {
         handleSearch,
         searchData,
         isSearchActive,
+
     } = useProcessDetails(initialData);
+
+    const reloadProcessList = async () => {
+        try {
+            const data = await fetchProcessDetails(); // 리스트 조회
+            setProcessList(data); // 상태 갱신
+            setData(data); // 테이블에 사용되는 데이터 상태도 갱신
+        } catch (error) {
+            console.error('리스트 갱신 실패:', error);
+            notify('error', '리스트 갱신 실패', '공정 리스트를 가져오는 중 오류가 발생했습니다.', 'top');
+        }
+    };
+
 
     useEffect(() => {
         console.log("현재 activeTabKey: ", activeTabKey);
@@ -92,6 +106,9 @@ const ProcessDetailsPage = ({ initialData }) => {
                         ...prev,
                         ...updatedProcessDetail,
                     }));
+
+                    await reloadProcessList(); // 새롭게 추가된 부분
+
 
                     notify(
                         'success',
@@ -152,6 +169,7 @@ const ProcessDetailsPage = ({ initialData }) => {
                                     <Table
                                         columns={processDetailsColumn}
                                         dataSource={data}
+                                        // dataSource={processList} // 수정된 리스트로 데이터 소스 변경
                                         rowClassName={getRowClassName}
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         size="small"
