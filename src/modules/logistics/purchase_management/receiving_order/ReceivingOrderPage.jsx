@@ -1,8 +1,7 @@
 import React, {useMemo, useEffect, useState} from 'react';
-
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './PurchaseUtil.jsx';
+import { tabItems } from './ReceivingOrderUtil.jsx';
 import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, InputNumber, notification, Upload, Divider, Tooltip} from 'antd';
 import dayjs from 'dayjs';
 import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
@@ -13,11 +12,10 @@ const { confirm } = Modal;
 
 const { RangePicker } = DatePicker;
 
-
-const PurchasePage = ({initialData}) => {
+const ReceivingOrderPage = ({initialData}) => {
     const [activeTabKey, setActiveTabKey] = useState('1');
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
-    const [purchaseList, setPurchaseList] = useState(initialData)
+    const [receivingOrderList, setReceivingOrderList] = useState(initialData)
     const [displayValues, setDisplayValues] = useState({});
     const [status, setStatus] = useState({});
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -27,36 +25,34 @@ const PurchasePage = ({initialData}) => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [purchaseParam, setPurchaseParam] = useState({
-        purchaseDetails: [], });
-    const [detailPurchase, setDetailPurchase] = useState(false);
+    const [receivingOrderParam, setReceivingOrderParam] = useState({
+        receivingOrderDetails: [], });
+    const [detailReceivingOrder, setDetailReceivingOrder] = useState(false);
     const [form] = Form.useForm();
-    const [purchaseDetails, setPurchaseDetails] = useState(detailPurchase.purchaseDetails || []);
-    const [editPurchase, setEditPurchase] = useState(false);
+    const [receivingOrderDetails, setReceivingOrderDetails] = useState(detailReceivingOrder.receivingOrderDetails || []);
+    const [editReceivingOrder, setEditReceivingOrder] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
 
-
-
     useEffect(() => {
 
-        if(!detailPurchase) return;
+        if(!detailReceivingOrder) return;
 
-        form.setFieldsValue(detailPurchase);
+        form.setFieldsValue(detailReceivingOrder);
         form.setFieldsValue({
-            purchaseOrderDetails: purchaseDetails,
+            receivingOrderOrderDetails: receivingOrderDetails,
         })
-        setPurchaseParam(detailPurchase);
+        setReceivingOrderParam(detailReceivingOrder);
 
         setDisplayValues({
-            managerName: detailPurchase.managerCode ? `[${detailPurchase.managerCode}] ${detailPurchase.managerName}` : null,
-            warehouseName:  detailPurchase.warehouseCode ? `[${detailPurchase.warehouseCode}] ${detailPurchase.warehouseName}` : null,
-            client: detailPurchase.clientId ?`[${detailPurchase.clientId}] ${detailPurchase.clientName}` : null,
-            vatType: detailPurchase.vatCode ? `[${detailPurchase.vatCode}] ${detailPurchase.vatName}` : null
+            managerName: detailReceivingOrder.managerCode ? `[${detailReceivingOrder.managerCode}] ${detailReceivingOrder.managerName}` : null,
+            warehouseName:  detailReceivingOrder.warehouseCode ? `[${detailReceivingOrder.warehouseCode}] ${detailReceivingOrder.warehouseName}` : null,
+            client: detailReceivingOrder.clientCode ?`[${detailReceivingOrder.clientCode}] ${detailReceivingOrder.clientName}` : null,
+            clientSearch: detailReceivingOrder.clientCode ?`[${detailReceivingOrder.clientCode}] ${detailReceivingOrder.clientName}` : null,
 
-        }, [detailPurchase, form, purchaseDetails]);
+        }, [detailReceivingOrder, form, receivingOrderDetails]);
 
-    }, [detailPurchase], form);
+    }, [detailReceivingOrder], form);
 
     const [searchParams, setSearchParams] = useState({
         startDate: null,
@@ -67,12 +63,11 @@ const PurchasePage = ({initialData}) => {
 
     const [searchData, setSearchData] = useState(null);
 
-
     const handleTabChange = (key) => {
-        setEditPurchase(false);
+        setEditReceivingOrder(false);
         setEditingRow(null);
-        setPurchaseDetails(null)
-
+        setReceivingOrderDetails(null)
+        setDetailReceivingOrder([]);
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
@@ -116,14 +111,14 @@ const PurchasePage = ({initialData}) => {
         const { startDate, endDate, clientCode, state } = searchParams;
 
         try {
-            const response = await apiClient.post(LOGISTICS_API.PURCHASE_LIST_API, searchParams);
+            const response = await apiClient.post(LOGISTICS_API.RECEIVING_ORDER_LIST_API, searchParams);
             const data = response.data;
             setSearchData(data);
             console.log(data)
 
-            notify('success', '조회 성공', '구매서 조회 성공.', 'bottomRight');
+            notify('success', '조회 성공', '입고지시서서 조회 성공.', 'bottomRight');
         } catch (error) {
-            notify('error', '조회 오류', '구매서 조회 중 오류가 발생했습니다.', 'top');
+            notify('error', '조회 오류', '입고지시서서 조회 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -142,7 +137,7 @@ const PurchasePage = ({initialData}) => {
         setIsLoading(true);
         let apiPath;
 
-        if(fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
+        if((fieldName === 'client') || (fieldName === 'clientSearch')) apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
@@ -170,7 +165,7 @@ const PurchasePage = ({initialData}) => {
     };
 
     const handleModalCancel = () => {
-        if(currentField === 'client'){
+        if((currentField === 'client') || (currentField === 'clientSearch')){
             setSearchParams({
                 clientId: null,
             })
@@ -187,7 +182,7 @@ const PurchasePage = ({initialData}) => {
 
         switch (currentField) {
             case 'managerName':
-                setPurchaseParam((prevParams) => ({
+                setReceivingOrderParam((prevParams) => ({
                     ...prevParams,
                     manager: {
                         id: record.id,
@@ -202,7 +197,7 @@ const PurchasePage = ({initialData}) => {
                 break;
 
             case 'warehouseName':
-                setPurchaseParam((prevParams) => ({
+                setReceivingOrderParam((prevParams) => ({
                     ...prevParams,
                     warehouse: {
                         id: record.id,
@@ -217,16 +212,12 @@ const PurchasePage = ({initialData}) => {
                 break;
 
             case 'client':
-                setPurchaseParam((prevParams) => ({
+                setReceivingOrderParam((prevParams) => ({
                     ...prevParams,
                     client: {
                         id: record.id,
                         name: record.printClientName,
                     },
-                }));
-                setSearchParams((prevParams) => ({
-                    ...prevParams,
-                    clientId: record.id,
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
@@ -234,34 +225,40 @@ const PurchasePage = ({initialData}) => {
                 }));
                 break;
 
+            case 'clientSearch':
+
+                setSearchParams((prevParams) => ({
+                    ...prevParams,
+                    clientId: record.id,
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    clientSearch: `[${record.id}] ${record.printClientName}`,
+                }));
+                break;
+
+
             case 'product':
                 // 제품 선택 시 해당 제품을 상태에 반영
-                const updatedDetails = [...purchaseParam.purchaseDetails];
+                const updatedDetails = [...receivingOrderParam.receivingOrderDetails];
 
                 console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
-                updateField('price', record.purchasePrice, editingRow);
+                updateField('standard', record.standard, editingRow);
 
-                const { quantity } = updatedDetails[editingRow].quantity;
-                const supplyPrice = calculateSupplyPrice(quantity, (record.purchasePrice));
-                console.log(supplyPrice)
-                const vat = calculateVat(supplyPrice);
 
-                updatedDetails[editingRow].supplyPrice = supplyPrice;
-                updatedDetails[editingRow].vat = vat;
-
-                setPurchaseParam((prevParams) => ({
+                setReceivingOrderParam((prevParams) => ({
                     ...prevParams,
-                    purchaseDetails: updatedDetails,
+                    receivingOrderDetails: updatedDetails,
                 }));
                 setEditingRow(null);
                 break;
 
             case 'vatType':
-                setPurchaseParam((prevParams) => ({
+                setReceivingOrderParam((prevParams) => ({
                     ...prevParams,
                     vatType: {
                         code: record.code,
@@ -281,15 +278,23 @@ const PurchasePage = ({initialData}) => {
 
     // 등록 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
-        setPurchaseParam((prevState) => ({
+        setReceivingOrderParam((prevState) => ({
             ...prevState,
             date: dayjs(date),
         }));
     };
 
+    // 납기 일자 변경 핸들러
+    const handleDeliveryDateChange = (date) => {
+        setReceivingOrderParam((prevState) => ({
+            ...prevState,
+            deliveryDate: dayjs(date),
+        }));
+    };
+
     // 필드 값 변경 시 호출되는 함수
     const handleFieldChange = (value, index, field) => {
-        const updatedDetails = [...purchaseParam.purchaseDetails];
+        const updatedDetails = [...receivingOrderParam.receivingOrderDetails];
 
         setEditingRow(index);
 
@@ -307,10 +312,10 @@ const PurchasePage = ({initialData}) => {
         }
 
 
-        setPurchaseDetails(updatedDetails); // 상태 업데이트
-        setPurchaseParam( {
-            ...purchaseParam,
-            purchaseDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+        setReceivingOrderDetails(updatedDetails); // 상태 업데이트
+        setReceivingOrderParam( {
+            ...receivingOrderParam,
+            receivingOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
         });
         setEditingRow(null);
     };
@@ -336,7 +341,7 @@ const PurchasePage = ({initialData}) => {
     };
 
     const updateField = (fieldName, value) => {
-        const updatedDetails = [...purchaseParam.purchaseDetails];
+        const updatedDetails = [...receivingOrderParam.receivingOrderDetails];
 
         console.log('editingRow: ', editingRow)
 
@@ -354,9 +359,9 @@ const PurchasePage = ({initialData}) => {
             updatedDetails[editingRow].vat = vat;
         }
 
-        setPurchaseParam((prevParams) => ({
+        setReceivingOrderParam((prevParams) => ({
             ...prevParams,
-            purchaseOrderDetails: updatedDetails,
+            receivingOrderOrderDetails: updatedDetails,
         }));
     };
 
@@ -370,17 +375,15 @@ const PurchasePage = ({initialData}) => {
         const newRow = {
             productCode: '',
             productName: '',
+            standard: '',
             quantity: 0,
-            price: 0,
-            supplyPrice: 0,
-            vat: 0,
             remarks: '',
         };
 
         // 기존 항목에 새로운 항목 추가
-        setPurchaseParam((prev) => ({
+        setReceivingOrderParam((prev) => ({
             ...prev,
-            purchaseDetails: [...prev.purchaseDetails, newRow],
+            receivingOrderDetails: [...prev.receivingOrderDetails, newRow],
         }));
     };
 
@@ -394,13 +397,13 @@ const PurchasePage = ({initialData}) => {
             onOk: async () => {
                 try {
                     // 삭제 API 호출해서 해야함 (수정)
-                    const updatedDetails = [...purchaseParam.purchaseDetails]; // 배열을 복사
+                    const updatedDetails = [...receivingOrderParam.receivingOrderDetails]; // 배열을 복사
                     updatedDetails.splice(index, 1); // 인덱스에 해당하는 항목 삭제
 
-                    setPurchaseDetails(updatedDetails); // 상태 업데이트
-                    setPurchaseParam((prev) => ({
+                    setReceivingOrderDetails(updatedDetails); // 상태 업데이트
+                    setReceivingOrderParam((prev) => ({
                             ...prev,
-                            purchaseDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+                            receivingOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
                         })
                     );
 
@@ -433,14 +436,6 @@ const PurchasePage = ({initialData}) => {
                         color = 'red';
                         value = '취소';
                         break;
-                    case 'INVOICED':
-                        color = 'purple';
-                        value = '결제중';
-                        break;
-                    case 'ACCOUNTED':
-                        color = 'blue';
-                        value = '회계 반영';
-                        break;
                     default:
                         color = 'gray'; // 기본 색상
                         value = '미확인';
@@ -450,33 +445,33 @@ const PurchasePage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">구매 일자</div>,
+            title: <div className="title-text">입력 일자</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
             render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
-            width: '10%',
+            width: '15%',
         },
         {
             title: <div className="title-text">거래처명</div>,
             dataIndex: 'clientName',
             key: 'clientName',
             align: 'center',
-            width: '15%',
+            width: '20%',
+        },
+        {
+            title: <div className="title-text">담당자명</div>,
+            dataIndex: 'managerName',
+            key: 'managerName',
+            align: 'center',
+            width: '10%',
         },
         {
             title: <div className="title-text">품목명</div>,
             dataIndex: 'productName',
             key: 'productName',
             align: 'center',
-            width: '25%',
-        },
-        {
-            title: <div className="title-text">과세 유형</div>,
-            dataIndex: 'vatName',
-            key: 'vatName',
-            align: 'center',
-            width: '10%',
+            width: '20%',
         },
         {
             title: <div className="title-text">총 수량</div>,
@@ -486,11 +481,11 @@ const PurchasePage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">총 가격</div>,
-            dataIndex: 'totalPrice',
-            key: 'totalPrice',
+            title: <div className="title-text">입고 예정 일자</div>,
+            dataIndex: 'deliveryDate',
+            key: 'deliveryDate',
             align: 'center',
-            render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
             width: '15%',
         },
     ];
@@ -502,10 +497,10 @@ const PurchasePage = ({initialData}) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="구매"
+                        title="입고지시서"
                         description={(
                             <Typography>
-                                구매 페이지는 <span>발주서에 따라 실제로 물품을 구매</span>하는 과정을 관리함. 이 페이지에서는 <span>구매 진행 상황</span>을 확인하고, 물품이 <span>입고될 때까지의 모든 과정을 기록</span>함. 또한, <span>지불 조건, 납기 상태</span> 등을 확인할 수 있음.
+                                입고지시서 페이지는 <span>입고지시서한 물품이 회사에 도착하기 전에 해당 물품을 창고로 입고하도록 지시</span>하는 문서를 관리함. 이 페이지에서는 <span>입고지시서를 생성, 수정, 삭제</span>할 수 있으며, 물품의 <span>입고 일정과 장소</span>를 지정할 수 있음. <span>입고 과정에서 발생하는 문제</span>도 이 페이지에서 관리됨.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -520,7 +515,7 @@ const PurchasePage = ({initialData}) => {
                     <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%'}}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>구매서 목록</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>입고지시서 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -554,8 +549,8 @@ const PurchasePage = ({initialData}) => {
                                                     >
                                                         <Input
                                                             placeholder="거래처"
-                                                            value={displayValues.client}
-                                                            onClick={() => handleInputClick('client')}
+                                                            value={displayValues.clientSearch}
+                                                            onClick={() => handleInputClick('clientSearch')}
                                                             className="search-input"
                                                             style={{ width: '100%' }}
                                                             suffix={<DownSquareOutlined />}
@@ -594,7 +589,7 @@ const PurchasePage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? purchaseList : searchData} // 발주서 리스트 데이터
+                                        dataSource={Object.values(searchParams).every(value => value === null) ? receivingOrderList : searchData} // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -612,13 +607,13 @@ const PurchasePage = ({initialData}) => {
                                                 setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
                                                 const id = record.id;
                                                 try {
-                                                    const response = await apiClient.post(LOGISTICS_API.PURCHASE_DETAIL_API(id));
-                                                    setDetailPurchase(response.data);
-                                                    console.log('detailPurchase: ', response.data)
-                                                    setPurchaseDetails(detailPurchase)
-                                                    setEditPurchase(true);
+                                                    const response = await apiClient.post(LOGISTICS_API.RECEIVING_ORDER_DETAIL_API(id));
+                                                    setDetailReceivingOrder(response.data);
+                                                    console.log('detailReceivingOrder: ', response.data)
+                                                    setReceivingOrderDetails(detailReceivingOrder)
+                                                    setEditReceivingOrder(true);
 
-                                                    notify('success', '구매 조회', '구매 정보 조회 성공.', 'bottomRight')
+                                                    notify('success', '입고지시서 조회', '입고지시서 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -629,19 +624,19 @@ const PurchasePage = ({initialData}) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    {editPurchase && (
+                    {editReceivingOrder && (
                         <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                             <Grow in={true} timeout={200}>
                                 <Paper elevation={3} sx={{ height: '100%' }}>
-                                    <Typography variant="h6" sx={{ padding: '20px' }}>구매 상세정보 및 수정</Typography>
+                                    <Typography variant="h6" sx={{ padding: '20px' }}>입고지시서 상세정보 및 수정</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                         <Form
-                                            initialValues={detailPurchase}
+                                            initialValues={detailReceivingOrder}
                                             form={form}
                                             onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                         >
-                                            {/* 구매 정보 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매서 정보</Divider>
+                                            {/* 입고지시서 정보 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>입고지시서 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
                                                     <Typography>등록 일자</Typography>
@@ -650,7 +645,20 @@ const PurchasePage = ({initialData}) => {
                                                     <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
-                                                            value={dayjs(purchaseParam.date)}
+                                                            value={dayjs(receivingOrderParam.date)}
+                                                            onChange={handleDeliveryDateChange}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+
+                                                <Col>
+                                                    <Typography>납기 일자</Typography>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                        <DatePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            value={dayjs(receivingOrderParam.deliveryDate)}
                                                             onChange={handleRegiDateChange}
                                                         />
                                                     </Form.Item>
@@ -693,91 +701,7 @@ const PurchasePage = ({initialData}) => {
                                                 </Col>
                                             </Row>
 
-                                            <Row gutter={16} >
-                                                <Col span={6}>
-                                                    <Form.Item style={{ marginBottom: 0 }} >
-                                                        <Input
-                                                            addonBefore="과세 유형"
-                                                            value={displayValues.vatType}
-                                                            onClick={() => handleInputClick('vatType')}
-                                                            onFocus={(e) => e.target.blur()}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-
-                                                <Col span={6}>
-                                                <Form.Item name="journalEntry">
-                                                    <Space.Compact>
-                                                        <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
-                                                        <Select
-                                                            style={{ width: '70%' }}
-                                                            value={purchaseParam.journalEntryCode}
-                                                            onChange={(value) => {
-                                                                setPurchaseParam((prevState) => ({
-                                                                    ...prevState,
-                                                                    journalEntryCode: value,
-                                                                }));
-                                                            }}
-                                                        >
-                                                            <Select.Option value="1">현금</Select.Option>
-                                                            <Select.Option value="2">외상</Select.Option>
-                                                            <Select.Option value="3">카드</Select.Option>
-
-                                                        </Select>
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-
-                                                <Col span={6}>
-                                                    <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                        <Checkbox>세금계산서 발행 여부</Checkbox>
-                                                    </Form.Item>
-                                                </Col>
-
-                                            </Row>
-
                                             <Row gutter={16}>
-
-                                                <Col span={6}>
-                                                    <Form.Item name="currency">
-                                                        <Space.Compact>
-                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
-                                                            <Select
-                                                                style={{ width: '70%' }}
-                                                                value={purchaseParam.currency}
-                                                                onChange={(value) => {
-                                                                    setPurchaseParam((prevState) => ({
-                                                                        ...prevState,
-                                                                        currency: value,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <Select.Option value="KRW">한국 [원]</Select.Option>
-                                                                <Select.Option value="USD">미국 [달러]</Select.Option>
-                                                                <Select.Option value="EUR">유럽 [유로]</Select.Option>
-                                                                <Select.Option value="JPY">일본 [엔]</Select.Option>
-                                                                <Select.Option value="CNY">중국 [위안]</Select.Option>
-                                                                <Select.Option value="GBP">영국 [파운드]</Select.Option>
-                                                            </Select>
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-
-
-                                                {(purchaseParam.currency !== '한국 [원]' && purchaseParam.currency !== 'KRW') && (
-                                                    <Col span={6}>
-                                                        <Form.Item  style={{ marginBottom: 0 }} >
-                                                            <Input
-                                                                addonBefore="환율"
-                                                                value={purchaseParam.exchangeRate}
-                                                                onClick={() => handleInputClick('exchangeRate')}
-                                                                onFocus={(e) => e.target.blur()}
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                )}
-
 
                                                 <Col span={12}>
                                                     <Form.Item name="remarks">
@@ -787,10 +711,10 @@ const PurchasePage = ({initialData}) => {
 
                                             </Row>
 
-                                            {/* 구매 상세 항목 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매 상세 항목</Divider>
+                                            {/* 입고지시서 상세 항목 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>입고지시서 상세 항목</Divider>
                                             <Table
-                                                dataSource={purchaseParam?.purchaseDetails || []}
+                                                dataSource={receivingOrderParam?.receivingOrderDetails || []}
                                                 columns={[
                                                     {
                                                         title: '품목',
@@ -809,6 +733,15 @@ const PurchasePage = ({initialData}) => {
                                                                 />
                                                             );
                                                         },
+                                                        width: '25%'
+                                                    },
+                                                    {
+                                                        title: '규격',
+                                                        dataIndex: 'standard',
+                                                        key: 'standard',
+                                                        align: 'center',
+                                                        render: (text) => <div className="small-text" style={{ textAlign: 'center' }}>{text}</div>,
+
                                                         width: '20%'
                                                     },
                                                     {
@@ -824,31 +757,7 @@ const PurchasePage = ({initialData}) => {
                                                                 className="small-text"
                                                             />
                                                         ),
-                                                        width: '6%'
-                                                    },
-                                                    {
-                                                        title: '단가',
-                                                        dataIndex: 'price',
-                                                        key: 'price',
-                                                        align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
-                                                    },
-                                                    {
-                                                        title: '공급가액',
-                                                        dataIndex: 'supplyPrice',
-                                                        key: 'supplyPrice',
-                                                        align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
-                                                    },
-                                                    {
-                                                        title: '부가세',
-                                                        dataIndex: 'vat',
-                                                        key: 'vat',
-                                                        align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
+                                                        width: '10%'
                                                     },
                                                     {
                                                         title: '비고',
@@ -916,6 +825,56 @@ const PurchasePage = ({initialData}) => {
 
                         {/* 거래처 선택 모달 */}
                         {currentField === 'client' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    거래처 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.id && item.id.toString().toLowerCase().includes(value)) ||
+                                                    (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                {modalData && (
+
+                                    <Table
+                                        columns={[
+                                            { title: '코드', dataIndex: 'id', key: 'id', align: 'center' },
+                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
+                                        ]}
+                                        dataSource={modalData}
+                                        rowKey="id"
+                                        size="small"
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: () => handleModalSelect(record) // 선택 시 처리
+                                        })}
+                                    />
+                                )}
+                            </>
+                        )}
+
+                        {/* 거래처 선택 모달 */}
+                        {currentField === 'clientSearch' && (
                             <>
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     거래처 선택
@@ -1090,55 +1049,6 @@ const PurchasePage = ({initialData}) => {
                                 )}
                             </>
                         )}
-                        {/* 과세 유형 선택 모달 */}
-                        {currentField === 'vatType' && (
-                            <>
-                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                    과세 유형 선택
-                                </Typography>
-                                <Input
-                                    placeholder="검색"
-                                    prefix={<SearchOutlined />}
-                                    onChange={(e) => {
-                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
-                                        if (!value) {
-                                            setModalData(initialModalData);
-                                        } else {
-                                            const filtered = initialModalData.filter((item) => {
-                                                return (
-                                                    (item.code && item.code.toString().toLowerCase().includes(value)) ||
-                                                    (item.name && item.name.toLowerCase().includes(value))
-                                                );
-                                            });
-                                            setModalData(filtered);
-                                        }
-                                    }}
-                                    style={{ marginBottom: 16 }}
-                                />
-                                {modalData && (
-
-                                    <Table
-                                        columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '과세명', dataIndex: 'name', key: 'name', align: 'center' }
-                                        ]}
-                                        dataSource={modalData}
-                                        rowKey="code"
-                                        size="small"
-                                        pagination={{
-                                            pageSize: 15,
-                                            position: ['bottomCenter'],
-                                            showSizeChanger: false,
-                                            showTotal: (total) => `총 ${total}개`,
-                                        }}
-                                        onRow={(record) => ({
-                                            style: { cursor: 'pointer' },
-                                            onClick: () => handleModalSelect(record) // 선택 시 처리
-                                        })}
-                                    />
-                                )}
-                            </>
-                        )}
 
                         {/* 품목 선택 모달 */}
                         {currentField === 'product' && (
@@ -1217,15 +1127,15 @@ const PurchasePage = ({initialData}) => {
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
                         <Paper elevation={3} sx={{ height: '100%' }}>
-                            <Typography variant="h6" sx={{ padding: '20px' }}>구매 상세정보 및 수정</Typography>
+                            <Typography variant="h6" sx={{ padding: '20px' }}>입고지시서 상세정보 및 수정</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
-                                    initialValues={detailPurchase}
+                                    initialValues={detailReceivingOrder}
                                     form={form}
                                     onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                 >
-                                    {/* 구매 정보 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매서 정보</Divider>
+                                    {/* 입고지시서 정보 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>입고지시서서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
                                             <Typography>등록 일자</Typography>
@@ -1234,7 +1144,7 @@ const PurchasePage = ({initialData}) => {
                                             <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={dayjs(purchaseParam.date)}
+                                                    value={dayjs(receivingOrderParam.date)}
                                                     onChange={handleRegiDateChange}
                                                 />
                                             </Form.Item>
@@ -1278,17 +1188,6 @@ const PurchasePage = ({initialData}) => {
                                     </Row>
 
                                     <Row gutter={16} >
-                                        <Col span={6}>
-                                            <Form.Item style={{ marginBottom: 0 }} >
-                                                <Input
-                                                    addonBefore="과세 유형"
-                                                    value={displayValues.vatType}
-                                                    onClick={() => handleInputClick('vatType')}
-                                                    onFocus={(e) => e.target.blur()}
-                                                    suffix={<DownSquareOutlined />}
-                                                />
-                                            </Form.Item>
-                                        </Col>
 
                                         <Col span={6}>
                                             <Form.Item name="journalEntry">
@@ -1296,9 +1195,9 @@ const PurchasePage = ({initialData}) => {
                                                     <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
                                                     <Select
                                                         style={{ width: '70%' }}
-                                                        value={purchaseParam.journalEntryCode}
+                                                        value={receivingOrderParam.journalEntryCode}
                                                         onChange={(value) => {
-                                                            setPurchaseParam((prevState) => ({
+                                                            setReceivingOrderParam((prevState) => ({
                                                                 ...prevState,
                                                                 journalEntryCode: value,
                                                             }));
@@ -1329,9 +1228,9 @@ const PurchasePage = ({initialData}) => {
                                                     <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
                                                     <Select
                                                         style={{ width: '70%' }}
-                                                        value={purchaseParam.currency}
+                                                        value={receivingOrderParam.currency}
                                                         onChange={(value) => {
-                                                            setPurchaseParam((prevState) => ({
+                                                            setReceivingOrderParam((prevState) => ({
                                                                 ...prevState,
                                                                 currency: value,
                                                             }));
@@ -1349,12 +1248,12 @@ const PurchasePage = ({initialData}) => {
                                         </Col>
 
 
-                                        {(purchaseParam.currency !== '한국 [원]' && purchaseParam.currency !== 'KRW') && (
+                                        {(receivingOrderParam.currency !== '한국 [원]' && receivingOrderParam.currency !== 'KRW') && (
                                             <Col span={6}>
                                                 <Form.Item  style={{ marginBottom: 0 }} >
                                                     <Input
                                                         addonBefore="환율"
-                                                        value={purchaseParam.exchangeRate}
+                                                        value={receivingOrderParam.exchangeRate}
                                                         onClick={() => handleInputClick('exchangeRate')}
                                                         onFocus={(e) => e.target.blur()}
                                                     />
@@ -1371,10 +1270,10 @@ const PurchasePage = ({initialData}) => {
 
                                     </Row>
 
-                                    {/* 구매 상세 항목 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매 상세 항목</Divider>
+                                    {/* 입고지시서 상세 항목 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>입고지시서 상세 항목</Divider>
                                     <Table
-                                        dataSource={purchaseParam?.purchaseDetails || []}
+                                        dataSource={receivingOrderParam?.receivingOrderDetails || []}
                                         columns={[
                                             {
                                                 title: '품목',
@@ -1488,4 +1387,4 @@ const PurchasePage = ({initialData}) => {
     );
 };
 
-export default PurchasePage;
+export default ReceivingOrderPage;

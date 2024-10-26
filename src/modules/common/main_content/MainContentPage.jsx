@@ -141,8 +141,8 @@ import PurchasePlanPage from "../../logistics/purchase_management/purchase_plan/
 import PriceRequestPage from "../../logistics/purchase_management/price_request/PriceRequestPage.jsx";
 import PurchaseOrderPage from "../../logistics/purchase_management/purchase_order/PurchaseOrderPage.jsx";
 import PurchasePage from "../../logistics/purchase_management/purchase/PurchasePage.jsx";
-import ReceivingInstructionPage
-    from "../../logistics/purchase_management/receiving_instruction/ReceivingInstructionPage.jsx";
+import ReceivingOrderPage
+    from "../../logistics/purchase_management/receiving_order/ReceivingOrderPage.jsx";
 import ReturnRequestPage from "../../logistics/return_management/return_request/ReturnRequestPage.jsx";
 import ReturnStatusPage from "../../logistics/return_management/return_status/ReturnStatusPage.jsx";
 import ShipmentInstructionInquiryPage
@@ -223,7 +223,7 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     PaymentItemManagementPage, SocialInsurancePage, PayStatementPage, RetirementBenefitEstimationPage, RetirementSettlementPage, PensionManagementPage,
     WithholdingTaxDeclarationPage, LocalIncomeTaxDeclarationPage, PaymentStatementIssuancePage, BusinessIncomeManagementPage, OtherIncomeManagementPage,
     ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShipmentPage,
-    PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
+    PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingOrderPage: ReceivingOrderPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
     AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,

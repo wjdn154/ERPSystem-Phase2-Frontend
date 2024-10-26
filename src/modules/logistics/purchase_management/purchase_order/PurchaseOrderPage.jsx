@@ -31,7 +31,7 @@ const PurchaseOrderPage = ({initialData}) => {
     const [form] = Form.useForm();
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
     const [displayValues, setDisplayValues] = useState({});
-    const [purchaseOrderDetails, setPurchaseOrderDetails] = useState(detailPurchaseOrder.purchaseOrderDetails || []);
+    const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([]);
     const [editingRow, setEditingRow] = useState(null);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
 
@@ -196,6 +196,16 @@ const PurchaseOrderPage = ({initialData}) => {
     };
 
     const handleModalCancel = () => {
+        if(currentField === 'client'){
+            setSearchParams({
+                clientId: null,
+            })
+            setDisplayValues((prevValues) => ({
+                ...prevValues,
+                client: null,
+            }));
+        }
+        setCurrentField(null);
         setIsModalVisible(false);  // 모달창 닫기
     };
 
@@ -338,6 +348,7 @@ const PurchaseOrderPage = ({initialData}) => {
     const handleTabChange = (key) => {
         setEditPurchaseOrder(false);
         setEditingRow(null);
+        setPurchaseOrderDetails(null)
         setDetailPurchaseOrder([]);
         setSelectedRowKeys(null)
         form.resetFields();
@@ -395,7 +406,7 @@ const PurchaseOrderPage = ({initialData}) => {
         });
     };
 
-// 폼 제출 핸들러
+    // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
         console.log('Form values:', values); // 폼 값 확인
         console.log('detailPurchaseOrder', detailPurchaseOrder)
@@ -496,7 +507,7 @@ const PurchaseOrderPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">발주 요청 일자</div>,
+            title: <div className="title-text">발주 일자</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
@@ -640,7 +651,7 @@ const PurchaseOrderPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={(searchParams.state === null) ? purchaseOrderList : searchData} // 발주서 리스트 데이터
+                                        dataSource={Object.values(searchParams).every(value => value === null) ? purchaseOrderList : searchData} // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -660,7 +671,7 @@ const PurchaseOrderPage = ({initialData}) => {
                                                 try {
                                                     const response = await apiClient.post(LOGISTICS_API.PURCHASE_ORDER_DETAIL_API(id));
                                                     setDetailPurchaseOrder(response.data);
-                                                    setPurchaseOrderDetails(detailPurchaseOrder)
+                                                    setPurchaseOrderDetails(detailPurchaseOrder.purchaseOrderDetails)
                                                     setEditPurchaseOrder(true);
 
                                                     notify('success', '발주서 조회', '발주서 정보 조회 성공.', 'bottomRight')
@@ -908,9 +919,10 @@ const PurchaseOrderPage = ({initialData}) => {
                                                 onRow={(record) => ({
                                                     // onClick: () => setEditingRow(record.id),  // 행 클릭 시 해당 행의 id를 상태로 저장
                                                 })}
+
                                             />
 
-                                            <Divider />
+                                            <Divider style={{ marginBottom: '10px'}} />
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                                 <Button type="default" onClick={handleAddRow} style={{ marginRight: '10px' }}>
                                                     <PlusOutlined /> 항목 추가
@@ -1168,9 +1180,10 @@ const PurchaseOrderPage = ({initialData}) => {
                                         onRow={(record) => ({
                                             // onClick: () => setEditingRow(record.id),  // 행 클릭 시 해당 행의 id를 상태로 저장
                                         })}
-                                    />
 
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                    />
+                                    <Divider style={{ marginBottom: '10px' }} />
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', paddingBottom: '10px' }}>
                                         <Button type="default" onClick={handleAddRow} style={{ marginRight: '10px' }}>
                                             <PlusOutlined /> 항목 추가
                                         </Button>
@@ -1183,6 +1196,7 @@ const PurchaseOrderPage = ({initialData}) => {
                                             저장
                                         </Button>
                                     </Box>
+
                                 </Form>
                             </Grid>
                         </Paper>
