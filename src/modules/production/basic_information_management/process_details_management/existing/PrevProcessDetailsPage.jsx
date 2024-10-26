@@ -1,15 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Box, Grid, Grow, Paper} from '@mui/material';
-import WelcomeSection from '../../../../components/WelcomeSection.jsx';
+import WelcomeSection from '../../../../../components/WelcomeSection.jsx';
 import {Typography} from '@mui/material';
 import {Button, Col, Modal, Row} from 'antd';
-import TemporarySection from "../../../../components/TemporarySection.jsx";
-import {useProcessDetails} from "./ProcessDetailsHook.jsx";
-import ProcessDetailsListSection from "./ProcessDetailsListSection.jsx";
-import SelectedProcessDetailsSection from "./SelectedProcessDetailsSection.jsx";
-import {getRowClassName, tabItems, processDetailsColumn} from "./ProcessDetailsUtil.jsx";
+import TemporarySection from "../../../../../components/TemporarySection.jsx";
+import {useProcessDetails} from "../ProcessDetailsHook.jsx";
+import SearchBar from "./SearchBar.jsx";
+import ProcessDetailsListSection from "../ProcessDetailsListSection.jsx";
+import SelectedProcessDetailsSection from "../SelectedProcessDetailsSection.jsx";
+import {getRowClassName, tabItems, processDetailsColumn} from "../ProcessDetailsUtil.jsx";
 
-const ProcessDetailsPage = ({ initialData }) => {
+const PrevProcessDetailsPage = ({ initialData }) => {
 
     const [activeTabKey, setActiveTabKey] = useState('1');
     const {
@@ -55,10 +56,37 @@ const ProcessDetailsPage = ({ initialData }) => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '700px !important', maxWidth: '1200px' }} container spacing={3}>
+                <Grid sx={{ padding: '0px 20px 0px 20px', minWidth: '1400px !important', maxWidth: '1700px' }} container spacing={3}>
                     <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
+                                {/*/!* 검색 바 *!/*/}
+                                {/*<Row gutter={16} style={{marginBottom: '16px'}}>*/}
+                                {/*    <Col span={8}>*/}
+                                {/*        <SearchBar onSearch={handleSearch}/>*/}
+                                {/*    </Col>*/}
+                                {/*</Row>*/}
+
+                                {/*/!* 검색 결과 목록 또는 경고 메시지 *!/*/}
+                                {/*{isSearchActive && (*/}
+                                {/*    <>*/}
+                                {/*        {searchData && searchData.length > 0 ? (*/}
+                                {/*            <Row gutter={16} style={{marginBottom: '16px'}}>*/}
+                                {/*                <Col span={24}>*/}
+                                {/*                    <ProcessDetailsListSection*/}
+                                {/*                        columns={processDetailsColumn}*/}
+                                {/*                        data={searchData}*/}
+                                {/*                        handleSelectedRow={handleSelectedRow}*/}
+                                {/*                        rowClassName={getRowClassName}*/}
+                                {/*                    />*/}
+                                {/*                </Col>*/}
+                                {/*            </Row>*/}
+                                {/*        ) : (*/}
+                                {/*            <Text type="warning">검색하신 공정명을 찾을 수 없습니다.</Text>*/}
+                                {/*        )}*/}
+                                {/*    </>*/}
+                                {/*)}*/}
+
                                 {/* 기본 데이터 목록 */}
                                 <Typography variant="h6" sx={{ padding: '20px' }} >생산공정 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
@@ -76,7 +104,7 @@ const ProcessDetailsPage = ({ initialData }) => {
                                     {/* 모달 컴포넌트 */}
                                     {processDetail && (
                                         <Modal
-                                            open={isProcessModalVisible} // 모달 상태에 따라 표시
+                                            visible={isProcessModalVisible} // 모달 상태에 따라 표시
                                             onCancel={handleClose} // 모달을 닫는 함수
                                             footer={null} // 모달의 하단 버튼 제거
                                         >
@@ -112,4 +140,4 @@ const ProcessDetailsPage = ({ initialData }) => {
     );
 };
 
-export default ProcessDetailsPage;
+export default PrevProcessDetailsPage;
