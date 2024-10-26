@@ -107,6 +107,20 @@ export const EMPLOYEE_API = {
     SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
     DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
     DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
+    UPDATE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
+// 인사관리 - 직위
+    POSITION_DATA_API: `${API_BASE_URL}/api/hr/positions`,
+    POSITION_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/position/${id}`,
+    JOB_TITLE_DATA_API: `${API_BASE_URL}/api/hr/jobTitles`,
+    JOB_TITLE_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/jobTitle/${id}`,
+//  인사관리 - 근태
+    ATTENDANCE_DATA_API: `${API_BASE_URL}/api/hr/attendance/records/all`,
+    ATTENDANCE_DETAIL_DATA_API:(employeeId) => `${API_BASE_URL}/api/hr/records/${employeeId}`,
+    SAVE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/check-in`,
+    DELETE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/del`,
+    UPDATE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/update`,
+
+
 }
 // 물류관리
 export const LOGISTICS_API = {
