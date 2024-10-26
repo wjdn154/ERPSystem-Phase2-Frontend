@@ -6,7 +6,7 @@ import {Button, Col, Form, Modal, notification, Row, Table} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {useProcessDetails} from "./ProcessDetailsHook.jsx";
 import SelectedProcessDetailsSection from "./SelectedProcessDetailsSection.jsx";
-import {getRowClassName, tabItems, processDetailsColumn} from "./ProcessDetailsUtil.jsx";
+import {getRowClassName, tabItems, processDetailsColumn, removeComma} from "./ProcessDetailsUtil.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {fetchProcessDetail} from "./ProcessDetailsApi.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
@@ -50,11 +50,6 @@ const ProcessDetailsPage = ({ initialData }) => {
         setActiveTabKey(key);
     };
 
-    // 콤마 제거 함수
-    const removeComma = (value) => {
-        return value ? value.toString().replace(/,/g, '') : value;
-    };
-
     const handleFormSubmit = async (values, type) => {
         console.log('폼 제출 값:', values); // 객체 내용 확인
         if (typeof values !== 'object') {
@@ -78,14 +73,19 @@ const ProcessDetailsPage = ({ initialData }) => {
                     const preparedValues = {
                         ...values,
                         defectRate: parseFloat(values.defectRate),  // 불량률을 숫자로 변환
-                        cost: parseInt(values.cost, 10),  // 비용을 정수로 변환
-                        isOutsourced: values.isOutsourced || false,  // 외주 여부 기본값 처리
-                        isUsed: values.isUsed || true,  // 사용 여부 기본값 처리
+                        cost: removeComma(values.cost), // 콤마 제거 후 숫자로 변환
+                        duration: parseFloat(values.duration),  // 소요시간 실수 변환
+                        isOutsourced: !!values.isOutsourced,  // Boolean 변환 명시적 적용
+                        isUsed: values.isUsed || false,  // 사용 여부 기본값 처리
                     };
+                    console.log('preparedValues 전송할 데이터:', preparedValues); // API에 전달될 값 로그
 
                     // API 호출 및 데이터 처리
                     const response = await apiClient.post(API_PATH, preparedValues);
                     const updatedProcessDetail = response.data;
+
+                    console.log('updatedProcessDetail 응답 데이터:', updatedProcessDetail); // API 응답 확인
+
 
                     // 성공 알림 및 상태 업데이트
                     setProcessDetailsData((prev) => ({
