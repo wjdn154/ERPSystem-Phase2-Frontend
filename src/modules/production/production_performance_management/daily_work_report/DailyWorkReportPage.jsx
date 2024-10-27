@@ -55,7 +55,7 @@ const DailyWorkReportPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1200px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >생산일보 조회</Typography>
@@ -95,11 +95,9 @@ const DailyWorkReportPage = () => {
 
                                                                 try {
                                                                     const response = await apiClient.post(PRODUCTION_API.WORK_PERFORMANCE_DAILY_REPORT_API, searchParams);
-                                                                    const data = response.data;
-                                                                    setReportData(data);
-                                                                    console.log(data);
+                                                                    setReportData(response.data);
+                                                                    console.log(response.data);
                                                                 } catch (error) {
-                                                                    console.log(error);
                                                                     notify('error', '조회 오류', '생산 월보 조회 중 오류가 발생했습니다.', 'top');
                                                                 }
                                                             }}
@@ -113,20 +111,7 @@ const DailyWorkReportPage = () => {
                                     </Grid>
                                     <Table
                                         style={{ marginBottom: '20px' }}
-                                        dataSource={reportData ? reportData.map((item, index) => ({
-                                            key: `entry-${index}`,
-                                            productCode: item.productCode,           // 품번
-                                            productName: item.productName,           // 품명
-                                            productStandard: item.productStandard,   // 규격
-                                            productUnit: item.productUnit,           // 단위
-                                            totalQuantity: item.totalQuantity,       // 실적수량
-                                            productSalesPrice: item.productSalesPrice, // 단가
-                                            totalAmount: item.totalQuantity * item.productSalesPrice, // 실적금액 (수량 * 단가)
-                                            acceptableQuantity: item.acceptableQuantity, // 양품수량
-                                            acceptableAmount: item.acceptableAmount,   // 양품금액
-                                            defectiveQuantity: item.defectiveQuantity, // 부적합수량
-                                            defectiveAmount: item.defectiveAmount,     // 부적합금액
-                                        })) : []}
+                                        dataSource={reportData?.map((item, index) => ({ ...item, key: `entry-${index}` }))}
                                         columns={[
                                             {
                                                 title: <div className="title-text">품번</div>,
@@ -160,72 +145,113 @@ const DailyWorkReportPage = () => {
                                                 title: <div className="title-text">실적수량</div>,
                                                 dataIndex: 'totalQuantity',
                                                 key: 'totalQuantity',
-                                                align: 'center',
-                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
-                                            },
-                                            {
-                                                title: <div className="title-text">단가</div>,
-                                                dataIndex: 'productSalesPrice',
-                                                key: 'productSalesPrice',
-                                                align: 'center',
-                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{text.toLocaleString()}</div>
                                             },
                                             {
                                                 title: <div className="title-text">실적금액</div>,
-                                                dataIndex: 'totalAmount',
-                                                key: 'totalAmount',
-                                                align: 'center',
-                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''
+                                                dataIndex: 'processCost',
+                                                key: 'processCost',
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{text.toLocaleString()}</div>
                                             },
                                             {
                                                 title: <div className="title-text">양품수량</div>,
                                                 dataIndex: 'acceptableQuantity',
                                                 key: 'acceptableQuantity',
-                                                align: 'center',
-                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{text.toLocaleString()}</div>
                                             },
                                             {
                                                 title: <div className="title-text">양품금액</div>,
                                                 dataIndex: 'acceptableAmount',
                                                 key: 'acceptableAmount',
-                                                align: 'center',
-                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
                                             },
                                             {
                                                 title: <div className="title-text">부적합수량</div>,
                                                 dataIndex: 'defectiveQuantity',
                                                 key: 'defectiveQuantity',
-                                                align: 'center',
-                                                render: (text) => text ? <div className="small-text">{text}</div> : ''
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{text.toLocaleString()}</div>
                                             },
                                             {
                                                 title: <div className="title-text">부적합금액</div>,
                                                 dataIndex: 'defectiveAmount',
                                                 key: 'defectiveAmount',
-                                                align: 'center',
-                                                render: (text) => text ? <div className="small-text" style={{ textAlign: 'right' }}>{text.toLocaleString()}</div> : ''
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
                                             },
+                                            {
+                                                title: <div className="title-text">평균 폐기물 발생량 (KG)</div>,
+                                                dataIndex: 'averageWasteGenerated',
+                                                key: 'averageWasteGenerated',
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">폐기물 발생량 (KG)</div>,
+                                                dataIndex: 'wasteGenerated',
+                                                key: 'wasteGenerated',
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">폐기물 발생율 (%)</div>,
+                                                dataIndex: 'wasteGeneratedPercentage',
+                                                key: 'wasteGeneratedPercentage',
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">평균 에너지 소비량 (MJ)</div>,
+                                                dataIndex: 'averageEnergyConsumed',
+                                                key: 'averageEnergyConsumed',
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">에너지 소비량 (MJ)</div>,
+                                                dataIndex: 'energyConsumed',
+                                                key: 'energyConsumed',
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
+                                            },
+                                            {
+                                                title: <div className="title-text">에너지 소비율 (%)</div>,
+                                                dataIndex: 'energyConsumedPercentage',
+                                                key: 'energyConsumedPercentage',
+                                                align: 'right',
+                                                render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
+                                            }
                                         ]}
                                         pagination={false}
                                         size="small"
                                         summary={() => (
                                             reportData && reportData.length > 0 ? (
-                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
-                                                <Table.Summary.Cell index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={1} />
-                                                <Table.Summary.Cell index={2} />
-                                                <Table.Summary.Cell index={3} />
-                                                <Table.Summary.Cell index={4}><div className="medium-text">{reportData.reduce((acc, curr) => acc + curr.totalQuantity, 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={5} />
-                                                <Table.Summary.Cell index={6}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + (curr.totalQuantity * curr.productSalesPrice), 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={7}><div className="medium-text">{reportData.reduce((acc, curr) => acc + curr.acceptableQuantity, 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={8}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + curr.acceptableAmount, 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={9}><div className="medium-text">{reportData.reduce((acc, curr) => acc + curr.defectiveQuantity, 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                <Table.Summary.Cell index={10}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + curr.defectiveAmount, 0).toLocaleString()}</div></Table.Summary.Cell>
-                                            </Table.Summary.Row>
+                                                <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                    <Table.Summary.Cell index={0}><div className="medium-text">합계</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1} />
+                                                    <Table.Summary.Cell index={2} />
+                                                    <Table.Summary.Cell index={3} />
+                                                    <Table.Summary.Cell index={4}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + curr.totalQuantity, 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={5}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + curr.processCost, 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={6}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + curr.acceptableQuantity, 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={7}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.acceptableAmount), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={8}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + curr.defectiveQuantity, 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={9}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.defectiveAmount), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={10}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.averageWasteGenerated), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={11}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.wasteGenerated), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={15}><div className="medium-text" style={{ textAlign: 'right' }}>{(reportData.reduce((acc, curr) => acc + parseFloat(curr.wasteGeneratedPercentage), 0) / reportData.length).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={13}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.averageEnergyConsumed), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={14}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.energyConsumed), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={15}><div className="medium-text" style={{ textAlign: 'right' }}>{(reportData.reduce((acc, curr) => acc + parseFloat(curr.energyConsumedPercentage), 0) / reportData.length).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></Table.Summary.Cell>
+                                                </Table.Summary.Row>
                                             ) : null
                                         )}
                                     />
+
                                 </Grid>
                             </Paper>
                         </Grow>
