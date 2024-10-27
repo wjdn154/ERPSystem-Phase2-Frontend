@@ -5,6 +5,7 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 import {
+    COMMON_API,
     EMPLOYEE_API,
     FINANCIAL_API,
     LOGISTICS_API,
@@ -25,12 +26,12 @@ export const menuItems = [
 export const subMenuItems = {
     '통합관리': [
         {
-            text: '대시보드', component: 'IntegrationDashboardPage', apiPath: undefined, url: '/integration'
+            text: '대시보드', component: 'IntegrationDashboardPage', apiPath: COMMON_API.DASHBOARD_API, url: '/integration'
         },
         {
             text: '기초정보관리',
             items: [
-                { text: '회사정보수정', component: 'CompanyInfoEditPage', apiPath: undefined, url: '/integration/basic-info/company-edit', requiredPermission: 'adminPermission', permissionLevel: 'ADMIN' }, // 관리자 권한
+                // { text: '회사정보수정', component: 'CompanyInfoEditPage', apiPath: undefined, url: '/integration/basic-info/company-edit', requiredPermission: 'adminPermission', permissionLevel: 'ADMIN' }, // 관리자 권한
                 { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: EMPLOYEE_API.USERS_PERMISSION_API(Cookies.get('jwt') ? jwtDecode(Cookies.get('jwt')).sub : null), url: '/integration/basic-info/user-management' }, // 사용자 관리 권한
             ]
         }
@@ -75,46 +76,46 @@ export const subMenuItems = {
         {
             text: '결산/재무제표',
             items: [
-                { text: '결산자료입력', component: 'ClosingDataEntryPage', apiPath: undefined, url: '/finance/financial-statements/closing-data', requiredPermission: 'closingDataPermission', permissionLevel: 'GENERAL' },  // 결산자료입력 권한
-                { text: '합계잔액시산표', component: 'TrialBalancePage', apiPath: undefined, url: '/finance/financial-statements/trial-balance', requiredPermission: 'trialBalancePermission', permissionLevel: 'GENERAL' },  // 합계잔액시산표 권한
+                // { text: '결산자료입력', component: 'ClosingDataEntryPage', apiPath: undefined, url: '/finance/financial-statements/closing-data', requiredPermission: 'closingDataPermission', permissionLevel: 'GENERAL' },  // 결산자료입력 권한
+                // { text: '합계잔액시산표', component: 'TrialBalancePage', apiPath: undefined, url: '/finance/financial-statements/trial-balance', requiredPermission: 'trialBalancePermission', permissionLevel: 'GENERAL' },  // 합계잔액시산표 권한
                 { text: '재무상태표', component: 'FinancialPositionPage', apiPath: undefined, url: '/finance/financial-statements/financial-position', requiredPermission: 'financialPositionPermission', permissionLevel: 'GENERAL' },  // 재무상태표 권한
                 { text: '손익계산서', component: 'IncomeStatementPage', apiPath: undefined, url: '/finance/financial-statements/income-statement', requiredPermission: 'incomeStatementPermission', permissionLevel: 'GENERAL' },  // 손익계산서 권한
-                { text: '제조원가명세서', component: 'CostStatementPage', apiPath: undefined, url: '/finance/financial-statements/cost-statement', requiredPermission: 'costStatementPermission', permissionLevel: 'GENERAL' },  // 제조원가명세서 권한
-                { text: '이익잉여금처분계산서', component: 'ProfitDistributionStatementPage', apiPath: undefined, url: '/finance/financial-statements/profit-distribution', requiredPermission: 'profitDistributionPermission', permissionLevel: 'GENERAL' },  // 이익잉여금처분계산서 권한
-                { text: '현금흐름표', component: 'CashFlowStatementPage', apiPath: undefined, url: '/finance/financial-statements/cash-flow', requiredPermission: 'cashFlowPermission', permissionLevel: 'GENERAL' },  // 현금흐름표 권한
-                { text: '자본변동표', component: 'EquityChangesStatementPage', apiPath: undefined, url: '/finance/financial-statements/equity-changes', requiredPermission: 'equityChangesPermission', permissionLevel: 'GENERAL' },  // 자본변동표 권한
-                { text: '결산부속명세서', component: 'ClosingAnnexStatementPage', apiPath: undefined, url: '/finance/financial-statements/closing-annex', requiredPermission: 'closingAnnexPermission', permissionLevel: 'GENERAL' },  // 결산부속명세서 권한
+                // { text: '제조원가명세서', component: 'CostStatementPage', apiPath: undefined, url: '/finance/financial-statements/cost-statement', requiredPermission: 'costStatementPermission', permissionLevel: 'GENERAL' },  // 제조원가명세서 권한
+                // { text: '이익잉여금처분계산서', component: 'ProfitDistributionStatementPage', apiPath: undefined, url: '/finance/financial-statements/profit-distribution', requiredPermission: 'profitDistributionPermission', permissionLevel: 'GENERAL' },  // 이익잉여금처분계산서 권한
+                // { text: '현금흐름표', component: 'CashFlowStatementPage', apiPath: undefined, url: '/finance/financial-statements/cash-flow', requiredPermission: 'cashFlowPermission', permissionLevel: 'GENERAL' },  // 현금흐름표 권한
+                // { text: '자본변동표', component: 'EquityChangesStatementPage', apiPath: undefined, url: '/finance/financial-statements/equity-changes', requiredPermission: 'equityChangesPermission', permissionLevel: 'GENERAL' },  // 자본변동표 권한
+                // { text: '결산부속명세서', component: 'ClosingAnnexStatementPage', apiPath: undefined, url: '/finance/financial-statements/closing-annex', requiredPermission: 'closingAnnexPermission', permissionLevel: 'GENERAL' },  // 결산부속명세서 권한
             ]
         },
-        {
-            text: '전기분재무제표',
-            items: [
-                { text: '전기분재무상태표', component: 'PreviousFinancialPositionPage', apiPath: undefined, url: '/finance/previous-financial-statements/financial-position', requiredPermission: 'previousFinancialPositionPermission', permissionLevel: 'GENERAL' },  // 전기분재무상태표 권한
-                { text: '전기분손익계산서', component: 'PreviousIncomeStatementPage', apiPath: undefined, url: '/finance/previous-financial-statements/income-statement', requiredPermission: 'previousIncomeStatementPermission', permissionLevel: 'GENERAL' },  // 전기분손익계산서 권한
-                { text: '전기분원가명세서', component: 'PreviousCostStatementPage', apiPath: undefined, url: '/finance/previous-financial-statements/cost-statement', requiredPermission: 'previousCostStatementPermission', permissionLevel: 'GENERAL' },  // 전기분원가명세서 권한
-                { text: '전기분잉여금처분계산서', component: 'PreviousProfitDistributionPage', apiPath: undefined, url: '/finance/previous-financial-statements/profit-distribution', requiredPermission: 'previousProfitDistributionPermission', permissionLevel: 'GENERAL' },  // 전기분잉여금처분계산서 권한
-                { text: '거래처별초기이월', component: 'ClientInitialCarryoverPage', apiPath: undefined, url: '/finance/previous-financial-statements/client-initial', requiredPermission: 'clientInitialPermission', permissionLevel: 'GENERAL' },  // 거래처별초기이월 권한
-                { text: '마감후이월', component: 'ClosingCarryoverPage', apiPath: undefined, url: '/finance/previous-financial-statements/closing-carryover', requiredPermission: 'closingCarryoverPermission', permissionLevel: 'GENERAL' },  // 마감후이월 권한
-            ]
-        },
-        {
-            text: '고정자산및감가상각',
-            items: [
-                { text: '고정자산등록', component: 'FixedAssetRegistrationPage', apiPath: undefined, url: '/finance/fixed-assets/register', requiredPermission: 'fixedAssetRegisterPermission', permissionLevel: 'GENERAL' },  // 고정자산등록 권한
-                { text: '미상각분감가상각비', component: 'UndepreciatedAmortizationPage', apiPath: undefined, url: '/finance/fixed-assets/undepreciated', requiredPermission: 'undepreciatedPermission', permissionLevel: 'GENERAL' },  // 미상각분감가상각비 권한
-                { text: '양도자산감가상각비', component: 'TransferredAssetAmortizationPage', apiPath: undefined, url: '/finance/fixed-assets/transferred', requiredPermission: 'transferredDepreciationPermission', permissionLevel: 'GENERAL' },  // 양도자산감가상각비 권한
-                { text: '고정자산관리대장', component: 'AssetRegisterPage', apiPath: undefined, url: '/finance/fixed-assets/register-book', requiredPermission: 'registerBookPermission', permissionLevel: 'GENERAL' },  // 고정자산관리대장 권한
-            ]
-        },
-        {
-            text: '자금관리',
-            items: [
-                { text: '받을어음현황', component: 'BillsReceivableStatusPage', apiPath: undefined, url: '/finance/funds/bills-receivable', requiredPermission: 'billsReceivablePermission', permissionLevel: 'GENERAL' },  // 받을어음현황 권한
-                { text: '지급어음현황', component: 'BillsPayableStatusPage', apiPath: undefined, url: '/finance/funds/bills-payable', requiredPermission: 'billsPayablePermission', permissionLevel: 'GENERAL' },  // 지급어음현황 권한
-                { text: '일일자금명세(경리일보)', component: 'DailyFundsStatementPage', apiPath: undefined, url: '/finance/funds/daily-finance', requiredPermission: 'dailyFinancePermission', permissionLevel: 'GENERAL' },  // 일일자금명세 권한
-                { text: '예적금현황', component: 'DepositsStatusPage', apiPath: undefined, url: '/finance/funds/deposits-status', requiredPermission: 'depositsStatusPermission', permissionLevel: 'GENERAL' },  // 예적금현황 권한
-            ]
-        },
+        // {
+        //     text: '전기분재무제표',
+        //     items: [
+        //         { text: '전기분재무상태표', component: 'PreviousFinancialPositionPage', apiPath: undefined, url: '/finance/previous-financial-statements/financial-position', requiredPermission: 'previousFinancialPositionPermission', permissionLevel: 'GENERAL' },  // 전기분재무상태표 권한
+        //         { text: '전기분손익계산서', component: 'PreviousIncomeStatementPage', apiPath: undefined, url: '/finance/previous-financial-statements/income-statement', requiredPermission: 'previousIncomeStatementPermission', permissionLevel: 'GENERAL' },  // 전기분손익계산서 권한
+        //         { text: '전기분원가명세서', component: 'PreviousCostStatementPage', apiPath: undefined, url: '/finance/previous-financial-statements/cost-statement', requiredPermission: 'previousCostStatementPermission', permissionLevel: 'GENERAL' },  // 전기분원가명세서 권한
+        //         { text: '전기분잉여금처분계산서', component: 'PreviousProfitDistributionPage', apiPath: undefined, url: '/finance/previous-financial-statements/profit-distribution', requiredPermission: 'previousProfitDistributionPermission', permissionLevel: 'GENERAL' },  // 전기분잉여금처분계산서 권한
+        //         { text: '거래처별초기이월', component: 'ClientInitialCarryoverPage', apiPath: undefined, url: '/finance/previous-financial-statements/client-initial', requiredPermission: 'clientInitialPermission', permissionLevel: 'GENERAL' },  // 거래처별초기이월 권한
+        //         { text: '마감후이월', component: 'ClosingCarryoverPage', apiPath: undefined, url: '/finance/previous-financial-statements/closing-carryover', requiredPermission: 'closingCarryoverPermission', permissionLevel: 'GENERAL' },  // 마감후이월 권한
+        //     ]
+        // },
+        // {
+        //     text: '고정자산및감가상각',
+        //     items: [
+        //         { text: '고정자산등록', component: 'FixedAssetRegistrationPage', apiPath: undefined, url: '/finance/fixed-assets/register', requiredPermission: 'fixedAssetRegisterPermission', permissionLevel: 'GENERAL' },  // 고정자산등록 권한
+        //         { text: '미상각분감가상각비', component: 'UndepreciatedAmortizationPage', apiPath: undefined, url: '/finance/fixed-assets/undepreciated', requiredPermission: 'undepreciatedPermission', permissionLevel: 'GENERAL' },  // 미상각분감가상각비 권한
+        //         { text: '양도자산감가상각비', component: 'TransferredAssetAmortizationPage', apiPath: undefined, url: '/finance/fixed-assets/transferred', requiredPermission: 'transferredDepreciationPermission', permissionLevel: 'GENERAL' },  // 양도자산감가상각비 권한
+        //         { text: '고정자산관리대장', component: 'AssetRegisterPage', apiPath: undefined, url: '/finance/fixed-assets/register-book', requiredPermission: 'registerBookPermission', permissionLevel: 'GENERAL' },  // 고정자산관리대장 권한
+        //     ]
+        // },
+        // {
+        //     text: '자금관리',
+        //     items: [
+        //         { text: '받을어음현황', component: 'BillsReceivableStatusPage', apiPath: undefined, url: '/finance/funds/bills-receivable', requiredPermission: 'billsReceivablePermission', permissionLevel: 'GENERAL' },  // 받을어음현황 권한
+        //         { text: '지급어음현황', component: 'BillsPayableStatusPage', apiPath: undefined, url: '/finance/funds/bills-payable', requiredPermission: 'billsPayablePermission', permissionLevel: 'GENERAL' },  // 지급어음현황 권한
+        //         { text: '일일자금명세(경리일보)', component: 'DailyFundsStatementPage', apiPath: undefined, url: '/finance/funds/daily-finance', requiredPermission: 'dailyFinancePermission', permissionLevel: 'GENERAL' },  // 일일자금명세 권한
+        //         { text: '예적금현황', component: 'DepositsStatusPage', apiPath: undefined, url: '/finance/funds/deposits-status', requiredPermission: 'depositsStatusPermission', permissionLevel: 'GENERAL' },  // 예적금현황 권한
+        //     ]
+        // },
     ],
     '인사관리': [
         // {
@@ -129,6 +130,8 @@ export const subMenuItems = {
                 { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: undefined, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
                 { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: undefined, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
                 { text: '퇴사자 관리', component: 'RetirementManagementPage', apiPath: undefined, url: '/hr/basic-info/retirement-management', requiredPermission: 'retirementManagementPermission', permissionLevel: 'GENERAL' },  // 퇴사자 관리 권한
+                { text: '급여 환경 설정', component: 'SalaryEnvironmentSettingsPage', apiPath: EMPLOYEE_API.POSITION_DATA_API, url: '/hr/basic-info/salary-environment-settings', requiredPermission: 'salaryEnvironmentSettingsPermission', permissionLevel: 'GENERAL' },  // 급여 환경 설정 권한
+                { text: '급여 체계 관리', component: 'SalarySystemManagementPage', apiPath: undefined, url: '/hr/basic-info/salary-system-management', requiredPermission: 'salarySystemManagementPermission', permissionLevel: 'GENERAL' },  // 급여 체계 관리 권한
             ]
         },
         {

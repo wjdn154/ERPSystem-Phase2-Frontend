@@ -12,6 +12,7 @@ export const COMMON_API = {
     COMPANY_LIST_API: `${API_BASE_URL}/api/financial/company/`, // 회사 목록 조회 API
     COMPANY_SEARCH_API: `${API_BASE_URL}/api/financial/company/search`, // 회사 검색 API
     REGISTER_API: `${API_BASE_URL}/api/hr/auth/register`, // 회원가입 API
+    DASHBOARD_API: `${API_BASE_URL}/api/integrated/dashboard`, // 대시보드 조회 API
 };
 
 // 재무회계
@@ -84,6 +85,7 @@ export const FINANCIAL_API = {
 
     // 결산/재무제표 관련 API
     FINANCIAL_STATEMENTS_API: `${API_BASE_URL}/api/financial/ledger/financialStatements/show`, // 재무상태표 조회 API
+    INCOME_STATEMENT_API: `${API_BASE_URL}/api/financial/ledger/incomeStatement/show`, // 손익계산서 조회 API
 };
 
 // 인사관리 - 사원
@@ -94,7 +96,8 @@ export const EMPLOYEE_API = {
     SAVE_EMPLOYEE_DATA_API: `${API_BASE_URL}/api/hr/employee/createEmployee`, // 사원 등록 API
     UPDATE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/hr/employee/updateEmployee/${id}`, // 사원 수정 API
     DELETE_EMPLOYEE_DATA_API:(id)=> `${API_BASE_URL}/api/hr/employee/del/${id}`,
-// 인사관리 - 사용자
+
+    // 인사관리 - 사용자
     USERS_PERMISSION_API: (username) => `${API_BASE_URL}/api/hr/users/permission/${username}`, // 사용자 권한 조회 API
     UPDATE_USERS_PERMISSION_API: `${API_BASE_URL}/api/hr/users/permission/update`,
     USERS_DATA_API: `${API_BASE_URL}/api/hr/users/all`,
@@ -102,11 +105,39 @@ export const EMPLOYEE_API = {
     SAVE_USERS_DATA_API: `${API_BASE_URL}/api/hr/users/create`,
     UPDATE_USERS_DATA_API: (id)=> `${API_BASE_URL}/api/hr/users/put/${id}`,
     DELETE_USERS_DATA_API: (id) =>`${API_BASE_URL}/api/hr/users/del/${id}`,
-// 인사관리 - 부서
+
+    // 인사관리 - 부서
     DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/all`,
     SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
     DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
     DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
+
+    ALLOWANCE_DATA_API: `${API_BASE_URL}/api/hr/basicconfiguration/allowance/show`,
+    UPDATE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
+
+    // 인사관리 - 직위
+    POSITION_DATA_API: `${API_BASE_URL}/api/hr/positions`,
+    POSITION_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/position/${id}`,
+    JOB_TITLE_DATA_API: `${API_BASE_URL}/api/hr/jobTitles`,
+    JOB_TITLE_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/jobTitle/${id}`,
+
+    //  인사관리 - 근태
+    ATTENDANCE_DATA_API: `${API_BASE_URL}/api/hr/attendance/records/all`,
+    ATTENDANCE_DETAIL_DATA_API:(employeeId) => `${API_BASE_URL}/api/hr/records/${employeeId}`,
+    SAVE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/check-in`,
+    DELETE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/del`,
+    UPDATE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/update`,
+
+    //  인사관리 - 휴가
+    LEAVE_DATA_API: `${API_BASE_URL}/api/hr/leaves/list`,
+    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/{id}`,
+    SAVE_LEAVE_API:`${API_BASE_URL}/api/hr/leaves/createLeaves`,
+
+    //  인사관리 - 급여
+    POSITION_SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/show`,
+    POSITION_SALARY_STEP_DATE_CATEGORY_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/datecategoryshow`,
+
+
 }
 // 물류관리
 export const LOGISTICS_API = {

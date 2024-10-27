@@ -4,19 +4,19 @@ export const tabItems = () => {
     return [
         {
             key: '1',
-            label: '근태 기록 조회/수정',
+            label: '퇴사자 목록 조회',
             children: (
                 <Typography>
-                    사원의 출퇴근 시간과 근무 상태를 일별, 월별로 조회 및 기존 데이터를 수정할 수 있음.
+                    퇴사한 사원의 목록을 조회하고, 퇴사 사유와 일정을 확인할 수 있는 탭임.
                 </Typography>
             ),
         },
         {
             key: '2',
-            label: '근태 기록 등록',
+            label: '퇴사자 기록 관리',
             children: (
                 <Typography>
-                    새로운 근태 기록을 등록할 수 있음.
+                    퇴사자 정보를 수정하거나 필요 시 기록을 삭제할 수 있는 탭임.
                 </Typography>
             ),
         },
