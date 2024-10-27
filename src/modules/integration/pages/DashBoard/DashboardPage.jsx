@@ -32,15 +32,16 @@ export default function DashboardPage({ initialData }) {
     });
 
     useEffect(() => {
-        setReportData(initialData);
+        if (initialData.environmentalScore) {
+            setReportData(initialData);
+        }
     }, [initialData]);
 
-    console.log(initialData);
+    console.log(reportData);
 
     return (
         <main className="flex-1 overflow-y-auto p-4">
             <div className="max-w-8xl my-10 mx-20">
-                {/* Dashboard widgets */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <DashboardWidget icon={AttachMoneyIcon} title="총 매출" value="₩34,192,000" color="bg-blue-500" />
                     <DashboardWidget icon={GroupsIcon} title="총 직원 수" value="1,257명" color="bg-green-500" />
@@ -48,7 +49,6 @@ export default function DashboardPage({ initialData }) {
                     <DashboardWidget icon={PrecisionManufacturingIcon} title="생산량" value="5,678개" color="bg-purple-500" />
                 </div>
 
-                {/* Charts */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
                     <ChartCard title="매출 및 비용 추이">
                         <ResponsiveContainer width="100%" height={300}>
@@ -84,7 +84,7 @@ export default function DashboardPage({ initialData }) {
                                         r="40"
                                         fill="transparent"
                                         strokeDasharray="251.2"
-                                        strokeDashoffset={`${251.2 * (1 - reportData.environmentalScore.totalScore / 100)}`} // 여기서 총 점수에 맞춰 동적 오프셋 조정
+                                        strokeDashoffset={`${251.2 * (1 - reportData.environmentalScore.totalScore / 100)}`}
                                         transform="rotate(-90 50 50)"
                                     ></circle>
                                 </svg>
