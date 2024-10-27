@@ -185,8 +185,8 @@ const DailyWorkReportPage = () => {
                                             },
                                             {
                                                 title: <div className="title-text">평균 폐기물 발생량 (KG)</div>,
-                                                dataIndex: 'averageWasteGenerated',
-                                                key: 'averageWasteGenerated',
+                                                dataIndex: 'industryAverageWasteGenerated',
+                                                key: 'industryAverageWasteGenerated',
                                                 align: 'right',
                                                 render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
                                             },
@@ -198,16 +198,16 @@ const DailyWorkReportPage = () => {
                                                 render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
                                             },
                                             {
-                                                title: <div className="title-text">폐기물 발생율 (%)</div>,
+                                                title: <div className="title-text">산업폐기물 발생율 (%)</div>,
                                                 dataIndex: 'wasteGeneratedPercentage',
                                                 key: 'wasteGeneratedPercentage',
                                                 align: 'right',
                                                 render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
                                             },
                                             {
-                                                title: <div className="title-text">평균 에너지 소비량 (MJ)</div>,
-                                                dataIndex: 'averageEnergyConsumed',
-                                                key: 'averageEnergyConsumed',
+                                                title: <div className="title-text">산업평균 에너지 소비량 (MJ)</div>,
+                                                dataIndex: 'industryAverageEnergyConsumed',
+                                                key: 'industryAverageEnergyConsumed',
                                                 align: 'right',
                                                 render: (text) => <div className="small-text">{parseFloat(text).toLocaleString()}</div>
                                             },
@@ -241,10 +241,10 @@ const DailyWorkReportPage = () => {
                                                     <Table.Summary.Cell index={7}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.acceptableAmount), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={8}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + curr.defectiveQuantity, 0).toLocaleString()}</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={9}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.defectiveAmount), 0).toLocaleString()}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={10}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.averageWasteGenerated), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={10}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.industryAverageWasteGenerated), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={11}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.wasteGenerated), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={15}><div className="medium-text" style={{ textAlign: 'right' }}>{(reportData.reduce((acc, curr) => acc + parseFloat(curr.wasteGeneratedPercentage), 0) / reportData.length).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={13}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.averageEnergyConsumed), 0).toLocaleString()}</div></Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={13}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.industryAverageEnergyConsumed), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={14}><div className="medium-text" style={{ textAlign: 'right' }}>{reportData.reduce((acc, curr) => acc + parseFloat(curr.energyConsumed), 0).toLocaleString()}</div></Table.Summary.Cell>
                                                     <Table.Summary.Cell index={15}><div className="medium-text" style={{ textAlign: 'right' }}>{(reportData.reduce((acc, curr) => acc + parseFloat(curr.energyConsumedPercentage), 0) / reportData.length).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></Table.Summary.Cell>
                                                 </Table.Summary.Row>
