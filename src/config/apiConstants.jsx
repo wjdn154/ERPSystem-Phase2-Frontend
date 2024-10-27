@@ -133,6 +133,10 @@ export const EMPLOYEE_API = {
     LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/{id}`,
     SAVE_LEAVE_API:`${API_BASE_URL}/api/hr/leaves/createLeaves`,
 
+    //  인사관리 - 급여
+    POSITION_SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/show`,
+    POSITION_SALARY_STEP_DATE_CATEGORY_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/datecategoryshow`,
+
 
 }
 // 물류관리
