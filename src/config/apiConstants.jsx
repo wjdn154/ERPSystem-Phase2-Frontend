@@ -84,6 +84,7 @@ export const FINANCIAL_API = {
 
     // 결산/재무제표 관련 API
     FINANCIAL_STATEMENTS_API: `${API_BASE_URL}/api/financial/ledger/financialStatements/show`, // 재무상태표 조회 API
+    INCOME_STATEMENT_API: `${API_BASE_URL}/api/financial/ledger/incomeStatement/show`, // 손익계산서 조회 API
 };
 
 // 인사관리 - 사원
