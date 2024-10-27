@@ -129,6 +129,8 @@ export const subMenuItems = {
                 { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: undefined, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
                 { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: undefined, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
                 { text: '퇴사자 관리', component: 'RetirementManagementPage', apiPath: undefined, url: '/hr/basic-info/retirement-management', requiredPermission: 'retirementManagementPermission', permissionLevel: 'GENERAL' },  // 퇴사자 관리 권한
+                { text: '급여 환경 설정', component: 'SalaryEnvironmentSettingsPage', apiPath: undefined, url: '/hr/basic-info/salary-environment-settings', requiredPermission: 'salaryEnvironmentSettingsPermission', permissionLevel: 'GENERAL' },  // 급여 환경 설정 권한
+                { text: '급여 체계 관리', component: 'SalarySystemManagementPage', apiPath: undefined, url: '/hr/basic-info/salary-system-management', requiredPermission: 'salarySystemManagementPermission', permissionLevel: 'GENERAL' },  // 급여 체계 관리 권한
             ]
         },
         {
