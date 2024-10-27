@@ -123,8 +123,16 @@ export const EMPLOYEE_API = {
     LEAVE_DATA_API: `${API_BASE_URL}/api/hr/leaves/list`,
     LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/{id}`,
     SAVE_LEAVE_API:`${API_BASE_URL}/api/hr/leaves/createLeaves`,
-
-
+// 인사관리  - 성과
+    PERFORMANCE_DATA_API: `${API_BASE_URL}/api/hr/performance/list`,
+    PERFORMANCE_DETAIL_DATA_API:(employeeId)=> `${API_BASE_URL}/api/hr/performance/employee/${employeeId}`,
+    SAVE_PERFORMANCE_API:  `${API_BASE_URL}/api/hr/performance/save`,
+    UPDATE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/put/${performanceId}`,
+    DELETE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/del/${performanceId}`,
+// 인사관리  - 발령
+    SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
+    TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
+    SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
 }
 // 물류관리
 export const LOGISTICS_API = {

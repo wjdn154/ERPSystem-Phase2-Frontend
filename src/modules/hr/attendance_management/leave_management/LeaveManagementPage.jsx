@@ -28,6 +28,7 @@ const LeaveManagementPage = ({initialData}) => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [activeTabKey, setActiveTabKey] = useState('1');
 
+
     const fetchLeave = async () => {
         try{
             const response = await apiClient.post(EMPLOYEE_API.LEAVE_DATA_API);
@@ -39,6 +40,7 @@ const LeaveManagementPage = ({initialData}) => {
             });
         }
     };
+
 
     useEffect(()=>{
         fetchLeave();
@@ -220,6 +222,10 @@ const LeaveManagementPage = ({initialData}) => {
                                                 dataIndex: 'startDate',
                                                 key: 'startDate',
                                                 align: 'center',
+                                                sorter: (a, b) => {
+                                                    return new Date(a.startDate) - new Date(b.startDate);
+                                                },
+                                                sortDirections: ['ascend', 'descend'],
                                                 render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
