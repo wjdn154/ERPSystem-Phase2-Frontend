@@ -72,20 +72,33 @@ const ProductionRequestPage = () => {
         setActiveTabKey(key);
     };
 
-    // 모달 데이터 가져오기
+    const API_CONFIG = {
+        client: { path: FINANCIAL_API.FETCH_CLIENT_LIST_API, method: 'post' },
+        department: { path: EMPLOYEE_API.DEPARTMENT_DATA_API, method: 'post' },
+        product: { path: LOGISTICS_API.PRODUCT_LIST_API, method: 'post' },
+        requester: { path: EMPLOYEE_API.EMPLOYEE_DATA_API, method: 'get' },
+    };
+
+// 모달 데이터 가져오기 함수
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
-        let apiPath;
-        if (fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
-        if (fieldName === 'department') apiPath = EMPLOYEE_API.DEPARTMENT_DATA_API;
-        if (fieldName === 'requester') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
-        if (fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
+
+        const { path, method } = API_CONFIG[fieldName] || {};
+        if (!path || !method) {
+            console.error(`올바른 API 경로 또는 메서드가 없습니다: ${fieldName}`);
+            setIsLoading(false); // 로딩 상태 해제
+            return;
+        }
 
         try {
-            const response = await apiClient.get(apiPath);
+            const response = await apiClient[method](path); // 동적 메서드 호출
             setModalData(response.data);
+            setInitialModalData(response.data); // 초기 데이터 저장
         } catch (error) {
+            console.error('API 호출 오류:', error);
             notify('error', '조회 실패', '데이터를 불러오는 데 실패했습니다.', 'top');
+        } finally {
+            setIsLoading(false); // 로딩 상태 해제
         }
     };
 
@@ -99,6 +112,8 @@ const ProductionRequestPage = () => {
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
         fetchProductionRequests(fieldName);
         setIsModalVisible(true);  // 모달창 열기
+
+
     };
 
     const handleModalCancel = () => {
@@ -113,19 +128,95 @@ const ProductionRequestPage = () => {
         setIsModalVisible(false);
     };
 
+    useEffect(() => {
+        if (productionRequestDetail) {
+            form.setFieldsValue({
+                ...productionRequestDetail,
+                requestDate: productionRequestDetail.requestDate ? dayjs(productionRequestDetail.requestDate) : null,
+                deadlineOfCompletion: productionRequestDetail.deadlineOfCompletion ? dayjs(productionRequestDetail.deadlineOfCompletion) : null,
+                dueDateToProvide: productionRequestDetail.dueDateToProvide ? dayjs(productionRequestDetail.dueDateToProvide) : null,
+            });
+        }
+    }, [productionRequestDetail, form]);
+
+
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
-        confirm({
+        console.log('폼 제출 값:', values); // 폼 데이터 확인
+
+        if (typeof values !== 'object') {
+            console.error('Error: values가 객체가 아닙니다', values);
+            return;
+        }
+
+        Modal.confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
-            onOk:async () => {
-                // 확인 버튼 클릭 시 실행되는 저장 로직
-                values.id = productionRequestParam.id;
-            }
-        })
-    }
+            onOk: async () => {
+                try {
+                    // API 경로 선택 (저장 / 업데이트)
+                    const API_PATH = type === 'update'
+                        ? PRODUCTION_API.PRODUCTION_REQUEST_UPDATE_API(values.id)
+                        : PRODUCTION_API.PRODUCTION_REQUEST_CREATE_API;
+
+                    // 필수 필드 검증
+                    if (!values.id || !values.requestType || !values.product) {
+                        notify('error', '저장 실패', '필수 필드가 누락되었습니다.', 'top');
+                        return;
+                    }
+
+                    // 불필요한 값 정리 및 변환
+                    const preparedValues = {
+                        ...values,
+                        requestQuantity: parseInt(values.requestQuantity, 10), // 요청 수량 숫자 변환
+                        confirmedQuantity: parseInt(values.confirmedQuantity, 10), // 확정 수량 숫자 변환
+                        isConfirmed: !!values.isConfirmed, // Boolean 변환 명시적 적용
+                        requestDate: values.requestDate ? values.requestDate.format('YYYY-MM-DD') : null, // 날짜 포맷
+                        deadlineOfCompletion: values.deadlineOfCompletion ? values.deadlineOfCompletion.format('YYYY-MM-DD') : null,
+                        dueDateToProvide: values.dueDateToProvide ? values.dueDateToProvide.format('YYYY-MM-DD') : null,
+                    };
+                    console.log('preparedValues 전송할 데이터:', preparedValues); // API로 전송할 데이터 확인
+
+                    // API 호출
+                    const response = await apiClient.post(API_PATH, preparedValues);
+                    const updatedRequest = response.data;
+
+                    console.log('updatedRequest 응답 데이터:', updatedRequest); // API 응답 데이터 확인
+
+                    // 성공 알림 및 상태 업데이트
+                    setProductionRequests((prev) =>
+                        type === 'update'
+                            ? prev.map((req) => (req.id === updatedRequest.id ? updatedRequest : req))
+                            : [...prev, updatedRequest]
+                    );
+
+                    notify(
+                        'success',
+                        type === 'update' ? '의뢰 수정 성공' : '의뢰 저장 성공',
+                        '생산 의뢰가 성공적으로 처리되었습니다.',
+                        'bottomRight'
+                    );
+
+                    // 폼 초기화 (필요할 경우)
+                    form.resetFields();
+                    handleModalCancel(); // 모달 닫기
+
+                } catch (error) {
+                    console.error('저장 실패:', error);
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                } finally {
+                    setIsLoading(false);
+                }
+            },
+            onCancel() {
+                notify('warning', '저장 취소', '저장이 취소되었습니다.', 'bottomRight');
+            },
+        });
+    };
+
+
 
     const fetchProductionRequests = async () => {
         setIsLoading(true);
@@ -186,17 +277,19 @@ const ProductionRequestPage = () => {
 
     // 생산 의뢰 삭제
     const handleDelete = async (id) => {
-        setIsLoading(true);
+        if (!id) {
+            notify('warning', '삭제 오류', '삭제할 항목을 선택하세요.');
+            return;
+        }
         try {
-            await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_DELETE_API);
-            notify('success', '성공', '삭제 작업이 성공적으로 완료되었습니다.');
+            await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_DELETE_API, { id });
+            notify('success', '삭제 완료', '데이터가 삭제되었습니다.');
             fetchProductionRequests();
         } catch (error) {
-            notify('error', '오류 발생', '데이터 삭제 중 오류가 발생했습니다.');
-        } finally {
-            setIsLoading(false);
+            notify('error', '삭제 오류', '삭제 중 오류가 발생했습니다.');
         }
     };
+
 
     // 검색 처리
     const handleSearch = async () => {
@@ -620,8 +713,8 @@ const ProductionRequestPage = () => {
                                                 <Col span={8}>
                                                     <Form.Item name="client" label="거래처">
                                                         <Input
-                                                            placeholder="거래처 선택"
-                                                            readOnly
+                                                            placeholder="거래처 선택" // FINANCIAL_API.CLIENT_SEARCH_API
+                                                            value={selectedValue.client || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('client')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -630,8 +723,8 @@ const ProductionRequestPage = () => {
                                                 <Col span={8}>
                                                     <Form.Item name="department" label="부서">
                                                         <Input
-                                                            placeholder="부서 선택"
-                                                            readOnly
+                                                            placeholder="부서 선택" // EMPLOYEE_API.DEPARTMENT_DATA_API
+                                                            value={selectedValue.department || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('department')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -640,8 +733,8 @@ const ProductionRequestPage = () => {
                                                 <Col span={8}>
                                                     <Form.Item name="product" label="제품">
                                                         <Input
-                                                            placeholder="제품 선택"
-                                                            readOnly
+                                                            placeholder="제품 선택" // LOGISTICS_API.PRODUCT_LIST_API
+                                                            value={selectedValue.product || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('product')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -653,7 +746,7 @@ const ProductionRequestPage = () => {
                                                     <Form.Item name="requester" label="요청자">
                                                         <Input
                                                             placeholder="요청자 선택"
-                                                            readOnly
+                                                            value={selectedValue.requester || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('requester')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -669,35 +762,159 @@ const ProductionRequestPage = () => {
                                                 </Button>
                                             </Box>
                                             <Modal
-                                                title="검색"
                                                 open={isModalVisible}
+                                                onCancel={handleModalCancel}
+                                                width="40vw"
                                                 footer={null}
-                                                onCancel={() => setIsModalVisible(false)}
                                             >
-                                                <Input
-                                                    placeholder="검색"
-                                                    prefix={<SearchOutlined />}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value.toLowerCase();
-                                                        const filtered = modalData.filter((item) =>
-                                                            item.name.toLowerCase().includes(value)
-                                                        );
-                                                        setModalData(filtered);
-                                                    }}
-                                                    style={{ marginBottom: 16 }}
-                                                />
-                                                <Table
-                                                    dataSource={modalData}
-                                                    columns={[
-                                                        { title: 'ID', dataIndex: 'id', key: 'id' },
-                                                        { title: '이름', dataIndex: 'name', key: 'name' },
-                                                    ]}
-                                                    rowKey="id"
-                                                    onRow={(record) => ({
-                                                        onClick: () => handleModalSelect(record),
-                                                    })}
-                                                />
+                                                {isLoading ? (
+                                                    <Spin /> // 로딩 스피너
+                                                ) : (
+                                                    <>
+                                                        {/* 거래처 선택 모달 */}
+                                                        {currentField === 'client' && (
+                                                            <>
+                                                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+                                                                    거래처 선택
+                                                                </Typography>
+                                                                <Input
+                                                                    placeholder="검색"
+                                                                    prefix={<SearchOutlined />}
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value.toLowerCase();
+                                                                        const filtered = initialModalData.filter((item) =>
+                                                                            item.name.toLowerCase().includes(value)
+                                                                        );
+                                                                        setModalData(filtered);
+                                                                    }}
+                                                                    style={{ marginBottom: 16 }}
+                                                                />
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                        { title: '거래처명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{ pageSize: 15, showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        onClick: () => handleModalSelect(record),
+                                                                    })}
+                                                                />
+                                                            </>
+                                                        )}
+
+                                                        {/* 부서 선택 모달 */}
+                                                        {currentField === 'department' && (
+                                                            <>
+                                                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+                                                                    부서 선택
+                                                                </Typography>
+                                                                <Input
+                                                                    placeholder="검색"
+                                                                    prefix={<SearchOutlined />}
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value.toLowerCase();
+                                                                        const filtered = initialModalData.filter((item) =>
+                                                                            item.name.toLowerCase().includes(value)
+                                                                        );
+                                                                        setModalData(filtered);
+                                                                    }}
+                                                                    style={{ marginBottom: 16 }}
+                                                                />
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                                                        { title: '부서명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{ pageSize: 15, showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        onClick: () => handleModalSelect(record),
+                                                                    })}
+                                                                />
+                                                            </>
+                                                        )}
+
+                                                        {/* 제품 선택 모달 */}
+                                                        {currentField === 'product' && (
+                                                            <>
+                                                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+                                                                    제품 선택
+                                                                </Typography>
+                                                                <Input
+                                                                    placeholder="검색"
+                                                                    prefix={<SearchOutlined />}
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value.toLowerCase();
+                                                                        const filtered = initialModalData.filter((item) =>
+                                                                            item.name.toLowerCase().includes(value)
+                                                                        );
+                                                                        setModalData(filtered);
+                                                                    }}
+                                                                    style={{ marginBottom: 16 }}
+                                                                />
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'code', key: 'id', align: 'center' },
+                                                                        { title: '제품명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{ pageSize: 15, showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        onClick: () => handleModalSelect(record),
+                                                                    })}
+                                                                />
+                                                            </>
+                                                        )}
+
+                                                        {/* 요청자 선택 모달 */}
+                                                        {currentField === 'requester' && (
+                                                            <>
+                                                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+                                                                    요청자 선택
+                                                                </Typography>
+                                                                <Input
+                                                                    placeholder="검색"
+                                                                    prefix={<SearchOutlined />}
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value.toLowerCase();
+                                                                        const filtered = initialModalData.filter((item) =>
+                                                                            `${item.lastName}${item.firstName}`.toLowerCase().includes(value)
+                                                                        );
+                                                                        setModalData(filtered);
+                                                                    }}
+                                                                    style={{ marginBottom: 16 }}
+                                                                />
+                                                                <Table
+                                                                    columns={[
+                                                                        { title: '코드', dataIndex: 'code', key: 'id', align: 'center' },
+                                                                        {
+                                                                            title: '이름',
+                                                                            key: 'name',
+                                                                            align: 'center',
+                                                                            render: (text, record) => `${record.lastName} ${record.firstName}`,
+                                                                        },
+                                                                    ]}
+                                                                    dataSource={modalData}
+                                                                    rowKey="id"
+                                                                    size="small"
+                                                                    pagination={{ pageSize: 15, showSizeChanger: false }}
+                                                                    onRow={(record) => ({
+                                                                        onClick: () => handleModalSelect(record),
+                                                                    })}
+                                                                />
+                                                            </>
+                                                        )}
+                                                    </>
+                                                )}
                                             </Modal>
+
                                         </Form>
 
                                     </Grid>

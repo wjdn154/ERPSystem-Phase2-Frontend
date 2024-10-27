@@ -251,12 +251,12 @@ export const PRODUCTION_API = {
     UPDATE_HAZARDOUS_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/hazardousMaterial/updateMaterial/${id}`, //유해물질 수정 API
     DELETE_HAZARDOUS_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/hazardousMaterial/deleteMaterial/${id}`, //유해물질 삭제 API
 
-    // 생산운영 및 계획
-    PRODUCTION_REQUEST_LIST_API: `${API_BASE_URL}/api/production/productionRequest`, // 전체 생산 요청 목록 조회 API
-    PRODUCTION_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionRequest/${id}`, // 특정 생산 요청 조회 API
-    PRODUCTION_REQUEST_CREATE_API: `${API_BASE_URL}/api/production/productionRequest/create`, // 생산 요청 생성 API
-    PRODUCTION_REQUEST_UPDATE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/update/${id}`, // 생산 요청 수정 API
-    PRODUCTION_REQUEST_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/delete/${id}`, // 생산 요청 삭제 API
+        // 생산운영 및 계획
+        PRODUCTION_REQUEST_LIST_API: `${API_BASE_URL}/api/production/productionRequest`, // 전체 생산 요청 목록 조회 API
+        PRODUCTION_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionRequest/${id}`, // 특정 생산 요청 조회 API
+        PRODUCTION_REQUEST_CREATE_API: `${API_BASE_URL}/api/production/productionRequest/create`, // 생산 요청 생성 API
+        PRODUCTION_REQUEST_UPDATE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/update/${id}`, // 생산 요청 수정 API
+        PRODUCTION_REQUEST_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/delete/${id}`, // 생산 요청 삭제 API
 
     // 작업지시
     MPS_LIST_API: `${API_BASE_URL}/api/production/mps/search`, // 전체 MPS 목록 조회 API
