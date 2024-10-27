@@ -9,12 +9,16 @@ export default defineConfig({
     port: 3000,
   },
   build: {
+    minify: 'esbuild',
     sourcemap: false,
-    minify: 'terser',
     rollupOptions: {
       output: {
-        manualChunks: undefined,
-      }
-    }
-  }
-})
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
+});
