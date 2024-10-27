@@ -62,7 +62,7 @@ const PerformanceEvaluationPage = ({initialData}) => {
         });
         setPerformanceParam(fetchPerformanceData);
         setDisplayValues({employeeName: `${fetchPerformanceData.employeeLastName} ${fetchPerformanceData.employeeFirstName}`,
-        evaluatorName: `${fetchPerformanceData.evaluatorLastName} ${fetchPerformanceData.evaluatorFirstName}`,
+            evaluatorName: `${fetchPerformanceData.evaluatorLastName} ${fetchPerformanceData.evaluatorFirstName}`,
         })
 
     }, [fetchPerformanceData, form]);
@@ -306,50 +306,50 @@ const PerformanceEvaluationPage = ({initialData}) => {
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>기본 정보</Divider>
                                     <Row gutter={16}>
                                         <Col span={6}>
-                                                        <Form.Item name="employeeNumber">
-                                                            <Input addonBefore="사원번호" disabled={'employeeNumber'}/>
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col span={6}>
-                                                        <Form.Item name="fullName">
-                                                            <Input
-                                                                addonBefore="사원이름"
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                </Row>
-                                                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
-                                                    평가자 정보
-                                                </Divider>
-                                                <Row gutter={16}>
-                                                    <Col span={6}>
-                                                        <Form.Item name="evaluatorName" >
-                                                            <Input
-                                                                addonBefore="평가자이름"
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                </Row>
-                                                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
-                                                    평가 정보
-                                                </Divider>
-                                                <Row gutter={16}>
-                                                    <Col span={6}>
-                                                        <Form.Item name="evaluationDate" rules={[{ required: true, message: '평가일을 입력하세요.' }]}>
-                                                            <Input addonBefore="평가일"/>
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col span={6}>
-                                                        <Form.Item name="score" rules={[{ required: true, message: '평가점수를 입력하세요.' }]}>
-                                                            <Input addonAfter="평가점수"/>
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col span={6}>
-                                                        <Form.Item name="comments" rules={[{ required: true, message: '평가내용을 입력하세요.' }]}>
-                                                            <Input addonAfter="평가내용"/>
-                                                        </Form.Item>
-                                                    </Col>
-                                                </Row>
+                                            <Form.Item name="employeeNumber">
+                                                <Input addonBefore="사원번호" disabled={'employeeNumber'}/>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="fullName">
+                                                <Input
+                                                    addonBefore="사원이름"
+                                                />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
+                                        평가자 정보
+                                    </Divider>
+                                    <Row gutter={16}>
+                                        <Col span={6}>
+                                            <Form.Item name="evaluatorName" >
+                                                <Input
+                                                    addonBefore="평가자이름"
+                                                />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
+                                        평가 정보
+                                    </Divider>
+                                    <Row gutter={16}>
+                                        <Col span={6}>
+                                            <Form.Item name="evaluationDate" rules={[{ required: true, message: '평가일을 입력하세요.' }]}>
+                                                <Input addonBefore="평가일"/>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="score" rules={[{ required: true, message: '평가점수를 입력하세요.' }]}>
+                                                <Input addonAfter="평가점수"/>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="comments" rules={[{ required: true, message: '평가내용을 입력하세요.' }]}>
+                                                <Input addonAfter="평가내용"/>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
                                 </Form>
                             </Grid>
                         </Paper>
@@ -364,6 +364,6 @@ const PerformanceEvaluationPage = ({initialData}) => {
                     </Grid>
                 </Grid>
             )}
-                </Box>
-            )};
+        </Box>
+    )};
 export default PerformanceEvaluationPage;
