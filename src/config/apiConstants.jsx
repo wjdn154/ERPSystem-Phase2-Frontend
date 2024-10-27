@@ -251,21 +251,26 @@ export const PRODUCTION_API = {
     UPDATE_HAZARDOUS_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/hazardousMaterial/updateMaterial/${id}`, //유해물질 수정 API
     DELETE_HAZARDOUS_MATERIAL_API:(id) => `${API_BASE_URL}/api/production/hazardousMaterial/deleteMaterial/${id}`, //유해물질 삭제 API
 
-        // 생산운영 및 계획
-        PRODUCTION_REQUEST_LIST_API: `${API_BASE_URL}/api/production/productionRequest`, // 전체 생산 요청 목록 조회 API
-        PRODUCTION_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionRequest/${id}`, // 특정 생산 요청 조회 API
-        PRODUCTION_REQUEST_CREATE_API: `${API_BASE_URL}/api/production/productionRequest/create`, // 생산 요청 생성 API
-        PRODUCTION_REQUEST_UPDATE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/update/${id}`, // 생산 요청 수정 API
-        PRODUCTION_REQUEST_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/delete/${id}`, // 생산 요청 삭제 API
+    // 생산운영 및 계획
+    PRODUCTION_REQUEST_LIST_API: `${API_BASE_URL}/api/production/productionRequest`, // 전체 생산 요청 목록 조회 API
+    PRODUCTION_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionRequest/${id}`, // 특정 생산 요청 조회 API
+    PRODUCTION_REQUEST_CREATE_API: `${API_BASE_URL}/api/production/productionRequest/create`, // 생산 요청 생성 API
+    PRODUCTION_REQUEST_UPDATE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/update/${id}`, // 생산 요청 수정 API
+    PRODUCTION_REQUEST_DELETE_API: (id) => `${API_BASE_URL}/api/production/productionRequest/delete/${id}`, // 생산 요청 삭제 API
+
+    MPS_LIST_API: `${API_BASE_URL}/api/production/mps/search`, // 전체 MPS 목록 조회 API
+    MPS_CREATE: `${API_BASE_URL}/api/production/mps/new`,             // MPS 생성 API
+    MPS_COMPLETE: (id) => `${API_BASE_URL}/api/production/mps/${id}/complete`, // MPS 완료 처리 API
+    MPS_GET_BY_ID: (id) => `${API_BASE_URL}/api/production/mps/${id}`, // 특정 MPS 조회 API
+    MPS_UPDATE: (id) => `${API_BASE_URL}/api/production/mps/update/${id}`, // MPS 업데이트 API
+    MPS_DELETE: (id) => `${API_BASE_URL}/api/production/mps/delete/${id}`, // MPS 삭제 API
 
     // 작업지시
-    MPS_LIST_API: `${API_BASE_URL}/api/production/mps/search`, // 전체 MPS 목록 조회 API
     SHIFT_TYPE_LIST_API: `${API_BASE_URL}/api/production/shiftType`, // 전체 교대유형 목록 조회 API
     SHIFT_TYPE_DETAIL_API: (id) => `${API_BASE_URL}/api/production/shiftType/${id}`, // 특정 교대유형 조회 API
     SHIFT_TYPE_CREATE_API: `${API_BASE_URL}/api/production/shiftType/new`, // 교대유형 생성 API
     SHIFT_TYPE_UPDATE_API: `${API_BASE_URL}/api/production/shiftType/update`, // 교대유형 수정 API
     SHIFT_TYPE_DELETE_API: (id) => `${API_BASE_URL}/api/production/shiftType/delete/${id}`, // 교대유형 삭제 API
-    PRODUCTION_ORDER_LIST_API: `${API_BASE_URL}/api/production/productionOrder/all`, // 전체 작업 지시 목록 조회 API
 
     WORKER_ASSIGNMENT_WORKCENTER_COUNT_API: `${API_BASE_URL}/api/production/workerAssignment/workcenters/count`, // 전체 작업장별 배정된 인원수 조회 API
     WORKER_ASSIGNMENT_WORKCENTER_DETAIL_API: (workcenterCode) => `${API_BASE_URL}/api/production/workerAssignment/workcenter/${workcenterCode}`, // 특정 작업장 배정된 작업자 명단 조회 API
@@ -277,6 +282,7 @@ export const PRODUCTION_API = {
     WORKER_ASSIGNMENT_PRODUCTION_ORDER_SUMMARY_API: (productionOrderId) => `${API_BASE_URL}/api/production/workerAssignment/productionOrder/${productionOrderId}/summary`, // 작업지시별 작업자 명단 조회 API
     WORKER_ASSIGNMENT_WORKER_HISTORY_API: (workerId) => `${API_BASE_URL}/api/production/workerAssignment/worker/${workerId}/assignments`, // 작업자별 배치이력 조회 API
 
+    PRODUCTION_ORDER_LIST_API: `${API_BASE_URL}/api/production/productionOrder/all`, // 전체 작업 지시 목록 조회 API
     PRODUCTION_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}`, // 특정 작업 지시 조회 API
     PRODUCTION_ORDER_SAVE_API: `${API_BASE_URL}/api/production/productionOrder/save`, // 작업 지시 생성 API
     PRODUCTION_ORDER_ASSIGN_WORKERS_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}/assignWorkers`, // 작업 지시 작업자 배정 API

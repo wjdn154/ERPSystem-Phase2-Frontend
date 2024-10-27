@@ -597,7 +597,6 @@ const ProductionRequestPage = () => {
                                                 }
                                             }
                                         })}
-
                                     />
                                 </Grid>
                             </Paper>
