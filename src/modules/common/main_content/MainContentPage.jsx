@@ -13,8 +13,6 @@ import UserPermissionPage
     from "../../integration/pages/basic_information_management/UserPermission/UserPermissionPage.jsx";
 import PendingVoucherApprovalPage
     from "../../financial/voucher_entry/pending_voucher_approval/PendingVoucherApprovalPage.jsx";
-import CompanyInfoEditPage
-    from "../../integration/pages/basic_information_management/company_info_edit/CompanyInfoEditPage.jsx";
 import AccountLedgerPage from "../../financial/ledger/account_ledger/AccountLedgerPage.jsx";
 import ClientLedgerPage from "../../financial/ledger/client_ledger/ClientLedgerPage.jsx";
 import ClosingDataEntryPage
@@ -205,13 +203,15 @@ import OutsourcingInspectionPage
     from "../../production/outsourcing_management/outsourcing_inspection_management/OutsourcingInspectionPage.jsx";
 import PendingSalesPurchaseVoucherApprovalPage
     from "../../financial/voucher_entry/pending_sales_purchase_voucher_approval/PendingSalesPurchaseVoucherApprovalPage.jsx";
+import SalaryEnvironmentSettingsPage
+    from "../../hr/basic_information_management/salary_environment_setting/SalaryEnvironmentSettingsPage.jsx";
 
 // 필요한 페이지 컴포넌트들
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage,
     WorkerPage, IntegrationDashboardPage,FinanceDashboardPage, ProductionDashboardPage, HRDashboardPage, LogisticsDashboardPage, PendingVoucherInputPage,
-    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, CompanyInfoEditPage, VoucherListPage,
+    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, VoucherListPage,
     PendingSalesPurchaseVoucherInputPage, PendingSalesPurchaseVoucherApprovalPage, ElectronicTaxInvoicePage, ClientLedgerPage, ClientAccountLedgerPage, AccountLedgerPage, CashBookPage, DailyMonthlyReportPage,
     JournalPage, GeneralLedgerPage, SalesPurchaseLedgerPage, TaxInvoiceStatusPage, VoucherPrintPage, ClosingDataEntryPage, TrialBalancePage, FinancialPositionPage, IncomeStatementPage, CostStatementPage, ProfitDistributionStatementPage,
     CashFlowStatementPage, EquityChangesStatementPage, ClosingAnnexStatementPage, PreviousFinancialPositionPage, PreviousIncomeStatementPage,
@@ -229,7 +229,7 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,
     MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ShiftTypePage, ProductionOrderPage, AssignmentHistoryPage,
     WorkPerformancePage, MonthlyWorkReportPage, DailyWorkReportPage, DefectTypeManagementPage, QualityInspectionPage, LotManagementPage, SerialNumberPage, GoodsReceiptPage,
-    OutsourcingOrderPage, OutsourcingInspectionPage,
+    OutsourcingOrderPage, OutsourcingInspectionPage, SalaryEnvironmentSettingsPage
 };
 
 // MainContentPage 컴포넌트
