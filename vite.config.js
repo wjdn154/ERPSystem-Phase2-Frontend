@@ -11,14 +11,18 @@ export default defineConfig({
   build: {
     minify: 'esbuild',
     sourcemap: false,
+    cacheDir: './node_modules/.vite',
     rollupOptions: {
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
             return 'vendor';
           }
         },
       },
     },
   },
-});
+})

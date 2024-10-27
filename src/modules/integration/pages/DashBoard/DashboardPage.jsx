@@ -7,18 +7,6 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 
-
-const salesData = [
-    { name: '1월', 매출: 4000, 비용: 2400 },
-    { name: '2월', 매출: 3000, 비용: 1398 },
-    { name: '3월', 매출: 2000, 비용: 9800 },
-    { name: '4월', 매출: 2780, 비용: 3908 },
-    { name: '5월', 매출: 1890, 비용: 4800 },
-    { name: '6월', 매출: 2390, 비용: 3800 },
-]
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
-
 export default function DashboardPage({ initialData }) {
     const [reportData, setReportData] = useState({
         environmentalScore: {
@@ -32,9 +20,15 @@ export default function DashboardPage({ initialData }) {
     });
 
     useEffect(() => {
-        if (initialData.environmentalScore) {
-            setReportData(initialData);
-        }
+        setReportData((prevData) => ({
+            ...prevData,
+            ...initialData,
+            environmentalScore: {
+                totalScore: initialData?.environmentalScore?.totalScore ?? prevData.environmentalScore.totalScore,
+                wasteScore: initialData?.environmentalScore?.wasteScore ?? prevData.environmentalScore.wasteScore,
+                energyScore: initialData?.environmentalScore?.energyScore ?? prevData.environmentalScore.energyScore,
+            },
+        }));
     }, [initialData]);
 
     console.log(reportData);
@@ -43,23 +37,28 @@ export default function DashboardPage({ initialData }) {
         <main className="flex-1 overflow-y-auto p-4">
             <div className="max-w-8xl my-10 mx-20">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <DashboardWidget icon={AttachMoneyIcon} title="총 매출" value="₩34,192,000" color="bg-blue-500" />
-                    <DashboardWidget icon={GroupsIcon} title="총 직원 수" value="1,257명" color="bg-green-500" />
-                    <DashboardWidget icon={LocalShippingIcon} title="재고 현황" value="15,234개" color="bg-yellow-500" />
-                    <DashboardWidget icon={PrecisionManufacturingIcon} title="생산량" value="5,678개" color="bg-purple-500" />
+                    <DashboardWidget icon={AttachMoneyIcon} title={reportData.widgets.financeName}  value={`₩${new Intl.NumberFormat('ko-KR').format(reportData.widgets.financeValue)}`} color="bg-blue-500" />
+                    <DashboardWidget icon={GroupsIcon} title="총 직원 수" value={reportData.widgets.hrValue} color="bg-green-500" />
+                    <DashboardWidget icon={LocalShippingIcon} title="재고 현황" value={reportData.widgets.logisticsValue} color="bg-yellow-500" />
+                    <DashboardWidget icon={PrecisionManufacturingIcon} title="생산량" value={reportData.widgets.productionValue} color="bg-purple-500" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
                     <ChartCard title="매출 및 비용 추이">
                         <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={salesData}>
+                            <LineChart data={reportData.salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" tickFormatter={(value = '') => value || ''} />
                                 <YAxis tickFormatter={(value = 0) => value || 0} />
                                 <Tooltip />
-                                <Legend />
-                                <Line type="monotone" dataKey="매출" stroke="#3B82F6" strokeWidth={2} dot={{ r: 4 }} />
-                                <Line type="monotone" dataKey="비용" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} />
+                                <Legend
+                                    payload={[
+                                        { value: '매출', type: 'line', id: 'sales', color: '#3B82F6' },
+                                        { value: '비용', type: 'line', id: 'cost', color: '#10B981' },
+                                    ]}
+                                />
+                                <Line type="monotone" dataKey="sales" stroke="#3B82F6" strokeWidth={2} dot={{ r: 4 }} />
+                                <Line type="monotone" dataKey="cost" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </ChartCard>
