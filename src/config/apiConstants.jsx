@@ -12,6 +12,7 @@ export const COMMON_API = {
     COMPANY_LIST_API: `${API_BASE_URL}/api/financial/company/`, // 회사 목록 조회 API
     COMPANY_SEARCH_API: `${API_BASE_URL}/api/financial/company/search`, // 회사 검색 API
     REGISTER_API: `${API_BASE_URL}/api/hr/auth/register`, // 회원가입 API
+    DASHBOARD_API: `${API_BASE_URL}/api/integrated/dashboard`, // 대시보드 조회 API
 };
 
 // 재무회계
@@ -108,6 +109,10 @@ export const EMPLOYEE_API = {
     SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
     DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
     DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
+
+    ALLOWANCE_DATA_API: `${API_BASE_URL}/api/hr/basicconfiguration/allowance/show`,
+
+
 }
 // 물류관리
 export const LOGISTICS_API = {

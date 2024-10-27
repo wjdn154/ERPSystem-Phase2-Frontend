@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { BarChart, Users, Package, Truck, Leaf, Settings } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { menuItems } from '../../../../config/menuItems';
@@ -17,16 +17,26 @@ const salesData = [
     { name: '6월', 매출: 2390, 비용: 3800 },
 ]
 
-const productionData = [
-    { name: 'A제품', value: 400 },
-    { name: 'B제품', value: 300 },
-    { name: 'C제품', value: 300 },
-    { name: 'D제품', value: 200 },
-]
-
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
 
-export default function DashboardPage() {
+export default function DashboardPage({ initialData }) {
+    const [reportData, setReportData] = useState({
+        environmentalScore: {
+            totalScore: 0,
+            wasteScore: 0,
+            energyScore: 0,
+        },
+        activities: [],
+        salesData: [],
+        widgets: [],
+    });
+
+    useEffect(() => {
+        setReportData(initialData);
+    }, [initialData]);
+
+    console.log(initialData);
+
     return (
         <main className="flex-1 overflow-y-auto p-4">
             <div className="max-w-8xl my-10 mx-20">
@@ -74,12 +84,12 @@ export default function DashboardPage() {
                                         r="40"
                                         fill="transparent"
                                         strokeDasharray="251.2"
-                                        strokeDashoffset="25"
+                                        strokeDashoffset={`${251.2 * (1 - reportData.environmentalScore.totalScore / 100)}`} // 여기서 총 점수에 맞춰 동적 오프셋 조정
                                         transform="rotate(-90 50 50)"
                                     ></circle>
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-4xl font-bold text-green-500">92%</span>
+                                    <span className="text-4xl font-bold text-green-500">{reportData.environmentalScore.totalScore}점</span>
                                     <span className="text-sm text-gray-500 mt-2">친환경 인증 점수</span>
                                 </div>
                             </div>
@@ -87,19 +97,19 @@ export default function DashboardPage() {
                         <div className="mt-4">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-sm font-medium text-gray-500">에너지 효율</span>
-                                <span className="text-sm font-medium text-green-500">95%</span>
+                                <span className="text-sm font-medium text-green-500">{reportData.environmentalScore.energyScore}점</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: '95%' }}></div>
+                                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${reportData.environmentalScore.energyScore}점` }}></div>
                             </div>
                         </div>
                         <div className="mt-4">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-sm font-medium text-gray-500">재활용 비율</span>
-                                <span className="text-sm font-medium text-green-500">88%</span>
+                                <span className="text-sm font-medium text-gray-500">폐기물 비율</span>
+                                <span className="text-sm font-medium text-green-500">{reportData.environmentalScore.wasteScore}점</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: '88%' }}></div>
+                                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${reportData.environmentalScore.wasteScore}점` }}></div>
                             </div>
                         </div>
                     </ChartCard>
@@ -108,7 +118,7 @@ export default function DashboardPage() {
                 {/* Additional dashboard content */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <Card title="최근 활동">
-                        <ActivityTimeline />
+                        <ActivityTimeline reportData={reportData} />
                     </Card>
                     <Card title="생산 현황">
                         <ProductionStatus />
@@ -159,7 +169,7 @@ function Card({ title, children }) {
     )
 }
 
-function ActivityTimeline() {
+function ActivityTimeline({reportData}) {
     const activities = [
         { id: 1, content: '신규 직원 5명 채용', department: '인사', date: '3시간 전' },
         { id: 2, content: '6월 매출 보고서 승인', department: '재무', date: '1일 전' },
@@ -170,7 +180,7 @@ function ActivityTimeline() {
     return (
         <div className="flow-root">
             <ul className="-mb-8">
-                {activities.map((item, itemIdx) => (
+                {reportData.activities.map((item, itemIdx) => (
                     <li key={item.id}>
                         <div className="relative pb-8">
                             {itemIdx !== activities.length - 1 ? (
@@ -180,24 +190,24 @@ function ActivityTimeline() {
                                 <div>
                   <span
                       className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${
-                          item.department === '인사'
+                          item.activityType === '"PRODUCTION"'
                               ? 'bg-blue-500'
-                              : item.department === '재무'
+                              : item.activityType === '"PRODUCTION"'
                                   ? 'bg-green-500'
-                                  : item.department === '인증'
+                                  : item.activityType === '"PRODUCTION"'
                                       ? 'bg-yellow-500'
                                       : 'bg-purple-500'
                       }`}
                   >
-                    <ActivityIcon department={item.department} style={{ width: '15px'}} className="text-white" />
+                    <ActivityIcon activityType={item.activityType} style={{ width: '15px'}} className="text-white" />
                   </span>
                                 </div>
                                 <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                     <div>
-                                        <p className="text-sm text-gray-500">{item.content}</p>
+                                        <p className="text-sm text-gray-500">{item.activityDescription}</p>
                                     </div>
                                     <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                                        <time dateTime={item.date}>{item.date}</time>
+                                        <time dateTime={item.activityTime}>{item.activityTime}</time>
                                     </div>
                                 </div>
                             </div>
@@ -209,15 +219,15 @@ function ActivityTimeline() {
     )
 }
 
-function ActivityIcon({ department, ...props }) {
-    switch (department) {
-        case '인사':
+function ActivityIcon({ activityType, ...props }) {
+    switch (activityType) {
+        case 'HR':
             return <GroupsIcon {...props} />
-        case '재무':
-            return <AttachMoneyIcon {...props} />
-        case '인증':
-            return <Leaf {...props} />
-        case '물류':
+        case 'FINANCE':
+            return <AttachMoneyIcon    {...props} />
+        case 'PRODUCTION':
+            return <PrecisionManufacturingIcon {...props} />
+        case 'LOGISTICS':
             return <LocalShippingIcon {...props} />
         default:
             return <Package {...props} />

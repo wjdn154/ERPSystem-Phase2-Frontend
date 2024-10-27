@@ -5,6 +5,7 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
 import {
+    COMMON_API,
     EMPLOYEE_API,
     FINANCIAL_API,
     LOGISTICS_API,
@@ -25,7 +26,7 @@ export const menuItems = [
 export const subMenuItems = {
     '통합관리': [
         {
-            text: '대시보드', component: 'IntegrationDashboardPage', apiPath: undefined, url: '/integration'
+            text: '대시보드', component: 'IntegrationDashboardPage', apiPath: COMMON_API.DASHBOARD_API, url: '/integration'
         },
         {
             text: '기초정보관리',
@@ -129,7 +130,7 @@ export const subMenuItems = {
                 { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: undefined, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
                 { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: undefined, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
                 { text: '퇴사자 관리', component: 'RetirementManagementPage', apiPath: undefined, url: '/hr/basic-info/retirement-management', requiredPermission: 'retirementManagementPermission', permissionLevel: 'GENERAL' },  // 퇴사자 관리 권한
-                { text: '급여 환경 설정', component: 'SalaryEnvironmentSettingsPage', apiPath: undefined, url: '/hr/basic-info/salary-environment-settings', requiredPermission: 'salaryEnvironmentSettingsPermission', permissionLevel: 'GENERAL' },  // 급여 환경 설정 권한
+                { text: '급여 환경 설정', component: 'SalaryEnvironmentSettingsPage', apiPath: EMPLOYEE_API.ALLOWANCE_DATA_API, url: '/hr/basic-info/salary-environment-settings', requiredPermission: 'salaryEnvironmentSettingsPermission', permissionLevel: 'GENERAL' },  // 급여 환경 설정 권한
                 { text: '급여 체계 관리', component: 'SalarySystemManagementPage', apiPath: undefined, url: '/hr/basic-info/salary-system-management', requiredPermission: 'salarySystemManagementPermission', permissionLevel: 'GENERAL' },  // 급여 체계 관리 권한
             ]
         },

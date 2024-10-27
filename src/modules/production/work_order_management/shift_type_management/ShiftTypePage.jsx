@@ -31,7 +31,6 @@ const ShiftTypePage = ({ initialData }) => {
 
     useEffect(() => {
         if (form && selectedRowKeys) {
-            console.log(selectedRowKeys);
             const selectedData = searchData.find((data) => data.id === selectedRowKeys[0]) || {};
             setSaveParams({
                 id: selectedData.id || null,
@@ -76,7 +75,6 @@ const ShiftTypePage = ({ initialData }) => {
 
             notify('success', '작업지시 확정 성공', '작업지시가 성공적으로 확정되었습니다.');
         } catch (error) {
-            console.log(error);
             notify('error', '오류 발생', '작업 지시 확정 처리 중 오류가 발생했습니다.');
         }
     };
@@ -87,11 +85,6 @@ const ShiftTypePage = ({ initialData }) => {
         const defectiveQuantity = Math.floor(totalQuantity * defectiveRate);
         const acceptableQuantity = totalQuantity - defectiveQuantity;
         return { acceptableQuantity, defectiveQuantity };
-    };
-
-    const calculateWorkDate = (quantity, startDate = dayjs()) => {
-        const workDurationHours = quantity / 100;
-        return startDate.add(workDurationHours, 'hour');
     };
 
     const handleCloseOrder = async () => {
@@ -114,7 +107,6 @@ const ShiftTypePage = ({ initialData }) => {
         }
 
         const { acceptableQuantity, defectiveQuantity } = generateQuantities(saveParams.actualProductionQuantity);
-        const workEndDate = calculateWorkDate(saveParams.actualProductionQuantity, dayjs(saveParams.actualStartDateTime));
 
         const closureParams = {
             productionOrderId: saveParams.id,
@@ -122,7 +114,6 @@ const ShiftTypePage = ({ initialData }) => {
             quantity: saveParams.actualProductionQuantity,
             defectiveQuantity: defectiveQuantity,
             acceptableQuantity: acceptableQuantity,
-            workDate: dayjs(workEndDate).toISOString(),
             actualStartDateTime: dayjs(saveParams.actualStartDateTime).format("YYYY-MM-DDTHH:mm:ss"),
             actualEndDateTime: dayjs(saveParams.actualEndDateTime).format("YYYY-MM-DDTHH:mm:ss"),
         };
@@ -146,7 +137,6 @@ const ShiftTypePage = ({ initialData }) => {
 
             notify('success', '작업 마감 성공', '작업이 성공적으로 마감되었습니다.');
         } catch (error) {
-            console.log(error);
             notify('error', '오류 발생', '작업 지시 마감 처리 중 오류가 발생했습니다.');
         }
     };
