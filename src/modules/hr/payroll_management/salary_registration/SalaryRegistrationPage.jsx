@@ -42,21 +42,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
     const [employeeId, setEmployeeId] = useState();
     const [currentField, setCurrentField] = useState('');
     const [isStudentLoanDisabled, setIsStudentLoanDisabled] = useState(true);
-    const [salaryParam, setSalaryParam] = useState({
-        employeeId: null,
-        salaryStepId: null,
-        salaryType: null,
-        incomeTaxType: null,// 국외소득유무
-        studentLoanRepaymentStatus: null,// 학자금상환여부
-        studentLoanRepaymentAmount: null,// 합자금 상환통지액
-        pensionType: null,// 연금유형 : 국민연금 or 사학연금
-        nationalPensionAmount: null,// 국민연금 금액
-        healthInsurancePensionAmount: null,// 건강보험 금액
-        healthInsuranceNumber: null,// 건강보험 번호
-        longTermCareInsurancePensionCode: null,// 장기요양보험 코드
-        employmentInsuranceAmount: null,// 고용보험 금액
-        unionMembershipStatus: null,// 노조가입여부
-    });
+
     const [displayValues, setDisplayValues] = useState({
         salaryStep: '',
         longTermCareInsurancePensionCode: '',
@@ -78,6 +64,8 @@ const SalaryRegistrationPage = ({ initialData }) => {
                 setPositionId(initialData[0].positionId);
                 form.setFieldsValue({
                     ...response.data,
+                    privateSchoolPensionAmount: '0',
+                    salaryType: response.data.salaryType || 'MONTHLYSALARY',
                 });
                 setDisplayValues({
                     salaryStep: response.data.salaryStepName,
@@ -89,7 +77,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
         };
 
         fetchData();
-    }, []);
+    }, [form, initialData]);
 
     const handleTabChange = (key) => {
         setActiveTabKey(key);
@@ -111,7 +99,6 @@ const SalaryRegistrationPage = ({ initialData }) => {
 
         try {
             const response = await apiClient.post(apiPath);
-            console.log(response.data);
             setModalData(response.data);
             setInitialModalData(response.data);
         } catch (error) {
@@ -125,13 +112,9 @@ const SalaryRegistrationPage = ({ initialData }) => {
         // 모달 창 마다가 formattedvalue, setclient param 설정 값이 다름
         switch (currentField) {
             case 'salaryStep':
-                setSalaryParam((prevParams) => ({
-                    ...prevParams,
-                    salaryStepId: record.id,
-                }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    salaryStep: record.name,
+                    salaryStep: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
                 }));
 
                 try {
@@ -150,6 +133,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
 
                     form.setFieldsValue({
                         nationalPensionAmount: nationalPension.data,
+                        privateSchoolPensionAmount: '0',
                         employmentInsuranceAmount: employmentInsurance.data,
                         healthInsurancePensionAmount: healthInsurance.data,
                     });
@@ -160,10 +144,6 @@ const SalaryRegistrationPage = ({ initialData }) => {
 
                 break;
             case 'longTermCareInsurancePensionCode':
-                setSalaryParam((prevParams) => ({
-                    ...prevParams,
-                    longTermCareInsurancePensionCode: record.code,
-                }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
                     longTermCareInsurancePensionCode: `[${record.code.toString().padStart(5, '0')}] ${record.description}`,
@@ -181,7 +161,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
         return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
 
-    const handleFormSubmit = async (values, type) => {
+    const handleFormSubmit = async (values) => {
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
@@ -194,43 +174,29 @@ const SalaryRegistrationPage = ({ initialData }) => {
                 values.longTermCareInsurancePensionCode = searchData2.longTermCareInsurancePensionCode;
 
                 console.log(values);
-                console.log(searchData2);
 
                 try {
-                    const API_PATH = type === 'update' ? FINANCIAL_API.UPDATE_CLIENT_API : FINANCIAL_API.SAVE_CLIENT_API;
+                    const API_PATH = EMPLOYEE_API.SALARY_ENTRY_API;
                     const response = await apiClient.post(API_PATH, values);
                     const updatedData = response.data;
-                    setClientList((prevClientList) =>
-                        prevClientList.map((client) =>
-                            client.id === updatedData.id
-                                ? {
-                                    ...client,
-                                    id: values.id,
-                                    representativeName: values.representativeName,
-                                    printClientName: values.printClientName,
-                                    roadAddress: values.address.roadAddress,
-                                    detailedAddress: values.address.detailedAddress,
-                                    phoneNumber: values.contactInfo.phoneNumber,
-                                    businessType: values.businessInfo.businessType,
-                                    transactionStartDate: values.transactionStartDate,
-                                    transactionEndDate: values.transactionEndDate,
-                                    remarks: values.remarks,
-                                }
-                                : client
-                        )
-                    );
-                    setEditClient(false);
-                    setFetchClientData(null);
-                    setClientParam({
-                        transactionStartDate: dayjs(),  // 현재 날짜로 설정
-                        transactionEndDate: "9999-12-31",  // 종료일을 9999-12-31로 설정
-                        transactionType: 'BOTH',
+                    setSearchData2({
+                        employeeId: values.employeeId,
+                        salaryStepId: values.salaryStepId,
+                        salaryType: values.salaryType,
+                        incomeTaxType: values.incomeTaxType,// 국외소득유무
+                        studentLoanRepaymentStatus: values.studentLoanRepaymentStatus,// 학자금상환여부
+                        studentLoanRepaymentAmount: values.studentLoanRepaymentAmount,// 합자금 상환통지액
+                        pensionType: values.pensionType,// 연금유형 : 국민연금 or 사학연금
+                        nationalPensionAmount: values.nationalPensionAmount,// 국민연금 금액
+                        privateSchoolPensionAmount: values.privateSchoolPensionAmount,
+                        healthInsurancePensionAmount: values.healthInsurancePensionAmount,// 건강보험 금액
+                        healthInsuranceNumber: values.healthInsuranceNumber,// 건강보험 번호
+                        longTermCareInsurancePensionCode: values.longTermCareInsurancePensionCode,// 장기요양보험 코드
+                        employmentInsuranceAmount: values.employmentInsuranceAmount,// 고용보험 금액
+                        unionMembershipStatus: values.unionMembershipStatus,// 노조가입여부
                     });
                     setDisplayValues({});
-                    type === 'update'
-                        ? notify('success', '거래처 수정', '거래처 정보 수정 성공.', 'bottomRight')
-                        : (notify('success', '거래처 저장', '거래처 정보 저장 성공.', 'bottomRight'), registrationForm.resetFields());
-
+                    notify('success', '급여 정보 수정', '급여 정보 수정 완료.', 'bottomRight')
                 } catch (error) {
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
                 }
@@ -347,6 +313,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                                     })
                                                     form.setFieldsValue({
                                                         ...response.data,
+                                                        privateSchoolPensionAmount: '0',
                                                     });
                                                     setDisplayValues({
                                                         salaryStep: response.data.salaryStepName,
@@ -363,6 +330,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {
                                                 setEmployeeId(record.id);
+                                                console.log(record.id);
                                                 setSelectedRowKeys([record.id]);
                                                 setPositionId(record.positionId);
 
@@ -376,6 +344,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                                     })
                                                     form.setFieldsValue({
                                                         ...response.data,
+                                                        privateSchoolPensionAmount: '0',
                                                     });
                                                     setDisplayValues({
                                                         salaryStep: response.data.salaryStepName,
@@ -401,7 +370,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                     <Form
                                         initialValues={searchData2}
                                         form={form}
-                                        onFinish={(values) => handleFormSubmit(values, 'update')}
+                                        onFinish={(values) => handleFormSubmit(values)}
                                     >
                                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>기본 정보</Divider>
                                         <Row gutter={16}>
@@ -417,13 +386,24 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name="salaryType">
+                                                <Form.Item>
                                                     <Space.Compact>
-                                                        <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} value="급여유형" disabled />
-                                                        <Select onChange={(value) => form.setFieldValue('salaryType', value)}>
-                                                            <Select.Option value="MONTHLYSALARY">월급</Select.Option>
-                                                            <Select.Option value="ANNUALSALARY">연봉</Select.Option>
-                                                        </Select>
+                                                        <Input
+                                                            style={{
+                                                                width: '60%',
+                                                                backgroundColor: '#FAFAFA',
+                                                                color: '#000',
+                                                                textAlign: 'center',
+                                                            }}
+                                                            value="급여유형"
+                                                            disabled
+                                                        />
+                                                        <Form.Item name="salaryType" noStyle>
+                                                            <Select>
+                                                                <Select.Option value="MONTHLYSALARY">월급</Select.Option>
+                                                                <Select.Option value="ANNUALSALARY">연봉</Select.Option>
+                                                            </Select>
+                                                        </Form.Item>
                                                     </Space.Compact>
                                                 </Form.Item>
                                             </Col>
@@ -459,6 +439,14 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                                     <Space.Compact>
                                                         <Input style={{ width: '100%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="국민연금 금액" disabled />
                                                         <Input disabled value={formatNumberWithComma(form.getFieldValue('nationalPensionAmount'))} />
+                                                    </Space.Compact>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="privateSchoolPensionAmount" rules={[{ required: true, message: '사학연금 금액을 입력하세요.' }]}>
+                                                    <Space.Compact>
+                                                        <Input style={{ width: '100%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="사학연금 금액" disabled />
+                                                        <Input disabled value={formatNumberWithComma(form.getFieldValue('privateSchoolPensionAmount'))} />
                                                     </Space.Compact>
                                                 </Form.Item>
                                             </Col>
@@ -557,6 +545,14 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                                             {modalData && (
                                                                 <Table
                                                                     columns={[
+                                                                        {
+                                                                            title: <div className="title-text">호봉코드</div>,
+                                                                            dataIndex: 'code',
+                                                                            key: 'code',
+                                                                            align: 'center',
+                                                                            width: '20%',
+                                                                            render: (text) => <div className="small-text">{text}</div>
+                                                                        },
                                                                         {
                                                                             title: <div className="title-text">호봉명</div>,
                                                                             dataIndex: 'name',
