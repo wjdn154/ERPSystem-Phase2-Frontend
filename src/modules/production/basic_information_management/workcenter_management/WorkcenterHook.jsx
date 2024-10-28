@@ -27,6 +27,18 @@ export const useWorkcenter = (initialData) => {
         setActiveTabKey(key);
     };
 
+    const reloadWorkcenters = async () => {
+        try {
+            const workcenters = await fetchWorkcenters();  // API 호출
+            setData(workcenters);  // 상태 갱신
+            notify('success', '갱신 완료', '작업장 목록이 갱신되었습니다.', 'bottomRight');
+        } catch (error) {
+            console.error('작업장 목록 갱신 중 오류 발생:', error);
+            notify('error', '갱신 실패', '작업장 목록을 갱신하는 중 오류가 발생했습니다.', 'top');
+        }
+    };
+
+
     // useSearch 훅을 사용하여 검색 상태 관리
     const searchFields = ['code', 'name', 'description']; // Workcenter에서 검색할 필드 지정
     const {
@@ -50,48 +62,6 @@ export const useWorkcenter = (initialData) => {
 
         loadWorkcenters();  // 함수 호출
     }, []);  // 빈 배열로 두어 컴포넌트가 마운트될 때 항상 데이터를 불러오도록 함
-
-
-    const fetchEquipmentDetails = async (id) => {
-        try {
-            const response = await apiClient.post(PRODUCTION_API.EQUIPMENT_DATA_DETAIL_API(id));
-            return response.data;
-        } catch (error) {
-            console.error(`설비 ID ${id}의 정보를 가져오는 중 오류 발생:`, error);
-            return null;
-        }
-    };
-
-// 여러 설비 ID에 대해 설비 정보를 가져오는 함수
-    const fetchEquipmentDetailsByEachId = async (equipmentIds) => {
-        try {
-            const equipmentDetails = await Promise.all(
-                equipmentIds.map(async (id) => {
-                    const equipment = await fetchEquipmentDetails(id);
-                    return equipment
-                        ? { equipmentNum: equipment.equipmentNum, equipmentName: equipment.equipmentName }
-                        : { equipmentNum: '알 수 없음', equipmentName: '알 수 없는 설비' };
-                })
-            );
-            return equipmentDetails;
-        } catch (error) {
-            console.error('설비 정보를 가져오는 중 오류 발생:', error);
-            return [];
-        }
-    };
-
-
-    // const fetchEquipmentByWorkcenterCode = async (workcenterCode) => {
-    //     try {
-    //         const response = await apiClient.post(
-    //             `${PRODUCTION_API.EQUIPMENT_LIST_BY_WORKCENTER}/${workcenterCode}`
-    //         );
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('설비 목록 조회 실패:', error);
-    //         return [];
-    //     }
-    // };
 
     // 특정 작업장 삭제 로직
     const handleDeleteWorkcenter = async (code) => {
@@ -167,42 +137,6 @@ export const useWorkcenter = (initialData) => {
         });
     };
 
-
-    // // handleSave
-    // const handleSave = async () => {
-    //     try {
-    //         const confirmSave = window.confirm("저장하시겠습니까?");
-    //         if (!confirmSave) return;
-    //
-    //         if (isEditing) {
-    //             await createWorkcenter(workcenter);
-    //         } else {
-    //             await updateWorkcenter(workcenter.code, workcenter);
-    //         }
-    //
-    //         // 새로운 작업장 추가 시, 기존 상태에 추가
-    //         if (isEditing) {
-    //             setData(prevData => [...prevData, workcenter]);
-    //             notify('success', '저장 성공', '작업장 데이터 저장 성공.', 'bottomRight')
-    //         } else {
-    //             // 업데이트 시, 기존 데이터에서 수정된 데이터 반영
-    //             setData(prevData =>
-    //                 prevData.map(item => (item.code === workcenter.code ? workcenter : item))
-    //             );
-    //         }
-    //
-    //         // handleClose(); // 모달 닫기
-    //     } catch (error) {
-    //         console.error("작업장 저장 중 오류 발생:", error);
-    //         notify('error', '조회 오류', '작업장 저장 중 오류 발생', 'top');
-    //     }
-    // };
-
-    // // handleClose
-    // const handleClose = () => {
-    //     setIsWorkcenterModalVisible(false);
-    // };
-
     // 새 작업장 추가 핸들러
     const handleAddWorkcenter = () => {
         setWorkcenter({
@@ -218,19 +152,15 @@ export const useWorkcenter = (initialData) => {
             workerAssignments: []
         });
         setIsEditing(true);
-        // setIsWorkcenterModalVisible(true);
     };
 
     return {
         data,
         workcenter,
         setWorkcenter,
-        // isWorkcenterModalVisible,
         handleDeleteWorkcenter,
         handleSelectedRow,
         handleInputChange,
-        // handleSave,
-        // handleClose,
         handleAddWorkcenter,
         handleSearch, // useSearch 훅에서 반환된 handleSearch
         searchData,
@@ -240,6 +170,7 @@ export const useWorkcenter = (initialData) => {
         setActiveRate,
         handleTabChange,
         activeTabKey,
-        handleWorkcenterTypeChange
+        handleWorkcenterTypeChange,
+        reloadWorkcenters,
     };
 };

@@ -47,11 +47,8 @@ const WorkcenterManagementPage = ({ initialData }) => {
         isSearchActive,
         handleTabChange,
         activeTabKey,
+        reloadWorkcenters,
     } = useWorkcenter(initialData);
-    //
-    // const refreshWorkcenters = async() => {
-    //     console.log('refreshWorkcenters:',  )
-    // }
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, workcenterType) => {
@@ -66,10 +63,10 @@ const WorkcenterManagementPage = ({ initialData }) => {
                 try {
                     const apiPath = PRODUCTION_API.UPDATE_WORKCENTER_API(values.code);
                     console.log('UPDATE_WORKCENTER_API 경로:', apiPath); // 경로 로그로 확인
-
-
                     await apiClient.post(apiPath, values);
                     notify('success', '성공', '작업장이 저장되었습니다.', 'bottomRight');
+                    await reloadWorkcenters();
+
                 } catch (error) {
                     console.error('저장 실패:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
