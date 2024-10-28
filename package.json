@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
     "@hookform/resolvers": "^3.9.0",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
@@ -22,6 +20,8 @@
     "axios": "^1.7.5",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "echarts": "^5.5.1",
+    "echarts-for-react": "^3.0.2",
     "exceljs": "^4.4.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
@@ -36,7 +36,7 @@
     "react-toastify": "^10.0.5",
     "recharts": "^2.13.0-alpha.3",
     "redux-persist": "^6.0.0",
-    "styled-components": "^6.1.13",
+    "tslib": "^2.8.0",
     "uuid": "^10.0.0",
     "xlsx": "^0.18.5",
     "yup": "^1.4.0"

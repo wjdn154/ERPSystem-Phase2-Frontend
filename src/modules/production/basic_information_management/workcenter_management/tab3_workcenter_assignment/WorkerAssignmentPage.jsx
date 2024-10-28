@@ -7,7 +7,7 @@ import {useNotificationContext} from "../../../../../config/NotificationContext.
 import dayjs from 'dayjs';
 import {Grid, Box } from "@mui/material";
 import {DownSquareOutlined, PrinterOutlined, SearchOutlined} from "@ant-design/icons";
-import * as XLSX from 'xlsx';
+//import * as XLSX from 'xlsx';
 
 // import { saveAs } from 'file-saver'; // 파일 저장을 위해 사용
 
@@ -166,8 +166,13 @@ const WorkerAssignmentPage = () => {
             );
             console.log("fetchWorkerAssignments API 응답:", response.data); // 응답 확인
 
-            setWorkerAssignments(response.data); // workerAssignments 필드가 아닌 리스트 자체로 설정
-            setLoading(false);
+            if (!Array.isArray(response.data) || response.data.length === 0) {
+                notify('warning', '알림', '선택하신 기간 동안 배정된 작업자가 없습니다.', 'bottomRight');
+            } else {
+                setWorkerAssignments(response.data); // workerAssignments 필드가 아닌 리스트 자체로 설정
+                setLoading(false);
+            }
+
         } catch (error) {
             console.error("작업자 배정 데이터를 불러오는데 실패했습니다.", error);
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
