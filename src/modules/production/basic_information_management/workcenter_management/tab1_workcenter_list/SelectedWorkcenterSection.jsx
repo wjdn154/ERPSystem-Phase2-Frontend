@@ -31,6 +31,7 @@ const SelectedWorkcenterSection = ({
                                      handleSave,
                                      handleDeleteWorkcenter,
                                        handleWorkcenterTypeChange,
+                                       handleFormSubmit,
                                    }) => {
 
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
@@ -115,24 +116,6 @@ const SelectedWorkcenterSection = ({
 
                 console.log('Selected Equipments:', selected);
                 setSelectedEquipments(selected); // 선택된 설비 설정
-
-                // // 설비 목록과 선택된 설비 동기화
-                // if (fetchedWorkcenter.equipmentList) {
-                //     const selected = fetchedWorkcenter.equipmentList.map(equipment => ({
-                //         id: equipment.id,
-                //         equipmentName: equipment.equipmentName,
-                //         modelName: equipment.modelName,
-                //     }));
-                //     setSelectedEquipments(selected);
-                // }
-
-                // // 선택된 설비 설정
-                // const selected = fetchedWorkcenter.equipmentList.map(equipment => ({
-                //     id: equipment.id,
-                //     equipmentName: equipment.equipmentName,
-                //     modelName: equipment.modelName,
-                // }))
-                // setSelectedEquipments(selected);
 
                 // 표시할 값 설정
                 setDisplayValues({
@@ -275,7 +258,6 @@ const SelectedWorkcenterSection = ({
         setIsLoading(true);
         let apiPath;
         if (fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
-        // if(fieldName === 'process') apiPath = PRODUCTION_API.SEARCH_FACTORIES_API;
         if(fieldName === 'process') apiPath = PRODUCTION_API.PROCESS_LIST_API;
         if(fieldName === 'equipment') apiPath = PRODUCTION_API.EQUIPMENT_DATA_API;
 
@@ -333,7 +315,9 @@ const SelectedWorkcenterSection = ({
                         form={form}
                         // onFinish={(values) => { handleFormSubmit(values, 'update') }}
                         onFinish={(values) => {
+                            console.log("onFinish form.getFieldsValue():", values)
                             values.selectedEquipments = selectedEquipments; // 선택된 설비를 폼 데이터에 포함
+                            console.log("onFinish selectedEquipments, ", selectedEquipments)
                             console.log('Form 제출 값:', values);  // 폼 데이터 확인
                             handleFormSubmit(values, 'update');
                         }}
@@ -341,7 +325,7 @@ const SelectedWorkcenterSection = ({
                         <Row gutter={16}>
                             <Col span={5}>
                                 <Form.Item name="code" rules={[{ required: true, message: '작업장 코드를 입력하세요.' }]}>
-                                    <Input addonBefore="작업장 코드"/>
+                                    <Input readOnly addonBefore="작업장 코드"/>
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
