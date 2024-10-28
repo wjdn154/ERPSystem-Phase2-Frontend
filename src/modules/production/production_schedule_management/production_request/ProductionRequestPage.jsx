@@ -124,11 +124,11 @@ const ProductionRequestPage = () => {
             case 'client':
                 return `${record.printClientName} (${record.representativeName}, ${record.businessType})`;
             case 'department':
-                return `${record.departmentName} (${record.departmentCode})`;
+                return `[${record.departmentCode}] ${record.departmentName}`;
             case 'requester':
                 return `${record.lastName}${record.firstName} (${record.departmentName}, ${record.titleName}, ${record.positionName})`;
             case 'product':
-                return `${record.code} ${record.name})`;
+                return `[${record.code}] ${record.name}`;
             default:
                 return '';
         }
@@ -141,9 +141,18 @@ const ProductionRequestPage = () => {
         setSelectedValue((prev) => ({ ...prev, [currentField]: selectedValue })); // 상태 업데이트
         form.setFieldsValue({ [currentField]: selectedValue }); // 폼 필드에 값 설정
 
+        console.log(`선택한 ${currentField}: `, selectedValue);  // 디버깅용 로그
         setIsModalVisible(false); // 모달 닫기
     };
 
+    useEffect(() => {
+        form.setFieldsValue({
+            client: selectedValue.client || '미지정',
+            department: selectedValue.department || '미지정',
+            product: selectedValue.product || '미지정',
+            requester: selectedValue.requester || '미지정',
+        });
+    }, [selectedValue, form]);
 
     useEffect(() => {
         if (productionRequestDetail) {
@@ -152,6 +161,10 @@ const ProductionRequestPage = () => {
                 requestDate: productionRequestDetail.requestDate ? dayjs(productionRequestDetail.requestDate) : null,
                 deadlineOfCompletion: productionRequestDetail.deadlineOfCompletion ? dayjs(productionRequestDetail.deadlineOfCompletion) : null,
                 dueDateToProvide: productionRequestDetail.dueDateToProvide ? dayjs(productionRequestDetail.dueDateToProvide) : null,
+                client: productionRequestDetail.clientName || '미지정',
+                department: productionRequestDetail.departmentName || '미지정',
+                product: productionRequestDetail.productName || '미지정',
+                requester: productionRequestDetail.requesterName || '미지정',
             });
         }
     }, [productionRequestDetail, form]);
@@ -768,10 +781,10 @@ const ProductionRequestPage = () => {
 
                                             <Row gutter={16}>
                                                 <Col span={6}>
-                                                    <Form.Item name="client" label="거래처">
+                                                    <Form.Item name="clientName" label="거래처">
                                                         <Input
                                                             placeholder="거래처 선택" // FINANCIAL_API.CLIENT_SEARCH_API
-                                                            value={selectedValue.client || ''}  // 선택한 값 표시
+                                                            // value={selectedValue.client || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('client')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -781,7 +794,7 @@ const ProductionRequestPage = () => {
                                                     <Form.Item name="department" label="부서">
                                                         <Input
                                                             placeholder="부서 선택" // EMPLOYEE_API.DEPARTMENT_DATA_API
-                                                            value={selectedValue.department || ''}  // 선택한 값 표시
+                                                            // value={selectedValue.department || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('department')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -791,7 +804,7 @@ const ProductionRequestPage = () => {
                                                     <Form.Item name="product" label="제품">
                                                         <Input
                                                             placeholder="제품 선택" // LOGISTICS_API.PRODUCT_LIST_API
-                                                            value={selectedValue.product || ''}  // 선택한 값 표시
+                                                            // value={selectedValue.product || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('product')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -801,7 +814,7 @@ const ProductionRequestPage = () => {
                                                     <Form.Item name="requester" label="요청자">
                                                         <Input
                                                             placeholder="요청자 선택"
-                                                            value={selectedValue.requester || ''}  // 선택한 값 표시
+                                                            // value={selectedValue.requester || ''}  // 선택한 값 표시
                                                             onClick={() => handleInputClick('requester')}
                                                             suffix={<DownSquareOutlined />}
                                                         />
