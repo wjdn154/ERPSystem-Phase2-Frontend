@@ -48,11 +48,17 @@ const SelectedWorkcenterSection = ({
     });
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [fetchWorkcenterData, setFetchWorkcenterData] = useState(false); // 거래처 조회한 정보 상태
-    const [workcenterParam, setWorkcenterParam] = useState(false); // 수정 할 거래처 정보 상태
+    const [workcenterParam, setWorkcenterParam] = useState({}); // 수정 할 거래처 정보 상태
     const [workerAssignments, setWorkerAssignments] = useState([]); // 초기값 빈 배열
     const [selectedEquipments, setSelectedEquipments] = useState([]);
     const [equipmentData, setEquipmentData] = useState([]); // 설비 테이블에 표시할 데이터
     const [searchTerm, setSearchTerm] = useState(''); // 검색 필드 상태
+
+    useEffect(() => {
+        if (Object.keys(workcenterParam).length > 0) {
+            form.setFieldsValue(workcenterParam); // 폼에 값 반영
+        }
+    }, [workcenterParam]);
 
     // 설비 데이터 로드 함수
     const fetchEquipmentData = async () => {
@@ -342,10 +348,9 @@ const SelectedWorkcenterSection = ({
                                             style={{ width: '60%' }}
                                             value={workcenterParam.workcenterType}
                                             onChange={(value) => {
-                                                setWorkcenterParam((prevState) => ({
-                                                    ...prevState,
-                                                    workcenterType: value,
-                                                }));
+                                                const updatedParam = { ...workcenterParam, workcenterType: value };
+                                                setWorkcenterParam(updatedParam);  // 상태 업데이트
+                                                form.setFieldsValue(updatedParam); // 폼에 바로 반영
                                             }}
                                         >
                                             <Select.Option value="Press">프레스</Select.Option>
