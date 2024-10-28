@@ -12,7 +12,7 @@ import WorkerAssignmentPage from "./tab3_workcenter_assignment/WorkerAssignmentP
 import {useWorkcenter} from "./WorkcenterHook.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {PRODUCTION_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import {fetchWorkcenter, fetchWorkcenters} from "./WorkcenterApi.jsx";
 
 const WorkcenterManagementPage = ({ initialData }) => {
@@ -29,7 +29,8 @@ const WorkcenterManagementPage = ({ initialData }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [displayValues, setDisplayValues] = useState({});
-
+    const [modalData, setModalData] = useState([]); // 모달에 사용할 데이터 관리
+    const [initialModalData, setInitialModalData] = useState([]);
 
     const {
         data,
@@ -133,6 +134,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                 try {
                                                     // 작업장 상세 정보 가져오기 (API 호출)
                                                     const detail = await fetchWorkcenter(record.code);
+                                                    console.log("fetchWorkcenter respone of record.code: ", detail)
 
                                                     setWorkcenter(detail); // 선택된 작업장 데이터 설정
                                                     setWorkcenterParam(detail);
@@ -141,7 +143,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                     console.error("작업장 정보 조회 실패:", error);
                                                     notify('error', '조회 오류', '작업장 정보 조회 중 오류가 발생했습니다.', 'top');
                                                 }
-                                                // handleFormSubmit(record);
                                             },
                                         })}
                                     />

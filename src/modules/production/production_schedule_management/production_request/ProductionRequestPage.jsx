@@ -72,33 +72,30 @@ const ProductionRequestPage = () => {
         setActiveTabKey(key);
     };
 
-    const API_CONFIG = {
-        client: { path: FINANCIAL_API.FETCH_CLIENT_LIST_API, method: 'post' },
-        department: { path: EMPLOYEE_API.DEPARTMENT_DATA_API, method: 'post' },
-        product: { path: LOGISTICS_API.PRODUCT_LIST_API, method: 'post' },
-        requester: { path: EMPLOYEE_API.EMPLOYEE_DATA_API, method: 'get' },
-    };
-
-// 모달 데이터 가져오기 함수
+    // 모달창 데이터 가져오기 함수
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
+        let apiPath;
+        if(fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
+        if(fieldName === 'department') apiPath = EMPLOYEE_API.DEPARTMENT_DATA_API;
+        if(fieldName === 'requester') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
+        if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
 
-        const { path, method } = API_CONFIG[fieldName] || {};
-        if (!path || !method) {
+        if (!apiPath) {
             console.error(`올바른 API 경로 또는 메서드가 없습니다: ${fieldName}`);
             setIsLoading(false); // 로딩 상태 해제
             return;
         }
 
         try {
-            const response = await apiClient[method](path); // 동적 메서드 호출
+            const response = await apiClient.post(apiPath);
             setModalData(response.data);
-            setInitialModalData(response.data); // 초기 데이터 저장
+            setInitialModalData(response.data);
+            console.log('response.data', response.data);
         } catch (error) {
-            console.error('API 호출 오류:', error);
-            notify('error', '조회 실패', '데이터를 불러오는 데 실패했습니다.', 'top');
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
-            setIsLoading(false); // 로딩 상태 해제
+            setIsLoading(false);
         }
     };
 

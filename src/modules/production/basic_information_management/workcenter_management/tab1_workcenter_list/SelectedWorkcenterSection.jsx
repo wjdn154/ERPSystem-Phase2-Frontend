@@ -57,7 +57,7 @@ const SelectedWorkcenterSection = ({
 
             try {
                 const fetchedWorkcenter = await fetchWorkcenter(workcenter.code); // API 호출 후 데이터 가져오기
-                console.log('가져온 작업장 데이터:', fetchedWorkcenter);
+                console.log('fetchWorkcenterData:', fetchedWorkcenter);
 
                 // 폼 필드에 값 설정
                 form.setFieldsValue(fetchedWorkcenter);
@@ -142,9 +142,9 @@ const SelectedWorkcenterSection = ({
                 setWorkcenterParam((prevParams) => ({
                     ...prevParams,
                     factory: {
-                        id: record.id,
-                        code: record.code,
-                        name: record.name,
+                        factoryCode: record.code,
+                        factoryName: record.name,
+                        warehouseType: record.warehouseType,
                     },
                 }));
                 setDisplayValues((prevValues) => ({
@@ -157,9 +157,9 @@ const SelectedWorkcenterSection = ({
                 setWorkcenterParam((prevParams) => ({
                     ...prevParams,
                     process: {
-                        id: record.id,
-                        code: record.code,
-                        name: record.name,
+                        processId: record.id,
+                        processCode: record.code,
+                        processName: record.name,
                     },
                 }));
                 setDisplayValues((prevValues) => ({
@@ -171,18 +171,26 @@ const SelectedWorkcenterSection = ({
             case 'equipment':
                 setWorkcenterParam((prevParams) => ({
                     ...prevParams,
-                    equipment: {
-                        id: record.id,
-                        equipmentNum: record.equipmentNum,
-                        equipmentName: record.equipmentName,
-                        modelName: record.modelName,
-                    },
+                    equipmentIds: [
+                        ...(prevParams.equipmentIds || []),
+                        record.id,
+                    ],
+                    equipmentNames: [
+                        ...(prevParams.equipmentNames || []),
+                        record.equipmentName,
+                    ],
+                    modelNames: [
+                        ...(prevParams.modelNames || []),
+                        record.modelName,
+                    ],
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    equipment: `[${record.equipmentNum.toString().padStart(5, '0')}] ${record.equipmentName}`,
+                    equipment: prevValues.equipment
+                        ? `${prevValues.equipment}, ${record.equipmentName}`
+                        : record.equipmentName,
                 }));
-                form.setFieldsValue({ equipmentName: `[${record.equipmentNum.toString().padStart(5, '0')}] ${record.equipmentName}`,});
+                form.setFieldsValue({ equipment: displayValues.equipment });
                 break;
         }
         setDisplayValues(updatedDisplayValues); // 상태 업데이트
@@ -214,19 +222,27 @@ const SelectedWorkcenterSection = ({
 
         try {
             const response = await apiClient.post(apiPath);
-            console.log('API 응답 데이터:', response.data);  // 응답 데이터 확인
+            console.log('fetchModalData 응답 데이터:', response.data);  // 응답 데이터 확인
 
             let resultData;
             // 공장 데이터만 필터링 적용
             if (fieldName === 'factory') {
-                resultData = response.data.filter(
+
+                let filteredData = response.data.filter(
                     (item) => item.warehouseType === 'FACTORY' || item.warehouseType === 'OUTSOURCING_FACTORY'
                 );
+
+                resultData = filteredData.map((item) => ({
+                    id: item.id,
+                    code: item.code,
+                    name: item.name,
+                }))
+
+            } else {
+                resultData = response.data;
             }
 
             console.log('최종 데이터:', resultData);  // 최종 데이터 확인
-
-
             setModalData(resultData);
             setInitialModalData(resultData);
 
@@ -495,8 +511,8 @@ const SelectedWorkcenterSection = ({
                                                             // (item.factory && item.factoryCode.toLowerCase().includes(value)) ||
                                                             // (item.factory && item.factoryName.toLowerCase().includes(value))
 
-                                                            (item.factoryCode && item.code.toLowerCase().includes(value)) ||
-                                                            (item.factoryName && item.name.toLowerCase().includes(value))
+                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                            (item.name && item.name.toLowerCase().includes(value))
                                                         );
                                                     });
                                                     setModalData(filtered);
@@ -509,13 +525,14 @@ const SelectedWorkcenterSection = ({
                                                 columns={[
                                                     {
                                                         title: <div className="title-text">코드</div>,
-                                                        dataIndex: 'factoryCode',
-                                                        key: 'factoryCode',
+                                                        dataIndex: 'code',
+                                                        key: 'code',
                                                         align: 'center'
                                                     },
                                                     {
                                                         title: <div className="title-text">이름</div>,
-                                                        key: 'factoryName',
+                                                        dataIndex: 'name',
+                                                        key: 'name',
                                                         align: 'center',
                                                     },
                                                 ]}
