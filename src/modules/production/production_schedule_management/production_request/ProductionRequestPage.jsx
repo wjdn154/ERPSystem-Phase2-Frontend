@@ -179,7 +179,7 @@ const ProductionRequestPage = () => {
                         : PRODUCTION_API.PRODUCTION_REQUEST_CREATE_API;
 
                     // 필수 필드 검증
-                    if (!values.id || !values.requestType || !values.product) {
+                    if (!values.requestType || !values.product) {
                         notify('error', '저장 실패', '필수 필드가 누락되었습니다.', 'top');
                         return;
                     }
