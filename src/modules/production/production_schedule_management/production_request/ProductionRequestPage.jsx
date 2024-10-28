@@ -506,6 +506,10 @@ const ProductionRequestPage = () => {
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
                                             <Col flex="1">
+                                                <Form.Item name="id" hidden>
+                                                    <Input />
+                                                </Form.Item>
+
                                                 <Form.Item label="의뢰 구분" tooltip="검색할 의뢰 구분을 선택하세요">
                                                     <Select
                                                         placeholder="의뢰 구분"
@@ -643,8 +647,10 @@ const ProductionRequestPage = () => {
                                             form={form}
                                             layout="vertical"
                                             onFinish={(values) => {
-                                                console.log("onFinish handleFormSubmit:", values)
-                                                handleFormSubmit(values, 'update')}
+                                                const allValues = form.getFieldsValue(true);  // 모든 필드 값 가져오기
+
+                                                console.log("onFinish handleFormSubmit:", allValues)
+                                                handleFormSubmit(allValues, 'update')}
                                             }
                                             style={{ padding: '20px' }}
                                         >
