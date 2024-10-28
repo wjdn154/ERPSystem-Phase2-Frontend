@@ -9,18 +9,24 @@ import {
 } from './ProcessDetailsApi.jsx';
 import { filterProcessDetails  } from './ProcessDetailsUtil.jsx';
 
-import {Modal} from "antd";
+import {Form, Modal} from "antd";
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 
 
 export const useProcessDetails = (initialData) => {
     const [data, setData] = useState(initialData || []);
     const [processDetail, setProcessDetail] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [isProcessModalVisible, setIsProcessModalVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [searchData, setSearchData] = useState([]);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [activeTabKey, setActiveTabKey] = useState('1');
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
+    const [form] = Form.useForm(); // 폼 인스턴스 생성
+    const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
 
     // 초기 데이터 로딩
     useEffect(() => {
@@ -93,19 +99,20 @@ export const useProcessDetails = (initialData) => {
     };
 
     // 행 선택 시 상세정보 설정
-    const handleSelectedRow = async (selectedRow) => {
-        setSelectedRow(selectedRow);
-        setIsEditing(false); // 선택 시 편집 모드를 해제하여 업데이트 모드로 설정
-
+    const handleSelectedRow = async (record) => {
         try {
-            const detail = await fetchProcessDetail(selectedRow.code);
-            console.log("fetchProcessDetail DATA:", detail);
-            setProcessDetail(detail);
-            setIsProcessModalVisible(true);            // 모달 표시
+            const detail = await fetchProcessDetail(record.code); // API 호출
+            console.log("handleSelectedRow 선택된 공정 데이터:", detail);
+
+            if (detail) {
+                setSelectedRow(detail); // 상태에 데이터 저장
+                form.setFieldsValue(detail); // 폼 필드에 데이터 설정
+            }
         } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+            console.error("handleSelectedRow에서 데이터를 가져오는 중 오류 발생:", error);
         }
-    }
+    };
+
 
     // Input 수정
     const handleInputChange = (e, key) => {
@@ -121,9 +128,9 @@ export const useProcessDetails = (initialData) => {
             }
         }
 
-        if (key === 'isOutsourced' || key === 'isUsed') {
-            value = value === 'Y' ? true : false;
-        }
+        // if (key === 'isOutsourced' || key === 'isUsed') {
+        //     value = value === 'Y' ? true : false;
+        // }
 
 
         setProcessDetail({
