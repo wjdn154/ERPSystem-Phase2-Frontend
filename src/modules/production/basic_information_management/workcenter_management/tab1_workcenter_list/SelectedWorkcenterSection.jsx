@@ -108,6 +108,32 @@ const SelectedWorkcenterSection = ({
                 // 선택된 작업장 정보를 상태에 저장
                 setWorkcenterParam(fetchedWorkcenter);
 
+                // equipmentIds에 해당하는 설비들을 필터링하여 선택된 설비로 설정
+                const selected = equipmentData.filter(equipment =>
+                    fetchedWorkcenter.equipmentIds.includes(equipment.id)
+                );
+
+                console.log('Selected Equipments:', selected);
+                setSelectedEquipments(selected); // 선택된 설비 설정
+
+                // // 설비 목록과 선택된 설비 동기화
+                // if (fetchedWorkcenter.equipmentList) {
+                //     const selected = fetchedWorkcenter.equipmentList.map(equipment => ({
+                //         id: equipment.id,
+                //         equipmentName: equipment.equipmentName,
+                //         modelName: equipment.modelName,
+                //     }));
+                //     setSelectedEquipments(selected);
+                // }
+
+                // // 선택된 설비 설정
+                // const selected = fetchedWorkcenter.equipmentList.map(equipment => ({
+                //     id: equipment.id,
+                //     equipmentName: equipment.equipmentName,
+                //     modelName: equipment.modelName,
+                // }))
+                // setSelectedEquipments(selected);
+
                 // 표시할 값 설정
                 setDisplayValues({
                     workcenterType: fetchedWorkcenter.workcenterType || '미등록',  // 작업장 유형
@@ -121,15 +147,14 @@ const SelectedWorkcenterSection = ({
 
                     // 오늘 작업자 수와 작업자 이름들을 처리
                     todayWorkerCount: fetchedWorkcenter.todayWorkerCount || '0명',
-                    todayWorkers: fetchedWorkcenter.todayWorkers && fetchedWorkcenter.todayWorkers.length > 0
-                        ? fetchedWorkcenter.todayWorkers.join(', ')
-                        : '배정된 작업자 없음',
-                });
+                    // todayWorkers: fetchedWorkcenter.todayWorkers && fetchedWorkcenter.todayWorkers.length > 0
+                    //     ? fetchedWorkcenter.todayWorkers.join(', ')
+                    //     : '배정된 작업자 없음',
 
-                // 선택된 설비 초기화
-                if (fetchedWorkcenter.equipmentList) {
-                    setSelectedEquipments(fetchedWorkcenter.equipmentList);
-                }
+                    equipment: selected.length > 0
+                        ? selected.map(equip => `${equip.equipmentName} (${equip.modelName})`).join(', ')
+                        : '선택된 설비 없음',
+                });
 
             } catch (error) {
                 console.error('작업장 데이터 가져오기 실패:', error);
@@ -137,7 +162,7 @@ const SelectedWorkcenterSection = ({
         };
 
         fetchWorkcenterData(); // 비동기 데이터 호출 함수 실행
-    }, [workcenter, form]);
+    }, [workcenter, equipmentData, form]);
 
     const fetchWorkerAssignments = async (workcenterCode) => {
         try {
@@ -157,6 +182,12 @@ const SelectedWorkcenterSection = ({
 
         }
     }
+
+    // 설비 데이터가 로드된 후 selectedEquipments 동기화
+    useEffect(() => {
+        const selectedIds = selectedEquipments.map(equipment => equipment.id);
+        console.log('Selected Equipment IDs:', selectedIds);
+    }, [selectedEquipments]);
 
     // 작업장 코드가 변경될 때마다 작업자 배정 데이터 가져오기
     useEffect(() => {
@@ -450,12 +481,18 @@ const SelectedWorkcenterSection = ({
                             </Col>
                             <Col span={5}>
                                 {/* 선택된 설비 */}
-                                <Form.Item label="선택된 설비">
-                                    {selectedEquipments.map((equipment) => (
-                                        <Tag key={equipment.id} color="green" style={{ marginBottom: '8px' }}>
-                                            {equipment.equipmentName} ({equipment.modelName})
-                                        </Tag>
-                                    ))}
+                                <Form.Item label="">
+                                    <>
+                                        {selectedEquipments.length > 0 ? (
+                                            selectedEquipments.map(equipment => (
+                                                <Tag key={equipment.id} color="green" style={{ marginBottom: '8px' }}>
+                                                    {equipment.equipmentName} ({equipment.modelName})
+                                                </Tag>
+                                            ))
+                                        ) : (
+                                            <Typography>선택된 설비가 없습니다.</Typography>
+                                        )}
+                                    </>
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -468,6 +505,13 @@ const SelectedWorkcenterSection = ({
                                     <Table
                                         dataSource={workerAssignments || []} // 안전하게 빈 배열로 설정
                                         size={'small'}
+                                        pagination={{
+                                            pageSize: 5,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}건`,
+                                        }}
+                                        loading={isLoading}
                                         columns={[
                                             {
                                                 title: <div className="title-text">작업지시</div>,
