@@ -136,6 +136,15 @@ export const EMPLOYEE_API = {
     //  인사관리 - 급여
     POSITION_SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/show`,
     POSITION_SALARY_STEP_DATE_CATEGORY_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/datecategoryshow`,
+    SALARY_ENTRY_API: `${API_BASE_URL}/api/hr/salary/entry`, // 급여 등록
+    SALARY_SHOW_API: `${API_BASE_URL}/api/hr/salary/show`, // 급여 조회
+    SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/salarystep/show`, // 호봉 조회
+    LONG_TERM_CARE_INSURANCE_PENSION_API: `${API_BASE_URL}/api/hr/long_term_care_insurance_pension/show`, // 장기요양보험 연금 조회
+    EMPLOYMENT_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/employment_insurance_pension/calculator`, // 고용보험 연금 계산
+    HEALTH_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/health_insurance_pension/calculator`, // 건강보험 연금 계산
+    NATIONAL_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/national_pension/calculator`, // 국민연금 계산
+
+
 
 
 }
