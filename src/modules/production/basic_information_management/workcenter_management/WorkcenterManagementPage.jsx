@@ -12,7 +12,7 @@ import WorkerAssignmentPage from "./tab3_workcenter_assignment/WorkerAssignmentP
 import {useWorkcenter} from "./WorkcenterHook.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {PRODUCTION_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import {fetchWorkcenter, fetchWorkcenters} from "./WorkcenterApi.jsx";
 
 const WorkcenterManagementPage = ({ initialData }) => {
@@ -29,7 +29,8 @@ const WorkcenterManagementPage = ({ initialData }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [displayValues, setDisplayValues] = useState({});
-
+    const [modalData, setModalData] = useState([]); // 모달에 사용할 데이터 관리
+    const [initialModalData, setInitialModalData] = useState([]);
 
     const {
         data,
@@ -47,9 +48,13 @@ const WorkcenterManagementPage = ({ initialData }) => {
         handleTabChange,
         activeTabKey,
     } = useWorkcenter(initialData);
+    //
+    // const refreshWorkcenters = async() => {
+    //     console.log('refreshWorkcenters:',  )
+    // }
 
     // 폼 제출 핸들러
-    const handleFormSubmit = async (values, type) => {
+    const handleFormSubmit = async (values, workcenterType) => {
         console.log('handleFormSubmit 호출됨. 폼 제출 값:', values);  // 전달된 값 확인
 
         Modal.confirm({
@@ -59,16 +64,12 @@ const WorkcenterManagementPage = ({ initialData }) => {
             cancelText: '취소',
             onOk: async () => {
                 try {
-                    if (type === 'register') {
-                        // API 요청: 새 작업장 등록
-                        await apiClient.post(PRODUCTION_API.SAVE_WORKCENTER_API, values);
-                        notify('success', '등록 성공', '작업장이 등록되었습니다.', 'bottomRight');
-                    } else if (type === 'update') {
-                        // API 요청: 기존 작업장 수정
-                        await apiClient.post(PRODUCTION_API.UPDATE_WORKCENTER_API(values.code), values);
-                        notify('success', '등록 성공', '작업장이 수정되었습니다.', 'bottomRight');
-                    }
-                    // refreshWorkcenters(); // 작업장 목록 새로고침
+                    const apiPath = PRODUCTION_API.UPDATE_WORKCENTER_API(values.code);
+                    console.log('UPDATE_WORKCENTER_API 경로:', apiPath); // 경로 로그로 확인
+
+
+                    await apiClient.post(apiPath, values);
+                    notify('success', '성공', '작업장이 저장되었습니다.', 'bottomRight');
                 } catch (error) {
                     console.error('저장 실패:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -133,6 +134,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                 try {
                                                     // 작업장 상세 정보 가져오기 (API 호출)
                                                     const detail = await fetchWorkcenter(record.code);
+                                                    console.log("fetchWorkcenter respone of record.code: ", detail)
 
                                                     setWorkcenter(detail); // 선택된 작업장 데이터 설정
                                                     setWorkcenterParam(detail);
@@ -141,7 +143,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                     console.error("작업장 정보 조회 실패:", error);
                                                     notify('error', '조회 오류', '작업장 정보 조회 중 오류가 발생했습니다.', 'top');
                                                 }
-                                                // handleFormSubmit(record);
                                             },
                                         })}
                                     />
@@ -186,6 +187,7 @@ const WorkcenterManagementPage = ({ initialData }) => {
                                                 name="code"
                                                 label="작업장 코드"
                                                 rules={[{ required: true, message: '작업장 코드를 입력해주세요.' }]}
+                                                readOnly
                                             >
                                                 <Input placeholder="예: WC001" />
                                             </Form.Item>
