@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {Box, Grid, Grow, Paper} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './ProductionOrderUtil.jsx';
+import { tabItems } from './ProductionOrderRegistrationUtil.jsx';
 import {Typography} from '@mui/material';
 import {Tag, Button, Col, Card, DatePicker, Form, Row, Steps, Table, Spin, Input, Modal, Checkbox} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
@@ -12,7 +12,7 @@ import {EMPLOYEE_API, FINANCIAL_API, PRODUCTION_API} from "../../../../config/ap
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 const { Step } = Steps;
 
-const ProductionOrderPage = () => {
+const ProductionOrderRegistrationPage = () => {
     const notify = useNotificationContext();
     const [activeTabKey, setActiveTabKey] = useState('1');
     const [searchData, setSearchData] = useState(null);
@@ -129,10 +129,10 @@ const ProductionOrderPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="작업 지시 관리"
+                        title="작업 지시 등록"
                         description={(
                             <Typography>
-                                작업 지시 관리 페이지는 <span>생산 공정에 필요한 작업 지시를 관리</span>하는 곳임. 이 페이지에서는 <span>작업 지시의 생성, 수정, 삭제</span>가 가능하며, 각 작업 지시에는 <span>지시 내용, 작업 일정, 배정된 인원</span> 등의 정보를 입력할 수 있음. 이를 통해 <span>작업의 진행 상황</span>을 체계적으로 관리하고, 작업이 원활하게 이루어지도록 지원함.
+                                작업 지시 등록 페이지는 <span>생산 공정에 필요한 작업 지시를 관리</span>하는 곳임. 이 페이지에서는 <span>작업 지시의 생성, 수정, 삭제</span>가 가능하며, 각 작업 지시에는 <span>지시 내용, 작업 일정, 배정된 인원</span> 등의 정보를 입력할 수 있음. 이를 통해 <span>작업의 진행 상황</span>을 체계적으로 관리하고, 작업이 원활하게 이루어지도록 지원함.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -605,4 +605,4 @@ const ProductionOrderPage = () => {
     );
 };
 
-export default ProductionOrderPage;
+export default ProductionOrderRegistrationPage;
