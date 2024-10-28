@@ -17,15 +17,22 @@ import {
     Col,
     Row,
     Divider,
-    Select
+    Select, message
 } from 'antd';import TemporarySection from "../../../../components/TemporarySection.jsx";
 import dayjs from "dayjs";
-import {BookOutlined, DownSquareOutlined, InfoCircleOutlined, SearchOutlined} from "@ant-design/icons";
+import {
+    BookOutlined, CheckCircleOutlined, CheckOutlined,
+    DownSquareOutlined,
+    ExclamationCircleOutlined,
+    InfoCircleOutlined, ReloadOutlined, SafetyCertificateOutlined,
+    SearchOutlined
+} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 import apiClient from "../../../../config/apiClient.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+const { confirm } = Modal;
 
 const MasterProductionPage = () => {
     const [mpsList, setMpsList] = useState([]);
@@ -44,14 +51,24 @@ const MasterProductionPage = () => {
     const [selectedValue, setSelectedValue] = useState({});
     const [currentField, setCurrentField] = useState('');
     const [currentMps, setCurrentMps] = useState('');
-    const [searchParams, setSearchParams] = useState({
-    });
+    const [searchParams, setSearchParams] = useState({});
 
-
-        useEffect(() => {
+    useEffect(() => {
         fetchMpsList();
         fetchProductList();
-    }, []); // 빈 배열은 컴포넌트가 처음 렌더링될 때만 실행되도록 보장
+    }, []);
+
+    const confirmMps = async (id) => {
+        try {
+            const response = await apiClient.post(PRODUCTION_API.MPS_CONFIRM(id));
+            notify('success', '확정 성공', 'MPS가 확정되었습니다.', 'bottomRight');
+            fetchMpsList(); // 목록 새로고침
+        } catch (error) {
+            console.error('API 호출 오류:', error);
+            notify('error', '확정 실패', 'MPS를 확정하는 데 실패했습니다.', 'top');
+        }
+    };
+
 
     const fetchProductList = async () => {
         try {
@@ -103,6 +120,36 @@ const MasterProductionPage = () => {
             endDateRange: values.endDateRange?.map((date) => dayjs(date).format('YYYY-MM-DD')),
         };
         fetchMpsList(filters);
+    };
+
+    // 검색 필드를 초기화하는 함수
+    const handleReset = () => {
+        form.resetFields();  // 폼 필드를 초기화합니다.
+        setSearchParams({}); // 검색 조건도 초기화합니다.
+        fetchMpsList();      // 초기 조건으로 데이터 조회
+    };
+
+    // 확정 모달 표시 함수
+    const showConfirmModal = (record) => {
+        // 계획 상태가 "계획"일 때만 모달을 띄움
+        if (record.status.toLowerCase() !== "계획") {
+            notify('error', '처리 오류', "확정 처리는 상태 '계획'만 가능합니다.", 'top');
+            return;
+        }
+        // 상태 값 로그로 확인
+        console.log('현재 상태:', record.status);
+
+        confirm({
+            title: '생산계획을 확정하시겠습니까?',
+            icon: <ExclamationCircleOutlined />,
+            content: '확정을 진행하면 더 이상 수정이 불가능합니다.',
+            onOk() {
+                confirmMps(record.id); // 확정 진행
+            },
+            onCancel() {
+                console.log('확정 취소됨');
+            },
+        });
     };
 
     // 초기 데이터 조회 함수
@@ -223,6 +270,27 @@ const MasterProductionPage = () => {
             dataIndex: 'status',
             key: 'status',
             align:'center',
+            render: (status) => {
+                let color = '';
+                switch (status) {
+                    case '등록':
+                        color = 'blue';
+                        break;
+                    case '진행 중':
+                        color = 'orange';
+                        break;
+                    case '확정':
+                        color = 'green';
+                        break;
+                    case '완료':
+                        color = 'gold';
+                        break;
+                    default:
+                        color = 'default';
+                        break;
+                }
+                return <Tag color={color}>{status}</Tag>;
+            },
         },
         {
             title: <div className="title-text">생산수량</div>,
@@ -255,7 +323,21 @@ const MasterProductionPage = () => {
             key: 'action',
             align:'center',
             render: (_, record) => (
-                <Button type="default" onClick={() => completeMps(record.id)}>
+                <Button
+                    type="default"
+                    size="small"
+                    icon={<CheckCircleOutlined />}
+                    // icon={<SafetyCertificateOutlined />}
+                    // icon={<CheckOutlined />}
+
+
+                    onClick={() => showConfirmModal(record.id)}
+                    style={{
+                        height: '24px',
+                        padding: '0 8px',
+                        lineHeight: '1',
+                    }}
+                >
                     확정
                 </Button>
             ),
@@ -344,6 +426,14 @@ const MasterProductionPage = () => {
                                                     <Button type="primary" onClick={handleSearch}  icon={<SearchOutlined />}>
                                                         검색
                                                     </Button>
+                                                    <Button
+                                                        type="default"
+                                                        icon={<ReloadOutlined />}
+                                                        onClick={handleReset}
+                                                        style={{ marginLeft: '8px' }}
+                                                    >
+                                                        초기화
+                                                    </Button>
                                                 </Form.Item>
                                             </Col>
                                         </Row>
@@ -352,8 +442,11 @@ const MasterProductionPage = () => {
                                         columns={columns}
                                         dataSource={mpsList}
                                         rowKey="id"
-                                        size="small" // TODO size small 인데 왜 다르지?
-                                        pagination={{ pageSize: 15 }}
+                                        size="small"
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'], // 페이지네이션을 중앙에 배치
+                                        }}
                                         rowSelection={{
                                             type: 'radio',
                                             selectedRowKeys,

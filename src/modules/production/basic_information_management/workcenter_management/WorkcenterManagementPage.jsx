@@ -14,14 +14,17 @@ import {useNotificationContext} from "../../../../config/NotificationContext.jsx
 import apiClient from "../../../../config/apiClient.jsx";
 import {PRODUCTION_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import {fetchWorkcenter, fetchWorkcenters} from "./WorkcenterApi.jsx";
+import {SearchOutlined} from "@ant-design/icons";
 
 const WorkcenterManagementPage = ({ initialData }) => {
 
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
-    // const [data, setData] = useState([]);
     const [workcenter, setWorkcenter] = useState(null); // 선택된 작업장 데이터 관리
+    const [workcenterList, setWorkcenterList] = useState(initialData || []);
+    const [filteredData, setFilteredData] = useState(workcenterList); // 필터링된 데이터 관리
+
     const [workcenterParam, setWorkcenterParam] = useState({
         workcenterType:'',
     }); // 선택된 작업장 데이터 관리
@@ -42,16 +45,41 @@ const WorkcenterManagementPage = ({ initialData }) => {
         // handleClose,
         handleInputChange,
         handleAddWorkcenter,
-        handleSearch,
         searchData,
         isSearchActive,
         handleTabChange,
         activeTabKey,
+        reloadWorkcenters,
     } = useWorkcenter(initialData);
-    //
-    // const refreshWorkcenters = async() => {
-    //     console.log('refreshWorkcenters:',  )
-    // }
+
+    useEffect(() => {
+        setFilteredData(data); // 초기 데이터 설정
+    }, [data]);
+
+    // 검색 핸들러
+    const handleSearch = async () => {
+        const { code, name, workcenterType } = searchParams;
+
+        try {
+            const filtered = data.filter((item) => {
+                const matchesCode = code ? item.code.includes(code) : true;
+                const matchesName = name ? item.name.includes(name) : true;
+                const matchesType = workcenterType ? item.workcenterType === workcenterType : true;
+                return matchesCode && matchesName && matchesType;
+            });
+
+            setFilteredData(filtered); // 필터된 데이터 설정
+        } catch (error) {
+            console.error('검색 오류:', error);
+        }
+    };
+
+    // 폼 초기화
+    const handleReset = () => {
+        form.resetFields();
+        setSearchParams({ code: '', name: '', workcenterType: '' }); // 검색 조건 초기화
+        setFilteredData(data); // 원래 데이터로 초기화
+    };
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, workcenterType) => {
@@ -66,10 +94,10 @@ const WorkcenterManagementPage = ({ initialData }) => {
                 try {
                     const apiPath = PRODUCTION_API.UPDATE_WORKCENTER_API(values.code);
                     console.log('UPDATE_WORKCENTER_API 경로:', apiPath); // 경로 로그로 확인
-
-
                     await apiClient.post(apiPath, values);
                     notify('success', '성공', '작업장이 저장되었습니다.', 'bottomRight');
+                    await reloadWorkcenters();
+
                 } catch (error) {
                     console.error('저장 실패:', error);
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -109,7 +137,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >작업장 목록</Typography>
-
                                 {/* 기본 데이터 목록 */}
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Table

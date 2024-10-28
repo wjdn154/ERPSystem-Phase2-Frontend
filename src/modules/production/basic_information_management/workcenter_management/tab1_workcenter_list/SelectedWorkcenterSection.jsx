@@ -228,15 +228,13 @@ const SelectedWorkcenterSection = ({
 
 
     // 모달창 열기 핸들러
-    const handleInputClick = (fieldName) => {
+    const handleInputClick = (fieldName) => {``
         setCurrentField(fieldName);
         setModalData(null);
         setInitialModalData(null);
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
         setIsModalVisible(true)  // 모달창 열기
-            .then(() => {
-                setIsModalVisible(true);  // 데이터를 가져온 후 모달창 열기
-        })
+
     };
 
     // 모달창 닫기 핸들러

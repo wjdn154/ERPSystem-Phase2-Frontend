@@ -30,7 +30,6 @@ const ProcessDetailsPage = ({ initialData }) => {
     const {
         data,
         setData,
-        handleSave,
         handleSelectedRow,
         handleDeleteProcessDetail,
         isProcessModalVisible,
@@ -45,12 +44,12 @@ const ProcessDetailsPage = ({ initialData }) => {
 
     const reloadProcessList = async () => {
         try {
-            const data = await fetchProcessDetails(); // 리스트 조회
-            setProcessList(data); // 상태 갱신
-            setData(data); // 테이블에 사용되는 데이터 상태도 갱신
+            const fetchedData  = await fetchProcessDetails(); // 리스트 조회
+            setProcessList(fetchedData ); // 상태 갱신
+            setData(fetchedData ); // 테이블에 사용되는 데이터 상태도 갱신
         } catch (error) {
             console.error('리스트 갱신 실패:', error);
-            notify('error', '리스트 갱신 실패', '공정 리스트를 가져오는 중 오류가 발생했습니다.', 'top');
+            notify('error', '리스트 갱신 실패', '공정 리스트를 갱신하는 중 오류가 발생했습니다.', 'top');
         }
     };
 
@@ -215,7 +214,6 @@ const ProcessDetailsPage = ({ initialData }) => {
                             setProcessDetailsData={setProcessDetailsData} // 상태 변경 함수 전달
                             handleInputChange={handleInputChange}
                             handleClose={() => setProcessDetailsData(null)} // 닫기 핸들러
-                            handleSave={handleSave}
                             handleSelectedRow={handleSelectedRow}
                             handleDeleteProcessDetail={handleDeleteProcessDetail}
                             rowClassName={getRowClassName}
