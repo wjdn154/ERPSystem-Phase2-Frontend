@@ -33,7 +33,7 @@ const SelectedWorkcenterSection = ({
                                        handleWorkcenterTypeChange,
                                        handleFormSubmit,
                                    }) => {
-
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
@@ -189,60 +189,43 @@ const SelectedWorkcenterSection = ({
         console.log('workerAssignments 상태:', workerAssignments);
     }, [workerAssignments]);
 
+    useEffect(() => {
+        console.log("Updated workcenterParam:", workcenterParam);
+    }, [workcenterParam]);
 
 
     // 모달창 선택 핸들러
     const handleModalSelect = (record) => {
-        if (currentField === 'equipment') {
-            // 선택된 설비 업데이트 (다중 선택)
-            setSelectedEquipments((prevEquipments) => {
-                // 중복 추가 방지를 위해 filter 사용
-                const isAlreadySelected = prevEquipments.some((equipment) => equipment.id === record.id);
-                if (isAlreadySelected) {
-                    return prevEquipments;
-                }
-                return [
-                    ...prevEquipments,
-                    {
-                        id: record.id,
-                        equipmentNum: record.equipmentNum,
-                        equipmentName: record.equipmentName,
-                        modelName: record.modelName,
-                    },
-                ];
-            });
-        } else {
-            // 기존 factory와 process의 경우
-            let updatedDisplayValues = { ...displayValues };
-            switch (currentField) {
-                case 'factory':
-                    setWorkcenterParam((prevParams) => ({
-                        ...prevParams,
-                        factory: {
-                            factoryCode: record.code,
-                            factoryName: record.name,
-                            warehouseType: record.warehouseType,
-                        },
-                    }));
-                    updatedDisplayValues.factory = `[${record.code.toString().padStart(5, '0')}] ${record.name}`;
-                    form.setFieldsValue({ factoryName: record.name });
-                    break;
-                case 'process':
-                    setWorkcenterParam((prevParams) => ({
-                        ...prevParams,
-                        process: {
-                            processId: record.id,
-                            processCode: record.code,
-                            processName: record.name,
-                        },
-                    }));
-                    updatedDisplayValues.process = `[${record.code.toString().padStart(5, '0')}] ${record.name}`;
-                    form.setFieldsValue({ processName: record.name });
-                    break;
-            }
-            setDisplayValues(updatedDisplayValues); // 상태 업데이트
+        let updatedDisplayValues = { ...displayValues };
+
+        switch (currentField) {
+            case 'factory':
+                const factoryValue = `[${record.code.toString().padStart(5, '0')}] ${record.name}`;
+                setWorkcenterParam((prevParams) => ({
+                    ...prevParams,
+                    factoryCode: record.code,
+                    factoryName: record.name,
+                }));
+                updatedDisplayValues.factory = factoryValue;
+                form.setFieldsValue({ factoryName: record.name }); // 폼 동기화
+                break;
+
+            case 'process':
+                const processValue = `[${record.code.toString().padStart(5, '0')}] ${record.name}`;
+                setWorkcenterParam((prevParams) => ({
+                    ...prevParams,
+                    processCode: record.code,
+                    processName: record.name,
+                }));
+                updatedDisplayValues.process = processValue;
+                form.setFieldsValue({ processName: record.name }); // 폼 동기화
+                break;
         }
+
+        setDisplayValues(updatedDisplayValues); // 화면에 표시할 값 업데이트
+        handleModalCancel(); // 모달 닫기
     };
+
 
     // 모달창 열기 핸들러
     const handleInputClick = (fieldName) => {
@@ -388,9 +371,7 @@ const SelectedWorkcenterSection = ({
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item
-                                    name="processName"
-                                >
+                                <Form.Item name="processName">
                                     <Input
                                         addonBefore="생산공정"
                                         placeholder="생산공정 선택"
@@ -401,9 +382,8 @@ const SelectedWorkcenterSection = ({
                                     />
                                 </Form.Item>
                             </Col>
-                            {/* 설비 선택 테이블 */}
-
                         </Row>
+                        {/* 설비 선택 테이블 */}
                         <Row gutter={16}>
                             <Col span={15}>
                                 <Form.Item name="description">
