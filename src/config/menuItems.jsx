@@ -127,8 +127,8 @@ export const subMenuItems = {
                 { text: '사원 관리', component: 'EmployeeManagementPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
                 { text: '사용자 관리', component: 'UserManagementPage', apiPath: EMPLOYEE_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한
                 { text: '부서 관리', component: 'DepartmentManagementPage', apiPath: EMPLOYEE_API.DEPARTMENT_DATA_API, url: '/hr/basic-info/department-management', requiredPermission: 'departmentManagementPermission', permissionLevel: 'GENERAL' },  // 부서 관리 권한
-                { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: undefined, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
-                { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: undefined, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
+                { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: EMPLOYEE_API.TRANSFER_DATA_API, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
+                { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: EMPLOYEE_API.PERFORMANCE_DATA_API, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
                 { text: '퇴사자 관리', component: 'RetirementManagementPage', apiPath: undefined, url: '/hr/basic-info/retirement-management', requiredPermission: 'retirementManagementPermission', permissionLevel: 'GENERAL' },  // 퇴사자 관리 권한
                 { text: '급여 환경 설정', component: 'SalaryEnvironmentSettingsPage', apiPath: EMPLOYEE_API.POSITION_DATA_API, url: '/hr/basic-info/salary-environment-settings', requiredPermission: 'salaryEnvironmentSettingsPermission', permissionLevel: 'GENERAL' },  // 급여 환경 설정 권한
                 { text: '급여 체계 관리', component: 'SalarySystemManagementPage', apiPath: undefined, url: '/hr/basic-info/salary-system-management', requiredPermission: 'salarySystemManagementPermission', permissionLevel: 'GENERAL' },  // 급여 체계 관리 권한
@@ -137,8 +137,8 @@ export const subMenuItems = {
         {
             text: '출결 관리',
             items: [
-                { text: '근태 관리', component: 'AttendanceManagementPage', apiPath: undefined, url: '/hr/attendance/time-management', requiredPermission: 'timeManagementPermission', permissionLevel: 'GENERAL' },  // 근태 관리 권한
-                { text: '휴가 관리', component: 'LeaveManagementPage', apiPath: undefined, url: '/hr/attendance/leave-management', requiredPermission: 'leaveManagementPermission', permissionLevel: 'GENERAL' },  // 휴가 관리 권한
+            { text: '근태 관리', component: 'AttendanceManagementPage', apiPath: EMPLOYEE_API.ATTENDANCE_DATA_API, url: '/hr/attendance/time-management', requiredPermission: 'timeManagementPermission', permissionLevel: 'GENERAL' },  // 근태 관리 권한
+                { text: '휴가 관리', component: 'LeaveManagementPage', apiPath: EMPLOYEE_API.LEAVE_DATA_API, url: '/hr/attendance/leave-management', requiredPermission: 'leaveManagementPermission', permissionLevel: 'GENERAL' },  // 휴가 관리 권한
                 { text: '초과근무 관리', component: 'OvertimeManagementPage', apiPath: undefined, url: '/hr/attendance/overtime-management', requiredPermission: 'overtimeManagementPermission', permissionLevel: 'GENERAL' },  // 초과근무 관리 권한
             ]
         },
@@ -196,11 +196,10 @@ export const subMenuItems = {
         {
             text: '영업 관리',
             items: [
-                { text: '견적서', component: 'QuotationPage', apiPath: undefined, url: '/logistics/sales/quotation', requiredPermission: 'quotationPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
-                { text: '주문서', component: 'OrderFormPage', apiPath: undefined, url: '/logistics/sales/order', requiredPermission: 'orderPermission', permissionLevel: 'GENERAL' },  // 주문서 권한
-                { text: '판매', component: 'SalesPage', apiPath: undefined, url: '/logistics/sales/sale', requiredPermission: 'salePermission', permissionLevel: 'GENERAL' },  // 판매 권한
-                { text: '출하지시서', component: 'ShipmentInstructionPage', apiPath: undefined, url: '/logistics/sales/shipping-order', requiredPermission: 'shippingOrderPermission', permissionLevel: 'GENERAL' },  // 출하지시서 권한
-                { text: '출하', component: 'ShipmentPage', apiPath: undefined, url: '/logistics/sales/shipment', requiredPermission: 'shipmentPermission', permissionLevel: 'GENERAL' },  // 출하 권한
+                { text: '견적서', component: 'QuotationPage', apiPath: LOGISTICS_API.QUOTATION_LIST_API, url: '/logistics/sales/quotation', requiredPermission: 'quotationPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
+                { text: '주문서', component: 'OrderFormPage', apiPath: LOGISTICS_API.ORDER_LIST_API, url: '/logistics/sales/order', requiredPermission: 'orderPermission', permissionLevel: 'GENERAL' },  // 주문서 권한
+                { text: '판매', component: 'SalesPage', apiPath: LOGISTICS_API.SALES_LIST_API, url: '/logistics/sales/sale', requiredPermission: 'salePermission', permissionLevel: 'GENERAL' },  // 판매 권한
+                { text: '출하지시서', component: 'ShippingOrderPage', apiPath: LOGISTICS_API.SHIPPING_ORDER_LIST_API, url: '/logistics/sales/shipping-order', requiredPermission: 'shippingOrderPermission', permissionLevel: 'GENERAL' },  // 출하지시서 권한
             ]
         },
         {
@@ -208,8 +207,8 @@ export const subMenuItems = {
             items: [
                 { text: '발주 요청', component: 'PurchaseRequestPage', apiPath: LOGISTICS_API.PURCHASE_REQUEST_LIST_API, url: '/logistics/purchase/purchase-request', requiredPermission: 'purchaseRequestPermission', permissionLevel: 'GENERAL' },  // 발주 요청 권한
                 { text: '발주서', component: 'PurchaseOrderPage', apiPath: LOGISTICS_API.PURCHASE_ORDER_LIST_API, url: '/logistics/purchase/purchase-order', requiredPermission: 'purchaseOrderPermission', permissionLevel: 'GENERAL' },  // 발주서 권한
-                { text: '구매', component: 'PurchasePage', apiPath: undefined, url: '/logistics/purchase/purchase', requiredPermission: 'purchasePermission', permissionLevel: 'GENERAL' },  // 구매 권한
-                { text: '입고지시서', component: 'ReceivingInstructionPage', apiPath: undefined, url: '/logistics/purchase/inbound-order', requiredPermission: 'inboundOrderPermission', permissionLevel: 'GENERAL' },  // 입고지시서 권한
+                { text: '구매', component: 'PurchasePage', apiPath: LOGISTICS_API.PURCHASE_LIST_API, url: '/logistics/purchase/purchase', requiredPermission: 'purchasePermission', permissionLevel: 'GENERAL' },  // 구매 권한
+                { text: '입고지시서', component: 'ReceivingOrderPage', apiPath: LOGISTICS_API.RECEIVING_ORDER_LIST_API, url: '/logistics/purchase/inbound-order', requiredPermission: 'inboundOrderPermission', permissionLevel: 'GENERAL' },  // 입고지시서 권한
             ]
         },
         {
@@ -222,7 +221,7 @@ export const subMenuItems = {
         {
             text: '출하지시서',
             items: [
-                { text: '출하지시서조회', component: 'ShipmentInstructionInquiryPage', apiPath: undefined, url: '/logistics/shipping-orders/view', requiredPermission: 'shippingOrderViewPermission', permissionLevel: 'GENERAL' },  // 출하지시서조회 권한
+                { text: '출하지시서조회', component: 'ShipmentInstructionInquiryPage', apiPath: LOGISTICS_API.SHIPPING_ORDER_LIST_API, url: '/logistics/shipping-orders/view', requiredPermission: 'shippingOrderViewPermission', permissionLevel: 'GENERAL' },  // 출하지시서조회 권한
                 { text: '출하지시서입력', component: 'ShipmentInstructionEntryPage', apiPath: undefined, url: '/logistics/shipping-orders/input', requiredPermission: 'shippingOrderInputPermission', permissionLevel: 'GENERAL' },  // 출하지시서입력 권한
             ]
         },

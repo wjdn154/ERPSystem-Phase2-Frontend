@@ -133,14 +133,14 @@ import QuotationPage from "../../logistics/sales_management/quotation/QuotationP
 import OrderFormPage from "../../logistics/sales_management/order_form/OrderFormPage.jsx";
 import SalesPage from "../../logistics/sales_management/sales/SalesPage.jsx";
 import ShipmentInstructionPage from "../../logistics/sales_management/sales_management/ShipmentInstructionPage.jsx";
-import ShipmentPage from "../../logistics/sales_management/shipment/ShipmentPage.jsx";
+import ShippingOrderPage from "../../logistics/sales_management/shipping_order/ShippingOrderPage.jsx";
 import PurchaseRequestPage from "../../logistics/purchase_management/purchase_request/PurchaseRequestPage.jsx";
 import PurchasePlanPage from "../../logistics/purchase_management/purchase_plan/PurchasePlanPage.jsx";
 import PriceRequestPage from "../../logistics/purchase_management/price_request/PriceRequestPage.jsx";
 import PurchaseOrderPage from "../../logistics/purchase_management/purchase_order/PurchaseOrderPage.jsx";
 import PurchasePage from "../../logistics/purchase_management/purchase/PurchasePage.jsx";
-import ReceivingInstructionPage
-    from "../../logistics/purchase_management/receiving_instruction/ReceivingInstructionPage.jsx";
+import ReceivingOrderPage
+    from "../../logistics/purchase_management/receiving_order/ReceivingOrderPage.jsx";
 import ReturnRequestPage from "../../logistics/return_management/return_request/ReturnRequestPage.jsx";
 import ReturnStatusPage from "../../logistics/return_management/return_status/ReturnStatusPage.jsx";
 import ShipmentInstructionInquiryPage
@@ -223,8 +223,8 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     ApplicantManagementPage, ApplicationManagementPage, InterviewManagementPage, JobOfferManagementPage, SalarySettlementPage, DeductionManagementPage,
     PaymentItemManagementPage, SocialInsurancePage, PayStatementPage, RetirementBenefitEstimationPage, RetirementSettlementPage, PensionManagementPage,
     WithholdingTaxDeclarationPage, LocalIncomeTaxDeclarationPage, PaymentStatementIssuancePage, BusinessIncomeManagementPage, OtherIncomeManagementPage,
-    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShipmentPage,
-    PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
+    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShippingOrderPage,
+    PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingOrderPage: ReceivingOrderPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
     AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,
