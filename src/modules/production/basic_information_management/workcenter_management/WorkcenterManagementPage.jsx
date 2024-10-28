@@ -14,14 +14,17 @@ import {useNotificationContext} from "../../../../config/NotificationContext.jsx
 import apiClient from "../../../../config/apiClient.jsx";
 import {PRODUCTION_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import {fetchWorkcenter, fetchWorkcenters} from "./WorkcenterApi.jsx";
+import {SearchOutlined} from "@ant-design/icons";
 
 const WorkcenterManagementPage = ({ initialData }) => {
 
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
-    // const [data, setData] = useState([]);
     const [workcenter, setWorkcenter] = useState(null); // 선택된 작업장 데이터 관리
+    const [workcenterList, setWorkcenterList] = useState(initialData || []);
+    const [filteredData, setFilteredData] = useState(workcenterList); // 필터링된 데이터 관리
+
     const [workcenterParam, setWorkcenterParam] = useState({
         workcenterType:'',
     }); // 선택된 작업장 데이터 관리
@@ -42,13 +45,41 @@ const WorkcenterManagementPage = ({ initialData }) => {
         // handleClose,
         handleInputChange,
         handleAddWorkcenter,
-        handleSearch,
         searchData,
         isSearchActive,
         handleTabChange,
         activeTabKey,
         reloadWorkcenters,
     } = useWorkcenter(initialData);
+
+    useEffect(() => {
+        setFilteredData(data); // 초기 데이터 설정
+    }, [data]);
+
+    // 검색 핸들러
+    const handleSearch = async () => {
+        const { code, name, workcenterType } = searchParams;
+
+        try {
+            const filtered = data.filter((item) => {
+                const matchesCode = code ? item.code.includes(code) : true;
+                const matchesName = name ? item.name.includes(name) : true;
+                const matchesType = workcenterType ? item.workcenterType === workcenterType : true;
+                return matchesCode && matchesName && matchesType;
+            });
+
+            setFilteredData(filtered); // 필터된 데이터 설정
+        } catch (error) {
+            console.error('검색 오류:', error);
+        }
+    };
+
+    // 폼 초기화
+    const handleReset = () => {
+        form.resetFields();
+        setSearchParams({ code: '', name: '', workcenterType: '' }); // 검색 조건 초기화
+        setFilteredData(data); // 원래 데이터로 초기화
+    };
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, workcenterType) => {
@@ -106,7 +137,49 @@ const WorkcenterManagementPage = ({ initialData }) => {
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >작업장 목록</Typography>
+                                {/* 검색 폼 */}
+                                {/*<Grid sx={{ padding: '0px 20px 0px 20px' }}>*/}
+                                {/*    <Form layout="vertical">*/}
+                                {/*        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>*/}
+                                {/*            <Form.Item name="code">*/}
+                                {/*                <Input*/}
+                                {/*                    placeholder="작업장 코드"*/}
+                                {/*                    allowClear*/}
+                                {/*                    prefix={<SearchOutlined />}*/}
+                                {/*                    onChange={(e) => setSearchParams((prev) => ({ ...prev, code: e.target.value }))}*/}
+                                {/*                />*/}
+                                {/*            </Form.Item>*/}
+                                {/*            <Form.Item name="name">*/}
+                                {/*                <Input*/}
+                                {/*                    placeholder="작업장 이름"*/}
+                                {/*                    allowClear*/}
+                                {/*                    prefix={<SearchOutlined />}*/}
+                                {/*                    onChange={(e) => setSearchParams((prev) => ({ ...prev, name: e.target.value }))}*/}
+                                {/*                />*/}
+                                {/*            </Form.Item>*/}
 
+                                {/*            <Form.Item name="workcenterType">*/}
+                                {/*                <Select*/}
+                                {/*                    placeholder="작업장 유형"*/}
+                                {/*                    allowClear*/}
+                                {/*                    style={{ width: 200 }}*/}
+                                {/*                    onChange={(value) => setSearchParams((prev) => ({ ...prev, workcenterType: value }))}*/}
+                                {/*                >*/}
+                                {/*                    <Select.Option value="Press">프레스</Select.Option>*/}
+                                {/*                    <Select.Option value="Welding">용접</Select.Option>*/}
+                                {/*                    <Select.Option value="Assembly">조립</Select.Option>*/}
+                                {/*                    <Select.Option value="Quality Inspection">품질 검사</Select.Option>*/}
+                                {/*                </Select>*/}
+                                {/*            </Form.Item>*/}
+                                {/*            <Box>*/}
+                                {/*                <Button type="primary" onClick={handleSearch} style={{ marginRight: '10px' }}>*/}
+                                {/*                    검색*/}
+                                {/*                </Button>*/}
+                                {/*                <Button onClick={handleReset}>초기화</Button>*/}
+                                {/*            </Box>*/}
+                                {/*        </Row>*/}
+                                {/*    </Form>*/}
+                                {/*</Grid>*/}
                                 {/* 기본 데이터 목록 */}
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Table
