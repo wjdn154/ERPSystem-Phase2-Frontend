@@ -41,7 +41,7 @@ export default function DashboardPage({ initialData }) {
                     <DashboardWidget icon={AttachMoneyIcon} title={reportData.widgets.financeName}  value={`₩${new Intl.NumberFormat('ko-KR').format(reportData.widgets.financeValue)}`} color="bg-blue-500" />
                     <DashboardWidget icon={GroupsIcon} title="총 직원 수" value={reportData.widgets.hrValue} color="bg-green-500" />
                     <DashboardWidget icon={LocalShippingIcon} title="재고 현황" value={reportData.widgets.logisticsValue} color="bg-yellow-500" />
-                    <DashboardWidget icon={PrecisionManufacturingIcon} title="생산량" value={reportData.widgets.productionValue} color="bg-purple-500" />
+                    <DashboardWidget icon={PrecisionManufacturingIcon} title={reportData.widgets.productionName} value={`${new Intl.NumberFormat('ko-KR').format(reportData.widgets.productionValue)} EA`} color="bg-purple-500" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
