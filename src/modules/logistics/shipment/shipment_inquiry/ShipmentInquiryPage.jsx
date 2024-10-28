@@ -283,9 +283,7 @@ const ShipmentInquiryPage = () => {
                 clientName: `[${detailShipmentData.clientCode}] ${detailShipmentData.clientName}`,
                 employeeName: `[${detailShipmentData.employeeNumber}] ${detailShipmentData.employeeName}`,
                 warehouseName: `[${detailShipmentData.warehouseCode}] ${detailShipmentData.warehouseName}`,
-                shipmentDate: detailShipmentData.shipmentDate
-                    ? dayjs(detailShipmentData.shipmentDate, 'YYYY-MM-DD')
-                    : null,
+                shipmentDate: detailShipmentData.shipmentDate ? dayjs(detailShipmentData.shipmentDate, 'YYYY-MM-DD') : null,
             });
 
             // 거래처, 담당자, 창고명 데이터를 원하는 형식으로 displayValues 설정
@@ -499,7 +497,8 @@ const ShipmentInquiryPage = () => {
                                                             value={displayValues.employeeName}
                                                             onClick={() => handleInputClick('employeeName')}
                                                             onFocus={(e) => e.target.blur()}
-                                                            suffix={<DownSquareOutlined/>}/>
+                                                            suffix={<DownSquareOutlined/>}
+                                                        />
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>

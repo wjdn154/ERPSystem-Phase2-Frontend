@@ -243,8 +243,9 @@ const JournalPage = () => {
                                             },
                                         ]}
                                         rowKey="id"
-                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                        // pagination={false}
+                                        // pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        pagination={false}
+                                        style={{ marginBottom: '20px' }}
                                         size={'small'}
                                         bordered={true}
                                         summary={() => (

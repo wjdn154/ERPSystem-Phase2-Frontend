@@ -33,6 +33,7 @@ const ShipmentStatusPage = () => {
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
     const [selectedClientId, setSelectedClientId] = useState(null);
     const [selectedProductId, setSelectedProductId] = useState(null);
+    const [totalQuantity, setTotalQuantity] = useState(0);  // totalQuantity 상태 추가
     const [displayValues, setDisplayValues] = useState({
         clientName: '',
         employeeName: '',
@@ -49,7 +50,8 @@ const ShipmentStatusPage = () => {
         setIsLoading(true);
         try {
             const response = await apiClient.post(LOGISTICS_API.SHIPMENT_ITEMS_API(startDate, endDate));
-            setShipmentProductsData(response.data);
+            setShipmentProductsData(response.data.shipmentProductListResponseDTOList);
+            setTotalQuantity(response.data.totalQuantity);  // totalQuantity 설정
             console.log(response.data);
             notify('success', '출하현황 조회 성공', '출하현황을 성공적으로 조회했습니다.', 'bottomRight');
         } catch (error) {
@@ -237,7 +239,7 @@ const ShipmentStatusPage = () => {
                     notify('success', '출하 수정', '출하 정보가 성공적으로 수정되었습니다.', 'bottomRight');
 
                     // 수정 후 데이터 다시 조회
-                    fetchShipmentList(searchParams.startDate, searchParams.endDate);
+                    fetchShipmentProducts(searchParams.startDate, searchParams.endDate);
                     setEditDetailShipmentData(false); // 수정 모드 해제
                 } catch (error) {
                     notify('error', '수정 실패', '출하 정보를 수정하는 중 오류가 발생했습니다.', 'top');
@@ -268,9 +270,6 @@ const ShipmentStatusPage = () => {
         fetchAdjustmentProgress(searchParams.startDate, searchParams.endDate);
     };
 
-    const totalQuantity = useMemo(() => {
-        return shipmentProductsData.reduce((acc, product) => acc + (product.quantity || 0), 0);
-    }, [shipmentProductsData]);
 
     useEffect(() => {
         fetchShipmentProducts(searchParams.startDate, searchParams.endDate);
@@ -369,7 +368,19 @@ const ShipmentStatusPage = () => {
                                 </Grid>
                                 <Grid sx={{margin: '20px'}}>
                                     <Table
-                                        dataSource={shipmentProductsData}
+                                        dataSource={[
+                                            ...shipmentProductsData.map((item, index) => ({ ...item, key: index })),  // 각 품목에 key로 index 추가
+                                            {
+                                                id: 'total',  // 총합 행을 위한 고유 ID
+                                                shipmentNumber: '',  // 다른 컬럼은 빈 값으로 설정
+                                                productName: '',
+                                                quantity: totalQuantity,  // 총합 수량
+                                                warehouseName: '',
+                                                clientName: '',
+                                                contactInfo: '',
+                                                comment: '총 수량 합계',  // 비고란에 총합임을 표시
+                                            }
+                                        ]}
                                         columns={[
                                             {
                                                 title: <div className="title-text">일자-No</div>,
