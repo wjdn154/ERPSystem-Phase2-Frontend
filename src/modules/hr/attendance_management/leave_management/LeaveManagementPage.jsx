@@ -28,6 +28,7 @@ const LeaveManagementPage = ({initialData}) => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [activeTabKey, setActiveTabKey] = useState('1');
 
+
     const fetchLeave = async () => {
         try{
             const response = await apiClient.post(EMPLOYEE_API.LEAVE_DATA_API);
@@ -39,6 +40,7 @@ const LeaveManagementPage = ({initialData}) => {
             });
         }
     };
+
 
     useEffect(()=>{
         fetchLeave();
@@ -53,7 +55,7 @@ const LeaveManagementPage = ({initialData}) => {
             ...fetchLeaveData,
             employeeName: `${fetchLeaveData.lastName}${fetchLeaveData.firstName}`
         });
-        setEmployeeParam(fetchLeaveData);
+        setLeaveParam(fetchLeaveData);
 
         setDisplayValues();
     }, [fetchLeaveData, form]);
@@ -88,7 +90,7 @@ const LeaveManagementPage = ({initialData}) => {
     const handleTabChange = (key) => {
         setEditLeave(false);
         setFetchLeaveData(null);
-        setEditLeave(true);({});
+        setLeaveParam({});
         setDisplayValues({});
         form.resetFields();
         registrationForm.resetFields(); // 2탭 폼 초기화
@@ -220,6 +222,10 @@ const LeaveManagementPage = ({initialData}) => {
                                                 dataIndex: 'startDate',
                                                 key: 'startDate',
                                                 align: 'center',
+                                                sorter: (a, b) => {
+                                                    return new Date(a.startDate) - new Date(b.startDate);
+                                                },
+                                                sortDirections: ['ascend', 'descend'],
                                                 render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
