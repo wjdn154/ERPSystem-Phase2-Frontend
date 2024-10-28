@@ -18,13 +18,10 @@ export const useWorkcenter = (initialData) => {
     const [data, setData] = useState(initialData || []);
     const [workcenter, setWorkcenter] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
-    const [isWorkcenterModalVisible, setIsWorkcenterModalVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [activeRate, setActiveRate] = useState(null);
-    const [equipmentMapping, setEquipmentMapping] = useState({});
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
-
 
     const handleTabChange = (key) => {
         setActiveTabKey(key);
@@ -43,32 +40,17 @@ export const useWorkcenter = (initialData) => {
     // 초기 데이터 로딩
     useEffect(() => {
         const loadWorkcenters = async () => {
-            // try {
-            //     const workcenters = await fetchWorkcenters();
-            //     const transformedData = await Promise.all(
-            //         workcenters.map(async (wc) => ({
-            //             ...wc,
-            //             equipmentInfo: await fetchEquipmentDetailsByIds(wc.equipmentIds),
-            //         }))
-            //     );
-            //     setData(transformedData);
-            // } catch (error) {
-            //     console.error('작업장 목록 로드 중 오류 발생:', error);
-            // }
-            const loadWorkcenters = async () => {
-                try {
-                    const workcenters = await fetchWorkcenters();
-                    setData(workcenters);
-                } catch (error) {
-                    console.error('작업장 목록을 불러오는 중 오류 발생:', error);
-                }
-            };
-            loadWorkcenters();
-
+            try {
+                const workcenters = await fetchWorkcenters();  // 작업장 목록 API 호출
+                setData(workcenters);  // 상태에 데이터 저장
+            } catch (error) {
+                console.error('작업장 목록을 불러오는 중 오류 발생:', error);
+            }
         };
 
-        loadWorkcenters();
-    }, []); // 빈 배열로 두어 컴포넌트가 마운트될 때 항상 데이터를 불러오도록 함
+        loadWorkcenters();  // 함수 호출
+    }, []);  // 빈 배열로 두어 컴포넌트가 마운트될 때 항상 데이터를 불러오도록 함
+
 
     const fetchEquipmentDetails = async (id) => {
         try {
@@ -116,20 +98,25 @@ export const useWorkcenter = (initialData) => {
         try {
             await deleteWorkcenter(code);
 
+            // notify('success', '삭제 완료', '작업장이 성공적으로 삭제되었습니다.', 'bottomRight');
+
+
             Modal.success({
                 content: '삭제가 완료되었습니다.',
             });
+
+            // 삭제된 작업장을 목록에서 제거
+            const updatedWorkcenters = data.filter((wc) => wc.code !== code);
+            setData(updatedWorkcenters)
 
             // 선택된 작업장이 삭제된 경우, 상세 보기 초기화
             if (workcenter && workcenter.code === code) {
                 setWorkcenter(null);
             }
 
-            // 리스트 새로고침
-            const updatedWorkcenters = await fetchWorkcenters();
-            setData(updatedWorkcenters);
-
         } catch (error) {
+            // notify('error', '삭제 실패', '작업장 데이터 삭제 실패.', 'top');
+
             Modal.error({
                 content: error.message.includes('사용 중이므로 삭제할 수 없습니다')
                     ? '해당 작업장은 현재 사용 중이므로 삭제할 수 없습니다.'
@@ -138,22 +125,7 @@ export const useWorkcenter = (initialData) => {
         }
     };
 
-    // // 행 선택 핸들러 설정
-    // const handleRowSelection = {
-    //     type: 'radio',
-    //     onSelect: async (record) => {
-    //         try {
-    //             const detail = await fetchWorkcenter(record.code);
-    //             setWorkcenter(detail);
-    //             setIsWorkcenterModalVisible(true);
-    //             notify('success')
-    //         } catch (error) {
-    //             console.error('작업장 상세 정보 조회 실패:', error);
-    //         }
-    //     },
-    // };
-
-// 행 선택 시 상세정보 설정
+    // 행 선택 시 상세정보 설정
     const handleSelectedRow = async (selectedRow) => {
         setSelectedRow(selectedRow);  // 선택된 행 상태 업데이트
         setIsLoading(true);  // 로딩 상태 활성화
@@ -161,20 +133,12 @@ export const useWorkcenter = (initialData) => {
         try {
             // API 호출로 작업장 세부 정보 가져오기
             const detail = await fetchWorkcenter(selectedRow.code);
-            console.log('workcenterHook:', detail);  // 데이터 확인용 로그
-
-            // // 설비 정보 형식 변환
-            // const formattedEquipments = detail.equipmentIds.map((id, index) => {
-            //     const equipmentName = detail.equipmentNames[index] || '이름 없음';
-            //     const modelName = detail.modelNames[index] || '모델명 없음';
-            //     return `[${id}] ${equipmentName} (${modelName})`;  // 설비 고유번호 + 설비명 + 모델명 형식
-            // }).join(', ');
+            console.log('handleSelectedRow:', detail);  // 데이터 확인용 로그
 
             // 작업장 정보와 형식화된 설비 정보를 함께 설정
             setWorkcenter({ ...detail });
-            // setWorkcenter({ ...detail, formattedEquipments });
         } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);  // 오류 로그
+            console.error("handleSelectedRow fetchWorkcenter(selectedRow.code) 데이터를 가져오는 중 오류 발생:", error);  // 오류 로그
         } finally {
             setIsLoading(false);  // 로딩 상태 종료
         }
