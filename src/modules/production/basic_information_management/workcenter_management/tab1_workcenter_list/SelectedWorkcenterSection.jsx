@@ -406,9 +406,9 @@ const SelectedWorkcenterSection = ({
                             <Button type="primary" htmlType="submit">
                             저장
                             </Button>
-                            {/*<Button onClick={handleDelete} style={{ marginLeft: '10px' }} danger>*/}
-                            {/*삭제*/}
-                            {/*</Button>*/}
+                            <Button type="default" onClick={handleDelete} style={{ marginLeft: '10px' }} danger>
+                            삭제
+                            </Button>
                         </Box>
                         {/* 모달창 */}
                         <Modal
