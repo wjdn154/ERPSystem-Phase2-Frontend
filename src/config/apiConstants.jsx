@@ -165,6 +165,7 @@ export const LOGISTICS_API = {
     WAREHOUSE_CREATE_API: `${API_BASE_URL}/api/logistics/warehouse/createWarehouse`, // 창고 생성 API
     WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/updateWarehouse/${id}`, // 창고 수정 API
     WAREHOUSE_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/deleteWarehouse/${id}`, // 창고 삭제 API
+    LOCATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/location/${id}`, // 창고 위치 상세 조회 API
     HIERARCHY_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/`, // 계층 그룹 목록 조회 API
     HIERARCHY_GROUP_WAREHOUSES_API: (groupId) => `${API_BASE_URL}/api/logistics/hierarchyGroup/${groupId}/warehouses`, // 계층 그룹의 창고 조회 API
     HIERARCHY_GROUP_SAVE_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/saveHierarchyGroup`, // 계층 그룹 저장 API
@@ -191,6 +192,16 @@ export const LOGISTICS_API = {
     SHIPMENT_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/shipment/update/${id}`, // 출하 수정 API
     SHIPMENT_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/shipment/delete/${id}`, // 출하 삭제 API
     SHIPMENT_ITEMS_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipment/items?startDate=${startDate}&endDate=${endDate}`, // 출하 품목 조회 API
+
+    RECEIVING_SCHEDULE_WAITING_RECEIPT_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/receivingSchedules/waitingReceipt?startDate=${startDate}&endDate=${endDate}`, // 입고 대기 상태의 입고 스케줄 조회 API
+    RECEIVING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/${id}`, // 특정 입고 지시서 상세 조회 API
+    RECEIVING_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/update/${id}`, // 특정 입고 지시서 수정 API
+    NEXT_INVENTORY_NUMBER_API: `${API_BASE_URL}/api/logistics/inventory/nextInventoryNumber`, // 다음 인벤토리 번호 조회 API
+    RECEIVING_SCHEDULE_PROCESS_API: () => `${API_BASE_URL}/api/logistics/receivingSchedules/process`, // 입고 처리 요청 API
+    RECEIVING_SCHEDULE_WAITING_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/receivingSchedules/waiting?startDate=${startDate}&endDate=${endDate}`, // 특정 날짜 범위 내 대기 중인 입고 일정 조회 API
+    INVENTORY_BY_LOCATION_API: (locationId) => `${API_BASE_URL}/api/logistics/inventory/byLocation/${locationId}`, // 특정 위치의 재고 조회 API
+    RECEIVING_SCHEDULE_PROCESS_CREATE_API: (id) => `${API_BASE_URL}/api/logistics/receivingSchedules/process/${id}`, // ReceivingSchedule 입고 처리 API
+
 };
 // 생산관리
 export const PRODUCTION_API = {

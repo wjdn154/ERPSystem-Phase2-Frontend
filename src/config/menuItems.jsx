@@ -189,7 +189,7 @@ export const subMenuItems = {
             text: '기초정보관리',
             items: [
                 { text: '품목 등록', component: 'ProductManagementPage', apiPath: LOGISTICS_API.PRODUCT_LIST_API, url: '/logistics/basic-info/product-management', requiredPermission: 'itemManagementPermission', permissionLevel: 'GENERAL' },  // 품목 관리 권한
-                { text: '창고등록', component: 'WarehouseRegistrationPage', apiPath: undefined, url: '/logistics/basic-info/warehouse-registration', requiredPermission: 'warehouseRegistrationPermission', permissionLevel: 'GENERAL' },  // 창고등록 권한
+                { text: '창고등록', component: 'WarehouseRegistrationPage', apiPath: LOGISTICS_API.WAREHOUSE_LIST_API, url: '/logistics/basic-info/warehouse-registration', requiredPermission: 'warehouseRegistrationPermission', permissionLevel: 'GENERAL' },  // 창고등록 권한
             ]
         },
         {
@@ -237,7 +237,7 @@ export const subMenuItems = {
             text: '입고관리',
             items: [
                 { text: '입고예정', component: 'IncomingSchedulePage', apiPath: undefined, url: '/logistics/inbound-management/expected', requiredPermission: 'inboundExpectedPermission', permissionLevel: 'GENERAL' },  // 입고예정 권한
-                { text: '입고처리', component: 'IncomingProcessingPage', apiPath: undefined, url: '/logistics/inbound-management/processing', requiredPermission: 'inboundProcessingPermission', permissionLevel: 'GENERAL' },  // 입고처리 권한
+                { text: '입고처리', component: 'IncomingProcessingPage', apiPath:undefined, url: '/logistics/inbound-management/processing', requiredPermission: 'inboundProcessingPermission', permissionLevel: 'GENERAL' },  // 입고처리 권한
             ]
         },
         {
