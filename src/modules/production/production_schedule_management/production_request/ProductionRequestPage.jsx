@@ -668,42 +668,111 @@ const ProductionRequestPage = () => {
                                             style={{ padding: '20px' }}
                                         >
                                             <Row gutter={16}>
-                                                <Col span={12}>
-                                                    <Form.Item
-                                                        name="requestType"
-                                                        label="의뢰 구분"
-                                                        rules={[{ required: true, message: '의뢰 구분을 선택하세요.' }]}
-                                                    >
-                                                        <Select placeholder="의뢰 구분 선택">
-                                                            <Option value="MASS_PRODUCTION">양산</Option>
-                                                            <Option value="PILOT_PRODUCTION">시험양산</Option>
-                                                            <Option value="URGENT_ORDER">특급수주</Option>
-                                                            <Option value="SAMPLE">샘플</Option>
-                                                            <Option value="PMS">PMS</Option>
-                                                        </Select>
+                                                <Col span={6}>
+                                                    <Form.Item name="client">
+                                                        <Input
+                                                            addonBefore="거래처"
+                                                            placeholder="거래처 선택"
+                                                            onClick={() => handleInputClick('client')}
+                                                            value={selectedValue.client}
+                                                            onFocus={(e) => e.target.blur()}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={12}>
-                                                    <Form.Item
-                                                        name="progressType"
-                                                        label="진행 상태"
-                                                        rules={[{ required: true, message: '진행 상태를 선택하세요.' }]}
-                                                    >
-                                                        <Select placeholder="진행 상태 선택">
-                                                            <Option value="CREATED">등록</Option>
-                                                            <Option value="IN_PROGRESS">진행 중</Option>
-                                                            <Option value="NOT_STARTED">미진행</Option>
-                                                            <Option value="HALTED">진행중단</Option>
-                                                            <Option value="COMPLETED">완료</Option>
-                                                            <Option value="INCOMPLETE">미완료</Option>
-                                                        </Select>
-
+                                                <Col span={6}>
+                                                    <Form.Item name="department">
+                                                        <Input
+                                                            addonBefore="부서"
+                                                            placeholder="부서 선택"
+                                                            onClick={() => handleInputClick('department')}
+                                                            value={selectedValue.department}
+                                                            onFocus={(e) => e.target.blur()}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item name="product">
+                                                        <Input
+                                                            addonBefore="제품"
+                                                            placeholder="제품 선택"
+                                                            onClick={() => handleInputClick('product')}
+                                                            value={selectedValue.product}
+                                                            onFocus={(e) => e.target.blur()}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={6}>
+                                                    <Form.Item name="requester">
+                                                        <Input
+                                                            addonBefore="요청자"
+                                                            placeholder="요청자 선택"
+                                                            onClick={() => handleInputClick('requester')}
+                                                            value={selectedValue.requester}
+                                                            onFocus={(e) => e.target.blur()}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
+                                                생산 의뢰 내용
+                                            </Divider>
+                                            <Row gutter={16}>
+                                                <Col span={8}>
+                                                    <Form.Item name="requestType" rules={[{ required: true, message: '의뢰 구분을 선택하세요.' }]}>
+                                                        <Space.Compact>
+                                                            <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="의뢰 구분" disabled />
+                                                            <Select
+                                                                name="requestType"
+                                                                style={{ width: '60%' }}
+                                                                placeholder="의뢰 구분 선택"
+                                                            >
+                                                                <Option value="MASS_PRODUCTION">양산</Option>
+                                                                <Option value="PILOT_PRODUCTION">시험양산</Option>
+                                                                <Option value="URGENT_ORDER">특급수주</Option>
+                                                                <Option value="SAMPLE">샘플</Option>
+                                                                <Option value="PMS">PMS</Option>
+                                                            </Select>
+                                                        </Space.Compact>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <Form.Item name="progressType" rules={[{ required: true, message: '진행 상태를 선택하세요.' }]}>
+                                                        <Space.Compact>
+                                                            <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="진행 상태" disabled />
+                                                            <Select
+                                                                name="progressType"
+                                                                style={{ width: '60%' }}
+                                                                placeholder="진행 상태 선택"
+                                                            >
+                                                                <Option value="CREATED">등록</Option>
+                                                                <Option value="IN_PROGRESS">진행 중</Option>
+                                                                <Option value="NOT_STARTED">미진행</Option>
+                                                                <Option value="HALTED">진행중단</Option>
+                                                                <Option value="COMPLETED">완료</Option>
+                                                                <Option value="INCOMPLETE">미완료</Option>
+                                                            </Select>
+                                                        </Space.Compact>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item name="isConfirmed">
+                                                        <Space.Compact>
+                                                            <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="확정 여부" disabled />
+                                                            <Select placeholder="확정 여부 선택" style={{ width: '60%' }}>
+                                                                <Option value={true}>확정됨</Option>
+                                                                <Option value={false}>미확정</Option>
+                                                            </Select>
+                                                        </Space.Compact>
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
 
                                             <Row gutter={16}>
-                                                <Col span={12}>
+                                                <Col span={24}>
                                                     <Form.Item
                                                         name="name"
                                                         label="의뢰명"
@@ -712,18 +781,10 @@ const ProductionRequestPage = () => {
                                                         <Input placeholder="의뢰명 입력" />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={12}>
-                                                    <Form.Item name="isConfirmed" label="확정 여부">
-                                                        <Select placeholder="확정 여부 선택">
-                                                            <Option value={true}>확정됨</Option>
-                                                            <Option value={false}>미확정</Option>
-                                                        </Select>
-                                                    </Form.Item>
-                                                </Col>
                                             </Row>
 
                                             <Row gutter={16}>
-                                                <Col span={12}>
+                                                <Col span={8}>
                                                     <Form.Item
                                                         label="의뢰등록일"
                                                         name="requestDate"
@@ -733,7 +794,7 @@ const ProductionRequestPage = () => {
                                                         <DatePicker style={{ width: '100%' }} />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={12}>
+                                                <Col span={8}>
                                                     <Form.Item
                                                         label="완료 요청일"
                                                         name="deadlineOfCompletion"
@@ -743,10 +804,7 @@ const ProductionRequestPage = () => {
                                                         <DatePicker style={{ width: '100%' }} />
                                                     </Form.Item>
                                                 </Col>
-                                            </Row>
-
-                                            <Row gutter={16}>
-                                                <Col span={12}>
+                                                <Col span={8}>
                                                     <Form.Item
                                                         label="납기일"
                                                         name="dueDateToProvide"
@@ -756,15 +814,14 @@ const ProductionRequestPage = () => {
                                                         <DatePicker style={{ width: '100%' }} />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={12}>
+                                            </Row>
+                                            <Row gutter={16}>
+                                                <Col span={8}>
                                                     <Form.Item name="requestQuantity" required label="요청 수량">
                                                         <Input type="number" placeholder="요청 수량 입력" />
                                                     </Form.Item>
                                                 </Col>
-                                            </Row>
-
-                                            <Row gutter={16}>
-                                                <Col span={12}>
+                                                <Col span={8}>
                                                     <Form.Item
                                                         name="confirmedQuantity" label="확정 수량"
                                                         tooltip="생산의뢰 확정 시 확정수량을 입력하세요"
@@ -772,55 +829,17 @@ const ProductionRequestPage = () => {
                                                         <Input type="number" placeholder="확정 수량 입력" />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={12}>
-                                                    <Form.Item name="remarks" label="특이사항">
-                                                        <Input.TextArea placeholder="특이사항 입력" />
+                                            </Row>
+                                            <Row gutter={16}>
+                                                <Col span={24}>
+                                                    <Form.Item name="remarks">
+                                                        <Input.TextArea addonBefore="특이사항" placeholder="특이사항 입력" />
                                                     </Form.Item>
                                                 </Col>
+
                                             </Row>
 
-                                            <Row gutter={16}>
-                                                <Col span={6}>
-                                                    <Form.Item name="clientName" label="거래처">
-                                                        <Input
-                                                            placeholder="거래처 선택" // FINANCIAL_API.CLIENT_SEARCH_API
-                                                            // value={selectedValue.client || ''}  // 선택한 값 표시
-                                                            onClick={() => handleInputClick('client')}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="department" label="부서">
-                                                        <Input
-                                                            placeholder="부서 선택" // EMPLOYEE_API.DEPARTMENT_DATA_API
-                                                            // value={selectedValue.department || ''}  // 선택한 값 표시
-                                                            onClick={() => handleInputClick('department')}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="product" label="제품">
-                                                        <Input
-                                                            placeholder="제품 선택" // LOGISTICS_API.PRODUCT_LIST_API
-                                                            // value={selectedValue.product || ''}  // 선택한 값 표시
-                                                            onClick={() => handleInputClick('product')}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="requester" label="요청자">
-                                                        <Input
-                                                            placeholder="요청자 선택"
-                                                            // value={selectedValue.requester || ''}  // 선택한 값 표시
-                                                            onClick={() => handleInputClick('requester')}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                            </Row>
+
                                             <Row gutter={16}>
                                             </Row>
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>

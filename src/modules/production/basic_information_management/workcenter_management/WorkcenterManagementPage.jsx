@@ -137,49 +137,6 @@ const WorkcenterManagementPage = ({ initialData }) => {
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >작업장 목록</Typography>
-                                {/* 검색 폼 */}
-                                {/*<Grid sx={{ padding: '0px 20px 0px 20px' }}>*/}
-                                {/*    <Form layout="vertical">*/}
-                                {/*        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>*/}
-                                {/*            <Form.Item name="code">*/}
-                                {/*                <Input*/}
-                                {/*                    placeholder="작업장 코드"*/}
-                                {/*                    allowClear*/}
-                                {/*                    prefix={<SearchOutlined />}*/}
-                                {/*                    onChange={(e) => setSearchParams((prev) => ({ ...prev, code: e.target.value }))}*/}
-                                {/*                />*/}
-                                {/*            </Form.Item>*/}
-                                {/*            <Form.Item name="name">*/}
-                                {/*                <Input*/}
-                                {/*                    placeholder="작업장 이름"*/}
-                                {/*                    allowClear*/}
-                                {/*                    prefix={<SearchOutlined />}*/}
-                                {/*                    onChange={(e) => setSearchParams((prev) => ({ ...prev, name: e.target.value }))}*/}
-                                {/*                />*/}
-                                {/*            </Form.Item>*/}
-
-                                {/*            <Form.Item name="workcenterType">*/}
-                                {/*                <Select*/}
-                                {/*                    placeholder="작업장 유형"*/}
-                                {/*                    allowClear*/}
-                                {/*                    style={{ width: 200 }}*/}
-                                {/*                    onChange={(value) => setSearchParams((prev) => ({ ...prev, workcenterType: value }))}*/}
-                                {/*                >*/}
-                                {/*                    <Select.Option value="Press">프레스</Select.Option>*/}
-                                {/*                    <Select.Option value="Welding">용접</Select.Option>*/}
-                                {/*                    <Select.Option value="Assembly">조립</Select.Option>*/}
-                                {/*                    <Select.Option value="Quality Inspection">품질 검사</Select.Option>*/}
-                                {/*                </Select>*/}
-                                {/*            </Form.Item>*/}
-                                {/*            <Box>*/}
-                                {/*                <Button type="primary" onClick={handleSearch} style={{ marginRight: '10px' }}>*/}
-                                {/*                    검색*/}
-                                {/*                </Button>*/}
-                                {/*                <Button onClick={handleReset}>초기화</Button>*/}
-                                {/*            </Box>*/}
-                                {/*        </Row>*/}
-                                {/*    </Form>*/}
-                                {/*</Grid>*/}
                                 {/* 기본 데이터 목록 */}
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Table
