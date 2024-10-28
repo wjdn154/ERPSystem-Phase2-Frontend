@@ -151,6 +151,15 @@ export const EMPLOYEE_API = {
     //  인사관리 - 급여
     POSITION_SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/show`,
     POSITION_SALARY_STEP_DATE_CATEGORY_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/datecategoryshow`,
+    SALARY_ENTRY_API: `${API_BASE_URL}/api/hr/salary/entry`, // 급여 등록
+    SALARY_SHOW_API: `${API_BASE_URL}/api/hr/salary/show`, // 급여 조회
+    SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/salarystep/show`, // 호봉 조회
+    LONG_TERM_CARE_INSURANCE_PENSION_API: `${API_BASE_URL}/api/hr/long_term_care_insurance_pension/show`, // 장기요양보험 연금 조회
+    EMPLOYMENT_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/employment_insurance_pension/calculator`, // 고용보험 연금 계산
+    HEALTH_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/health_insurance_pension/calculator`, // 건강보험 연금 계산
+    NATIONAL_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/national_pension/calculator`, // 국민연금 계산
+
+
 
 
 }
@@ -219,7 +228,6 @@ export const LOGISTICS_API = {
     SHIPMENT_ITEMS_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipment/items?startDate=${startDate}&endDate=${endDate}`, // 출하 품목 조회 API
 
     RECEIVING_SCHEDULE_WAITING_RECEIPT_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/receivingSchedules/waitingReceipt?startDate=${startDate}&endDate=${endDate}`, // 입고 대기 상태의 입고 스케줄 조회 API
-    RECEIVING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/${id}`, // 특정 입고 지시서 상세 조회 API
     RECEIVING_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/update/${id}`, // 특정 입고 지시서 수정 API
     NEXT_INVENTORY_NUMBER_API: `${API_BASE_URL}/api/logistics/inventory/nextInventoryNumber`, // 다음 인벤토리 번호 조회 API
     RECEIVING_SCHEDULE_PROCESS_API: () => `${API_BASE_URL}/api/logistics/receivingSchedules/process`, // 입고 처리 요청 API

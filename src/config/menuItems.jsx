@@ -156,6 +156,7 @@ export const subMenuItems = {
             text: '급여 관리',
             items: [
                 { text: '급여 정산', component: 'SalarySettlementPage', apiPath: undefined, url: '/hr/payroll/salary-settlement', requiredPermission: null, permissionLevel: 'GENERAL' },
+                { text: '급여 등록', component: 'SalaryRegistrationPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/payroll/salary-registration', requiredPermission: null, permissionLevel: 'GENERAL' },
                 { text: '지급항목 관리', component: 'PaymentItemManagementPage', apiPath: undefined, url: '/hr/payroll/payment-item-management', requiredPermission: null, permissionLevel: 'GENERAL' },
                 { text: '공제 관리', component: 'DeductionManagementPage', apiPath: undefined, url: '/hr/payroll/deduction-management', requiredPermission: null, permissionLevel: 'GENERAL' },
                 { text: '사회보험', component: 'SocialInsurancePage', apiPath: undefined, url: '/hr/payroll/social-insurance', requiredPermission: null, permissionLevel: 'GENERAL' },
