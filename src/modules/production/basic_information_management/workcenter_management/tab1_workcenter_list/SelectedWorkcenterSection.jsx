@@ -24,6 +24,7 @@ import { LOGISTICS_API, PRODUCTION_API } from "../../../../../config/apiConstant
 import apiClient from "../../../../../config/apiClient.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 import {fetchWorkcenter} from "../WorkcenterApi.jsx";
+import * as equipment from "date-fns/locale";
 const SelectedWorkcenterSection = ({
                                      workcenter,
                                      handleInputChange,
@@ -92,7 +93,7 @@ const SelectedWorkcenterSection = ({
         );
     });
 
-    // selected 로
+    // 작업장 데이터 가져오기 및 폼 초기화
     useEffect(() => {
         const fetchWorkcenterData = async () => {
             if (!workcenter) return;
@@ -118,22 +119,18 @@ const SelectedWorkcenterSection = ({
                         ? `[${String(fetchedWorkcenter.processCode).padStart(5, '0')}] ${fetchedWorkcenter.processName}`
                         : '미등록',  // 공정 정보
 
-                    // 설비 정보가 여러 개일 경우 쉼표로 구분해서 표시
-                    equipment: fetchedWorkcenter.equipmentNames && fetchedWorkcenter.equipmentNames.length > 0
-                        ? fetchedWorkcenter.equipmentNames.join(', ')
-                        : '미등록',
-
-                    // 모델명도 여러 개일 경우 쉼표로 구분해서 표시
-                    models: fetchedWorkcenter.modelNames && fetchedWorkcenter.modelNames.length > 0
-                        ? fetchedWorkcenter.modelNames.join(', ')
-                        : '미등록',
-
                     // 오늘 작업자 수와 작업자 이름들을 처리
                     todayWorkerCount: fetchedWorkcenter.todayWorkerCount || '0명',
                     todayWorkers: fetchedWorkcenter.todayWorkers && fetchedWorkcenter.todayWorkers.length > 0
                         ? fetchedWorkcenter.todayWorkers.join(', ')
                         : '배정된 작업자 없음',
                 });
+
+                // 선택된 설비 초기화
+                if (fetchedWorkcenter.equipmentList) {
+                    setSelectedEquipments(fetchedWorkcenter.equipmentList);
+                }
+
             } catch (error) {
                 console.error('작업장 데이터 가져오기 실패:', error);
             }
@@ -305,6 +302,7 @@ const SelectedWorkcenterSection = ({
                         form={form}
                         // onFinish={(values) => { handleFormSubmit(values, 'update') }}
                         onFinish={(values) => {
+                            values.selectedEquipments = selectedEquipments; // 선택된 설비를 폼 데이터에 포함
                             console.log('Form 제출 값:', values);  // 폼 데이터 확인
                             handleFormSubmit(values, 'update');
                         }}
@@ -384,9 +382,18 @@ const SelectedWorkcenterSection = ({
                                 </Form.Item>
                             </Col>
                             {/* 설비 선택 테이블 */}
-                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>설비 선택</Divider>
-                            <Col span={15}>
 
+                        </Row>
+                        <Row gutter={16}>
+                            <Col span={15}>
+                                <Form.Item name="description">
+                                    <Input addonBefore="설명" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>설비 선택</Divider>
+                        <Row gutter={12}>
+                            <Col span={15}>
                                 <Form.Item name="equipment">
 
                                     <Input
@@ -418,7 +425,7 @@ const SelectedWorkcenterSection = ({
                                             },
                                         ]}
                                         dataSource={filteredEquipmentData}
-                                        rowKey={(record) => record.equipmentNum || record.id}
+                                        rowKey={(record) => record.id}
                                         size="small"
                                         pagination={{
                                             pageSize: 5,
@@ -428,7 +435,16 @@ const SelectedWorkcenterSection = ({
                                         }}
                                         loading={isLoading}
                                         style={{ width: '100%' }} // 너비 조정
-
+                                        onRow={(record) => ({
+                                            onClick: () => {
+                                                const alreadySelected = selectedEquipments.some((equipment) => equipment.id === record.id);
+                                                if (alreadySelected) {
+                                                    setSelectedEquipments(selectedEquipments.filter((equipment) => equipment.id !== record.id));
+                                                } else {
+                                                    setSelectedEquipments([...selectedEquipments, record]);
+                                                }
+                                            }
+                                        })}
                                     />
                                 </Form.Item>
                             </Col>
@@ -441,16 +457,10 @@ const SelectedWorkcenterSection = ({
                                         </Tag>
                                     ))}
                                 </Form.Item>
-                                {/*<Form.Item*/}
                             </Col>
                         </Row>
-                        <Row gutter={16}>
-                            <Col span={15}>
-                                <Form.Item name="description">
-                                    <Input addonBefore="설명" />
-                                </Form.Item>
-                            </Col>
-                        </Row>
+
+
                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>작업자배정</Divider>
                         <Row gutter={12}>
                             <Col span={15}>
