@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: 의존성 설치
         run: npm install
@@ -19,7 +19,7 @@ jobs:
         run: npm run build
 
       - name: 빌드 결과 업로드
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-build
           path: ./dist
