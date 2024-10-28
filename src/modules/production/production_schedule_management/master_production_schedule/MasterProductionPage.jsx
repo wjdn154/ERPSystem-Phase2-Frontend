@@ -53,6 +53,18 @@ const MasterProductionPage = () => {
         fetchProductList();
     }, []); // 빈 배열은 컴포넌트가 처음 렌더링될 때만 실행되도록 보장
 
+    const confirmMps = async (id) => {
+        try {
+            const response = await apiClient.post(PRODUCTION_API.MPS_CONFIRM(id));
+            notify('success', '확정 성공', 'MPS가 확정되었습니다.', 'bottomRight');
+            fetchMpsList(); // 목록 새로고침
+        } catch (error) {
+            console.error('API 호출 오류:', error);
+            notify('error', '확정 실패', 'MPS를 확정하는 데 실패했습니다.', 'top');
+        }
+    };
+
+
     const fetchProductList = async () => {
         try {
             const response = await apiClient.post(LOGISTICS_API.PRODUCT_LIST_API);
@@ -255,7 +267,7 @@ const MasterProductionPage = () => {
             key: 'action',
             align:'center',
             render: (_, record) => (
-                <Button type="default" onClick={() => completeMps(record.id)}>
+                <Button type="default" onClick={() => confirmMps(record.id)}>
                     확정
                 </Button>
             ),
