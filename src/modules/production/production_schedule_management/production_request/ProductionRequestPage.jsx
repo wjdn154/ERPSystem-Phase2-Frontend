@@ -119,11 +119,31 @@ const ProductionRequestPage = () => {
         setCurrentRequest(null);
     }
 
-    const handleModalSelect = (record) => {
-        setSelectedValue((prev) => ({ ...prev, [currentField]: record.name }));
-        form.setFieldsValue({ [currentField]: record.name });
-        setIsModalVisible(false);
+    const getDisplayValue = (field, record) => {
+        switch (field) {
+            case 'client':
+                return `${record.printClientName} (${record.representativeName}, ${record.businessType})`;
+            case 'department':
+                return `${record.departmentName} (${record.departmentCode})`;
+            case 'requester':
+                return `${record.lastName}${record.firstName} (${record.departmentName}, ${record.titleName}, ${record.positionName})`;
+            case 'product':
+                return `${record.code} ${record.name})`;
+            default:
+                return '';
+        }
     };
+
+
+    const handleModalSelect = (record) => {
+        const selectedValue = getDisplayValue(currentField, record); // 선택한 값을 문자열로 조합
+
+        setSelectedValue((prev) => ({ ...prev, [currentField]: selectedValue })); // 상태 업데이트
+        form.setFieldsValue({ [currentField]: selectedValue }); // 폼 필드에 값 설정
+
+        setIsModalVisible(false); // 모달 닫기
+    };
+
 
     useEffect(() => {
         if (productionRequestDetail) {
@@ -490,13 +510,17 @@ const ProductionRequestPage = () => {
                                                     <Select
                                                         placeholder="의뢰 구분"
                                                         value={searchParams.requestType || undefined}
-                                                        onChange={(value) => setSearchParams({ ...searchParams, requestType: value })}
+                                                        onChange={(value) => {
+                                                            const updatedParam = { ...productionRequestParam, requestType: value };
+                                                            setProductionRequestParam(updatedParam);
+                                                            form.setFieldsValue(updatedParam);
+                                                        }}
                                                     >
-                                                        <Option value="MASS_PRODUCTION">양산</Option>
-                                                        <Option value="PILOT_PRODUCTION">시험양산</Option>
-                                                        <Option value="URGENT_ORDER">특급수주</Option>
-                                                        <Option value="SAMPLE">샘플</Option>
-                                                        <Option value="PMS">PMS</Option>
+                                                        <Select.Option value="Mass Production">양산</Select.Option>
+                                                        <Select.Option value="Pilot Production">시험양산</Select.Option>
+                                                        <Select.Option value="Urgent Order">특급수주</Select.Option>
+                                                        <Select.Option value="Sample">샘플</Select.Option>
+                                                        <Select.Option value="PMS">PMS</Select.Option>
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
@@ -507,7 +531,6 @@ const ProductionRequestPage = () => {
                                                             placeholder="의뢰명"
                                                             value={searchParams.requestName}
                                                             onChange={(e) => setSearchParams({ ...searchParams, requestName: e.target.value })}
-                                                            // onClick={() => fetchModalData('requestName')}
                                                         />
                                                     </Space.Compact>
                                                 </Form.Item>
@@ -517,11 +540,18 @@ const ProductionRequestPage = () => {
                                                     <Select
                                                         placeholder="진행 상태"
                                                         value={searchParams.progressType || undefined}
-                                                        onChange={(value) => setSearchParams({ ...searchParams, progressType: value })}
+                                                        onChange={(value) => {
+                                                            const updatedParam = { ...productionRequestParam, progressType: value };
+                                                            setProductionRequestParam(updatedParam);
+                                                            form.setFieldsValue(updatedParam);
+                                                        }}
                                                     >
-                                                        <Option value="PENDING">대기 중</Option>
-                                                        <Option value="IN_PROGRESS">진행 중</Option>
-                                                        <Option value="COMPLETED">완료됨</Option>
+                                                        <Select.Option value="Created">등록</Select.Option>
+                                                        <Select.Option value="In Progress">진행 중</Select.Option>
+                                                        <Select.Option value="Not Started">미진행</Select.Option>
+                                                        <Select.Option value="Halted">진행중단</Select.Option>
+                                                        <Select.Option value="Completed">완료</Select.Option>
+                                                        <Select.Option value="Incomplete">미완료</Select.Option>
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
@@ -530,10 +560,14 @@ const ProductionRequestPage = () => {
                                                     <Select
                                                         placeholder="확정 여부"
                                                         value={searchParams.isConfirmed}
-                                                        onChange={(value) => setSearchParams({ ...searchParams, isConfirmed: value })}
+                                                        onChange={(value) => {
+                                                            const updatedParam = { ...productionRequestParam, isConfirmed: value };
+                                                            setProductionRequestParam(updatedParam);
+                                                            form.setFieldsValue(updatedParam);
+                                                        }}
                                                     >
-                                                        <Option value="true">확정됨</Option>
-                                                        <Option value="false">미확정</Option>
+                                                        <Select.Option value={true}>확정됨</Select.Option>
+                                                        <Select.Option value={false}>미확정</Select.Option>
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
@@ -608,7 +642,10 @@ const ProductionRequestPage = () => {
                                         <Form
                                             form={form}
                                             layout="vertical"
-                                            onFinish={(values) => handleFormSubmit(values, 'update')}
+                                            onFinish={(values) => {
+                                                console.log("onFinish handleFormSubmit:", values)
+                                                handleFormSubmit(values, 'update')}
+                                            }
                                             style={{ padding: '20px' }}
                                         >
                                             <Row gutter={16}>
@@ -668,12 +705,22 @@ const ProductionRequestPage = () => {
 
                                             <Row gutter={16}>
                                                 <Col span={12}>
-                                                    <Form.Item name="requestDate" label="요청일">
+                                                    <Form.Item
+                                                        label="의뢰등록일"
+                                                        name="requestDate"
+                                                        required
+                                                        tooltip="생산의뢰 등록일을 선택하세요" // TODO 생성시 자동입력
+                                                    >
                                                         <DatePicker style={{ width: '100%' }} />
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={12}>
-                                                    <Form.Item name="deadlineOfCompletion" label="완료 요청일">
+                                                    <Form.Item
+                                                        label="완료 요청일"
+                                                        name="deadlineOfCompletion"
+                                                        required
+                                                        tooltip="생산의뢰 완료 요청일을 선택하세요"
+                                                    >
                                                         <DatePicker style={{ width: '100%' }} />
                                                     </Form.Item>
                                                 </Col>
@@ -681,12 +728,17 @@ const ProductionRequestPage = () => {
 
                                             <Row gutter={16}>
                                                 <Col span={12}>
-                                                    <Form.Item name="dueDateToProvide" label="납기일">
+                                                    <Form.Item
+                                                        label="납기일"
+                                                        name="dueDateToProvide"
+                                                        required
+                                                        tooltip="의뢰품목의 납기일을 선택하세요"
+                                                    >
                                                         <DatePicker style={{ width: '100%' }} />
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={12}>
-                                                    <Form.Item name="requestQuantity" label="요청 수량">
+                                                    <Form.Item name="requestQuantity" required label="요청 수량">
                                                         <Input type="number" placeholder="요청 수량 입력" />
                                                     </Form.Item>
                                                 </Col>
@@ -694,7 +746,10 @@ const ProductionRequestPage = () => {
 
                                             <Row gutter={16}>
                                                 <Col span={12}>
-                                                    <Form.Item name="confirmedQuantity" label="확정 수량">
+                                                    <Form.Item
+                                                        name="confirmedQuantity" label="확정 수량"
+                                                        tooltip="생산의뢰 확정 시 확정수량을 입력하세요"
+                                                    >
                                                         <Input type="number" placeholder="확정 수량 입력" />
                                                     </Form.Item>
                                                 </Col>
@@ -706,7 +761,7 @@ const ProductionRequestPage = () => {
                                             </Row>
 
                                             <Row gutter={16}>
-                                                <Col span={8}>
+                                                <Col span={6}>
                                                     <Form.Item name="client" label="거래처">
                                                         <Input
                                                             placeholder="거래처 선택" // FINANCIAL_API.CLIENT_SEARCH_API
@@ -716,7 +771,7 @@ const ProductionRequestPage = () => {
                                                         />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={8}>
+                                                <Col span={6}>
                                                     <Form.Item name="department" label="부서">
                                                         <Input
                                                             placeholder="부서 선택" // EMPLOYEE_API.DEPARTMENT_DATA_API
@@ -726,7 +781,7 @@ const ProductionRequestPage = () => {
                                                         />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={8}>
+                                                <Col span={6}>
                                                     <Form.Item name="product" label="제품">
                                                         <Input
                                                             placeholder="제품 선택" // LOGISTICS_API.PRODUCT_LIST_API
@@ -736,9 +791,7 @@ const ProductionRequestPage = () => {
                                                         />
                                                     </Form.Item>
                                                 </Col>
-                                            </Row>
-                                            <Row gutter={16}>
-                                                <Col span={8}>
+                                                <Col span={6}>
                                                     <Form.Item name="requester" label="요청자">
                                                         <Input
                                                             placeholder="요청자 선택"
@@ -748,6 +801,8 @@ const ProductionRequestPage = () => {
                                                         />
                                                     </Form.Item>
                                                 </Col>
+                                            </Row>
+                                            <Row gutter={16}>
                                             </Row>
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                                 <Button type="primary" htmlType="submit">
@@ -779,7 +834,9 @@ const ProductionRequestPage = () => {
                                                                     onChange={(e) => {
                                                                         const value = e.target.value.toLowerCase();
                                                                         const filtered = initialModalData.filter((item) =>
-                                                                            item.name.toLowerCase().includes(value)
+                                                                            item.printClientName.toLowerCase().includes(value) ||
+                                                                            item.representativeName.toLowerCase().includes(value) ||
+                                                                            item.businessType.toLowerCase().includes(value)
                                                                         );
                                                                         setModalData(filtered);
                                                                     }}
@@ -787,8 +844,9 @@ const ProductionRequestPage = () => {
                                                                 />
                                                                 <Table
                                                                     columns={[
-                                                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                        { title: '거래처명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                        { title: '업종', dataIndex: 'businessType', key: 'businessType', align: 'center' },
+                                                                        { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' },
+                                                                        { title: '대표자명', dataIndex: 'representativeName', key: 'representativeName', align: 'center' },
                                                                     ]}
                                                                     dataSource={modalData}
                                                                     rowKey="id"
@@ -805,7 +863,7 @@ const ProductionRequestPage = () => {
                                                         {currentField === 'department' && (
                                                             <>
                                                                 <Typography variant="h6" sx={{ marginBottom: '20px' }}>
-                                                                    부서 선택
+                                                                    요청부서 선택
                                                                 </Typography>
                                                                 <Input
                                                                     placeholder="검색"
@@ -813,7 +871,8 @@ const ProductionRequestPage = () => {
                                                                     onChange={(e) => {
                                                                         const value = e.target.value.toLowerCase();
                                                                         const filtered = initialModalData.filter((item) =>
-                                                                            item.name.toLowerCase().includes(value)
+                                                                            item.departmentCode.toLowerCase().includes(value) ||
+                                                                            item.departmentName.toLowerCase().includes(value)
                                                                         );
                                                                         setModalData(filtered);
                                                                     }}
@@ -821,8 +880,8 @@ const ProductionRequestPage = () => {
                                                                 />
                                                                 <Table
                                                                     columns={[
-                                                                        { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                                                        { title: '부서명', dataIndex: 'name', key: 'name', align: 'center' },
+                                                                        { title: '부서 코드', dataIndex: 'departmentCode', key: 'departmentCode', align: 'center' },
+                                                                        { title: '부서명', dataIndex: 'departmentName', key: 'departmentName', align: 'center' },
                                                                     ]}
                                                                     dataSource={modalData}
                                                                     rowKey="id"
@@ -832,6 +891,7 @@ const ProductionRequestPage = () => {
                                                                         onClick: () => handleModalSelect(record),
                                                                     })}
                                                                 />
+
                                                             </>
                                                         )}
 
@@ -847,7 +907,8 @@ const ProductionRequestPage = () => {
                                                                     onChange={(e) => {
                                                                         const value = e.target.value.toLowerCase();
                                                                         const filtered = initialModalData.filter((item) =>
-                                                                            item.name.toLowerCase().includes(value)
+                                                                            item.name.toLowerCase().includes(value) ||
+                                                                            item.code.toLowerCase().includes(value)
                                                                         );
                                                                         setModalData(filtered);
                                                                     }}
@@ -881,7 +942,10 @@ const ProductionRequestPage = () => {
                                                                     onChange={(e) => {
                                                                         const value = e.target.value.toLowerCase();
                                                                         const filtered = initialModalData.filter((item) =>
-                                                                            `${item.lastName}${item.firstName}`.toLowerCase().includes(value)
+                                                                            `${item.lastName}${item.firstName}`.toLowerCase().includes(value) ||
+                                                                            item.departmentName.toLowerCase().includes(value) ||
+                                                                            item.positionName.toLowerCase().includes(value) ||
+                                                                            item.titleName.toLowerCase().includes(value)
                                                                         );
                                                                         setModalData(filtered);
                                                                     }}
@@ -889,13 +953,16 @@ const ProductionRequestPage = () => {
                                                                 />
                                                                 <Table
                                                                     columns={[
-                                                                        { title: '코드', dataIndex: 'code', key: 'id', align: 'center' },
+                                                                        { title: '부서 코드', dataIndex: 'departmentCode', key: 'departmentCode', align: 'center' },
+                                                                        { title: '부서명', dataIndex: 'departmentName', key: 'departmentName', align: 'center' },
                                                                         {
-                                                                            title: '이름',
+                                                                            title: '이름 (사번)',
                                                                             key: 'name',
                                                                             align: 'center',
-                                                                            render: (text, record) => `${record.lastName} ${record.firstName}`,
+                                                                            render: (text, record) => `${record.lastName}${record.firstName} (${record.employeeNumber})`,
                                                                         },
+                                                                        { title: '직책', dataIndex: 'positionName', key: 'positionName', align: 'center' },
+                                                                        { title: '직위', dataIndex: 'titleName', key: 'titleName', align: 'center' },
                                                                     ]}
                                                                     dataSource={modalData}
                                                                     rowKey="id"
@@ -905,6 +972,7 @@ const ProductionRequestPage = () => {
                                                                         onClick: () => handleModalSelect(record),
                                                                     })}
                                                                 />
+
                                                             </>
                                                         )}
                                                     </>
