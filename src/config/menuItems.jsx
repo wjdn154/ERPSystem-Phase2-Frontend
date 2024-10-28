@@ -192,11 +192,10 @@ export const subMenuItems = {
         {
             text: '영업 관리',
             items: [
-                { text: '견적서', component: 'QuotationPage', apiPath: undefined, url: '/logistics/sales/quotation', requiredPermission: 'quotationPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
-                { text: '주문서', component: 'OrderFormPage', apiPath: undefined, url: '/logistics/sales/order', requiredPermission: 'orderPermission', permissionLevel: 'GENERAL' },  // 주문서 권한
-                { text: '판매', component: 'SalesPage', apiPath: undefined, url: '/logistics/sales/sale', requiredPermission: 'salePermission', permissionLevel: 'GENERAL' },  // 판매 권한
-                { text: '출하지시서', component: 'ShipmentInstructionPage', apiPath: undefined, url: '/logistics/sales/shipping-order', requiredPermission: 'shippingOrderPermission', permissionLevel: 'GENERAL' },  // 출하지시서 권한
-                { text: '출하', component: 'ShipmentPage', apiPath: undefined, url: '/logistics/sales/shipment', requiredPermission: 'shipmentPermission', permissionLevel: 'GENERAL' },  // 출하 권한
+                { text: '견적서', component: 'QuotationPage', apiPath: LOGISTICS_API.QUOTATION_LIST_API, url: '/logistics/sales/quotation', requiredPermission: 'quotationPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
+                { text: '주문서', component: 'OrderFormPage', apiPath: LOGISTICS_API.ORDER_LIST_API, url: '/logistics/sales/order', requiredPermission: 'orderPermission', permissionLevel: 'GENERAL' },  // 주문서 권한
+                { text: '판매', component: 'SalesPage', apiPath: LOGISTICS_API.SALES_LIST_API, url: '/logistics/sales/sale', requiredPermission: 'salePermission', permissionLevel: 'GENERAL' },  // 판매 권한
+                { text: '출하지시서', component: 'ShippingOrderPage', apiPath: LOGISTICS_API.SHIPPING_ORDER_LIST_API, url: '/logistics/sales/shipping-order', requiredPermission: 'shippingOrderPermission', permissionLevel: 'GENERAL' },  // 출하지시서 권한
             ]
         },
         {
@@ -218,7 +217,7 @@ export const subMenuItems = {
         {
             text: '출하지시서',
             items: [
-                { text: '출하지시서조회', component: 'ShipmentInstructionInquiryPage', apiPath: undefined, url: '/logistics/shipping-orders/view', requiredPermission: 'shippingOrderViewPermission', permissionLevel: 'GENERAL' },  // 출하지시서조회 권한
+                { text: '출하지시서조회', component: 'ShipmentInstructionInquiryPage', apiPath: LOGISTICS_API.SHIPPING_ORDER_LIST_API, url: '/logistics/shipping-orders/view', requiredPermission: 'shippingOrderViewPermission', permissionLevel: 'GENERAL' },  // 출하지시서조회 권한
                 { text: '출하지시서입력', component: 'ShipmentInstructionEntryPage', apiPath: undefined, url: '/logistics/shipping-orders/input', requiredPermission: 'shippingOrderInputPermission', permissionLevel: 'GENERAL' },  // 출하지시서입력 권한
             ]
         },

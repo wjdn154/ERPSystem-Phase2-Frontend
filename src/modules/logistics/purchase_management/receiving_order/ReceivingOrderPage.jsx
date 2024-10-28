@@ -1127,7 +1127,7 @@ const ReceivingOrderPage = ({initialData}) => {
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
                         <Paper elevation={3} sx={{ height: '100%' }}>
-                            <Typography variant="h6" sx={{ padding: '20px' }}>입고지시서 상세정보 및 수정</Typography>
+                            <Typography variant="h6" sx={{ padding: '20px' }}>입고지시서 등록</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
                                     initialValues={detailReceivingOrder}
@@ -1135,7 +1135,7 @@ const ReceivingOrderPage = ({initialData}) => {
                                     onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                 >
                                     {/* 입고지시서 정보 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>입고지시서서 정보</Divider>
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>입고지시서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
                                             <Typography>등록 일자</Typography>
@@ -1145,6 +1145,19 @@ const ReceivingOrderPage = ({initialData}) => {
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(receivingOrderParam.date)}
+                                                    onChange={handleDeliveryDateChange}
+                                                />
+                                            </Form.Item>
+                                        </Col>
+
+                                        <Col>
+                                            <Typography>납기 일자</Typography>
+                                        </Col>
+                                        <Col>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                <DatePicker
+                                                    disabledDate={(current) => current && current.year() !== 2024}
+                                                    value={dayjs(receivingOrderParam.deliveryDate)}
                                                     onChange={handleRegiDateChange}
                                                 />
                                             </Form.Item>
@@ -1187,80 +1200,7 @@ const ReceivingOrderPage = ({initialData}) => {
                                         </Col>
                                     </Row>
 
-                                    <Row gutter={16} >
-
-                                        <Col span={6}>
-                                            <Form.Item name="journalEntry">
-                                                <Space.Compact>
-                                                    <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
-                                                    <Select
-                                                        style={{ width: '70%' }}
-                                                        value={receivingOrderParam.journalEntryCode}
-                                                        onChange={(value) => {
-                                                            setReceivingOrderParam((prevState) => ({
-                                                                ...prevState,
-                                                                journalEntryCode: value,
-                                                            }));
-                                                        }}
-                                                    >
-                                                        <Select.Option value="1">현금</Select.Option>
-                                                        <Select.Option value="2">외상</Select.Option>
-                                                        <Select.Option value="3">카드</Select.Option>
-
-                                                    </Select>
-                                                </Space.Compact>
-                                            </Form.Item>
-                                        </Col>
-
-                                        <Col span={6}>
-                                            <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                <Checkbox>세금계산서 발행 여부</Checkbox>
-                                            </Form.Item>
-                                        </Col>
-
-                                    </Row>
-
                                     <Row gutter={16}>
-
-                                        <Col span={6}>
-                                            <Form.Item name="currency">
-                                                <Space.Compact>
-                                                    <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
-                                                    <Select
-                                                        style={{ width: '70%' }}
-                                                        value={receivingOrderParam.currency}
-                                                        onChange={(value) => {
-                                                            setReceivingOrderParam((prevState) => ({
-                                                                ...prevState,
-                                                                currency: value,
-                                                            }));
-                                                        }}
-                                                    >
-                                                        <Select.Option value="KRW">한국 [원]</Select.Option>
-                                                        <Select.Option value="USD">미국 [달러]</Select.Option>
-                                                        <Select.Option value="EUR">유럽 [유로]</Select.Option>
-                                                        <Select.Option value="JPY">일본 [엔]</Select.Option>
-                                                        <Select.Option value="CNY">중국 [위안]</Select.Option>
-                                                        <Select.Option value="GBP">영국 [파운드]</Select.Option>
-                                                    </Select>
-                                                </Space.Compact>
-                                            </Form.Item>
-                                        </Col>
-
-
-                                        {(receivingOrderParam.currency !== '한국 [원]' && receivingOrderParam.currency !== 'KRW') && (
-                                            <Col span={6}>
-                                                <Form.Item  style={{ marginBottom: 0 }} >
-                                                    <Input
-                                                        addonBefore="환율"
-                                                        value={receivingOrderParam.exchangeRate}
-                                                        onClick={() => handleInputClick('exchangeRate')}
-                                                        onFocus={(e) => e.target.blur()}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                        )}
-
 
                                         <Col span={12}>
                                             <Form.Item name="remarks">
@@ -1292,6 +1232,15 @@ const ReceivingOrderPage = ({initialData}) => {
                                                         />
                                                     );
                                                 },
+                                                width: '25%'
+                                            },
+                                            {
+                                                title: '규격',
+                                                dataIndex: 'standard',
+                                                key: 'standard',
+                                                align: 'center',
+                                                render: (text) => <div className="small-text" style={{ textAlign: 'center' }}>{text}</div>,
+
                                                 width: '20%'
                                             },
                                             {
@@ -1307,31 +1256,7 @@ const ReceivingOrderPage = ({initialData}) => {
                                                         className="small-text"
                                                     />
                                                 ),
-                                                width: '6%'
-                                            },
-                                            {
-                                                title: '단가',
-                                                dataIndex: 'price',
-                                                key: 'price',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
-                                            },
-                                            {
-                                                title: '공급가액',
-                                                dataIndex: 'supplyPrice',
-                                                key: 'supplyPrice',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
-                                            },
-                                            {
-                                                title: '부가세',
-                                                dataIndex: 'vat',
-                                                key: 'vat',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
+                                                width: '10%'
                                             },
                                             {
                                                 title: '비고',

@@ -141,6 +141,20 @@ export const LOGISTICS_API = {
     RECEIVING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/receiving-orders/`, // 입고 지시서 목록 조회 API
     RECEIVING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/${id}`, // 입고지시서 상세 정보 조회 API
 
+    // 영업 관리
+    QUOTATION_LIST_API: `${API_BASE_URL}/api/logistics/quotations/`, // 견적서 목록 조회 API
+    QUOTATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/quotations/${id}`, // 견적서 상세 정보 조회 API
+    QUOTATION_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/quotations/update/${id}`, // 견적서 수정 조회 API
+    ORDER_LIST_API: `${API_BASE_URL}/api/logistics/orders/`, // 주문서 목록 조회 API
+    ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/orders/${id}`, // 주문서 상세 정보 조회 API
+    ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/update/${id}`, // 주문서 수정 조회 API
+    SALES_LIST_API: `${API_BASE_URL}/api/logistics/sales/`, // 판매서 목록 조회 API
+    SALES_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/sales/${id}`, // 판매서 상세 정보 조회 API
+    SALES_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/sales/${id}`, // 판매서 수정 조회 API
+    SHIPPING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/shipping-orders/`, // 출하지시서 목록 조회 API
+    SHIPPING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/shipping-orders/${id}`, // 출하지시서 상세 정보 조회 API
+    SHIPPING_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/shipping-orders/${id}`, // 출하지시서 수정 조회 API
+
     //재고 실사 조회
     INVENTORY_INSPECTION_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/?startDate=${startDate}&endDate=${endDate}`,
     INVENTORY_INSPECTION_DETAILS_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/details?startDate=${startDate}&endDate=${endDate}`,
