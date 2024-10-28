@@ -111,6 +111,7 @@ export const EMPLOYEE_API = {
     SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
     DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
     DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
+    UPDATE_DEPARTMENT_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
 
     ALLOWANCE_DATA_API: `${API_BASE_URL}/api/hr/basicconfiguration/allowance/show`,
     UPDATE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
@@ -130,8 +131,22 @@ export const EMPLOYEE_API = {
 
     //  인사관리 - 휴가
     LEAVE_DATA_API: `${API_BASE_URL}/api/hr/leaves/list`,
-    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/{id}`,
+    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/${id}`,
     SAVE_LEAVE_API:`${API_BASE_URL}/api/hr/leaves/createLeaves`,
+
+    // 인사관리  - 성과
+    PERFORMANCE_DATA_API: `${API_BASE_URL}/api/hr/performance/list`,
+    PERFORMANCE_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/performance/employee/${id}`,
+    SAVE_PERFORMANCE_API:  `${API_BASE_URL}/api/hr/performance/save`,
+    UPDATE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/put/${performanceId}`,
+    DELETE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/del/${performanceId}`,
+    // 인사관리  - 발령
+    SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
+    TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
+    SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
+    UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/api/hr/transfer/update/${id}`,
+    TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
+
 
     //  인사관리 - 급여
     POSITION_SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/show`,
@@ -160,11 +175,32 @@ export const LOGISTICS_API = {
     HIERARCHY_GROUP_SAVE_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/saveHierarchyGroup`, // 계층 그룹 저장 API
     HIERARCHY_GROUP_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/hierarchyGroup/test/update/${id}`, // 계층 그룹 수정 API
     HIERARCHY_GROUP_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/hierarchyGroup/deleteHierarchyGroup/${id}`, // 계층 그룹 삭제 API
+
     // 구매 관리
     PURCHASE_REQUEST_LIST_API: `${API_BASE_URL}/api/logistics/purchase-requests/`, // 발주 요청 목록 조회 API
     PURCHASE_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchase-requests/${id}`, // 발주 요청 상세 정보 조회 API
+    PURCHASE_REQUEST_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/purchase-requests/update/${id}`, // 발주 요청 수정 조회 API
     PURCHASE_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/purchase-orders/`, // 발주 요청 목록 조회 API
     PURCHASE_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchase-orders/${id}`, // 발주서 상세 정보 조회 API
+    PURCHASE_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/purchase-orders/update/${id}`, // 발주서 수정 조회 API
+    PURCHASE_LIST_API: `${API_BASE_URL}/api/logistics/purchases/`, // 구매서 목록 조회 API
+    PURCHASE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchases/${id}`, // 발주서 상세 정보 조회 API
+    RECEIVING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/receiving-orders/`, // 입고 지시서 목록 조회 API
+    RECEIVING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/${id}`, // 입고지시서 상세 정보 조회 API
+
+    // 영업 관리
+    QUOTATION_LIST_API: `${API_BASE_URL}/api/logistics/quotations/`, // 견적서 목록 조회 API
+    QUOTATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/quotations/${id}`, // 견적서 상세 정보 조회 API
+    QUOTATION_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/quotations/update/${id}`, // 견적서 수정 조회 API
+    ORDER_LIST_API: `${API_BASE_URL}/api/logistics/orders/`, // 주문서 목록 조회 API
+    ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/orders/${id}`, // 주문서 상세 정보 조회 API
+    ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/update/${id}`, // 주문서 수정 조회 API
+    SALES_LIST_API: `${API_BASE_URL}/api/logistics/sales/`, // 판매서 목록 조회 API
+    SALES_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/sales/${id}`, // 판매서 상세 정보 조회 API
+    SALES_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/sales/${id}`, // 판매서 수정 조회 API
+    SHIPPING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/shipping-orders/`, // 출하지시서 목록 조회 API
+    SHIPPING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/shipping-orders/${id}`, // 출하지시서 상세 정보 조회 API
+    SHIPPING_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/shipping-orders/${id}`, // 출하지시서 수정 조회 API
 
     //재고 실사 조회
     INVENTORY_INSPECTION_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/?startDate=${startDate}&endDate=${endDate}`,
