@@ -111,6 +111,7 @@ export const EMPLOYEE_API = {
     SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
     DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
     DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
+    UPDATE_DEPARTMENT_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
 
     ALLOWANCE_DATA_API: `${API_BASE_URL}/api/hr/basicconfiguration/allowance/show`,
     UPDATE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
@@ -130,12 +131,12 @@ export const EMPLOYEE_API = {
 
     //  인사관리 - 휴가
     LEAVE_DATA_API: `${API_BASE_URL}/api/hr/leaves/list`,
-    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/{id}`,
+    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/${id}`,
     SAVE_LEAVE_API:`${API_BASE_URL}/api/hr/leaves/createLeaves`,
 
     // 인사관리  - 성과
     PERFORMANCE_DATA_API: `${API_BASE_URL}/api/hr/performance/list`,
-    PERFORMANCE_DETAIL_DATA_API:(employeeId)=> `${API_BASE_URL}/api/hr/performance/employee/${employeeId}`,
+    PERFORMANCE_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/performance/employee/${id}`,
     SAVE_PERFORMANCE_API:  `${API_BASE_URL}/api/hr/performance/save`,
     UPDATE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/put/${performanceId}`,
     DELETE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/del/${performanceId}`,
@@ -143,6 +144,9 @@ export const EMPLOYEE_API = {
     SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
     TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
     SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
+    UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/api/hr/transfer/update/${id}`,
+    TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
+
 
     //  인사관리 - 급여
     POSITION_SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/show`,

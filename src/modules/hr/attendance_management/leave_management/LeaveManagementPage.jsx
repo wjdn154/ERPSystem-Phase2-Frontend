@@ -55,7 +55,7 @@ const LeaveManagementPage = ({initialData}) => {
             ...fetchLeaveData,
             employeeName: `${fetchLeaveData.lastName}${fetchLeaveData.firstName}`
         });
-        setEmployeeParam(fetchLeaveData);
+        setLeaveParam(fetchLeaveData);
 
         setDisplayValues();
     }, [fetchLeaveData, form]);
@@ -90,7 +90,7 @@ const LeaveManagementPage = ({initialData}) => {
     const handleTabChange = (key) => {
         setEditLeave(false);
         setFetchLeaveData(null);
-        setEditLeave(true);({});
+        setLeaveParam({});
         setDisplayValues({});
         form.resetFields();
         registrationForm.resetFields(); // 2탭 폼 초기화

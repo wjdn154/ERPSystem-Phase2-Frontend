@@ -6,12 +6,12 @@ import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, Spin,
 import apiClient from '../../../../config/apiClient.jsx';
 import {EMPLOYEE_API, FINANCIAL_API} from '../../../../config/apiConstants.jsx';
 import { Divider } from 'antd';
-import { useNotificationContext } from "../../../../config/NotificationContext.jsx";
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 const { Option } = Select;
 const { confirm } = Modal;
 
-const PerformanceEvaluationPage = ({initialData}) => {
+const PerformanceEvaluationPage = ( {initialData} ) => {
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
@@ -28,43 +28,20 @@ const PerformanceEvaluationPage = ({initialData}) => {
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
     const [displayValues, setDisplayValues] = useState({});
 
-    const fetchPerformance = async () => {
-        try{
-            const response = await apiClient.post(EMPLOYEE_API.PERFORMANCE_DATA_API);
-            setPerformanceList(response.data);
-        } catch(error){
-            notification.error({
-                message: '직책 목록 조회 실패',
-                description: '직책 목록을 불러오는 중 오류가 발생했습니다.',
-            });
-        }
-    };
-    useEffect(()=>{
-        fetchPerformance();
-    }, []);
-
     useEffect(() => {
         if (!fetchPerformanceData) return; // 선택된 사원 데이터가 없으면 종료
-        console.log('Fetched Performance Data:', fetchPerformanceData); // Employee 데이터 확인
-
-
-        // firstName과 lastName을 조합해서 employeeName 필드에 설정
         form.setFieldsValue({
-            ...fetchPerformanceData,
-            employeeNumber: fetchPerformanceData.employeeNumber,
-            employeeFirstName:fetchPerformanceData.employeeFirstName,
-            employeeLastName:fetchPerformanceData.employeeLastName,
-            evaluatorFirstName: fetchPerformanceData.evaluatorFirstName,
-            evaluatorLastName: fetchPerformanceData.evaluatorLastName,
-            evaluationDate: fetchPerformanceData.evaluationDate,
-            score: fetchPerformanceData.score,
-            comments: fetchPerformanceData.comments,
-        });
-        setPerformanceParam(fetchPerformanceData);
-        setDisplayValues({employeeName: `${fetchPerformanceData.employeeLastName} ${fetchPerformanceData.employeeFirstName}`,
-            evaluatorName: `${fetchPerformanceData.evaluatorLastName} ${fetchPerformanceData.evaluatorFirstName}`,
-        })
-
+            employeeId: fetchPerformanceData[0].employeeId,
+            evaluatorId: fetchPerformanceData[0].evaluatorId,
+            employeeNumber: fetchPerformanceData[0].employeeNumber,
+            employeeName: fetchPerformanceData[0].employeeName,
+            evaluatorName: fetchPerformanceData[0].evaluatorName,
+            evaluationDate: fetchPerformanceData[0].evaluationDate,
+            title: fetchPerformanceData[0].title,
+            comments: fetchPerformanceData[0].comments,
+            score: fetchPerformanceData[0].score,});
+        setPerformanceParam(fetchPerformanceData[0]);
+        setDisplayValues({});
     }, [fetchPerformanceData, form]);
 
     // 모달창 열기 핸들러
@@ -96,11 +73,9 @@ const PerformanceEvaluationPage = ({initialData}) => {
 
     // 모달창 선택 핸들러
     const handleModalSelect = (record) => {
-        switch (currentField) {
-            case 'performance':
+        if (currentField ==='performance'){
                 setPerformanceParam((prevParams) => (prevParams));
                 setDisplayValues((prevValues) => ({prevValues}));
-                break;
         }
         // 모달창 닫기
         setIsModalVisible(false);
@@ -114,26 +89,26 @@ const PerformanceEvaluationPage = ({initialData}) => {
             cancelText: '취소',
             onOk: async () => {
                 const employeeName = values.employeeName || '';
-                const lastName = employeeName.slice(0, 1); // 첫 글자를 성으로 설정
-                const firstName = employeeName.slice(1); // 나머지 글자를 이름으로 설정
                 const formattedValues = {
                     ...values,
-                    employeeId: performanceParam.employeeId,
-                    evaluatorId: performanceParam.evaluatorId,
+                    title: performanceParam.title,
+                    evaluationDate: performanceParam.evaluationDate,
+                    score: performanceParam.score,
+                    comments: performanceParam.comments,
                 };
-                console.log("formattedValues111",formattedValues);
+                const formData = new FormData();
+                formData.append("formattedValues", JSON.stringify(formattedValues));
 
                 try {
-                    console.log("formattedValues222",formattedValues);
                     const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_PERFORMANCE_API(performanceParam.performanceId ) : EMPLOYEE_API.SAVE_PERFORMANCE_API;
-                    const response = await apiClient.post(API_PATH,formattedValues,{
+                    const response = await apiClient.post(API_PATH,formData,{
                         headers: { 'Content-Type': 'multipart/form-data' },
                     });
                     const updatedData = response.data;
 
                     if (type === 'update') {
                         setPerformanceList((prevList) =>
-                            prevList.map((performance) => performance.id === updatedData.id ? updatedData : performance)
+                            prevList.map((employee) => employee.id === updatedData.id ? updatedData : employee)
                         );
                     } else {
                         setPerformanceList((prevList) => [...prevList, updatedData]);
@@ -210,25 +185,17 @@ const PerformanceEvaluationPage = ({initialData}) => {
                                             },
                                             {
                                                 title: <div className="title-text">사원이름</div>,
-                                                dataIndex: 'fullName',
-                                                key: 'fullName',
+                                                dataIndex: 'employeeName',
+                                                key: 'employeeName',
                                                 align: 'center',
-                                                render: (text, record) => (
-                                                    <div className="small-text">
-                                                        {record.employeeLastName}{record.employeeFirstName}
-                                                    </div>
-                                                ),
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">평가자이름</div>,
-                                                dataIndex: 'fullName',
-                                                key: 'fullName',
+                                                dataIndex: 'evaluatorName',
+                                                key: 'evaluatorName',
                                                 align: 'center',
-                                                render: (text, record) => (
-                                                    <div className="small-text">
-                                                        {record.evaluatorLastName}{record.evaluatorFirstName}
-                                                    </div>
-                                                ),
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">평가제목</div>,
@@ -273,13 +240,14 @@ const PerformanceEvaluationPage = ({initialData}) => {
                                             style: { cursor: 'pointer' },
                                             onClick: async () => {
                                                 setSelectedRowKeys([record.employeeId]); // 클릭한 행의 키로 상태 업데이트
-                                                const employeeId = record.employeeId;
-                                                console.log("DD",employeeId);
+                                                const id = record.employeeId;
                                                 try {
-                                                    const response = await apiClient.post(EMPLOYEE_API.PERFORMANCE_DETAIL_DATA_API(employeeId));
+                                                    const response = await apiClient.post(EMPLOYEE_API.PERFORMANCE_DETAIL_DATA_API(id));
                                                     setFetchPerformanceData(response.data);
                                                     setEditPerformance(true);
-                                                    notify('success', '성과평가 조회', '성과평가 정보 조회 성공.', 'bottomRight')
+                                                    console.log(fetchPerformanceData);
+
+                                                    notify('success', '성과 조회', '성과 평가 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -299,7 +267,7 @@ const PerformanceEvaluationPage = ({initialData}) => {
                             <Typography variant="h6" sx={{ padding: '20px' }}>성과평가 수정</Typography>`
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
-                                    initialValues={fetchPerformanceData}
+                                    initialValues={fetchPerformanceData[0]}
                                     form={form}
                                     onFinish={(values) => { handleFormSubmit(values, 'update'); }}
                                 >
@@ -307,49 +275,57 @@ const PerformanceEvaluationPage = ({initialData}) => {
                                     <Row gutter={16}>
                                         <Col span={6}>
                                             <Form.Item name="employeeNumber">
-                                                <Input addonBefore="사원번호" disabled={'employeeNumber'}/>
+                                                <Input addonBefore="사원번호" disabled/>
                                             </Form.Item>
                                         </Col>
                                         <Col span={6}>
-                                            <Form.Item name="fullName">
+                                            <Form.Item name="employeeName">
                                                 <Input
-                                                    addonBefore="사원이름"
-                                                />
+                                                    addonBefore="사원이름" disabled/>
                                             </Form.Item>
                                         </Col>
                                     </Row>
+
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
-                                        평가자 정보
+                                        평가 정보
                                     </Divider>
+
                                     <Row gutter={16}>
                                         <Col span={6}>
                                             <Form.Item name="evaluatorName" >
                                                 <Input
-                                                    addonBefore="평가자이름"
-                                                />
+                                                    addonBefore="평가자이름" disabled/>
                                             </Form.Item>
                                         </Col>
-                                    </Row>
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>
-                                        평가 정보
-                                    </Divider>
-                                    <Row gutter={16}>
                                         <Col span={6}>
                                             <Form.Item name="evaluationDate" rules={[{ required: true, message: '평가일을 입력하세요.' }]}>
                                                 <Input addonBefore="평가일"/>
                                             </Form.Item>
                                         </Col>
                                         <Col span={6}>
-                                            <Form.Item name="score" rules={[{ required: true, message: '평가점수를 입력하세요.' }]}>
-                                                <Input addonAfter="평가점수"/>
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={6}>
-                                            <Form.Item name="comments" rules={[{ required: true, message: '평가내용을 입력하세요.' }]}>
-                                                <Input addonAfter="평가내용"/>
+                                            <Form.Item name="title" rules={[{ required: true, message: '평가제목을 입력하세요.' }]}>
+                                                <Input addonBefore="평가 제목"/>
                                             </Form.Item>
                                         </Col>
                                     </Row>
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name="score" rules={[{ required: true, message: '평가점수를 입력하세요.' }]}>
+                                                    <Input addonBefore="평가점수"/>
+                                                </Form.Item>
+                                            </Col>
+                                        <Col span={12}>
+                                            <Form.Item name="comments" rules={[{ required: true, message: '평가내용을 입력하세요.' }]}>
+                                                <Input addonBefore="평가내용"/>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    {/* 저장 버튼 */}
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                        <Button type="primary" htmlType="submit">
+                                            저장
+                                        </Button>
+                                    </Box>
                                 </Form>
                             </Grid>
                         </Paper>
