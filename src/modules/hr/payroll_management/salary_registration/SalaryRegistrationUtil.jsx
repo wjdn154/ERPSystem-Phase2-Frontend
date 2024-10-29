@@ -4,19 +4,19 @@ export const tabItems = () => {
     return [
         {
             key: '1',
-            label: '출하 목록',
+            label: '급여 정산 목록',
             children: (
                 <Typography>
-                    출하된 상품의 기록을 조회하고, 필요한 경우 수정할 수 있음.
+                    사원의 월별 급여 내역을 확인하고, 급여 정산 내역을 조회할 수 있음.
                 </Typography>
             ),
         },
         {
             key: '2',
-            label: '출하 등록',
+            label: '급여 정산 계산',
             children: (
                 <Typography>
-                    새로운 출하를 등록하는 탭으로, 출하지시서와 연동하여 출하 정보를 입력할 수 있음.
+                    사원의 근무 정보를 바탕으로 급여를 계산하고, 각종 공제 항목을 반영한 급여를 확인할 수 있음.
                 </Typography>
             ),
         },
