@@ -179,9 +179,9 @@ import MakeToOrderPlanPage
     from "../../production/production_schedule_management/make_to_order_plan/MakeToOrderPlanPage.jsx";
 import MakeToStockPlanPage
     from "../../production/production_schedule_management/make_to_stock_plan/MakeToStockPlanPage.jsx";
-import ShiftTypePage from "../../production/work_order_management/shift_type_management/ShiftTypePage.jsx";
-import ProductionOrderPage
-    from "../../production/work_order_management/production_order_management/ProductionOrderPage.jsx";
+import ProductionOrderConfirmationPage from "../../production/work_order_management/production_order_confirmation/ProductionOrderConfirmationPage.jsx";
+import ProductionOrderRegistrationPage
+    from "../../production/work_order_management/production_order_registration/ProductionOrderRegistrationPage.jsx";
 import AssignmentHistoryPage
     from "../../production/work_order_management/assignment_history_management/AssignmentHistoryPage.jsx";
 import WorkPerformancePage
@@ -205,7 +205,13 @@ import PendingSalesPurchaseVoucherApprovalPage
     from "../../financial/voucher_entry/pending_sales_purchase_voucher_approval/PendingSalesPurchaseVoucherApprovalPage.jsx";
 import SalaryEnvironmentSettingsPage
     from "../../hr/basic_information_management/salary_environment_setting/SalaryEnvironmentSettingsPage.jsx";
+
 import SalePlanPage from "../../logistics/sales_management/sales_plan/SalePlanPage.jsx";
+
+import SalaryRegistrationPage from "../../hr/payroll_management/salary_registration/SalaryRegistrationPage.jsx";
+import ProductionOrderClosingPage
+    from "../../production/work_order_management/production_order_closing/ProductionOrderClosingPage.jsx";
+
 
 // 필요한 페이지 컴포넌트들
 
@@ -228,9 +234,9 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
     AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,
-    MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ShiftTypePage, ProductionOrderPage, AssignmentHistoryPage,
+    MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ProductionOrderConfirmationPage, ProductionOrderRegistrationPage, AssignmentHistoryPage,
     WorkPerformancePage, MonthlyWorkReportPage, DailyWorkReportPage, DefectTypeManagementPage, QualityInspectionPage, LotManagementPage, SerialNumberPage, GoodsReceiptPage,
-    OutsourcingOrderPage, OutsourcingInspectionPage, SalaryEnvironmentSettingsPage
+    OutsourcingOrderPage, OutsourcingInspectionPage, SalaryEnvironmentSettingsPage, SalaryRegistrationPage, ProductionOrderClosingPage
 };
 
 // MainContentPage 컴포넌트
