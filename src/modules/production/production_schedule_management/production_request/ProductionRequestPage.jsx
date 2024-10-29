@@ -569,45 +569,44 @@ const ProductionRequestPage = () => {
                                         </Row>
 
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
-                                                <Col flex="1">
-                                                    <Form.Item name="name" label="의뢰명" tooltip="검색할 생산 의뢰명을 입력하세요">
-                                                        <Space.Compact style={{ width: '100%' }}>
-                                                            <Input
-                                                                placeholder="의뢰명"
-                                                                value={searchParams.requestName || ''} // 초기값을 빈 문자열로 설정
-                                                                // onChange={(e) => setSearchParams({ ...searchParams, requestName: e.target.value }) // searchParams를 바로 참조하는 방식이라 비동기적 상태 변경 시 예기치 않은 결과 발생
-                                                                onChange={(e) => setSearchParams((prev) => ({
-                                                                    ...prev,// 안정성과 일관성을 위해 함수형 업데이트 방식(prev)을 사용하는 것이 더 좋습니다. 기존의 searchParams 상태를 담고 있는 새 복사객체
-                                                                    requestName: e.target.value,
-                                                                }))}
-                                                            />
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col flex="1">
-                                                    <Form.Item label="요청일 조회 기간" tooltip="검색할 요청기간의 시작일과 종료일을 선택하세요">
-                                                        <RangePicker
-                                                            value={[
-                                                                searchParams.startRequestDate ? dayjs(searchParams.startRequestDate) : null,
-                                                                searchParams.endRequestDate ? dayjs(searchParams.endRequestDate) : null,
-                                                            ]}
-                                                            onChange={(dates) => {
-                                                                setSearchParams((prev) => ({
-                                                                    ...prev,
-                                                                    startRequestDate: dates ? dates[0].format('YYYY-MM-DD') : null,
-                                                                    endRequestDate: dates ? dates[1].format('YYYY-MM-DD') : null,
-                                                                }));
-                                                            }}
+                                            <Col flex="1">
+                                                <Form.Item name="name" label="의뢰명" tooltip="검색할 생산 의뢰명을 입력하세요">
+                                                    <Space.Compact style={{ width: '100%' }}>
+                                                        <Input
+                                                            placeholder="의뢰명"
+                                                            value={searchParams.requestName || ''} // 초기값을 빈 문자열로 설정
+                                                            // onChange={(e) => setSearchParams({ ...searchParams, requestName: e.target.value }) // searchParams를 바로 참조하는 방식이라 비동기적 상태 변경 시 예기치 않은 결과 발생
+                                                            onChange={(e) => setSearchParams((prev) => ({
+                                                                ...prev,// 안정성과 일관성을 위해 함수형 업데이트 방식(prev)을 사용하는 것이 더 좋습니다. 기존의 searchParams 상태를 담고 있는 새 복사객체
+                                                                requestName: e.target.value,
+                                                            }))}
                                                         />
-                                                    </Form.Item>
-
-                                                </Col>
-                                                <Col>
-                                                    <Form.Item>
-                                                        <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />}>검색</Button>
-                                                        <Button style={{ marginLeft: '8px' }} onClick={handleResetSearch} icon={<ReloadOutlined />}>초기화</Button>
-                                                    </Form.Item>
-                                                </Col>
+                                                    </Space.Compact>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col flex="1">
+                                                <Form.Item label="요청일 조회 기간" tooltip="검색할 요청기간의 시작일과 종료일을 선택하세요">
+                                                    <RangePicker
+                                                        value={[
+                                                            searchParams.startRequestDate ? dayjs(searchParams.startRequestDate) : null,
+                                                            searchParams.endRequestDate ? dayjs(searchParams.endRequestDate) : null,
+                                                        ]}
+                                                        onChange={(dates) => {
+                                                            setSearchParams((prev) => ({
+                                                                ...prev,
+                                                                startRequestDate: dates ? dates[0].format('YYYY-MM-DD') : null,
+                                                                endRequestDate: dates ? dates[1].format('YYYY-MM-DD') : null,
+                                                            }));
+                                                        }}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col>
+                                                <Form.Item>
+                                                    <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />}>검색</Button>
+                                                    <Button style={{ marginLeft: '8px' }} onClick={handleResetSearch} icon={<ReloadOutlined />}>초기화</Button>
+                                                </Form.Item>
+                                            </Col>
                                             </Row>
                                     </Form>
                                 </Grid>
@@ -1012,7 +1011,6 @@ const ProductionRequestPage = () => {
                                                                         onClick: () => handleModalSelect(record),
                                                                     })}
                                                                 />
-
                                                             </>
                                                         )}
                                                     </>
