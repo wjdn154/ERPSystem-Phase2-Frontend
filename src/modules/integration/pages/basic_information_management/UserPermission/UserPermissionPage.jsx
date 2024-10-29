@@ -80,9 +80,12 @@ const UserPermissionPage = ( ) => {
                     const response = await apiClient.post(EMPLOYEE_API.UPDATE_USERS_PERMISSION_API, requestBody);
                     const permission = response.data;
 
-                    dispatch(setAuth({token, permission}));
+
                     setPermissions(permission);
-                    if (selectedUser.email === jwtDecode(token).sub) setMyPermissions(permission);
+                    if (selectedUser.email === jwtDecode(token).sub) {
+                        dispatch(setAuth({permission}));
+                        setMyPermissions(permission);
+                    }
 
                     notification.success({
                         message: '성공',

@@ -32,76 +32,6 @@ const AppContent = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const eventSourceRef = useRef(null);
-
-    // SSE 연결을 설정하고 구독
-    useEffect(() => {
-        if (token) {
-            const employeeId = jwtDecode(token).employeeId;
-            const tenantId = `tenant_${jwtDecode(token).companyId}`;
-
-            const initializeSSE = async () => {
-                let response;
-                try {
-                    response = await apiClient.post(COMMON_API.GET_USER_SUBSCRIPTION_INFO_API(employeeId, isAdmin));
-                } catch (error) {
-                    console.error("사용자 정보 조회 에러:", error);
-                    return;
-                }
-
-                if (response) {
-                    const module = response.data.module;
-                    const permission = response.data.permission;
-
-                    // eventSource를 useRef로 저장
-                    eventSourceRef.current = new EventSource(COMMON_API.NOTIFICATION_SUBSCRIBE_API(employeeId, tenantId, module, permission));
-
-                    eventSourceRef.current.addEventListener("notification", (event) => {
-                        console.log("알림 수신:", event.data);
-                        notify('info', "알림", event.data, 'topRight');
-                    });
-
-                    eventSourceRef.current.onmessage = (event) => {
-                        const notification = JSON.parse(event.data);
-                        notify('info', notification.type, notification.content, 'topRight');
-                    };
-
-                    eventSourceRef.current.onerror = (error) => {
-                        console.error("SSE 연결 에러:", error);
-                        eventSourceRef.current.close(); // 에러 발생 시 연결 종료
-                    };
-
-                    try {
-                        console.log(module);
-                        console.log(permission);
-                        response = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(employeeId, tenantId, module, permission));
-                        console.log(response);
-                    } catch (error) {
-                        console.error("사용자 정보 조회 에러:", error);
-                    }
-                }
-            };
-
-            initializeSSE();
-
-            // cleanup 함수에서 기존 eventSource 연결 종료
-            return () => {
-                if (eventSourceRef.current) {
-                    console.log("이전 구독 종료:", eventSourceRef.current);
-                    eventSourceRef.current.close(); // 기존 연결 종료
-                    eventSourceRef.current = null; // 리소스 해제 후 초기화
-                    try {
-                        apiClient.post(COMMON_API.NOTIFICATION_UNSUBSCRIBE_API, {
-                            employeeId: employeeId,
-                        })
-                    }catch (error) {
-                        console.error("구독 해제 에러:", error);
-                    }
-                }
-            };
-        }
-    }, [token, isAdmin, dispatch]);
-
 
 
     useEffect(() => {
@@ -189,7 +119,7 @@ const AppContent = () => {
                                     <Sidebar />
                                 </Sider>
                                 <Box  style={{ width: '100%' }}>
-                                <Headers eventSourceRef={eventSourceRef}/>
+                                <Headers />
                                 <Content style={{ transition: 'margin-left 0.3s ease' }}>
                                     <Box sx={{ overflowY: 'auto', height: 'calc(100vh - 64px)', backgroundColor: '#fff' }}>
                                         <ContentWrapper>
