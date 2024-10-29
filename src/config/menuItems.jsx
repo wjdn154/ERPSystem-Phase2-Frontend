@@ -196,6 +196,7 @@ export const subMenuItems = {
         {
             text: '영업 관리',
             items: [
+                { text: '판매계획', component: 'SalePlanPage', apiPath: LOGISTICS_API.SALE_PLAN_LIST_API, url: '/logistics/sales/sale-plan', requiredPermission: 'salePlanPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
                 { text: '견적서', component: 'QuotationPage', apiPath: LOGISTICS_API.QUOTATION_LIST_API, url: '/logistics/sales/quotation', requiredPermission: 'quotationPermission', permissionLevel: 'GENERAL' },  // 견적서 권한
                 { text: '주문서', component: 'OrderFormPage', apiPath: LOGISTICS_API.ORDER_LIST_API, url: '/logistics/sales/order', requiredPermission: 'orderPermission', permissionLevel: 'GENERAL' },  // 주문서 권한
                 { text: '판매', component: 'SalesPage', apiPath: LOGISTICS_API.SALES_LIST_API, url: '/logistics/sales/sale', requiredPermission: 'salePermission', permissionLevel: 'GENERAL' },  // 판매 권한
@@ -211,20 +212,13 @@ export const subMenuItems = {
                 { text: '입고지시서', component: 'ReceivingOrderPage', apiPath: LOGISTICS_API.RECEIVING_ORDER_LIST_API, url: '/logistics/purchase/inbound-order', requiredPermission: 'inboundOrderPermission', permissionLevel: 'GENERAL' },  // 입고지시서 권한
             ]
         },
-        {
-            text: '반품 관리',
-            items: [
-                { text: '반품 접수', component: 'ReturnRequestPage', apiPath: undefined, url: '/logistics/returns/returns-reception', requiredPermission: 'returnsReceptionPermission', permissionLevel: 'GENERAL' },  // 반품 접수 권한
-                { text: '반품 현황', component: 'ReturnStatusPage', apiPath: undefined, url: '/logistics/returns/returns-status', requiredPermission: 'returnsStatusPermission', permissionLevel: 'GENERAL' },  // 반품 현황 권한
-            ]
-        },
-        {
-            text: '출하지시서',
-            items: [
-                { text: '출하지시서조회', component: 'ShipmentInstructionInquiryPage', apiPath: LOGISTICS_API.SHIPPING_ORDER_LIST_API, url: '/logistics/shipping-orders/view', requiredPermission: 'shippingOrderViewPermission', permissionLevel: 'GENERAL' },  // 출하지시서조회 권한
-                { text: '출하지시서입력', component: 'ShipmentInstructionEntryPage', apiPath: undefined, url: '/logistics/shipping-orders/input', requiredPermission: 'shippingOrderInputPermission', permissionLevel: 'GENERAL' },  // 출하지시서입력 권한
-            ]
-        },
+        // {
+        //     text: '반품 관리',
+        //     items: [
+        //         { text: '반품 접수', component: 'ReturnRequestPage', apiPath: undefined, url: '/logistics/returns/returns-reception', requiredPermission: 'returnsReceptionPermission', permissionLevel: 'GENERAL' },  // 반품 접수 권한
+        //         { text: '반품 현황', component: 'ReturnStatusPage', apiPath: undefined, url: '/logistics/returns/returns-status', requiredPermission: 'returnsStatusPermission', permissionLevel: 'GENERAL' },  // 반품 현황 권한
+        //     ]
+        // },
         {
             text: '출하',
             items: [
