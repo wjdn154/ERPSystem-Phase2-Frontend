@@ -291,6 +291,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                         setPurchaseRequestList((prevList) =>
                             prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
                         );
+                        setPurchaseRequestDetails(updatedData.purchaseRequestDetails);
                     } else {
                         setPurchaseRequestList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();

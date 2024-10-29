@@ -1,8 +1,7 @@
 import React, {useMemo, useEffect, useState} from 'react';
-
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './QuotationUtil.jsx';
+import { tabItems } from './SalePlanUtil.jsx';
 import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, InputNumber, notification, Upload, Divider, Tooltip} from 'antd';
 import dayjs from 'dayjs';
 import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
@@ -13,10 +12,10 @@ const { confirm } = Modal;
 
 const { RangePicker } = DatePicker;
 
-const QuotationPage = ({initialData}) => {
+const SalePlanPage = ({initialData}) => {
     const [activeTabKey, setActiveTabKey] = useState('1');
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
-    const [quotationList, setQuotationList] = useState(initialData)
+    const [salePlanList, setSalePlanList] = useState(initialData)
     const [displayValues, setDisplayValues] = useState({});
     const [status, setStatus] = useState({});
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -26,36 +25,52 @@ const QuotationPage = ({initialData}) => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [quotationParam, setQuotationParam] = useState({
-        quotationDetails: [], });
-    const [detailQuotation, setDetailQuotation] = useState(false);
+    const [detailSalePlan, setDetailSalePlan] = useState(false);
+    const [salePlanDetails, setSalePlanDetails] = useState(detailSalePlan?.salePlanDetails || []);
+    const [salePlanParam, setSalePlanParam] = useState({
+        salePlanDetails: [],
+        date: dayjs(),  // 기본 현재 날짜로 설정
+        expectedSalesDate: dayjs(),  // 기본 현재 날짜로 설정
+    });
     const [form] = Form.useForm();
-    const [quotationDetails, setQuotationDetails] = useState(detailQuotation.quotationDetails || []);
-    const [editQuotation, setEditQuotation] = useState(false);
+    const [editSalePlan, setEditSalePlan] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
 
 
 
     useEffect(() => {
+        console.log("useEffect for detailSalePlan triggered"); // 확인용 로그
 
-        if(!detailQuotation) return;
+        if(!detailSalePlan) return;
 
-        form.setFieldsValue(detailQuotation);
+        console.log("detailSalePlan:", detailSalePlan); // 값 확인
+        console.log("Initial salePlanParam:", salePlanParam); // 값 확인
+
+        form.setFieldsValue(detailSalePlan);
         form.setFieldsValue({
-            quotationOrderDetails: quotationDetails,
+            salePlanDetails: salePlanDetails,
         })
-        setQuotationParam(detailQuotation);
+
+        console.log('salePlanDetails: ', salePlanDetails)
+
+        setSalePlanParam((prevParam) => ({
+            ...prevParam,
+            ...detailSalePlan,
+            date: detailSalePlan.date ? dayjs(detailSalePlan.date) : dayjs(),
+            expectedSalesDate: detailSalePlan.expectedSalesDate ? dayjs(detailSalePlan.expectedSalesDate) : dayjs(),
+        }));
+
+        console.log('SalePlanParam', salePlanParam)
 
         setDisplayValues({
-            managerName: detailQuotation.managerCode ? `[${detailQuotation.managerCode}] ${detailQuotation.managerName}` : null,
-            warehouseName:  detailQuotation.warehouseCode ? `[${detailQuotation.warehouseCode}] ${detailQuotation.warehouseName}` : null,
-            client: detailQuotation.clientId ?`[${detailQuotation.clientId}] ${detailQuotation.clientName}` : null,
-            vatType: detailQuotation.vatCode ? `[${detailQuotation.vatCode}] ${detailQuotation.vatName}` : null
+            managerName: detailSalePlan.managerCode ? `[${detailSalePlan.managerCode}] ${detailSalePlan.managerName}` : null,
+            warehouseName:  detailSalePlan.warehouseCode ? `[${detailSalePlan.warehouseCode}] ${detailSalePlan.warehouseName}` : null,
+            client: detailSalePlan.clientId ?`[${detailSalePlan.clientId}] ${detailSalePlan.clientName}` : null,
 
-        }, [detailQuotation, form, quotationDetails]);
+        });
 
-    }, [detailQuotation], form);
+    }, [detailSalePlan], form);
 
     const [searchParams, setSearchParams] = useState({
         startDate: null,
@@ -67,18 +82,22 @@ const QuotationPage = ({initialData}) => {
     const [searchData, setSearchData] = useState(null);
 
 
-
     const handleTabChange = (key) => {
-        setEditQuotation(false);
+        setActiveTabKey(key);
+        setEditSalePlan(false);
         setEditingRow(null);
-        setQuotationDetails(null)
-
+        // setSalePlanDetails(detailSalePlan?.salePlanDetails || [])
+        setSalePlanParam({
+            salePlanDetails: [],
+            date: dayjs(),
+            expectedSalesDate: dayjs(),
+        });
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
 
-        setActiveTabKey(key);
+
     };
 
     // 날짜 선택 처리
@@ -96,7 +115,7 @@ const QuotationPage = ({initialData}) => {
     const formatNumberWithComma = (value) => {
         // value가 숫자인 경우 문자열로 변환
         const stringValue = String(value);
-        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+        return stringValue.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
     };
 
     // 콤마 제거 함수
@@ -116,15 +135,17 @@ const QuotationPage = ({initialData}) => {
         const { startDate, endDate, clientCode, state } = searchParams;
 
         try {
-            const response = await apiClient.post(LOGISTICS_API.QUOTATION_LIST_API, searchParams);
+            const response = await apiClient.post(LOGISTICS_API.SALE_PLAN_LIST_API, searchParams);
             const data = response.data;
             setSearchData(data);
             console.log(data)
 
-            notify('success', '조회 성공', '견적서 조회 성공.', 'bottomRight');
+            notify('success', '조회 성공', '판매계획 조회 성공.', 'bottomRight');
+            return response.data;
         } catch (error) {
-            notify('error', '조회 오류', '견적서 조회 중 오류가 발생했습니다.', 'top');
+            notify('error', '조회 오류', '판매계획 조회 중 오류가 발생했습니다.', 'top');
         }
+
     };
 
     // 입력 필드 클릭 시 모달 열기
@@ -146,19 +167,18 @@ const QuotationPage = ({initialData}) => {
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
-        if(fieldName === 'vatType') apiPath = FINANCIAL_API.VAT_TYPE_SEARCH_API;
 
         try {
             const response = await apiClient.post(apiPath);
 
             // 데이터가 문자열이고 JSON 배열 형식일 경우 파싱, 아니면 그대로 배열로 처리
             let data = response.data;
+            console.log(data);
             if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
                 data = JSON.parse(data);
             }
 
             const modalData = Array.isArray(data) ? data : [data];
-            console.log(modalData);
 
             setModalData(modalData);
             setInitialModalData(modalData);
@@ -187,7 +207,7 @@ const QuotationPage = ({initialData}) => {
 
         switch (currentField) {
             case 'managerName':
-                setQuotationParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     manager: {
                         id: record.id,
@@ -202,7 +222,7 @@ const QuotationPage = ({initialData}) => {
                 break;
 
             case 'warehouseName':
-                setQuotationParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     warehouse: {
                         id: record.id,
@@ -217,7 +237,7 @@ const QuotationPage = ({initialData}) => {
                 break;
 
             case 'client':
-                setQuotationParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     client: {
                         id: record.id,
@@ -236,40 +256,27 @@ const QuotationPage = ({initialData}) => {
 
             case 'product':
                 // 제품 선택 시 해당 제품을 상태에 반영
-                const updatedDetails = [...quotationParam.quotationDetails];
+                const updatedDetails = [...salePlanParam.salePlanDetails];
 
                 console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('price', record.salesPrice, editingRow);
 
                 const { quantity } = updatedDetails[editingRow].quantity;
-                const supplyPrice = calculateSupplyPrice(quantity, (record.salesPrice));
-                console.log(supplyPrice)
-                const vat = calculateVat(supplyPrice);
+                const expectedSales = calculateExpectedSales(quantity, (record.salesPrice));
 
 
-                setQuotationParam((prevParams) => ({
+
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
-                    quotationDetails: updatedDetails,
+                    salePlanDetails: updatedDetails,
                 }));
+                console.log('salePlanParam:', salePlanParam)
                 setEditingRow(null);
-                break;
-
-            case 'vatType':
-                setQuotationParam((prevParams) => ({
-                    ...prevParams,
-                    vatType: {
-                        code: record.vatTypeCode,
-                        name: record.vatTypeName,
-                    },
-                }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    vatType: `[${record.vatTypeCode}] ${record.vatTypeName}`,
-                }));
                 break;
         }
 
@@ -277,81 +284,57 @@ const QuotationPage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
-        setQuotationParam((prevState) => ({
+        setSalePlanParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
+        console.log(salePlanParam)
+    };
+
+    const handleExpectedDateChange = (date) => {
+        setSalePlanParam((prevState) => ({
+            ...prevState,
+            expectedSalesDate: date ? dayjs(date).format('YYYY-MM-DD') : null,
+        }));
+        console.log(salePlanParam)
     };
 
     // 필드 값 변경 시 호출되는 함수
     const handleFieldChange = (value, index, field) => {
-        const updatedDetails = [...quotationParam.quotationDetails];
+        const updatedDetails = [...salePlanParam.salePlanDetails];
 
         setEditingRow(index);
+        console.log('PRICE: ', value)
 
         updatedDetails[index][field] = value;
 
         if (field === 'quantity') {
             const quantity = value;
-
-            const price = updatedDetails[index].price;
-
-            const vatType = quotationParam.vatCode;
-
-            updatedDetails[index].supplyPrice = quantity * price; // 공급가액 = 수량 * 단가
-
-            // updatedDetails[index].vat = calculateVat(updatedDetails[index].supplyPrice);
-
-            updatedDetails[index].vat = calculateVat(value, price, vatType, index);
-
+            const price = removeComma(updatedDetails[index].price);
+            updatedDetails[index].expectedSales = quantity * price; // 공급가액 = 수량 * 단가
+        }
+        if (field === 'price') {
+            const quantity = updatedDetails[index].quantity;
+            const price = removeComma(value);
+            updatedDetails[index].expectedSales = quantity * price; // 공급가액 = 수량 * 단가
         }
 
 
-        setQuotationDetails(updatedDetails); // 상태 업데이트
-        setQuotationParam( {
-            ...quotationParam,
-            quotationDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+        setSalePlanDetails(updatedDetails); // 상태 업데이트
+        setSalePlanParam( {
+            ...salePlanParam,
+            salePlanDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
         });
         setEditingRow(null);
     };
 
-    const calculateSupplyPrice = (quantity, price) => {
+    const calculateExpectedSales = (quantity, price) => {
         return quantity * price;
     };
 
-    // const calculateVat = (supplyPrice) => {
-    //     return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
-    // };
-
-    // API를 사용해 부가세 계산
-    const calculateVat = async (quantity, price, vatTypeId, index) => {
-        try {
-            const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
-                vatTypeId,
-                quantity,
-                price,
-            });
-            const vatAmount = response.data;
-
-            console.log('vatAmount: ', vatAmount)
-
-            const updatedDetails = [...quotationDetails];
-            updatedDetails[index].vat = vatAmount;
-
-            setQuotationDetails(updatedDetails);
-            setQuotationParam({
-                ...quotationParam,
-                quotationDetails: updatedDetails,
-            });
-        } catch (error) {
-            console.error("부가세 계산 중 오류 발생:", error);
-        }
-    };
-
     const updateField = (fieldName, value) => {
-        const updatedDetails = [...quotationParam.quotationDetails];
+        const updatedDetails = [...salePlanParam.salePlanDetails];
 
         console.log('editingRow: ', editingRow)
 
@@ -362,16 +345,14 @@ const QuotationPage = ({initialData}) => {
         // 수량이나 단가가 변경되면 공급가액을 재계산
         if (fieldName === 'quantity' || fieldName === 'price') {
             const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
+            const expectedSales = calculateExpectedSales(quantity, price);
 
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
+            updatedDetails[editingRow].expectedSales = expectedSales;
         }
 
-        setQuotationParam((prevParams) => ({
+        setSalePlanParam((prevParams) => ({
             ...prevParams,
-            quotationOrderDetails: updatedDetails,
+            salePlanDetails: updatedDetails,
         }));
     };
 
@@ -393,9 +374,9 @@ const QuotationPage = ({initialData}) => {
         };
 
         // 기존 항목에 새로운 항목 추가
-        setQuotationParam((prev) => ({
+        setSalePlanParam((prev) => ({
             ...prev,
-            quotationDetails: [...prev.quotationDetails, newRow],
+            salePlanDetails: [...prev.salePlanDetails, newRow],
         }));
     };
 
@@ -409,13 +390,13 @@ const QuotationPage = ({initialData}) => {
             onOk: async () => {
                 try {
                     // 삭제 API 호출해서 해야함 (수정)
-                    const updatedDetails = [...quotationParam.quotationDetails]; // 배열을 복사
+                    const updatedDetails = [...salePlanParam.salePlanDetails]; // 배열을 복사
                     updatedDetails.splice(index, 1); // 인덱스에 해당하는 항목 삭제
 
-                    setQuotationDetails(updatedDetails); // 상태 업데이트
-                    setQuotationParam((prev) => ({
+                    setSalePlanDetails(updatedDetails); // 상태 업데이트
+                    setSalePlanParam((prev) => ({
                             ...prev,
-                            quotationDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+                            salePlanDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
                         })
                     );
 
@@ -429,39 +410,38 @@ const QuotationPage = ({initialData}) => {
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
         console.log('Form values:', values); // 폼 값 확인
-        console.log('detailQuotation', detailQuotation)
-        console.log('quotationParam: ', quotationParam)
+        console.log('detailSalePlan', detailSalePlan)
+        console.log('salePlanParam: ', salePlanParam)
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
+                console.log(salePlanParam.salePlanDetails)
                 try {
-                    const quotationData = {
-                        clientId: quotationParam.clientId,
-                        managerId: quotationParam.managerId,
-                        warehouseId: quotationParam.warehouseId,
-                        currencyId: quotationParam.currencyId,
-                        date: quotationParam.date,
-                        vatId: quotationParam.vatId,
-                        journalEntryCode: quotationParam.journalEntryCode,
-                        electronicTaxInvoiceStatus: quotationParam.electronicTaxInvoiceStatus,
-                        items: Array.isArray(quotationParam.quotationDetails
-                        ) ? quotationParam.quotationDetails.map(item => ({
+                    const salePlanData = {
+                        clientId: salePlanParam.client ? salePlanParam.client.id : salePlanParam.clientId,
+                        managerId: salePlanParam.manager ? salePlanParam.manager.id : salePlanParam.managerId,
+                        warehouseId: salePlanParam.warehouse ? salePlanParam.warehouse.id : salePlanParam.warehouseId,
+                        date: salePlanParam.date,
+                        expectedSalesDate: salePlanParam.expectedSalesDate,
+                        items: Array.isArray(salePlanParam.salePlanDetails
+                        ) ? salePlanParam.salePlanDetails.map(item => ({
                             productId: item.productId,
-                            quantity: item.quantity,
+                            quantity: item.quantity ? item.quantity : 0,
+                            expectedSales: Number(item.expectedSales),
                             remarks: item.remarks,
                         })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
                         remarks: values.remarks
                     };
 
-                    console.log('Sending data to API:', quotationData); // API로 전송할 데이터 확인
+                    console.log('Sending data to API:', salePlanData); // API로 전송할 데이터 확인
 
-                    const API_PATH = type === 'update' ? LOGISTICS_API.QUOTATION_UPDATE_API(quotationParam.id) : LOGISTICS_API.PURCHASE_ORDER_CREATE_API;
+                    const API_PATH = type === 'update' ? LOGISTICS_API.SALE_PLAN_UPDATE_API(salePlanParam.id) : LOGISTICS_API.SALE_PLAN_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
 
-                    const response = await apiClient[method](API_PATH, quotationData, {
+                    const response = await apiClient[method](API_PATH, salePlanData, {
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -469,23 +449,30 @@ const QuotationPage = ({initialData}) => {
 
                     const updatedData = response.data;
 
+                    console.log('updateData: ', updatedData)
+
                     if (type === 'update') {
-                        setQuotationList((prevList) =>
+                        setSalePlanList((prevList) =>
                             prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
                         );
                     } else {
-                        setQuotationList((prevList) => [...prevList, updatedData]);
+                        setSalePlanList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
+                        console.log('salePlanList: ', salePlanList)
                     }
 
-                    setEditQuotation(false);
-                    setDetailQuotation(null);
-                    setQuotationParam(null);
+                    const data = await handleSearch();
+                    setSalePlanList(data);
+
+
+                    setEditSalePlan(false);
+                    setDetailSalePlan(null);
+                    setSalePlanParam(null);
                     setDisplayValues({});
 
                     type === 'update'
-                        ? notify('success', '발주서 수정', '발주서 정보 수정 성공.', 'bottomRight')
-                        : notify('success', '발주서 저장', '발주서 정보 저장 성공.', 'bottomRight');
+                        ? notify('success', '판매계획 수정', '판매계획 정보 수정 성공.', 'bottomRight')
+                        : notify('success', '판매계획 저장', '판매계획 정보 저장 성공.', 'bottomRight');
                 } catch (error) {
                     console.error('Error saving data:', error); // 오류 로그 출력
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -503,44 +490,7 @@ const QuotationPage = ({initialData}) => {
 
     const columns = [
         {
-            title: <div className="title-text">상태</div>,
-            dataIndex: 'status',
-            key: 'status',
-            align: 'center',
-            render: (text) => {
-                let color;
-                let value;
-                switch (text) {
-                    case "WAITING_FOR_SHIPMENT":
-                        color = "orange";
-                        value = "출하 대기";
-                        break;
-                    case "SHIPMENT_COMPLETED":
-                        color = "green";
-                        value = "출하 완료";
-                        break;
-                    case "IN_PROGRESS":
-                        color = "purple";
-                        value = "진행중";
-                        break;
-                    case "COMPLETED":
-                        color = "blue";
-                        value = "진행완료";
-                        break;
-                    case "CANCELED":
-                        color = "red";
-                        value = "취소";
-                        break;
-                    default:
-                        color = "gray"; // 기본 색상
-                        value = "미확인";
-                }
-                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
-            },
-            width: '10%',
-        },
-        {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">등록 일자</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
@@ -552,8 +502,16 @@ const QuotationPage = ({initialData}) => {
             dataIndex: 'clientName',
             key: 'clientName',
             align: 'center',
-            width: '15%',
+            width: '20%',
         },
+        {
+            title: <div className="title-text">담당자명</div>,
+            dataIndex: 'managerName',
+            key: 'managerName',
+            align: 'center',
+            width: '10%',
+        },
+
         {
             title: <div className="title-text">품목명</div>,
             dataIndex: 'productName',
@@ -562,10 +520,11 @@ const QuotationPage = ({initialData}) => {
             width: '25%',
         },
         {
-            title: <div className="title-text">과세 유형</div>,
-            dataIndex: 'vatName',
-            key: 'vatName',
+            title: <div className="title-text">예상매출일자</div>,
+            dataIndex: 'expectedSaleDate',
+            key: 'expectedSaleDate',
             align: 'center',
+            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
             width: '10%',
         },
         {
@@ -576,13 +535,14 @@ const QuotationPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">총 가격</div>,
-            dataIndex: 'totalPrice',
-            key: 'totalPrice',
+            title: <div className="title-text">총 예상매출액</div>,
+            dataIndex: 'totalExpectedSales',
+            key: 'totalExpectedSales',
             align: 'center',
             render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
             width: '15%',
         },
+
     ];
 
     return (
@@ -590,10 +550,10 @@ const QuotationPage = ({initialData}) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="견적서"
+                        title="판매계획"
                         description={(
                             <Typography>
-                                견적서 페이지는 <span>고객에게 제품이나 서비스를 제공하기 전 예상 비용</span>을 산출하고, 이를 문서화하는 곳임. 이 페이지에서는 <span>견적서를 작성, 수정, 삭제</span>할 수 있으며, 작성된 견적서는 <span>고객에게 직접 전송</span>하거나 내부적으로 <span>승인 절차를 거치는 기능</span>을 제공함. 또한, <span>견적서 항목</span>을 추가하고 <span>수량, 단가, 총 비용</span>을 자동으로 계산하는 기능이 포함됨.
+                                판매계획 페이지는 <span>완료된 거래와 관련된 판매계획 기록을 관리</span>하는 곳임. 이 페이지에서는 <span>판매계획 내역을 조회, 수정, 삭제</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음. 또한, <span>판매계획 실적</span>을 분석하여 보고서를 작성하는 기능도 포함되어 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -608,7 +568,7 @@ const QuotationPage = ({initialData}) => {
                     <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%'}}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>견적서 목록</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -682,7 +642,7 @@ const QuotationPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? quotationList : searchData} // 발주서 리스트 데이터
+                                        dataSource={Object.values(searchParams).every(value => value === null) ? salePlanList : searchData} // 판매계획 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -700,13 +660,15 @@ const QuotationPage = ({initialData}) => {
                                                 setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
                                                 const id = record.id;
                                                 try {
-                                                    const response = await apiClient.post(LOGISTICS_API.QUOTATION_DETAIL_API(id));
-                                                    setDetailQuotation(response.data);
-                                                    console.log('detailQuotation: ', response.data)
-                                                    setQuotationDetails(detailQuotation)
-                                                    setEditQuotation(true);
+                                                    const response = await apiClient.post(LOGISTICS_API.SALE_PLAN_DETAIL_API(id));
+                                                    setDetailSalePlan(response.data);
+                                                    console.log('detailSalePlan: ', response.data)
+                                                    setSalePlanParam(response.data)
 
-                                                    notify('success', '견적서 조회', '견적서 정보 조회 성공.', 'bottomRight')
+                                                    setSalePlanDetails(detailSalePlan)
+                                                    setEditSalePlan(true);
+
+                                                    notify('success', '판매계획 조회', '판매계획 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -717,19 +679,19 @@ const QuotationPage = ({initialData}) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    {editQuotation && (
+                    {editSalePlan && (
                         <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                             <Grow in={true} timeout={200}>
                                 <Paper elevation={3} sx={{ height: '100%' }}>
-                                    <Typography variant="h6" sx={{ padding: '20px' }}>견적서 상세정보 및 수정</Typography>
+                                    <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 상세정보 및 수정</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                         <Form
-                                            initialValues={detailQuotation}
+                                            initialValues={detailSalePlan}
                                             form={form}
                                             onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                         >
-                                            {/* 견적서 정보 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>견적서 정보</Divider>
+                                            {/* 판매계획 정보 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
                                                     <Typography>등록 일자</Typography>
@@ -738,8 +700,20 @@ const QuotationPage = ({initialData}) => {
                                                     <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
-                                                            value={dayjs(quotationParam.date)}
+                                                            value={salePlanParam.date ? dayjs(salePlanParam.date) : null}
                                                             onChange={handleRegiDateChange}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col>
+                                                    <Typography>예상매출일자</Typography>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '예상매출일자를 입력하세요.' }]}>
+                                                        <DatePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            value={salePlanParam.expectedSalesDate ? dayjs(salePlanParam.expectedSalesDate) : null}
+                                                            onChange={handleExpectedDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -752,17 +726,6 @@ const QuotationPage = ({initialData}) => {
                                                             addonBefore="담당자"
                                                             value={displayValues.managerName}
                                                             onClick={() => handleInputClick('managerName')}
-                                                            onFocus={(e) => e.target.blur()}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <Form.Item style={{ marginBottom: 0 }} >
-                                                        <Input
-                                                            addonBefore="출하창고"
-                                                            value={displayValues.warehouseName}
-                                                            onClick={() => handleInputClick('warehouseName')}
                                                             onFocus={(e) => e.target.blur()}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -781,93 +744,21 @@ const QuotationPage = ({initialData}) => {
                                                 </Col>
                                             </Row>
 
-                                            <Row gutter={16} >
+                                            <Row gutter={16}>
+
                                                 <Col span={6}>
                                                     <Form.Item style={{ marginBottom: 0 }} >
                                                         <Input
-                                                            addonBefore="과세 유형"
-                                                            value={displayValues.vatType}
-                                                            onClick={() => handleInputClick('vatType')}
+                                                            addonBefore="출하창고"
+                                                            value={displayValues.warehouseName}
+                                                            onClick={() => handleInputClick('warehouseName')}
                                                             onFocus={(e) => e.target.blur()}
                                                             suffix={<DownSquareOutlined />}
                                                         />
                                                     </Form.Item>
                                                 </Col>
 
-                                                <Col span={6}>
-                                                    <Form.Item name="journalEntry">
-                                                        <Space.Compact>
-                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
-                                                            <Select
-                                                                style={{ width: '70%' }}
-                                                                value={quotationParam.journalEntryCode}
-                                                                onChange={(value) => {
-                                                                    setQuotationParam((prevState) => ({
-                                                                        ...prevState,
-                                                                        journalEntryCode: value,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <Select.Option value="4">현금</Select.Option>
-                                                                <Select.Option value="5">외상</Select.Option>
-                                                                <Select.Option value="6">카드</Select.Option>
-
-                                                            </Select>
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-
-                                                <Col span={6}>
-                                                    <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                        <Checkbox>세금계산서 발행 여부</Checkbox>
-                                                    </Form.Item>
-                                                </Col>
-
-                                            </Row>
-
-                                            <Row gutter={16}>
-
-                                                <Col span={6}>
-                                                    <Form.Item name="currency">
-                                                        <Space.Compact>
-                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
-                                                            <Select
-                                                                style={{ width: '70%' }}
-                                                                value={quotationParam.currency}
-                                                                onChange={(value) => {
-                                                                    setQuotationParam((prevState) => ({
-                                                                        ...prevState,
-                                                                        currency: value,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <Select.Option value="KRW">한국 [원]</Select.Option>
-                                                                <Select.Option value="USD">미국 [달러]</Select.Option>
-                                                                <Select.Option value="EUR">유럽 [유로]</Select.Option>
-                                                                <Select.Option value="JPY">일본 [엔]</Select.Option>
-                                                                <Select.Option value="CNY">중국 [위안]</Select.Option>
-                                                                <Select.Option value="GBP">영국 [파운드]</Select.Option>
-                                                            </Select>
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-
-
-                                                {(quotationParam.currency !== '한국 [원]' && quotationParam.currency !== 'KRW') && (
-                                                    <Col span={6}>
-                                                        <Form.Item  style={{ marginBottom: 0 }} >
-                                                            <Input
-                                                                addonBefore="환율"
-                                                                value={quotationParam.exchangeRate}
-                                                                onClick={() => handleInputClick('exchangeRate')}
-                                                                onFocus={(e) => e.target.blur()}
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                )}
-
-
-                                                <Col span={12}>
+                                                <Col span={16}>
                                                     <Form.Item name="remarks">
                                                         <Input addonBefore="비고" />
                                                     </Form.Item>
@@ -875,10 +766,10 @@ const QuotationPage = ({initialData}) => {
 
                                             </Row>
 
-                                            {/* 견적서 상세 항목 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>견적서 상세 항목</Divider>
+                                            {/* 판매계획 상세 항목 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 상세 항목</Divider>
                                             <Table
-                                                dataSource={quotationParam?.quotationDetails || []}
+                                                dataSource={salePlanParam?.salePlanDetails || []}
                                                 columns={[
                                                     {
                                                         title: '품목',
@@ -919,24 +810,29 @@ const QuotationPage = ({initialData}) => {
                                                         dataIndex: 'price',
                                                         key: 'price',
                                                         align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                        render: (text, record, index) => (
+
+                                                            <Input
+                                                                value={formatNumberWithComma(text)}
+                                                                onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'price')}
+                                                                className="small-text"
+                                                            />
+                                                        ),
 
                                                     },
                                                     {
-                                                        title: '공급가액',
-                                                        dataIndex: 'supplyPrice',
-                                                        key: 'supplyPrice',
+                                                        title: '예상매출액',
+                                                        dataIndex: 'expectedSales',
+                                                        key: 'expectedSales',
                                                         align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                        render: (text, record, index) => (
 
-                                                    },
-                                                    {
-                                                        title: '부가세',
-                                                        dataIndex: 'vat',
-                                                        key: 'vat',
-                                                        align: 'center',
-                                                        render: (text) => <span>{(text)?.toLocaleString()}</span>
-
+                                                            <Input
+                                                                value={formatNumberWithComma(text)}
+                                                                onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'expectedSales')}
+                                                                className="small-text"
+                                                            />
+                                                        ),
                                                     },
                                                     {
                                                         title: '비고',
@@ -1207,25 +1103,10 @@ const QuotationPage = ({initialData}) => {
 
                                     <Table
                                         columns={[
-                                            {
-                                                title: '코드',
-                                                dataIndex: 'vatTypeCode',
-                                                key: 'vatTypeCode',
-                                                align: 'center'
-                                            },
-                                            {
-                                                title: '과세명',
-                                                dataIndex: 'vatTypeName',
-                                                key: 'vatTypeName',
-                                                align: 'center',
-                                                render: (text, record) => (
-                                                    <Tooltip title={record.description}>
-                                                        <span>{text}</span>
-                                                    </Tooltip>
-                                                )
-                                            }
+                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                            { title: '과세명', dataIndex: 'name', key: 'name', align: 'center' }
                                         ]}
-                                        dataSource={modalData[0].salesVatTypeShowDTO}
+                                        dataSource={modalData}
                                         rowKey="code"
                                         size="small"
                                         pagination={{
@@ -1320,15 +1201,15 @@ const QuotationPage = ({initialData}) => {
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
                         <Paper elevation={3} sx={{ height: '100%' }}>
-                            <Typography variant="h6" sx={{ padding: '20px' }}>견적서 등록</Typography>
+                            <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 입력</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
-                                    initialValues={detailQuotation}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    initialValues={detailSalePlan}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
-                                    {/* 견적서 정보 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>견적서 정보</Divider>
+                                    {/* 판매계획 정보 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
                                             <Typography>등록 일자</Typography>
@@ -1337,8 +1218,20 @@ const QuotationPage = ({initialData}) => {
                                             <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={dayjs(quotationParam.date)}
+                                                    value={salePlanParam.date ? dayjs(salePlanParam.date) : dayjs()}
                                                     onChange={handleRegiDateChange}
+                                                />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col>
+                                            <Typography>예상매출일자</Typography>
+                                        </Col>
+                                        <Col>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '예상매출일자를 입력하세요.' }]}>
+                                                <DatePicker
+                                                    disabledDate={(current) => current && current.year() !== 2024}
+                                                    value={salePlanParam.expectedSalesDate ? dayjs(salePlanParam.expectedSalesDate) : dayjs()}
+                                                    onChange={handleExpectedDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>
@@ -1351,17 +1244,6 @@ const QuotationPage = ({initialData}) => {
                                                     addonBefore="담당자"
                                                     value={displayValues.managerName}
                                                     onClick={() => handleInputClick('managerName')}
-                                                    onFocus={(e) => e.target.blur()}
-                                                    suffix={<DownSquareOutlined />}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item style={{ marginBottom: 0 }} >
-                                                <Input
-                                                    addonBefore="출하창고"
-                                                    value={displayValues.warehouseName}
-                                                    onClick={() => handleInputClick('warehouseName')}
                                                     onFocus={(e) => e.target.blur()}
                                                     suffix={<DownSquareOutlined />}
                                                 />
@@ -1380,93 +1262,21 @@ const QuotationPage = ({initialData}) => {
                                         </Col>
                                     </Row>
 
-                                    <Row gutter={16} >
+                                    <Row gutter={16}>
+
                                         <Col span={6}>
                                             <Form.Item style={{ marginBottom: 0 }} >
                                                 <Input
-                                                    addonBefore="과세 유형"
-                                                    value={displayValues.vatType}
-                                                    onClick={() => handleInputClick('vatType')}
+                                                    addonBefore="출하창고"
+                                                    value={displayValues.warehouseName}
+                                                    onClick={() => handleInputClick('warehouseName')}
                                                     onFocus={(e) => e.target.blur()}
                                                     suffix={<DownSquareOutlined />}
                                                 />
                                             </Form.Item>
                                         </Col>
 
-                                        <Col span={6}>
-                                            <Form.Item name="journalEntry">
-                                                <Space.Compact>
-                                                    <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
-                                                    <Select
-                                                        style={{ width: '70%' }}
-                                                        value={quotationParam.journalEntryCode}
-                                                        onChange={(value) => {
-                                                            setQuotationParam((prevState) => ({
-                                                                ...prevState,
-                                                                journalEntryCode: value,
-                                                            }));
-                                                        }}
-                                                    >
-                                                        <Select.Option value="4">현금</Select.Option>
-                                                        <Select.Option value="5">외상</Select.Option>
-                                                        <Select.Option value="6">카드</Select.Option>
-
-                                                    </Select>
-                                                </Space.Compact>
-                                            </Form.Item>
-                                        </Col>
-
-                                        <Col span={6}>
-                                            <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                <Checkbox>세금계산서 발행 여부</Checkbox>
-                                            </Form.Item>
-                                        </Col>
-
-                                    </Row>
-
-                                    <Row gutter={16}>
-
-                                        <Col span={6}>
-                                            <Form.Item name="currency">
-                                                <Space.Compact>
-                                                    <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
-                                                    <Select
-                                                        style={{ width: '70%' }}
-                                                        value={quotationParam.currency}
-                                                        onChange={(value) => {
-                                                            setQuotationParam((prevState) => ({
-                                                                ...prevState,
-                                                                currency: value,
-                                                            }));
-                                                        }}
-                                                    >
-                                                        <Select.Option value="KRW">한국 [원]</Select.Option>
-                                                        <Select.Option value="USD">미국 [달러]</Select.Option>
-                                                        <Select.Option value="EUR">유럽 [유로]</Select.Option>
-                                                        <Select.Option value="JPY">일본 [엔]</Select.Option>
-                                                        <Select.Option value="CNY">중국 [위안]</Select.Option>
-                                                        <Select.Option value="GBP">영국 [파운드]</Select.Option>
-                                                    </Select>
-                                                </Space.Compact>
-                                            </Form.Item>
-                                        </Col>
-
-
-                                        {(quotationParam.currency !== '한국 [원]' && quotationParam.currency !== 'KRW') && (
-                                            <Col span={6}>
-                                                <Form.Item  style={{ marginBottom: 0 }} >
-                                                    <Input
-                                                        addonBefore="환율"
-                                                        value={quotationParam.exchangeRate}
-                                                        onClick={() => handleInputClick('exchangeRate')}
-                                                        onFocus={(e) => e.target.blur()}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                        )}
-
-
-                                        <Col span={12}>
+                                        <Col span={16}>
                                             <Form.Item name="remarks">
                                                 <Input addonBefore="비고" />
                                             </Form.Item>
@@ -1474,10 +1284,10 @@ const QuotationPage = ({initialData}) => {
 
                                     </Row>
 
-                                    {/* 견적서 상세 항목 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>견적서 상세 항목</Divider>
+                                    {/* 판매계획 상세 항목 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 상세 항목</Divider>
                                     <Table
-                                        dataSource={quotationParam?.quotationDetails || []}
+                                        dataSource={salePlanParam?.salePlanDetails || []}
                                         columns={[
                                             {
                                                 title: '품목',
@@ -1518,24 +1328,29 @@ const QuotationPage = ({initialData}) => {
                                                 dataIndex: 'price',
                                                 key: 'price',
                                                 align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                render: (text, record, index) => (
+
+                                                    <Input
+                                                        value={formatNumberWithComma(text)}
+                                                        onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'price')}
+                                                        className="small-text"
+                                                    />
+                                                ),
 
                                             },
                                             {
-                                                title: '공급가액',
-                                                dataIndex: 'supplyPrice',
-                                                key: 'supplyPrice',
+                                                title: '예상매출액',
+                                                dataIndex: 'expectedSales',
+                                                key: 'expectedSales',
                                                 align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                render: (text, record, index) => (
 
-                                            },
-                                            {
-                                                title: '부가세',
-                                                dataIndex: 'vat',
-                                                key: 'vat',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
+                                                    <Input
+                                                        value={formatNumberWithComma(text)}
+                                                        onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'expectedSales')}
+                                                        className="small-text"
+                                                    />
+                                                ),
                                             },
                                             {
                                                 title: '비고',
@@ -1592,4 +1407,4 @@ const QuotationPage = ({initialData}) => {
     );
 };
 
-export default QuotationPage;
+export default SalePlanPage;
