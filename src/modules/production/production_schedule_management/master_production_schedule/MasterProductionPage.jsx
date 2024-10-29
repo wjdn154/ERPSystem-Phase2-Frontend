@@ -112,18 +112,19 @@ const MasterProductionPage = () => {
     };
 
     const handleModalSelect = (record) => {
-        const selectedValue = getDisplayValue(currentField, record);
+        const selectedValueStr = getDisplayValue(currentField, record);
 
-        // 상태 업데이트 후 폼 필드 값 설정
-        setSelectedValue((prev) => {
-            const newValue = { ...prev, [currentField]: selectedValue };
-            form.setFieldsValue(newValue); // 상태가 반영된 후에 폼 필드 설정
-            return newValue; // 새로운 상태 반환
-        });
+        setSelectedValue((prev) => ({ ...prev, [currentField]: selectedValueStr }));
+        setSearchParams((prev) => ({ ...prev, [currentField]: selectedValueStr }));
+        console.log(`선택한 ${currentField}:`, selectedValueStr);
 
-        setSearchParams((prev) => ({ ...prev, [currentField]: selectedValue }));
-        console.log(`선택한 ${currentField}:`, selectedValue);
-        setIsModalVisible(false); // 모달 닫기
+        // setTimeout을 사용해서 상태 갱신 후 필터링 수행
+        setTimeout(() => {
+            console.log("모달에서 선택된 후의 searchParams:", searchParams);
+            // 이 시점에서 필터링을 다시 수행하거나, 필터링 로직을 확인할 수 있습니다.
+        }, 0);
+
+        setIsModalVisible(false);
     };
 
 
