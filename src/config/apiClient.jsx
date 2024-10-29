@@ -24,7 +24,6 @@ apiClient.interceptors.request.use((config) => {
 
     if(!token) {
         store.dispatch(logout());
-        return Promise.reject(new Error('JWT 토큰이 없습니다. 로그아웃 처리됨.'));
     }
 
     config.headers.Authorization = `Bearer ${token}`; // JWT 토큰을 헤더에 추가

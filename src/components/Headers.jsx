@@ -1,19 +1,20 @@
 import React from 'react';
-import {Layout, Row, Col, Avatar, Dropdown, Button, notification} from 'antd';
+import {Badge, Layout, Row, Col, Avatar, Dropdown, Button, notification} from 'antd';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../config/redux/authSlice.jsx";
-import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Box, Grid, Grow } from '@mui/material';
-import {useNotificationContext} from "../config/NotificationContext.jsx";
+import {UserOutlined, DownOutlined, LogoutOutlined, BellOutlined} from '@ant-design/icons';
+import apiClient from "../config/apiClient.jsx";
+import {COMMON_API} from "../config/apiConstants.jsx";
+import {jwtDecode} from "jwt-decode";
 
 const { Header } = Layout;
 
-function Headers() {
+function Headers({ eventSourceRef }) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const userNickname = useSelector(state => state.auth.userNickname);
+    const { token, userNickname } = useSelector((state) => state.auth);
 
     const handleProfile = () => {
         notification.error({
@@ -30,13 +31,23 @@ function Headers() {
             ),
             placement: 'top',
         });
-    }
+    };
 
     // 로그아웃 처리
     const handleLogout = () => {
-        Cookies.remove('jwt'); // JWT 토큰 삭제
-        dispatch(logout());
-        navigate('/login');
+        try {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+            apiClient.post(COMMON_API.NOTIFICATION_UNSUBSCRIBE_API, {
+                employeeId: jwtDecode(token).employeeId,
+            }).then(() => {
+                Cookies.remove('jwt'); // JWT 토큰 삭제
+                dispatch(logout());
+                navigate('/login');
+            });
+        } catch (error) {
+            console.error("구독 해제 에러:", error);
+        }
     };
 
     // 사용자 메뉴 아이템
@@ -55,13 +66,26 @@ function Headers() {
             label: '로그아웃',
             icon: <LogoutOutlined />,
             onClick: handleLogout,
-        }
+        },
+    ];
+
+    // 알림 메뉴 아이템
+    const notificationItems = [
+        { key: '1', label: '새로운 알림asdasdasasd 1' },
+        { key: '2', label: '새로운 알림 2' },
+        { key: '3', label: '새로운 알림 3' },
     ];
 
     return (
         <Header style={styles.header}>
-            <Row justify="space-between" align="middle" style={styles.row}>
-                <Box />
+            <Row align="middle" style={styles.row}>
+                <Col style={{ marginRight: '20px'}}>
+                    <Dropdown menu={{ items: notificationItems }} trigger={['click']}>
+                        <Badge count={1} offset={[-5, 5]}>
+                            <BellOutlined style={styles.notificationIcon} />
+                        </Badge>
+                    </Dropdown>
+                </Col>
                 <Col>
                     {userNickname ? (
                         <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
@@ -96,11 +120,8 @@ const styles = {
     },
     row: {
         width: '100%',
-        color: '#000',
-    },
-    img: {
-        width: '80px',
-        cursor: 'pointer',
+        display: 'flex',
+        justifyContent: 'flex-end'
     },
     userSection: {
         display: 'flex',
@@ -108,8 +129,8 @@ const styles = {
         cursor: 'pointer',
     },
     userNickname: {
-        marginLeft: '10px',
-        marginRight: '10px',
+        marginLeft: '8px',
+        marginRight: '8px',
         fontWeight: 'bold',
         color: '#000',
     },
@@ -118,6 +139,12 @@ const styles = {
     },
     avatar: {
         backgroundColor: '#1890ff',
+    },
+    notificationIcon: {
+        fontSize: '20px',
+        color: '#1890ff',
+        marginRight: '10px',
+        cursor: 'pointer',
     },
 };
 
