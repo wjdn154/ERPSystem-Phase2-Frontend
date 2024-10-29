@@ -29,7 +29,7 @@ import {
 import apiClient from "../../../../config/apiClient.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import dayjs from "dayjs";
-import {BookOutlined, DownSquareOutlined, InfoCircleOutlined, SearchOutlined} from "@ant-design/icons";
+import {BookOutlined, DownSquareOutlined, InfoCircleOutlined, ReloadOutlined, SearchOutlined} from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -50,16 +50,9 @@ const ProductionRequestPage = () => {
         requestName: '',
         requestType: '',
         progressType: '',
-        isConfirmed: '',
+        isConfirmed: undefined,
     });
-    const [searchDetailParams, setSearchDetailParams] = useState({
-        startRequestDate: null,
-        endRequestDate: null,
-        requestName: '',
-        requestType: '',
-        progressType: '',
-        isConfirmed: '',
-    });
+
     const [modalData, setModalData] = useState(null);
     const [initialModalData, setInitialModalData] = useState(null);
     const [selectedValue, setSelectedValue] = useState({});
@@ -290,21 +283,85 @@ const ProductionRequestPage = () => {
 
     // 검색 처리
     const handleSearch = async () => {
+        console.log("handleSearch searchParams 검색 조건:", searchParams);  // 검색 조건 확인
         const { startRequestDate, endRequestDate, requestName, requestType, progressType, isConfirmed } = searchParams;
-        if (!startRequestDate || !endRequestDate) {
-            notify('warning', '검색 오류', '데이터 조회 중 오류가 발생했습니다.');
-            return;
-        }
+
         try {
             setIsLoading(true);
-            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_LIST_API, searchParams);
-            setProductionRequests(response.data);
+            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_REQUEST_LIST_API);
+
+            const filteredData = response.data.filter((item) => {
+                const {
+                    requestName, requestType, progressType, isConfirmed,
+                    startRequestDate, endRequestDate,
+                } = searchParams;
+
+                // filtering conditions
+                const matchName = !searchParams.requestName || item.name.toLowerCase().includes(searchParams.requestName.toLowerCase().trim());
+                const matchType = !searchParams.requestType || item.requestType === searchParams.requestType;
+                const matchProgress = !searchParams.progressType || item.progressType === searchParams.progressType;
+                const matchConfirmed = searchParams.isConfirmed === undefined || item.isConfirmed === searchParams.isConfirmed;
+
+                const matchStartDate =
+                    !searchParams.startRequestDate ||
+                    new Date(item.requestDate) >= new Date(searchParams.startRequestDate);
+
+                const matchEndDate =
+                    !searchParams.endRequestDate ||
+                    new Date(item.requestDate) <= new Date(searchParams.endRequestDate);
+
+                // const matchStartDate = !searchParams.startRequestDate || dayjs(item.requestDate).isSameOrAfter(dayjs(searchParams.startRequestDate));
+                // const matchEndDate = !searchParams.endRequestDate || dayjs(item.requestDate).isSameOrBefore(dayjs(searchParams.endRequestDate));
+
+                // 조건 중 하나라도 false가 나오면 해당 항목은 제외됨
+                return (
+                    matchName && matchType && matchProgress && matchConfirmed && matchStartDate && matchEndDate
+                )
+            })
+
+            console.log("Filtered Data:", filteredData);
+
+            if (filteredData.length === 0) {
+                notify('info', '조회 결과 없음', '조건에 맞는 데이터가 없습니다.', 'top');
+            }
+
+            setProductionRequests(filteredData); // 필터링된 데이터로 상태 갱신
+            notify('success', '조회 성공', '데이터 검색 조회 성공.', 'bottomRight');
+
         } catch (error) {
-            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.');
+            console.error("handleSearch API 호출 오류:", error);
+
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
             setIsLoading(false);
         }
     };
+
+    const handleResetSearch = () => {
+        setSearchParams({
+            startRequestDate: null,
+            endRequestDate: null,
+            requestName: '',
+            requestType: '',
+            progressType: '',
+            isConfirmed: undefined,
+        }); // 초기 상태로 검색 조건을 리셋합니다.
+        form.resetFields();     // 폼 필드 초기화
+
+        // 폼 필드에 초기값 강제 설정 (입력 필드에 표시되는 값 제거)
+        form.setFieldsValue({
+            startRequestDate: null,
+            endRequestDate: null,
+            requestName: '',
+            requestType: '',
+            progressType: '',
+            isConfirmed: undefined,
+        });
+
+        fetchProductionRequests();
+
+    }
+
 
     const productionRequestColumns = [
         {
@@ -440,8 +497,8 @@ const ProductionRequestPage = () => {
                                 <Typography variant="h6" sx={{ padding: '20px' }} >생산의뢰 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
-                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
-                                            <Col flex="1">
+                                        <Row gutter={16}>
+                                            <Col span={5}>
                                                 <Form.Item name="id" hidden>
                                                     <Input />
                                                 </Form.Item>
@@ -451,9 +508,12 @@ const ProductionRequestPage = () => {
                                                         placeholder="의뢰 구분"
                                                         value={searchParams.requestType || undefined}
                                                         onChange={(value) => {
-                                                            const updatedParam = { ...productionRequestParam, requestType: value };
-                                                            setProductionRequestParam(updatedParam);
-                                                            form.setFieldsValue(updatedParam);
+                                                            setSearchParams((prev) => ({
+                                                                ...prev,
+                                                                requestType: value,
+                                                            })); // 상태를 업데이트합니다.
+
+                                                            form.setFieldsValue({ requestType: value }); // 폼 필드 동기화
                                                         }}
                                                     >
                                                         <Select.Option value="Mass Production">양산</Select.Option>
@@ -464,26 +524,18 @@ const ProductionRequestPage = () => {
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
-                                            <Col flex="1">
-                                                <Form.Item name="name" label="의뢰명" tooltip="검색할 생산 의뢰명을 입력하세요">
-                                                    <Space.Compact style={{ width: '100%' }}>
-                                                        <Input
-                                                            placeholder="의뢰명"
-                                                            value={searchParams.requestName}
-                                                            onChange={(e) => setSearchParams({ ...searchParams, requestName: e.target.value })}
-                                                        />
-                                                    </Space.Compact>
-                                                </Form.Item>
-                                            </Col>
-                                            <Col flex="1">
+                                            <Col span={5}>
                                                 <Form.Item label="진행 상태" tooltip="검색할 진행 상태를 선택하세요">
                                                     <Select
                                                         placeholder="진행 상태"
                                                         value={searchParams.progressType || undefined}
                                                         onChange={(value) => {
-                                                            const updatedParam = { ...productionRequestParam, progressType: value };
-                                                            setProductionRequestParam(updatedParam);
-                                                            form.setFieldsValue(updatedParam);
+                                                            setSearchParams((prev) => ({
+                                                                ...prev,
+                                                                progressType: value,
+                                                            })); // 상태를 업데이트합니다.
+
+                                                            form.setFieldsValue({ progressType: value }); // 폼 필드 동기화
                                                         }}
                                                     >
                                                         <Select.Option value="Created">등록</Select.Option>
@@ -495,15 +547,18 @@ const ProductionRequestPage = () => {
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
-                                            <Col flex="1">
+                                            <Col span={5}>
                                                 <Form.Item label="확정 여부" tooltip="확정 여부를 선택하세요">
                                                     <Select
                                                         placeholder="확정 여부"
                                                         value={searchParams.isConfirmed}
                                                         onChange={(value) => {
-                                                            const updatedParam = { ...productionRequestParam, isConfirmed: value };
-                                                            setProductionRequestParam(updatedParam);
-                                                            form.setFieldsValue(updatedParam);
+                                                            setSearchParams((prev) => ({
+                                                                ...prev,
+                                                                isConfirmed: value,
+                                                            })); // 상태를 업데이트합니다.
+
+                                                            form.setFieldsValue({ isConfirmed: value }); // 폼 필드 동기화
                                                         }}
                                                     >
                                                         <Select.Option value={true}>확정됨</Select.Option>
@@ -511,29 +566,49 @@ const ProductionRequestPage = () => {
                                                     </Select>
                                                 </Form.Item>
                                             </Col>
-                                            <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                        </Row>
+
+                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
                                                 <Col flex="1">
-                                                    <Form.Item label="조회 기간" required tooltip="검색할 기간의 시작일과 종료일을 선택하세요">
+                                                    <Form.Item name="name" label="의뢰명" tooltip="검색할 생산 의뢰명을 입력하세요">
+                                                        <Space.Compact style={{ width: '100%' }}>
+                                                            <Input
+                                                                placeholder="의뢰명"
+                                                                value={searchParams.requestName || ''} // 초기값을 빈 문자열로 설정
+                                                                // onChange={(e) => setSearchParams({ ...searchParams, requestName: e.target.value }) // searchParams를 바로 참조하는 방식이라 비동기적 상태 변경 시 예기치 않은 결과 발생
+                                                                onChange={(e) => setSearchParams((prev) => ({
+                                                                    ...prev,// 안정성과 일관성을 위해 함수형 업데이트 방식(prev)을 사용하는 것이 더 좋습니다. 기존의 searchParams 상태를 담고 있는 새 복사객체
+                                                                    requestName: e.target.value,
+                                                                }))}
+                                                            />
+                                                        </Space.Compact>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col flex="1">
+                                                    <Form.Item label="요청일 조회 기간" tooltip="검색할 요청기간의 시작일과 종료일을 선택하세요">
                                                         <RangePicker
+                                                            value={[
+                                                                searchParams.startRequestDate ? dayjs(searchParams.startRequestDate) : null,
+                                                                searchParams.endRequestDate ? dayjs(searchParams.endRequestDate) : null,
+                                                            ]}
                                                             onChange={(dates) => {
-                                                                if (dates) {
-                                                                    setSearchParams({
-                                                                        ...searchParams,
-                                                                        startRequestDate: dates[0].format('YYYY-MM-DD'),
-                                                                        endRequestDate: dates[1].format('YYYY-MM-DD'),
-                                                                    });
-                                                                }
+                                                                setSearchParams((prev) => ({
+                                                                    ...prev,
+                                                                    startRequestDate: dates ? dates[0].format('YYYY-MM-DD') : null,
+                                                                    endRequestDate: dates ? dates[1].format('YYYY-MM-DD') : null,
+                                                                }));
                                                             }}
                                                         />
                                                     </Form.Item>
+
                                                 </Col>
                                                 <Col>
                                                     <Form.Item>
                                                         <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />}>검색</Button>
+                                                        <Button style={{ marginLeft: '8px' }} onClick={handleResetSearch} icon={<ReloadOutlined />}>초기화</Button>
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-                                        </Row>
                                     </Form>
                                 </Grid>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
