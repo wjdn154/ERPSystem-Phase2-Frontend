@@ -144,8 +144,9 @@ export const EMPLOYEE_API = {
     SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
     TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
     SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
-    UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/api/hr/transfer/update/${id}`,
+    UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/transfer/update/${id}`,
     TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
+    UPDATE_TRANSFER_TYPE_API:(id) => `${API_BASE_URL}/api/hr/transferType/update/${id}`,
 
 
     //  인사관리 - 급여
