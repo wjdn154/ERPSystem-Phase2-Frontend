@@ -243,7 +243,7 @@ export const subMenuItems = {
         {
             text: '출고관리',
             items: [
-                { text: '출고예정', component: 'OutgoingSchedulePage', apiPath: undefined, url: '/logistics/outbound-management/expected', requiredPermission: 'outboundExpectedPermission', permissionLevel: 'GENERAL' },  // 출고예정 권한
+                { text: '출고예정', component: 'OutgoingSchedulePage', apiPath: LOGISTICS_API.SHIPPING_ORDER_LIST_API, url: '/logistics/outbound-management/expected', requiredPermission: 'outboundExpectedPermission', permissionLevel: 'GENERAL' },  // 출고예정 권한
                 { text: '출고예정현황', component: 'OutgoingStatusPage', apiPath: undefined, url: '/logistics/outbound-management/expected-status', requiredPermission: 'outboundExpectedStatusPermission', permissionLevel: 'GENERAL' },  // 출고예정현황 권한
                 { text: '출고처리', component: 'OutgoingProcessingPage', apiPath: undefined, url: '/logistics/outbound-management/processing', requiredPermission: 'outboundProcessingPermission', permissionLevel: 'GENERAL' },  // 출고처리 권한
             ]
