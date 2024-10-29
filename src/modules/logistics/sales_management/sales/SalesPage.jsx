@@ -33,8 +33,17 @@ const SalesPage = ({initialData}) => {
     const [editSales, setEditSales] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [clientSearch, setClientSearch] = useState(
+        {
+            clientId: null,
+            clientName: null
+        }
+    );
 
-
+    useEffect(() => {
+        // quotationList가 업데이트될 때마다 searchData를 최신 상태로 설정
+        setSearchData(salesList);
+    }, [salesList]);
 
     useEffect(() => {
 
@@ -44,12 +53,17 @@ const SalesPage = ({initialData}) => {
         form.setFieldsValue({
             salesOrderDetails: saleDetails,
         })
-        setSalesParam(detailSales);
+
+        setSalesParam((prevParam) => ({
+            ...prevParam,
+            ...detailSales,
+        }));
 
         setDisplayValues({
             managerName: detailSales.managerCode ? `[${detailSales.managerCode}] ${detailSales.managerName}` : null,
             warehouseName:  detailSales.warehouseCode ? `[${detailSales.warehouseCode}] ${detailSales.warehouseName}` : null,
             client: detailSales.clientId ?`[${detailSales.clientId}] ${detailSales.clientName}` : null,
+            clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
             vatType: detailSales.vatCode ? `[${detailSales.vatCode}] ${detailSales.vatName}` : null
 
         }, [detailSales, form, saleDetails]);
@@ -67,16 +81,24 @@ const SalesPage = ({initialData}) => {
 
 
     const handleTabChange = (key) => {
+        setActiveTabKey(key);
         setEditSales(false);
         setEditingRow(null);
-        setSaleDetails(null)
-
+        setSalesParam({
+            saleDetails: [],
+            date: dayjs().format('YYYY-MM-DD'),
+        });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        });
+        setDetailSales(salesParam.saleDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
-
-        setActiveTabKey(key);
     };
 
     // 날짜 선택 처리
@@ -140,7 +162,7 @@ const SalesPage = ({initialData}) => {
         setIsLoading(true);
         let apiPath;
 
-        if(fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
+        if((fieldName === 'client') || (fieldName === 'clientSearch')) apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
@@ -168,13 +190,14 @@ const SalesPage = ({initialData}) => {
     };
 
     const handleModalCancel = () => {
-        if(currentField === 'client'){
+        if((currentField === 'client') || (currentField === 'clientSearch')){
             setSearchParams({
                 clientId: null,
             })
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 client: null,
+                clientSearch: null
             }));
         }
         setCurrentField(null);
@@ -222,15 +245,25 @@ const SalesPage = ({initialData}) => {
                         name: record.printClientName,
                     },
                 }));
-                setSearchParams((prevParams) => ({
-                    ...prevParams,
-                    clientId: record.id,
-                }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
                     client: `[${record.id}] ${record.printClientName}`,
                 }));
                 break;
+
+            case 'clientSearch':
+
+                setSearchParams((prevParams) => ({
+                    ...prevParams,
+                    clientId: record.id,
+
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    clientSearch: `[${record.id}] ${record.printClientName}`,
+                }));
+                break;
+
 
             case 'product':
                 // 제품 선택 시 해당 제품을 상태에 반영
@@ -239,9 +272,11 @@ const SalesPage = ({initialData}) => {
                 console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('price', record.salesPrice, editingRow);
+                updateField('remarks', record.remarks, editingRow)
 
                 const { quantity } = updatedDetails[editingRow].quantity;
                 const supplyPrice = calculateSupplyPrice(quantity, (record.salesPrice));
@@ -260,13 +295,13 @@ const SalesPage = ({initialData}) => {
                 setSalesParam((prevParams) => ({
                     ...prevParams,
                     vatType: {
-                        code: record.code,
-                        name: record.name,
+                        code: record.vatTypeCode,
+                        name: record.vatTypeName,
                     },
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    vatType: `[${record.code}] ${record.name}`,
+                    vatType: `[${record.vatTypeCode}] ${record.vatTypeName}`,
                 }));
                 break;
         }
@@ -398,7 +433,7 @@ const SalesPage = ({initialData}) => {
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
         console.log('Form values:', values); // 폼 값 확인
-        console.log('detailPurchaseOrder', detailPurchaseOrder)
+        console.log('detailSales', detailSales)
         console.log('salesParam: ', salesParam)
         confirm({
             title: '저장 확인',
@@ -408,13 +443,14 @@ const SalesPage = ({initialData}) => {
             onOk: async () => {
                 try {
                     const salesData = {
-                        clientId: salesParam.clientId,
-                        managerId: salesParam.managerId,
-                        warehouseId: salesParam.warehouseId,
+                        clientId: salesParam.client ? salesParam.client.id : salesParam.clientId,
+                        managerId: salesParam.manager ? salesParam.manager.id : salesParam.managerId,
+                        warehouseId: salesParam.warehouse ? salesParam.warehouse.id : salesParam.warehouseId,
                         currencyId: salesParam.currencyId,
                         date: salesParam.date,
-                        deliveryDate: salesParam.deliveryDate,
-                        vatType: salesParam.vatType,
+                        vatId: salesParam.vatType ? Number(salesParam.vatType.code) : salesParam.vatId,
+                        journalEntryCode: salesParam.journalEntryCode,
+                        electronicTaxInvoiceStatus: salesParam.electronicTaxInvoiceStatus,
                         items: Array.isArray(salesParam.saleDetails
                         ) ? salesParam.saleDetails.map(item => ({
                             productId: item.productId,
@@ -426,7 +462,7 @@ const SalesPage = ({initialData}) => {
 
                     console.log('Sending data to API:', salesData); // API로 전송할 데이터 확인
 
-                    const API_PATH = type === 'update' ? LOGISTICS_API.SALES_UPDATE_API(salesParam.id) : LOGISTICS_API.PURCHASE_ORDER_CREATE_API;
+                    const API_PATH = type === 'update' ? LOGISTICS_API.SALES_UPDATE_API(salesParam.id) : LOGISTICS_API.SALES_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
 
                     const response = await apiClient[method](API_PATH, salesData, {
@@ -438,17 +474,27 @@ const SalesPage = ({initialData}) => {
                     const updatedData = response.data;
 
                     if (type === 'update') {
-                        setPurchaseOrderList((prevList) =>
+                        setSalesList((prevList) =>
                             prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
                         );
                     } else {
-                        setPurchaseOrderList((prevList) => [...prevList, updatedData]);
+                        setSalesList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
                     }
+                    handleSearch()
 
-                    setEditPurchaseOrder(false);
-                    setDetailPurchaseOrder(null);
-                    setPurchaseOrderParam(null);
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
+
+                    setEditSales(false);
+                    setSalesParam({
+                        saleDetails: [],
+                    });
+                    setDetailSales(salesParam.saleDetails || []);
                     setDisplayValues({});
 
                     type === 'update'
@@ -610,8 +656,8 @@ const SalesPage = ({initialData}) => {
                                                     >
                                                         <Input
                                                             placeholder="거래처"
-                                                            value={displayValues.client}
-                                                            onClick={() => handleInputClick('client')}
+                                                            value={displayValues.clientSearch}
+                                                            onClick={() => handleInputClick('clientSearch')}
                                                             className="search-input"
                                                             style={{ width: '100%' }}
                                                             suffix={<DownSquareOutlined />}
@@ -650,7 +696,7 @@ const SalesPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? salesList : searchData} // 발주서 리스트 데이터
+                                        dataSource={searchData} // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -786,8 +832,17 @@ const SalesPage = ({initialData}) => {
                                                 </Col>
 
                                                 <Col span={6}>
-                                                    <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                        <Checkbox>세금계산서 발행 여부</Checkbox>
+                                                    <Form.Item name="electronicTaxInvoiceStatus">
+                                                        <Checkbox
+                                                            onChange={(e) => {
+                                                                setSalesParam((prevState) => ({
+                                                                    ...prevState,
+                                                                    electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
+                                                                }));
+                                                            }}
+                                                        >
+                                                            세금계산서 발행 여부
+                                                        </Checkbox>
                                                     </Form.Item>
                                                 </Col>
 
@@ -803,9 +858,19 @@ const SalesPage = ({initialData}) => {
                                                                 style={{ width: '70%' }}
                                                                 value={salesParam.currency}
                                                                 onChange={(value) => {
+                                                                    const currencyIdMapping = {
+                                                                        KRW: 6,
+                                                                        USD: 1,
+                                                                        EUR: 2,
+                                                                        JPY: 3,
+                                                                        CNY: 4,
+                                                                        GBP: 5,
+                                                                    };
+
                                                                     setSalesParam((prevState) => ({
                                                                         ...prevState,
                                                                         currency: value,
+                                                                        currencyId: currencyIdMapping[value],
                                                                     }));
                                                                 }}
                                                             >
@@ -1020,6 +1085,56 @@ const SalesPage = ({initialData}) => {
                             </>
                         )}
 
+                        {/* 거래처 검색 선택 모달 */}
+                        {currentField === 'clientSearch' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    거래처 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.id && item.id.toString().toLowerCase().includes(value)) ||
+                                                    (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                {modalData && (
+
+                                    <Table
+                                        columns={[
+                                            { title: '코드', dataIndex: 'id', key: 'id', align: 'center' },
+                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
+                                        ]}
+                                        dataSource={modalData}
+                                        rowKey="id"
+                                        size="small"
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: () => handleModalSelect(record) // 선택 시 처리
+                                        })}
+                                    />
+                                )}
+                            </>
+                        )}
+
                         {/* 담당자 선택 모달 */}
                         {currentField === 'managerName' && (
                             <>
@@ -1175,10 +1290,25 @@ const SalesPage = ({initialData}) => {
 
                                     <Table
                                         columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '과세명', dataIndex: 'name', key: 'name', align: 'center' }
+                                            {
+                                                title: '코드',
+                                                dataIndex: 'vatTypeCode',
+                                                key: 'vatTypeCode',
+                                                align: 'center'
+                                            },
+                                            {
+                                                title: '과세명',
+                                                dataIndex: 'vatTypeName',
+                                                key: 'vatTypeName',
+                                                align: 'center',
+                                                render: (text, record) => (
+                                                    <Tooltip title={record.description}>
+                                                        <span>{text}</span>
+                                                    </Tooltip>
+                                                )
+                                            }
                                         ]}
-                                        dataSource={modalData}
+                                        dataSource={modalData[0].salesVatTypeShowDTO}
                                         rowKey="code"
                                         size="small"
                                         pagination={{
@@ -1277,8 +1407,8 @@ const SalesPage = ({initialData}) => {
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
                                     initialValues={detailSales}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
                                     {/* 판매서 정보 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매서 정보</Divider>
@@ -1370,8 +1500,17 @@ const SalesPage = ({initialData}) => {
                                         </Col>
 
                                         <Col span={6}>
-                                            <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                <Checkbox>세금계산서 발행 여부</Checkbox>
+                                            <Form.Item name="electronicTaxInvoiceStatus">
+                                                <Checkbox
+                                                    onChange={(e) => {
+                                                        setSalesParam((prevState) => ({
+                                                            ...prevState,
+                                                            electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
+                                                        }));
+                                                    }}
+                                                >
+                                                    세금계산서 발행 여부
+                                                </Checkbox>
                                             </Form.Item>
                                         </Col>
 
@@ -1387,9 +1526,19 @@ const SalesPage = ({initialData}) => {
                                                         style={{ width: '70%' }}
                                                         value={salesParam.currency}
                                                         onChange={(value) => {
+                                                            const currencyIdMapping = {
+                                                                KRW: 6,
+                                                                USD: 1,
+                                                                EUR: 2,
+                                                                JPY: 3,
+                                                                CNY: 4,
+                                                                GBP: 5,
+                                                            };
+
                                                             setSalesParam((prevState) => ({
                                                                 ...prevState,
                                                                 currency: value,
+                                                                currencyId: currencyIdMapping[value],
                                                             }));
                                                         }}
                                                     >

@@ -29,36 +29,35 @@ const SalePlanPage = ({initialData}) => {
     const [salePlanDetails, setSalePlanDetails] = useState(detailSalePlan?.salePlanDetails || []);
     const [salePlanParam, setSalePlanParam] = useState({
         salePlanDetails: [],
-        date: dayjs(),  // 기본 현재 날짜로 설정
-        expectedSalesDate: dayjs(),  // 기본 현재 날짜로 설정
     });
     const [form] = Form.useForm();
     const [editSalePlan, setEditSalePlan] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
-
-
+    const [clientSearch, setClientSearch] = useState(
+        {
+            clientId: null,
+            clientName: null
+        }
+    );
 
     useEffect(() => {
-        console.log("useEffect for detailSalePlan triggered"); // 확인용 로그
+        setSearchData(salePlanList);
+    }, [salePlanList]);
+
+    useEffect(() => {
 
         if(!detailSalePlan) return;
 
-        console.log("detailSalePlan:", detailSalePlan); // 값 확인
-        console.log("Initial salePlanParam:", salePlanParam); // 값 확인
 
         form.setFieldsValue(detailSalePlan);
         form.setFieldsValue({
             salePlanDetails: salePlanDetails,
         })
 
-        console.log('salePlanDetails: ', salePlanDetails)
-
         setSalePlanParam((prevParam) => ({
             ...prevParam,
             ...detailSalePlan,
-            date: detailSalePlan.date ? dayjs(detailSalePlan.date) : dayjs(),
-            expectedSalesDate: detailSalePlan.expectedSalesDate ? dayjs(detailSalePlan.expectedSalesDate) : dayjs(),
         }));
 
         console.log('SalePlanParam', salePlanParam)
@@ -67,6 +66,7 @@ const SalePlanPage = ({initialData}) => {
             managerName: detailSalePlan.managerCode ? `[${detailSalePlan.managerCode}] ${detailSalePlan.managerName}` : null,
             warehouseName:  detailSalePlan.warehouseCode ? `[${detailSalePlan.warehouseCode}] ${detailSalePlan.warehouseName}` : null,
             client: detailSalePlan.clientId ?`[${detailSalePlan.clientId}] ${detailSalePlan.clientName}` : null,
+            clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
 
         });
 
@@ -83,20 +83,26 @@ const SalePlanPage = ({initialData}) => {
 
 
     const handleTabChange = (key) => {
+
         setActiveTabKey(key);
         setEditSalePlan(false);
         setEditingRow(null);
-        // setSalePlanDetails(detailSalePlan?.salePlanDetails || [])
         setSalePlanParam({
             salePlanDetails: [],
-            date: dayjs(),
-            expectedSalesDate: dayjs(),
+            date: dayjs().format('YYYY-MM-DD'),
+            expectedSalesDate: dayjs().format('YYYY-MM-DD'),
         });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        })
+        setDetailSalePlan(salePlanParam.salePlanDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
-
 
     };
 
@@ -132,7 +138,7 @@ const SalePlanPage = ({initialData}) => {
     };
 
     const handleSearch = async () => {
-        const { startDate, endDate, clientCode, state } = searchParams;
+        const { startDate, endDate, clientId, state } = searchParams;
 
         try {
             const response = await apiClient.post(LOGISTICS_API.SALE_PLAN_LIST_API, searchParams);
@@ -163,7 +169,7 @@ const SalePlanPage = ({initialData}) => {
         setIsLoading(true);
         let apiPath;
 
-        if(fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
+        if((fieldName === 'client') || (fieldName === 'clientSearch')) apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
@@ -190,13 +196,14 @@ const SalePlanPage = ({initialData}) => {
     };
 
     const handleModalCancel = () => {
-        if(currentField === 'client'){
+        if((currentField === 'client') || (currentField === 'clientSearch')){
             setSearchParams({
                 clientId: null,
             })
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 client: null,
+                clientSearch: null
             }));
         }
         setCurrentField(null);
@@ -244,13 +251,22 @@ const SalePlanPage = ({initialData}) => {
                         name: record.printClientName,
                     },
                 }));
-                setSearchParams((prevParams) => ({
-                    ...prevParams,
-                    clientId: record.id,
-                }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
                     client: `[${record.id}] ${record.printClientName}`,
+                }));
+                break;
+
+            case 'clientSearch':
+
+                setSearchParams((prevParams) => ({
+                    ...prevParams,
+                    clientId: record.id,
+
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    clientSearch: `[${record.id}] ${record.printClientName}`,
                 }));
                 break;
 
@@ -289,7 +305,7 @@ const SalePlanPage = ({initialData}) => {
             ...prevState,
             date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
-        console.log(salePlanParam)
+        console.log(salePlanParam.date)
     };
 
     const handleExpectedDateChange = (date) => {
@@ -297,7 +313,7 @@ const SalePlanPage = ({initialData}) => {
             ...prevState,
             expectedSalesDate: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
-        console.log(salePlanParam)
+        console.log(salePlanParam.date)
     };
 
     // 필드 값 변경 시 호출되는 함수
@@ -424,7 +440,7 @@ const SalePlanPage = ({initialData}) => {
                         clientId: salePlanParam.client ? salePlanParam.client.id : salePlanParam.clientId,
                         managerId: salePlanParam.manager ? salePlanParam.manager.id : salePlanParam.managerId,
                         warehouseId: salePlanParam.warehouse ? salePlanParam.warehouse.id : salePlanParam.warehouseId,
-                        date: salePlanParam.date,
+                        date: dayjs(salePlanParam.date).format('YYYY-MM-DD'),
                         expectedSalesDate: salePlanParam.expectedSalesDate,
                         items: Array.isArray(salePlanParam.salePlanDetails
                         ) ? salePlanParam.salePlanDetails.map(item => ({
@@ -458,16 +474,25 @@ const SalePlanPage = ({initialData}) => {
                     } else {
                         setSalePlanList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
+                        console.log("일로옴??")
                         console.log('salePlanList: ', salePlanList)
                     }
 
-                    const data = await handleSearch();
-                    setSalePlanList(data);
+                    console.log('searchParams:', searchParams)
+                    handleSearch()
 
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
 
                     setEditSalePlan(false);
-                    setDetailSalePlan(null);
-                    setSalePlanParam(null);
+                    setSalePlanParam({
+                        salePlanDetails: [],
+                    });
+                    setDetailSalePlan(salePlanParam.salePlanDetails || []);
                     setDisplayValues({});
 
                     type === 'update'
@@ -602,8 +627,8 @@ const SalePlanPage = ({initialData}) => {
                                                     >
                                                         <Input
                                                             placeholder="거래처"
-                                                            value={displayValues.client}
-                                                            onClick={() => handleInputClick('client')}
+                                                            value={displayValues.clientSearch}
+                                                            onClick={() => handleInputClick('clientSearch')}
                                                             className="search-input"
                                                             style={{ width: '100%' }}
                                                             suffix={<DownSquareOutlined />}
@@ -642,7 +667,7 @@ const SalePlanPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? salePlanList : searchData} // 판매계획 리스트 데이터
+                                        dataSource={searchData} // 판매계획 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -900,6 +925,56 @@ const SalePlanPage = ({initialData}) => {
 
                         {/* 거래처 선택 모달 */}
                         {currentField === 'client' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    거래처 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.id && item.id.toString().toLowerCase().includes(value)) ||
+                                                    (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                {modalData && (
+
+                                    <Table
+                                        columns={[
+                                            { title: '코드', dataIndex: 'id', key: 'id', align: 'center' },
+                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
+                                        ]}
+                                        dataSource={modalData}
+                                        rowKey="id"
+                                        size="small"
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: () => handleModalSelect(record) // 선택 시 처리
+                                        })}
+                                    />
+                                )}
+                            </>
+                        )}
+
+                        {/* 거래처 검색 선택 모달 */}
+                        {currentField === 'clientSearch' && (
                             <>
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     거래처 선택
@@ -1218,7 +1293,7 @@ const SalePlanPage = ({initialData}) => {
                                             <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={salePlanParam.date ? dayjs(salePlanParam.date) : dayjs()}
+                                                    value={dayjs(salePlanParam.date)}
                                                     onChange={handleRegiDateChange}
                                                 />
                                             </Form.Item>
@@ -1230,7 +1305,7 @@ const SalePlanPage = ({initialData}) => {
                                             <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '예상매출일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={salePlanParam.expectedSalesDate ? dayjs(salePlanParam.expectedSalesDate) : dayjs()}
+                                                    value={dayjs(salePlanParam.expectedSalesDate)}
                                                     onChange={handleExpectedDateChange}
                                                 />
                                             </Form.Item>

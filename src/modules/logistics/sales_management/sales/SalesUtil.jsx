@@ -13,10 +13,10 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '판매 보고서',
+            label: '판매 입력',
             children: (
                 <Typography>
-                    판매 실적을 분석한 보고서를 확인하고, 기간별, 제품별 통계를 제공함.
+                    진행 중인 판매를 관리하며, 상태를 업데이트하거나 필요한 정보를 입력할 수 있음.
                 </Typography>
             ),
         },

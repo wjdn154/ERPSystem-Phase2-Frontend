@@ -30,12 +30,21 @@ const QuotationPage = ({initialData}) => {
         quotationDetails: [], });
     const [detailQuotation, setDetailQuotation] = useState(false);
     const [form] = Form.useForm();
-    const [quotationDetails, setQuotationDetails] = useState(detailQuotation.quotationDetails || []);
+    const [quotationDetails, setQuotationDetails] = useState(detailQuotation?.quotationDetails || []);
     const [editQuotation, setEditQuotation] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [clientSearch, setClientSearch] = useState(
+        {
+            clientId: null,
+            clientName: null
+        }
+    );
 
-
+    useEffect(() => {
+        // quotationList가 업데이트될 때마다 searchData를 최신 상태로 설정
+        setSearchData(quotationList);
+    }, [quotationList]);
 
     useEffect(() => {
 
@@ -43,17 +52,21 @@ const QuotationPage = ({initialData}) => {
 
         form.setFieldsValue(detailQuotation);
         form.setFieldsValue({
-            quotationOrderDetails: quotationDetails,
+            quotationDetails: quotationDetails,
         })
-        setQuotationParam(detailQuotation);
+        setQuotationParam((prevParam) => ({
+            ...prevParam,
+            ...detailQuotation,
+        }));
 
         setDisplayValues({
             managerName: detailQuotation.managerCode ? `[${detailQuotation.managerCode}] ${detailQuotation.managerName}` : null,
             warehouseName:  detailQuotation.warehouseCode ? `[${detailQuotation.warehouseCode}] ${detailQuotation.warehouseName}` : null,
             client: detailQuotation.clientId ?`[${detailQuotation.clientId}] ${detailQuotation.clientName}` : null,
+            clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
             vatType: detailQuotation.vatCode ? `[${detailQuotation.vatCode}] ${detailQuotation.vatName}` : null
 
-        }, [detailQuotation, form, quotationDetails]);
+        });
 
     }, [detailQuotation], form);
 
@@ -69,16 +82,25 @@ const QuotationPage = ({initialData}) => {
 
 
     const handleTabChange = (key) => {
+        setActiveTabKey(key);
         setEditQuotation(false);
         setEditingRow(null);
-        setQuotationDetails(null)
-
+        setQuotationParam({
+            quotationDetails: [],
+            date: dayjs().format('YYYY-MM-DD'),
+        });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        });
+        setDetailQuotation(quotationParam.quotationDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
 
-        setActiveTabKey(key);
     };
 
     // 날짜 선택 처리
@@ -142,7 +164,7 @@ const QuotationPage = ({initialData}) => {
         setIsLoading(true);
         let apiPath;
 
-        if(fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
+        if((fieldName === 'client') || (fieldName === 'clientSearch')) apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
@@ -170,13 +192,14 @@ const QuotationPage = ({initialData}) => {
     };
 
     const handleModalCancel = () => {
-        if(currentField === 'client'){
+        if((currentField === 'client') || (currentField === 'clientSearch')){
             setSearchParams({
                 clientId: null,
             })
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 client: null,
+                clientSearch: null
             }));
         }
         setCurrentField(null);
@@ -224,13 +247,22 @@ const QuotationPage = ({initialData}) => {
                         name: record.printClientName,
                     },
                 }));
-                setSearchParams((prevParams) => ({
-                    ...prevParams,
-                    clientId: record.id,
-                }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
                     client: `[${record.id}] ${record.printClientName}`,
+                }));
+                break;
+
+            case 'clientSearch':
+
+                setSearchParams((prevParams) => ({
+                    ...prevParams,
+                    clientId: record.id,
+
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    clientSearch: `[${record.id}] ${record.printClientName}`,
                 }));
                 break;
 
@@ -241,9 +273,11 @@ const QuotationPage = ({initialData}) => {
                 console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('price', record.salesPrice, editingRow);
+                updateField('remarks', record.remarks, editingRow)
 
                 const { quantity } = updatedDetails[editingRow].quantity;
                 const supplyPrice = calculateSupplyPrice(quantity, (record.salesPrice));
@@ -281,7 +315,7 @@ const QuotationPage = ({initialData}) => {
     const handleRegiDateChange = (date) => {
         setQuotationParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: dayjs(date).format('YYYY-MM-DD'),
         }));
     };
 
@@ -371,7 +405,7 @@ const QuotationPage = ({initialData}) => {
 
         setQuotationParam((prevParams) => ({
             ...prevParams,
-            quotationOrderDetails: updatedDetails,
+            quotationDetails: updatedDetails,
         }));
     };
 
@@ -439,12 +473,12 @@ const QuotationPage = ({initialData}) => {
             onOk: async () => {
                 try {
                     const quotationData = {
-                        clientId: quotationParam.clientId,
-                        managerId: quotationParam.managerId,
-                        warehouseId: quotationParam.warehouseId,
+                        clientId: quotationParam.client ? quotationParam.client.id : quotationParam.clientId,
+                        managerId: quotationParam.manager ? quotationParam.manager.id : quotationParam.managerId,
+                        warehouseId: quotationParam.warehouse ? quotationParam.warehouse.id : quotationParam.warehouseId,
                         currencyId: quotationParam.currencyId,
                         date: quotationParam.date,
-                        vatId: quotationParam.vatId,
+                        vatId: quotationParam.vatType ? Number(quotationParam.vatType.code) : quotationParam.vatId,
                         journalEntryCode: quotationParam.journalEntryCode,
                         electronicTaxInvoiceStatus: quotationParam.electronicTaxInvoiceStatus,
                         items: Array.isArray(quotationParam.quotationDetails
@@ -455,10 +489,11 @@ const QuotationPage = ({initialData}) => {
                         })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
                         remarks: values.remarks
                     };
+                    console.log('quotationData: ', quotationData)
 
                     console.log('Sending data to API:', quotationData); // API로 전송할 데이터 확인
 
-                    const API_PATH = type === 'update' ? LOGISTICS_API.QUOTATION_UPDATE_API(quotationParam.id) : LOGISTICS_API.PURCHASE_ORDER_CREATE_API;
+                    const API_PATH = type === 'update' ? LOGISTICS_API.QUOTATION_UPDATE_API(quotationParam.id) : LOGISTICS_API.QUOTATION_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
 
                     const response = await apiClient[method](API_PATH, quotationData, {
@@ -469,18 +504,31 @@ const QuotationPage = ({initialData}) => {
 
                     const updatedData = response.data;
 
+                    console.log('updatedData: ', updatedData)
+
                     if (type === 'update') {
+
                         setQuotationList((prevList) =>
                             prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
                         );
+                        console.log('quotationList: ',quotationList)
                     } else {
                         setQuotationList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
                     }
 
+                    handleSearch()
+
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
                     setEditQuotation(false);
-                    setDetailQuotation(null);
-                    setQuotationParam(null);
+                    setQuotationParam({
+                        quotationDetails: [], });
+                    setDetailQuotation(quotationParam.quotationDetails || []);
                     setDisplayValues({});
 
                     type === 'update'
@@ -642,8 +690,8 @@ const QuotationPage = ({initialData}) => {
                                                     >
                                                         <Input
                                                             placeholder="거래처"
-                                                            value={displayValues.client}
-                                                            onClick={() => handleInputClick('client')}
+                                                            value={displayValues.clientSearch}
+                                                            onClick={() => handleInputClick('clientSearch')}
                                                             className="search-input"
                                                             style={{ width: '100%' }}
                                                             suffix={<DownSquareOutlined />}
@@ -682,7 +730,7 @@ const QuotationPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? quotationList : searchData} // 발주서 리스트 데이터
+                                        dataSource={searchData} // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -818,8 +866,17 @@ const QuotationPage = ({initialData}) => {
                                                 </Col>
 
                                                 <Col span={6}>
-                                                    <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                        <Checkbox>세금계산서 발행 여부</Checkbox>
+                                                    <Form.Item name="electronicTaxInvoiceStatus">
+                                                        <Checkbox
+                                                            onChange={(e) => {
+                                                                setQuotationParam((prevState) => ({
+                                                                    ...prevState,
+                                                                    electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
+                                                                }));
+                                                            }}
+                                                        >
+                                                            세금계산서 발행 여부
+                                                        </Checkbox>
                                                     </Form.Item>
                                                 </Col>
 
@@ -835,9 +892,19 @@ const QuotationPage = ({initialData}) => {
                                                                 style={{ width: '70%' }}
                                                                 value={quotationParam.currency}
                                                                 onChange={(value) => {
+                                                                    const currencyIdMapping = {
+                                                                        KRW: 6,
+                                                                        USD: 1,
+                                                                        EUR: 2,
+                                                                        JPY: 3,
+                                                                        CNY: 4,
+                                                                        GBP: 5,
+                                                                    };
+
                                                                     setQuotationParam((prevState) => ({
                                                                         ...prevState,
                                                                         currency: value,
+                                                                        currencyId: currencyIdMapping[value],
                                                                     }));
                                                                 }}
                                                             >
@@ -1004,6 +1071,56 @@ const QuotationPage = ({initialData}) => {
 
                         {/* 거래처 선택 모달 */}
                         {currentField === 'client' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    거래처 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.id && item.id.toString().toLowerCase().includes(value)) ||
+                                                    (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                {modalData && (
+
+                                    <Table
+                                        columns={[
+                                            { title: '코드', dataIndex: 'id', key: 'id', align: 'center' },
+                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
+                                        ]}
+                                        dataSource={modalData}
+                                        rowKey="id"
+                                        size="small"
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: () => handleModalSelect(record) // 선택 시 처리
+                                        })}
+                                    />
+                                )}
+                            </>
+                        )}
+
+                        {/* 거래처 검색 선택 모달 */}
+                        {currentField === 'clientSearch' && (
                             <>
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
                                     거래처 선택
@@ -1324,8 +1441,8 @@ const QuotationPage = ({initialData}) => {
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
                                     initialValues={detailQuotation}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
                                     {/* 견적서 정보 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>견적서 정보</Divider>
@@ -1417,8 +1534,17 @@ const QuotationPage = ({initialData}) => {
                                         </Col>
 
                                         <Col span={6}>
-                                            <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                <Checkbox>세금계산서 발행 여부</Checkbox>
+                                            <Form.Item name="electronicTaxInvoiceStatus">
+                                                <Checkbox
+                                                    onChange={(e) => {
+                                                        setQuotationParam((prevState) => ({
+                                                            ...prevState,
+                                                            electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
+                                                        }));
+                                                    }}
+                                                >
+                                                    세금계산서 발행 여부
+                                                </Checkbox>
                                             </Form.Item>
                                         </Col>
 
@@ -1434,9 +1560,19 @@ const QuotationPage = ({initialData}) => {
                                                         style={{ width: '70%' }}
                                                         value={quotationParam.currency}
                                                         onChange={(value) => {
+                                                            const currencyIdMapping = {
+                                                                KRW: 6,
+                                                                USD: 1,
+                                                                EUR: 2,
+                                                                JPY: 3,
+                                                                CNY: 4,
+                                                                GBP: 5,
+                                                            };
+
                                                             setQuotationParam((prevState) => ({
                                                                 ...prevState,
                                                                 currency: value,
+                                                                currencyId: currencyIdMapping[value],
                                                             }));
                                                         }}
                                                     >

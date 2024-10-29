@@ -35,7 +35,16 @@ const PurchasePage = ({initialData}) => {
     const [editPurchase, setEditPurchase] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
-
+    const [clientSearch, setClientSearch] = useState(
+        {
+            clientId: null,
+            clientName: null
+        }
+    );
+    useEffect(() => {
+        // quotationList가 업데이트될 때마다 searchData를 최신 상태로 설정
+        setSearchData(purchaseList);
+    }, [purchaseList]);
 
 
     useEffect(() => {
@@ -44,7 +53,7 @@ const PurchasePage = ({initialData}) => {
 
         form.setFieldsValue(detailPurchase);
         form.setFieldsValue({
-            purchaseOrderDetails: purchaseDetails,
+            purchaseDetails: purchaseDetails,
         })
         setPurchaseParam(detailPurchase);
 
@@ -52,6 +61,7 @@ const PurchasePage = ({initialData}) => {
             managerName: detailPurchase.managerCode ? `[${detailPurchase.managerCode}] ${detailPurchase.managerName}` : null,
             warehouseName:  detailPurchase.warehouseCode ? `[${detailPurchase.warehouseCode}] ${detailPurchase.warehouseName}` : null,
             client: detailPurchase.clientId ?`[${detailPurchase.clientId}] ${detailPurchase.clientName}` : null,
+            clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
             vatType: detailPurchase.vatCode ? `[${detailPurchase.vatCode}] ${detailPurchase.vatName}` : null
 
         }, [detailPurchase, form, purchaseDetails]);
@@ -142,7 +152,7 @@ const PurchasePage = ({initialData}) => {
         setIsLoading(true);
         let apiPath;
 
-        if(fieldName === 'client') apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
+        if((fieldName === 'client') || (fieldName === 'clientSearch')) apiPath = FINANCIAL_API.FETCH_CLIENT_LIST_API;
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
@@ -170,13 +180,14 @@ const PurchasePage = ({initialData}) => {
     };
 
     const handleModalCancel = () => {
-        if(currentField === 'client'){
+        if((currentField === 'client') || (currentField === 'clientSearch')){
             setSearchParams({
                 clientId: null,
             })
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 client: null,
+                clientSearch: null
             }));
         }
         setCurrentField(null);
@@ -224,13 +235,22 @@ const PurchasePage = ({initialData}) => {
                         name: record.printClientName,
                     },
                 }));
-                setSearchParams((prevParams) => ({
-                    ...prevParams,
-                    clientId: record.id,
-                }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
                     client: `[${record.id}] ${record.printClientName}`,
+                }));
+                break;
+
+            case 'clientSearch':
+
+                setSearchParams((prevParams) => ({
+                    ...prevParams,
+                    clientId: record.id,
+
+                }));
+                setDisplayValues((prevValues) => ({
+                    ...prevValues,
+                    clientSearch: `[${record.id}] ${record.printClientName}`,
                 }));
                 break;
 
@@ -241,9 +261,12 @@ const PurchasePage = ({initialData}) => {
                 console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('price', record.purchasePrice, editingRow);
+                updateField('remarks', record.remarks, editingRow)
+                
 
                 const { quantity } = updatedDetails[editingRow].quantity;
                 const supplyPrice = calculateSupplyPrice(quantity, (record.purchasePrice));
@@ -264,13 +287,13 @@ const PurchasePage = ({initialData}) => {
                 setPurchaseParam((prevParams) => ({
                     ...prevParams,
                     vatType: {
-                        code: record.code,
-                        name: record.name,
+                        code: record.vatTypeCode,
+                        name: record.vatTypeName,
                     },
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
-                    vatType: `[${record.code}] ${record.name}`,
+                    vatType: `[${record.vatTypeCode}] ${record.vatTypeName}`,
                 }));
                 break;
         }
@@ -356,7 +379,7 @@ const PurchasePage = ({initialData}) => {
 
         setPurchaseParam((prevParams) => ({
             ...prevParams,
-            purchaseOrderDetails: updatedDetails,
+            purchaseDetails: updatedDetails,
         }));
     };
 
@@ -407,6 +430,91 @@ const PurchasePage = ({initialData}) => {
                 } catch (error) {
                     notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
                 }
+            },
+        });
+    };
+
+    // 폼 제출 핸들러
+    const handleFormSubmit = async (values, type) => {
+        console.log('Form values:', values); // 폼 값 확인
+        console.log('detailPurchase', detailPurchase)
+        console.log('purchaseParam: ', purchaseParam)
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                try {
+                    const purchaseData = {
+                        clientId: purchaseParam.client ? purchaseParam.client.id : purchaseParam.clientId,
+                        managerId: purchaseParam.manager ? purchaseParam.manager.id : purchaseParam.managerId,
+                        warehouseId: purchaseParam.warehouse ? purchaseParam.warehouse.id : purchaseParam.warehouseId,
+                        currencyId: purchaseParam.currencyId,
+                        date: purchaseParam.date,
+                        vatId: purchaseParam.vatType ? purchaseParam.vatType.code : purchaseParam.vatCode,
+                        journalEntryCode: purchaseParam.journalEntryCode,
+                        electronicTaxInvoiceStatus: purchaseParam.electronicTaxInvoiceStatus,
+                        items: Array.isArray(purchaseParam.purchaseDetails
+                        ) ? purchaseParam.purchaseDetails.map(item => ({
+                            productId: item.productId,
+                            quantity: item.quantity,
+                            remarks: item.remarks,
+                        })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
+                        remarks: values.remarks
+                    };
+
+                    console.log('Sending data to API:', purchaseData); // API로 전송할 데이터 확인
+
+                    const API_PATH = type === 'update' ? LOGISTICS_API.PURCHASE_UPDATE_API(purchaseParam.id) : LOGISTICS_API.PURCHASE_CREATE_API;
+                    const method = type === 'update' ? 'put' : 'post';
+
+                    const response = await apiClient[method](API_PATH, purchaseData, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const updatedData = response.data;
+
+                    if (type === 'update') {
+                        setPurchaseList((prevList) =>
+                            prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
+                        );
+                    } else {
+                        setPurchaseList((prevList) => [...prevList, updatedData]);
+                        registrationForm.resetFields();
+                    }
+                    handleSearch()
+
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
+
+                    setEditPurchase(false);
+                    setPurchaseParam({
+                        purchaseDetails: [],
+                    });
+                    setDetailPurchase(purchaseParam.purchaseDetails || []);
+                    setDisplayValues({});
+
+                    type === 'update'
+                        ? notify('success', '발주서 수정', '발주서 정보 수정 성공.', 'bottomRight')
+                        : notify('success', '발주서 저장', '발주서 정보 저장 성공.', 'bottomRight');
+                } catch (error) {
+                    console.error('Error saving data:', error); // 오류 로그 출력
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '저장 취소',
+                    description: '저장이 취소되었습니다.',
+                    placement: 'bottomLeft',
+                });
             },
         });
     };
@@ -554,8 +662,8 @@ const PurchasePage = ({initialData}) => {
                                                     >
                                                         <Input
                                                             placeholder="거래처"
-                                                            value={displayValues.client}
-                                                            onClick={() => handleInputClick('client')}
+                                                            value={displayValues.clientSearch}
+                                                            onClick={() => handleInputClick('clientSearch')}
                                                             className="search-input"
                                                             style={{ width: '100%' }}
                                                             suffix={<DownSquareOutlined />}
@@ -594,7 +702,7 @@ const PurchasePage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? purchaseList : searchData} // 발주서 리스트 데이터
+                                        dataSource={searchData } // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -964,6 +1072,56 @@ const PurchasePage = ({initialData}) => {
                             </>
                         )}
 
+                        {/* 거래처 검색 선택 모달 */}
+                        {currentField === 'clientSearch' && (
+                            <>
+                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                    거래처 선택
+                                </Typography>
+                                <Input
+                                    placeholder="검색"
+                                    prefix={<SearchOutlined />}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                        if (!value) {
+                                            setModalData(initialModalData);
+                                        } else {
+                                            const filtered = initialModalData.filter((item) => {
+                                                return (
+                                                    (item.id && item.id.toString().toLowerCase().includes(value)) ||
+                                                    (item.printClientName && item.printClientName.toLowerCase().includes(value))
+                                                );
+                                            });
+                                            setModalData(filtered);
+                                        }
+                                    }}
+                                    style={{ marginBottom: 16 }}
+                                />
+                                {modalData && (
+
+                                    <Table
+                                        columns={[
+                                            { title: '코드', dataIndex: 'id', key: 'id', align: 'center' },
+                                            { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
+                                        ]}
+                                        dataSource={modalData}
+                                        rowKey="id"
+                                        size="small"
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: () => handleModalSelect(record) // 선택 시 처리
+                                        })}
+                                    />
+                                )}
+                            </>
+                        )}
+
                         {/* 담당자 선택 모달 */}
                         {currentField === 'managerName' && (
                             <>
@@ -1119,10 +1277,25 @@ const PurchasePage = ({initialData}) => {
 
                                     <Table
                                         columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '과세명', dataIndex: 'name', key: 'name', align: 'center' }
+                                            {
+                                                title: '코드',
+                                                dataIndex: 'vatTypeCode',
+                                                key: 'vatTypeCode',
+                                                align: 'center'
+                                            },
+                                            {
+                                                title: '과세명',
+                                                dataIndex: 'vatTypeName',
+                                                key: 'vatTypeName',
+                                                align: 'center',
+                                                render: (text, record) => (
+                                                    <Tooltip title={record.description}>
+                                                        <span>{text}</span>
+                                                    </Tooltip>
+                                                )
+                                            }
                                         ]}
-                                        dataSource={modalData}
+                                        dataSource={modalData[0].purchaseVatTypeShowDTO}
                                         rowKey="code"
                                         size="small"
                                         pagination={{
