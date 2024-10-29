@@ -6,6 +6,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import GroupsIcon from '@mui/icons-material/Groups';
+import {Button} from "antd";
 
 export default function DashboardPage({ initialData }) {
     const [reportData, setReportData] = useState({
@@ -31,8 +32,6 @@ export default function DashboardPage({ initialData }) {
         }));
     }, [initialData]);
 
-    console.log(reportData);
-
     return (
         <main className="flex-1 overflow-y-auto p-4">
             <div className="max-w-8xl my-10 mx-20">
@@ -40,7 +39,7 @@ export default function DashboardPage({ initialData }) {
                     <DashboardWidget icon={AttachMoneyIcon} title={reportData.widgets.financeName}  value={`₩${new Intl.NumberFormat('ko-KR').format(reportData.widgets.financeValue)}`} color="bg-blue-500" />
                     <DashboardWidget icon={GroupsIcon} title="총 직원 수" value={reportData.widgets.hrValue} color="bg-green-500" />
                     <DashboardWidget icon={LocalShippingIcon} title="재고 현황" value={reportData.widgets.logisticsValue} color="bg-yellow-500" />
-                    <DashboardWidget icon={PrecisionManufacturingIcon} title="생산량" value={reportData.widgets.productionValue} color="bg-purple-500" />
+                    <DashboardWidget icon={PrecisionManufacturingIcon} title={reportData.widgets.productionName} value={`${new Intl.NumberFormat('ko-KR').format(reportData.widgets.productionValue)} EA`} color="bg-purple-500" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
@@ -88,27 +87,31 @@ export default function DashboardPage({ initialData }) {
                                     ></circle>
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-4xl font-bold text-green-500">{reportData.environmentalScore.totalScore}점</span>
+                                    <span
+                                        className="text-4xl font-bold text-green-500">{reportData.environmentalScore.totalScore}점</span>
                                     <span className="text-sm text-gray-500 mt-2">친환경 인증 점수</span>
                                 </div>
                             </div>
                         </div>
                         <div className="mt-4">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-sm font-medium text-gray-500">에너지 효율</span>
-                                <span className="text-sm font-medium text-green-500">{reportData.environmentalScore.energyScore}점</span>
+                                <span className="text-sm font-medium text-gray-500">폐기물 비율</span>
+                                <span
+                                    className="text-sm font-medium text-green-500">{reportData.environmentalScore.wasteScore}점</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${reportData.environmentalScore.energyScore}점` }}></div>
+                                <div className="bg-green-500 h-2.5 rounded-full" style={{width: `${reportData.environmentalScore.wasteScore}%`}}></div>
                             </div>
                         </div>
                         <div className="mt-4">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-sm font-medium text-gray-500">폐기물 비율</span>
-                                <span className="text-sm font-medium text-green-500">{reportData.environmentalScore.wasteScore}점</span>
+                                <span className="text-sm font-medium text-gray-500">에너지 효율</span>
+                                <span
+                                    className="text-sm font-medium text-green-500">{reportData.environmentalScore.energyScore}점</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${reportData.environmentalScore.wasteScore}점` }}></div>
+                                <div className="bg-green-500 h-2.5 rounded-full"
+                                     style={{width: `${reportData.environmentalScore.energyScore}%`}}></div>
                             </div>
                         </div>
                     </ChartCard>
@@ -120,7 +123,7 @@ export default function DashboardPage({ initialData }) {
                         <ActivityTimeline reportData={reportData} />
                     </Card>
                     <Card title="생산 현황">
-                        <ProductionStatus />
+                        <ProductionStatus/>
                     </Card>
                 </div>
             </div>
@@ -128,7 +131,7 @@ export default function DashboardPage({ initialData }) {
     )
 }
 
-function DashboardWidget({ icon: Icon, title, value, color }) {
+function DashboardWidget({icon: Icon, title, value, color}) {
     return (
         <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="p-5">
@@ -169,37 +172,30 @@ function Card({ title, children }) {
 }
 
 function ActivityTimeline({reportData}) {
-    const activities = [
-        { id: 1, content: '신규 직원 5명 채용', department: '인사', date: '3시간 전' },
-        { id: 2, content: '6월 매출 보고서 승인', department: '재무', date: '1일 전' },
-        { id: 3, content: '친환경 인증 갱신 완료', department: '인증', date: '2일 전' },
-        { id: 4, content: '신규 공급업체 계약 체결', department: '물류', date: '1주일 전' },
-    ]
-
+    const [activityShowAll, setActivityShowAll] = useState(false);
+    const activitiesToShow = activityShowAll ? reportData.activities : reportData.activities.slice(0, 4);
     return (
         <div className="flow-root">
             <ul className="-mb-8">
-                {reportData.activities.map((item, itemIdx) => (
+                {activitiesToShow.length > 0 ? activitiesToShow.map((item, itemIdx) => (
                     <li key={item.id}>
                         <div className="relative pb-8">
-                            {itemIdx !== activities.length - 1 ? (
-                                <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                            {itemIdx !== activitiesToShow.length - 1 ? (
+                                <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                                      aria-hidden="true"></span>
                             ) : null}
                             <div className="relative flex space-x-3">
                                 <div>
-                  <span
-                      className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${
-                          item.activityType === '"PRODUCTION"'
-                              ? 'bg-blue-500'
-                              : item.activityType === '"PRODUCTION"'
-                                  ? 'bg-green-500'
-                                  : item.activityType === '"PRODUCTION"'
-                                      ? 'bg-yellow-500'
-                                      : 'bg-purple-500'
-                      }`}
-                  >
-                    <ActivityIcon activityType={item.activityType} style={{ width: '15px'}} className="text-white" />
-                  </span>
+                                    <span
+                                        className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${
+                                            item.activityType === 'FINANCE' ? 'bg-blue-500' :
+                                                item.activityType === 'HR' ? 'bg-green-500' :
+                                                    item.activityType === 'LOGISTICS' ? 'bg-yellow-500' : 'bg-purple-500'
+                                        }`}
+                                    >
+                                        <ActivityIcon activityType={item.activityType} style={{width: '15px'}}
+                                                      className="text-white"/>
+                                    </span>
                                 </div>
                                 <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                     <div>
@@ -212,13 +208,27 @@ function ActivityTimeline({reportData}) {
                             </div>
                         </div>
                     </li>
-                ))}
+                )) : (
+                    <div className="flex items-center justify-center h-32">
+                        <span className="text-gray-400">활동 내역이 없습니다.</span>
+                    </div>
+                )}
             </ul>
+            {reportData.activities.length > 4 && (
+                <div className="mt-4 flex justify-end">
+                    <Button
+                        onClick={() => setActivityShowAll(!activityShowAll)}
+                        type="primary"
+                    >
+                        {activityShowAll ? '간략히 보기' : '더보기'}
+                    </Button>
+                </div>
+            )}
         </div>
     )
 }
 
-function ActivityIcon({ activityType, ...props }) {
+function ActivityIcon({activityType, ...props}) {
     switch (activityType) {
         case 'HR':
             return <GroupsIcon {...props} />
@@ -235,9 +245,9 @@ function ActivityIcon({ activityType, ...props }) {
 
 function ProductionStatus() {
     const statuses = [
-        { name: '생산 중', percentage: 65, color: 'bg-blue-500' },
-        { name: '생산 완료', percentage: 30, color: 'bg-green-500' },
-        { name: '생산 지연', percentage: 5, color: 'bg-red-500' },
+        {name: '생산 중', percentage: 65, color: 'bg-blue-500'},
+        {name: '생산 완료', percentage: 30, color: 'bg-green-500'},
+        {name: '생산 지연', percentage: 5, color: 'bg-red-500'},
     ]
 
     return (
@@ -249,7 +259,8 @@ function ProductionStatus() {
                         <span className="text-sm font-medium text-gray-900">{status.percentage}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div className={`${status.color} h-2.5 rounded-full`} style={{ width: `${status.percentage}%` }}></div>
+                        <div className={`${status.color} h-2.5 rounded-full`}
+                             style={{width: `${status.percentage}%`}}></div>
                     </div>
                 </div>
             ))}

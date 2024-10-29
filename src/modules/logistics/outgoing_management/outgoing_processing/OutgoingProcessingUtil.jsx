@@ -13,7 +13,7 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '출고 처리 입력',
+            label: '출고 대기',
             children: (
                 <Typography>
                     출고된 상품의 수량과 출고 일자를 입력하고, 처리 상태를 업데이트할 수 있음.

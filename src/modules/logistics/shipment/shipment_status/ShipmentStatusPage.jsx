@@ -29,7 +29,7 @@ const ShipmentStatusPage = () => {
     const [modalData, setModalData] = useState(null);
     const [initialModalData, setInitialModalData] = useState(null);
     const [currentFieldIndex, setCurrentFieldIndex] = useState(null); // 현재 수정하려는 리스트 항목의 인덱스
-    const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
+    const [selectedWarehouseId, setSelectedWarehouseId] = useState(false);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
     const [selectedClientId, setSelectedClientId] = useState(null);
     const [selectedProductId, setSelectedProductId] = useState(null);
@@ -77,7 +77,7 @@ const ShipmentStatusPage = () => {
                 setLoading(false);
                 return;
             }
-            apiPath = LOGISTICS_API.WAREHOUSE_INVENTORY_DETAIL_API(selectedWarehouseId);
+            apiPath = LOGISTICS_API.INVENTORY_BY_WAREHOUSE_API(selectedWarehouseId);
         }
 
         try {
@@ -330,7 +330,7 @@ const ShipmentStatusPage = () => {
                     <Grid item xs={12} md={5} sx={{minWidth: '1000px !important', maxWidth: '1500px !important'}}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{height: '100%'}}>
-                                <Typography variant="h6" sx={{padding: '20px'}}>재고 조정 진행 단계 조회</Typography>
+                                <Typography variant="h6" sx={{padding: '20px'}}>출하 조회</Typography>
                                 <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{
@@ -450,6 +450,7 @@ const ShipmentStatusPage = () => {
                                                 try {
                                                     const response = await apiClient.post(LOGISTICS_API.SHIPMENT_DETAIL_API(id));
                                                     console.log(response.data);
+                                                    setSelectedWarehouseId(record.id);
                                                     setDetailShipmentData(response.data);
                                                     setEditDetailShipmentData(true);
                                                     notify('success', '품목 조회', '출하 정보 조회 성공.', 'bottomRight')

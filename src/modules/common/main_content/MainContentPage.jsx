@@ -205,6 +205,9 @@ import PendingSalesPurchaseVoucherApprovalPage
     from "../../financial/voucher_entry/pending_sales_purchase_voucher_approval/PendingSalesPurchaseVoucherApprovalPage.jsx";
 import SalaryEnvironmentSettingsPage
     from "../../hr/basic_information_management/salary_environment_setting/SalaryEnvironmentSettingsPage.jsx";
+import SalaryRegistrationPage from "../../hr/payroll_management/salary_registration/SalaryRegistrationPage.jsx";
+import ProductionOrderClosingPage
+    from "../../production/work_order_management/production_order_closing/ProductionOrderClosingPage.jsx";
 
 import SalePlanPage from "../../logistics/sales_management/sales_plan/SalePlanPage.jsx";
 

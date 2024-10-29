@@ -24,14 +24,16 @@ import { LOGISTICS_API, PRODUCTION_API } from "../../../../../config/apiConstant
 import apiClient from "../../../../../config/apiClient.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 import {fetchWorkcenter} from "../WorkcenterApi.jsx";
+import * as equipment from "date-fns/locale";
 const SelectedWorkcenterSection = ({
                                      workcenter,
                                      handleInputChange,
                                      handleSave,
                                      handleDeleteWorkcenter,
                                        handleWorkcenterTypeChange,
+                                       handleFormSubmit,
                                    }) => {
-
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
@@ -46,24 +48,80 @@ const SelectedWorkcenterSection = ({
     });
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
     const [fetchWorkcenterData, setFetchWorkcenterData] = useState(false); // 거래처 조회한 정보 상태
-    const [workcenterParam, setWorkcenterParam] = useState(false); // 수정 할 거래처 정보 상태
+    const [workcenterParam, setWorkcenterParam] = useState({}); // 수정 할 거래처 정보 상태
     const [workerAssignments, setWorkerAssignments] = useState([]); // 초기값 빈 배열
+    const [selectedEquipments, setSelectedEquipments] = useState([]);
+    const [equipmentData, setEquipmentData] = useState([]); // 설비 테이블에 표시할 데이터
+    const [searchTerm, setSearchTerm] = useState(''); // 검색 필드 상태
 
+    useEffect(() => {
+        if (Object.keys(workcenterParam).length > 0) {
+            form.setFieldsValue(workcenterParam); // 폼에 값 반영
+        }
+    }, [workcenterParam]);
 
-    // selected 로
+    // 설비 데이터 로드 함수
+    const fetchEquipmentData = async () => {
+        setIsLoading(true);
+        try {
+            const response = await apiClient.post(PRODUCTION_API.EQUIPMENT_DATA_API);
+            setEquipmentData(response.data);
+        } catch (error) {
+            notification.error({
+                message: '조회 오류',
+                description: '설비 데이터 조회 중 오류가 발생했습니다.',
+            });
+            console.error('설비 데이터 조회 실패:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 초기 마운트 시 설비 데이터 로드
+    useEffect(() => {
+        fetchEquipmentData();
+    }, []);
+
+    // 설비 선택 테이블의 Row 선택 설정
+    const equipmentRowSelection = {
+        onChange: (selectedRowKeys, selectedRows) => {
+            setSelectedEquipments(selectedRows);
+        },
+        selectedRowKeys: selectedEquipments.map((equipment) => equipment.id),
+    };
+
+    // 검색어로 테이블 데이터 필터링
+    const filteredEquipmentData = equipmentData.filter((item) => {
+        const lowercasedSearchTerm = searchTerm.toLowerCase();
+        return (
+            (item.equipmentNum && item.equipmentNum.toLowerCase().includes(lowercasedSearchTerm)) ||
+            (item.equipmentName && item.equipmentName.toLowerCase().includes(lowercasedSearchTerm)) ||
+            (item.modelName && item.modelName.toLowerCase().includes(lowercasedSearchTerm))
+        );
+    });
+
+    // 작업장 데이터 가져오기 및 폼 초기화
     useEffect(() => {
         const fetchWorkcenterData = async () => {
             if (!workcenter) return;
 
             try {
                 const fetchedWorkcenter = await fetchWorkcenter(workcenter.code); // API 호출 후 데이터 가져오기
-                console.log('가져온 작업장 데이터:', fetchedWorkcenter);
+                console.log('fetchWorkcenterData:', fetchedWorkcenter);
 
                 // 폼 필드에 값 설정
                 form.setFieldsValue(fetchedWorkcenter);
 
                 // 선택된 작업장 정보를 상태에 저장
                 setWorkcenterParam(fetchedWorkcenter);
+
+                // equipmentIds에 해당하는 설비들을 필터링하여 선택된 설비로 설정
+                const selected = equipmentData.filter(equipment =>
+                    fetchedWorkcenter.equipmentIds.includes(equipment.id)
+                );
+
+                console.log('Selected Equipments:', selected);
+                setSelectedEquipments(selected); // 선택된 설비 설정
 
                 // 표시할 값 설정
                 setDisplayValues({
@@ -76,29 +134,24 @@ const SelectedWorkcenterSection = ({
                         ? `[${String(fetchedWorkcenter.processCode).padStart(5, '0')}] ${fetchedWorkcenter.processName}`
                         : '미등록',  // 공정 정보
 
-                    // 설비 정보가 여러 개일 경우 쉼표로 구분해서 표시
-                    equipment: fetchedWorkcenter.equipmentNames && fetchedWorkcenter.equipmentNames.length > 0
-                        ? fetchedWorkcenter.equipmentNames.join(', ')
-                        : '미등록',
-
-                    // 모델명도 여러 개일 경우 쉼표로 구분해서 표시
-                    models: fetchedWorkcenter.modelNames && fetchedWorkcenter.modelNames.length > 0
-                        ? fetchedWorkcenter.modelNames.join(', ')
-                        : '미등록',
-
                     // 오늘 작업자 수와 작업자 이름들을 처리
                     todayWorkerCount: fetchedWorkcenter.todayWorkerCount || '0명',
-                    todayWorkers: fetchedWorkcenter.todayWorkers && fetchedWorkcenter.todayWorkers.length > 0
-                        ? fetchedWorkcenter.todayWorkers.join(', ')
-                        : '배정된 작업자 없음',
+                    // todayWorkers: fetchedWorkcenter.todayWorkers && fetchedWorkcenter.todayWorkers.length > 0
+                    //     ? fetchedWorkcenter.todayWorkers.join(', ')
+                    //     : '배정된 작업자 없음',
+
+                    equipment: selected.length > 0
+                        ? selected.map(equip => `${equip.equipmentName} (${equip.modelName})`).join(', ')
+                        : '선택된 설비 없음',
                 });
+
             } catch (error) {
                 console.error('작업장 데이터 가져오기 실패:', error);
             }
         };
 
         fetchWorkcenterData(); // 비동기 데이터 호출 함수 실행
-    }, [workcenter, form]);
+    }, [workcenter, equipmentData, form]);
 
     const fetchWorkerAssignments = async (workcenterCode) => {
         try {
@@ -119,6 +172,12 @@ const SelectedWorkcenterSection = ({
         }
     }
 
+    // 설비 데이터가 로드된 후 selectedEquipments 동기화
+    useEffect(() => {
+        const selectedIds = selectedEquipments.map(equipment => equipment.id);
+        console.log('Selected Equipment IDs:', selectedIds);
+    }, [selectedEquipments]);
+
     // 작업장 코드가 변경될 때마다 작업자 배정 데이터 가져오기
     useEffect(() => {
         if (workcenter && workcenter.code) {
@@ -130,74 +189,52 @@ const SelectedWorkcenterSection = ({
         console.log('workerAssignments 상태:', workerAssignments);
     }, [workerAssignments]);
 
+    useEffect(() => {
+        console.log("Updated workcenterParam:", workcenterParam);
+    }, [workcenterParam]);
 
 
     // 모달창 선택 핸들러
     const handleModalSelect = (record) => {
         let updatedDisplayValues = { ...displayValues };
 
-        // 모달 창 마다가 formattedvalue, setclient param 설정 값이 다름
         switch (currentField) {
             case 'factory':
+                const factoryValue = `[${record.code.toString().padStart(5, '0')}] ${record.name}`;
                 setWorkcenterParam((prevParams) => ({
                     ...prevParams,
-                    factory: {
-                        id: record.id,
-                        code: record.code,
-                        name: record.name,
-                    },
+                    factoryCode: record.code,
+                    factoryName: record.name,
                 }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    factory: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
-                }));
-                form.setFieldsValue({ factoryName: record.name });
+                updatedDisplayValues.factory = factoryValue;
+                form.setFieldsValue({ factoryName: record.name }); // 폼 동기화
                 break;
+
             case 'process':
+                const processValue = `[${record.code.toString().padStart(5, '0')}] ${record.name}`;
                 setWorkcenterParam((prevParams) => ({
                     ...prevParams,
-                    process: {
-                        id: record.id,
-                        code: record.code,
-                        name: record.name,
-                    },
+                    processCode: record.code,
+                    processName: record.name,
                 }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    process: `[${record.code.toString().padStart(5, '0')}] ${record.name}`,
-                }));
-                form.setFieldsValue({ processName: record.name });
-                break;
-            case 'equipment':
-                setWorkcenterParam((prevParams) => ({
-                    ...prevParams,
-                    equipment: {
-                        id: record.id,
-                        equipmentNum: record.equipmentNum,
-                        equipmentName: record.equipmentName,
-                        modelName: record.modelName,
-                    },
-                }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    equipment: `[${record.equipmentNum.toString().padStart(5, '0')}] ${record.equipmentName}`,
-                }));
-                form.setFieldsValue({ equipmentName: `[${record.equipmentNum.toString().padStart(5, '0')}] ${record.equipmentName}`,});
+                updatedDisplayValues.process = processValue;
+                form.setFieldsValue({ processName: record.name }); // 폼 동기화
                 break;
         }
-        setDisplayValues(updatedDisplayValues); // 상태 업데이트
 
-        // 모달창 닫기
-        setIsModalVisible(false);
+        setDisplayValues(updatedDisplayValues); // 화면에 표시할 값 업데이트
+        handleModalCancel(); // 모달 닫기
     };
 
+
     // 모달창 열기 핸들러
-    const handleInputClick = (fieldName) => {
+    const handleInputClick = (fieldName) => {``
         setCurrentField(fieldName);
         setModalData(null);
         setInitialModalData(null);
         fetchModalData(fieldName);  // 모달 데이터 가져오기 호출
-        setIsModalVisible(true);  // 모달창 열기
+        setIsModalVisible(true)  // 모달창 열기
+
     };
 
     // 모달창 닫기 핸들러
@@ -208,25 +245,32 @@ const SelectedWorkcenterSection = ({
         setIsLoading(true);
         let apiPath;
         if (fieldName === 'factory') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
-        // if(fieldName === 'process') apiPath = PRODUCTION_API.SEARCH_FACTORIES_API;
         if(fieldName === 'process') apiPath = PRODUCTION_API.PROCESS_LIST_API;
         if(fieldName === 'equipment') apiPath = PRODUCTION_API.EQUIPMENT_DATA_API;
 
         try {
             const response = await apiClient.post(apiPath);
-            console.log('API 응답 데이터:', response.data);  // 응답 데이터 확인
+            console.log('fetchModalData 응답 데이터:', response.data);  // 응답 데이터 확인
 
             let resultData;
             // 공장 데이터만 필터링 적용
             if (fieldName === 'factory') {
-                resultData = response.data.filter(
+
+                let filteredData = response.data.filter(
                     (item) => item.warehouseType === 'FACTORY' || item.warehouseType === 'OUTSOURCING_FACTORY'
                 );
+
+                resultData = filteredData.map((item) => ({
+                    id: item.id,
+                    code: item.code,
+                    name: item.name,
+                }))
+
+            } else {
+                resultData = response.data;
             }
 
             console.log('최종 데이터:', resultData);  // 최종 데이터 확인
-
-
             setModalData(resultData);
             setInitialModalData(resultData);
 
@@ -258,6 +302,9 @@ const SelectedWorkcenterSection = ({
                         form={form}
                         // onFinish={(values) => { handleFormSubmit(values, 'update') }}
                         onFinish={(values) => {
+                            console.log("onFinish form.getFieldsValue():", values)
+                            values.selectedEquipments = selectedEquipments; // 선택된 설비를 폼 데이터에 포함
+                            console.log("onFinish selectedEquipments, ", selectedEquipments)
                             console.log('Form 제출 값:', values);  // 폼 데이터 확인
                             handleFormSubmit(values, 'update');
                         }}
@@ -265,7 +312,7 @@ const SelectedWorkcenterSection = ({
                         <Row gutter={16}>
                             <Col span={5}>
                                 <Form.Item name="code" rules={[{ required: true, message: '작업장 코드를 입력하세요.' }]}>
-                                    <Input addonBefore="작업장 코드"/>
+                                    <Input readOnly addonBefore="작업장 코드"/>
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
@@ -282,10 +329,9 @@ const SelectedWorkcenterSection = ({
                                             style={{ width: '60%' }}
                                             value={workcenterParam.workcenterType}
                                             onChange={(value) => {
-                                                setWorkcenterParam((prevState) => ({
-                                                    ...prevState,
-                                                    workcenterType: value,
-                                                }));
+                                                const updatedParam = { ...workcenterParam, workcenterType: value };
+                                                setWorkcenterParam(updatedParam);  // 상태 업데이트
+                                                form.setFieldsValue(updatedParam); // 폼에 바로 반영
                                             }}
                                         >
                                             <Select.Option value="Press">프레스</Select.Option>
@@ -323,9 +369,7 @@ const SelectedWorkcenterSection = ({
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item
-                                    name="processName"
-                                >
+                                <Form.Item name="processName">
                                     <Input
                                         addonBefore="생산공정"
                                         placeholder="생산공정 선택"
@@ -336,21 +380,8 @@ const SelectedWorkcenterSection = ({
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={5}>
-                                <Form.Item
-                                    name="equipment" // TODO setFieldValues 랑 통일시키기
-                                >
-                                    <Input
-                                        addonBefore="설비"
-                                        placeholder="설비 선택"
-                                        onClick={() => handleInputClick('equipment')}
-                                        value={displayValues.equipment}
-                                        onFocus={(e) => e.target.blur()}
-                                        suffix={<DownSquareOutlined />}
-                                    />
-                                </Form.Item>
-                            </Col>
                         </Row>
+                        {/* 설비 선택 테이블 */}
                         <Row gutter={16}>
                             <Col span={15}>
                                 <Form.Item name="description">
@@ -358,18 +389,101 @@ const SelectedWorkcenterSection = ({
                                 </Form.Item>
                             </Col>
                         </Row>
+                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>설비 선택</Divider>
+                        <Row gutter={12}>
+                            <Col span={15}>
+                                <Form.Item name="equipment">
+
+                                    <Input
+                                        placeholder="설비 검색"
+                                        prefix={<SearchOutlined />}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        style={{ marginBottom: 16 }}
+                                    />
+                                    <Table
+                                        rowSelection={equipmentRowSelection}
+                                        columns={[
+                                            {
+                                                title: '설비번호',
+                                                dataIndex: 'equipmentNum',
+                                                key: 'equipmentNum',
+                                                align: 'center',
+                                            },
+                                            {
+                                                title: '설비명',
+                                                dataIndex: 'equipmentName',
+                                                key: 'equipmentName',
+                                                align: 'center',
+                                            },
+                                            {
+                                                title: '모델명',
+                                                dataIndex: 'modelName',
+                                                key: 'modelName',
+                                                align: 'center',
+                                            },
+                                        ]}
+                                        dataSource={filteredEquipmentData}
+                                        rowKey={(record) => record.id}
+                                        size="small"
+                                        pagination={{
+                                            pageSize: 5,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}개`,
+                                        }}
+                                        loading={isLoading}
+                                        style={{ width: '100%' }} // 너비 조정
+                                        onRow={(record) => ({
+                                            onClick: () => {
+                                                const alreadySelected = selectedEquipments.some((equipment) => equipment.id === record.id);
+                                                if (alreadySelected) {
+                                                    setSelectedEquipments(selectedEquipments.filter((equipment) => equipment.id !== record.id));
+                                                } else {
+                                                    setSelectedEquipments([...selectedEquipments, record]);
+                                                }
+                                            }
+                                        })}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={5}>
+                                {/* 선택된 설비 */}
+                                <Form.Item label="">
+                                    <>
+                                        {selectedEquipments.length > 0 ? (
+                                            selectedEquipments.map(equipment => (
+                                                <Tag key={equipment.id} color="green" style={{ marginBottom: '8px' }}>
+                                                    {equipment.equipmentName} ({equipment.modelName})
+                                                </Tag>
+                                            ))
+                                        ) : (
+                                            <Typography>선택된 설비가 없습니다.</Typography>
+                                        )}
+                                    </>
+                                </Form.Item>
+                            </Col>
+                        </Row>
+
+
                         <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>작업자배정</Divider>
                         <Row gutter={12}>
                             <Col span={15}>
                                 <Form.Item>
                                     <Table
                                         dataSource={workerAssignments || []} // 안전하게 빈 배열로 설정
+                                        size={'small'}
+                                        pagination={{
+                                            pageSize: 5,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false,
+                                            showTotal: (total) => `총 ${total}건`,
+                                        }}
+                                        loading={isLoading}
                                         columns={[
                                             {
                                                 title: <div className="title-text">작업지시</div>,
                                                 dataIndex: 'productionOrderName',
                                                 key: 'productionOrderName',
-                                                width: '30%',
                                                 align: 'center',
                                                 render: (text) => <div>{text}</div>,
                                             },
@@ -377,7 +491,6 @@ const SelectedWorkcenterSection = ({
                                                 title: <div className="title-text">교대유형</div>,
                                                 dataIndex: 'shiftTypeName',
                                                 key: 'shiftTypeName',
-                                                width: '15%',
                                                 align: 'center',
                                                 render: (text) => <div>{text}</div>,
                                             },
@@ -385,7 +498,6 @@ const SelectedWorkcenterSection = ({
                                                 title: <div className="title-text">작업자(사번)</div>,
                                                 dataIndex: 'workerName',
                                                 key: 'workerName',
-                                                width: '25%',
                                                 align: 'center',
                                                 render: (text, record) => (
                                                     <div>{text} ({record.employeeNumber})</div>
@@ -395,7 +507,6 @@ const SelectedWorkcenterSection = ({
                                                 title: <div className="title-text">배정일자</div>,
                                                 dataIndex: 'assignmentDate',
                                                 key: 'assignmentDate',
-                                                width: '15%',
                                                 align: 'center',
                                             },
                                     ]}></Table>
@@ -492,11 +603,8 @@ const SelectedWorkcenterSection = ({
                                                 } else {
                                                     const filtered = initialModalData.filter((item) => {
                                                         return (
-                                                            // (item.factory && item.factoryCode.toLowerCase().includes(value)) ||
-                                                            // (item.factory && item.factoryName.toLowerCase().includes(value))
-
-                                                            (item.factoryCode && item.code.toLowerCase().includes(value)) ||
-                                                            (item.factoryName && item.name.toLowerCase().includes(value))
+                                                            (item.code && item.code.toLowerCase().includes(value)) ||
+                                                            (item.name && item.name.toLowerCase().includes(value))
                                                         );
                                                     });
                                                     setModalData(filtered);
@@ -509,13 +617,14 @@ const SelectedWorkcenterSection = ({
                                                 columns={[
                                                     {
                                                         title: <div className="title-text">코드</div>,
-                                                        dataIndex: 'factoryCode',
-                                                        key: 'factoryCode',
+                                                        dataIndex: 'code',
+                                                        key: 'code',
                                                         align: 'center'
                                                     },
                                                     {
                                                         title: <div className="title-text">이름</div>,
-                                                        key: 'factoryName',
+                                                        dataIndex: 'name',
+                                                        key: 'name',
                                                         align: 'center',
                                                     },
                                                 ]}
@@ -535,71 +644,6 @@ const SelectedWorkcenterSection = ({
                                             />
                                         )}
                                     </>
-                                )}
-                                {currentField === 'equipment' && (
-                                    <>
-                                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                            설비 선택
-                                        </Typography>
-                                        <Input
-                                            placeholder="검색"
-                                            prefix={<SearchOutlined />}
-                                            onChange={(e) => {
-                                                const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
-                                                if (!value) {
-                                                    setModalData(initialModalData);
-                                                } else {
-                                                    const filtered = initialModalData.filter((item) => {
-                                                        return (
-                                                            (item.equipmentNum && item.equipmentNum.toLowerCase().includes(value)) ||
-                                                            (item.equipmentName && item.equipmentName.toLowerCase().includes(value)) ||
-                                                            (item.modelName && item.modelName.toLowerCase().includes(value))
-                                                        );
-                                                    });
-                                                    setModalData(filtered);
-                                                }
-                                            }}
-                                            style={{ marginBottom: 16 }}
-                                        />
-                                        {modalData && (
-                                            <Table
-                                                columns={[
-                                                    {
-                                                        title: <div className="title-text">설비번호</div>,
-                                                        dataIndex: 'equipmentNum',
-                                                        key: 'equipmentNum',
-                                                        align: 'center'
-                                                    },
-                                                    {
-                                                        title: <div className="title-text">설비명</div>,
-                                                        dataIndex: 'equipmentName',
-                                                        key: 'equipmentName',
-                                                        align: 'center'
-                                                    },
-                                                    {
-                                                        title: <div className="title-text">모델명</div>,
-                                                        dataIndex: 'modelName',
-                                                        key: 'modelName',
-                                                        align: 'center'
-                                                    },
-                                                ]}
-                                                dataSource={modalData}
-                                                rowKey={(record) => record.equipmentNum || record.id} // 고유 필드를 사용해 rowKey 설정
-                                                size={'small'}
-                                                pagination={{
-                                                    pageSize: 15,
-                                                    position: ['bottomCenter'],
-                                                    showSizeChanger: false,
-                                                    showTotal: (total) => `총 ${total}개`,
-                                                }}
-                                                onRow={(record) => ({
-                                                    style: { cursor: 'pointer' },
-                                                    onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                })}
-                                            />
-                                        )}
-                                    </>
-
                                 )}
 
                                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
