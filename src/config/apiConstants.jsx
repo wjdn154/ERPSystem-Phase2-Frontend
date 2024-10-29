@@ -180,7 +180,7 @@ export const LOGISTICS_API = {
     WAREHOUSE_CREATE_API: `${API_BASE_URL}/api/logistics/warehouse/createWarehouse`, // 창고 생성 API
     WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/updateWarehouse/${id}`, // 창고 수정 API
     WAREHOUSE_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/deleteWarehouse/${id}`, // 창고 삭제 API
-    LOCATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/location/${id}`, // 창고 위치 상세 조회 API
+    LOCATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/location/${id}`, // 창고별 로케이션 조회
     HIERARCHY_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/`, // 계층 그룹 목록 조회 API
     HIERARCHY_GROUP_WAREHOUSES_API: (groupId) => `${API_BASE_URL}/api/logistics/hierarchyGroup/${groupId}/warehouses`, // 계층 그룹의 창고 조회 API
     HIERARCHY_GROUP_SAVE_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/saveHierarchyGroup`, // 계층 그룹 저장 API
@@ -237,6 +237,7 @@ export const LOGISTICS_API = {
     RECEIVING_SCHEDULE_PROCESS_API: () => `${API_BASE_URL}/api/logistics/receivingSchedules/process`, // 입고 처리 요청 API
     RECEIVING_SCHEDULE_WAITING_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/receivingSchedules/waiting?startDate=${startDate}&endDate=${endDate}`, // 특정 날짜 범위 내 대기 중인 입고 일정 조회 API
     INVENTORY_BY_LOCATION_API: (locationId) => `${API_BASE_URL}/api/logistics/inventory/byLocation/${locationId}`, // 특정 위치의 재고 조회 API
+    INVENTORY_BY_WAREHOUSE_API: (warehouseId) => `${API_BASE_URL}/api/logistics/inventory/warehouse/${warehouseId}`, // 특정 위치의 재고 조회 API
     RECEIVING_SCHEDULE_PROCESS_CREATE_API: (id) => `${API_BASE_URL}/api/logistics/receivingSchedules/process/${id}`, // ReceivingSchedule 입고 처리 API
     SHIPPING_ORDER_DETAILS_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipping-order-details/details?startDate=${startDate}&endDate=${endDate}`, // 특정 날짜 범위의 출하지시서 상세 정보 조회 API
     SHIPPING_PROCESS_REGISTER_API: `${API_BASE_URL}/api/logistics/shipping-process/register`, // ShippingProcessing 등록 API
