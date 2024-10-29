@@ -127,8 +127,8 @@ export const subMenuItems = {
                 { text: '사원 관리', component: 'EmployeeManagementPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
                 { text: '사용자 관리', component: 'UserManagementPage', apiPath: EMPLOYEE_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한
                 { text: '부서 관리', component: 'DepartmentManagementPage', apiPath: EMPLOYEE_API.DEPARTMENT_DATA_API, url: '/hr/basic-info/department-management', requiredPermission: 'departmentManagementPermission', permissionLevel: 'GENERAL' },  // 부서 관리 권한
-                { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: undefined, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
-                { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: undefined, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
+                { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: EMPLOYEE_API.TRANSFER_DATA_API, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
+                { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: EMPLOYEE_API.PERFORMANCE_DATA_API, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
                 { text: '퇴사자 관리', component: 'RetirementManagementPage', apiPath: undefined, url: '/hr/basic-info/retirement-management', requiredPermission: 'retirementManagementPermission', permissionLevel: 'GENERAL' },  // 퇴사자 관리 권한
                 { text: '급여 환경 설정', component: 'SalaryEnvironmentSettingsPage', apiPath: EMPLOYEE_API.POSITION_DATA_API, url: '/hr/basic-info/salary-environment-settings', requiredPermission: 'salaryEnvironmentSettingsPermission', permissionLevel: 'GENERAL' },  // 급여 환경 설정 권한
                 { text: '급여 체계 관리', component: 'SalarySystemManagementPage', apiPath: undefined, url: '/hr/basic-info/salary-system-management', requiredPermission: 'salarySystemManagementPermission', permissionLevel: 'GENERAL' },  // 급여 체계 관리 권한
@@ -137,8 +137,8 @@ export const subMenuItems = {
         {
             text: '출결 관리',
             items: [
-                { text: '근태 관리', component: 'AttendanceManagementPage', apiPath: undefined, url: '/hr/attendance/time-management', requiredPermission: 'timeManagementPermission', permissionLevel: 'GENERAL' },  // 근태 관리 권한
-                { text: '휴가 관리', component: 'LeaveManagementPage', apiPath: undefined, url: '/hr/attendance/leave-management', requiredPermission: 'leaveManagementPermission', permissionLevel: 'GENERAL' },  // 휴가 관리 권한
+            { text: '근태 관리', component: 'AttendanceManagementPage', apiPath: EMPLOYEE_API.ATTENDANCE_DATA_API, url: '/hr/attendance/time-management', requiredPermission: 'timeManagementPermission', permissionLevel: 'GENERAL' },  // 근태 관리 권한
+                { text: '휴가 관리', component: 'LeaveManagementPage', apiPath: EMPLOYEE_API.LEAVE_DATA_API, url: '/hr/attendance/leave-management', requiredPermission: 'leaveManagementPermission', permissionLevel: 'GENERAL' },  // 휴가 관리 권한
                 { text: '초과근무 관리', component: 'OvertimeManagementPage', apiPath: undefined, url: '/hr/attendance/overtime-management', requiredPermission: 'overtimeManagementPermission', permissionLevel: 'GENERAL' },  // 초과근무 관리 권한
             ]
         },
@@ -156,6 +156,7 @@ export const subMenuItems = {
             text: '급여 관리',
             items: [
                 { text: '급여 정산', component: 'SalarySettlementPage', apiPath: undefined, url: '/hr/payroll/salary-settlement', requiredPermission: null, permissionLevel: 'GENERAL' },
+                { text: '급여 등록', component: 'SalaryRegistrationPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/payroll/salary-registration', requiredPermission: null, permissionLevel: 'GENERAL' },
                 { text: '지급항목 관리', component: 'PaymentItemManagementPage', apiPath: undefined, url: '/hr/payroll/payment-item-management', requiredPermission: null, permissionLevel: 'GENERAL' },
                 { text: '공제 관리', component: 'DeductionManagementPage', apiPath: undefined, url: '/hr/payroll/deduction-management', requiredPermission: null, permissionLevel: 'GENERAL' },
                 { text: '사회보험', component: 'SocialInsurancePage', apiPath: undefined, url: '/hr/payroll/social-insurance', requiredPermission: null, permissionLevel: 'GENERAL' },
@@ -295,9 +296,10 @@ export const subMenuItems = {
         {
             text: '작업 지시 관리',
             items: [
-                { text: '교대 유형 관리', component: 'ShiftTypePage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/shift-type', requiredPermission: 'shiftTypePermission', permissionLevel: 'GENERAL' },  // 교대유형 관리 권한
-                { text: '작업 지시 관리', component: 'ProductionOrderPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },  // 작업 지시 관리 권한
-                { text: '작업배정이력 관리', component: 'AssignmentHistoryPage', apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_MONTHLY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },  // 작업배정이력 관리 권한
+                { text: '작업 지시 등록', component: 'ProductionOrderRegistrationPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },
+                { text: '작업 지시 확정', component: 'ProductionOrderConfirmationPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_UNCONFIRMED_LIST_API, url: '/production/common-scheduling/production-order-confirmation', requiredPermission: 'productionOrderConfirmationPermission', permissionLevel: 'GENERAL' },
+                { text: '작업 지시 마감', component: 'ProductionOrderClosingPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order-closing', requiredPermission: 'productionOrderClosingPermission', permissionLevel: 'GENERAL' },
+                { text: '작업배정이력 관리', component: 'AssignmentHistoryPage', apiPath: PRODUCTION_API.WORKER_ASSIGNMENT_MONTHLY_API, url: '/production/common-scheduling/worker-assignment', requiredPermission: 'workerAssignmentPermission', permissionLevel: 'GENERAL' },
             ]
         },
         {

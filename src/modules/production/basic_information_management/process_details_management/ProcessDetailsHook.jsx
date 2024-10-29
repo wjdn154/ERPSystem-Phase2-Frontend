@@ -58,18 +58,6 @@ export const useProcessDetails = (initialData) => {
                 content: '삭제가 완료되었습니다.',
             });
 
-            // setData((prevState) => {
-            //     const updatedDetails = prevState.filter((processDetail) => processDetail.code !== code);
-            //
-            //     // code 재정렬 로직: 삭제 후 남은 항목의 code를 1부터 연속적으로 할당
-            //     const reindexedDetails = updatedDetails.map((detail, index) => ({
-            //         ...detail,
-            //         code: `PRC${(index + 1).toString().padStart(3, '0')}`, // code를 1부터 시작하도록 재설정, 예: "PRC001"
-            //     }));
-            //
-            //     return reindexedDetails;
-            // });
-
             // 선택된 공정 세부사항이 삭제된 경우, 상세 보기 초기화
             if (processDetail && processDetail.code === code) {
                 setProcessDetail(null);
@@ -139,28 +127,6 @@ export const useProcessDetails = (initialData) => {
         })
     }
 
-    // handleSave
-    const handleSave = async () => {
-        try {
-            const confirmSave = window.confirm("저장하시겠습니까?");
-
-            if (!confirmSave) return; // 사용자가 '아니오'를 선택하면 저장을 중단
-
-            if (isEditing) {
-                await createProcessDetail(processDetail); // 새로운 공정 생성
-            } else {
-                await updateProcessDetail(processDetail.code, processDetail); // 기존 공정 업데이트
-            }
-
-            const updatedData = await fetchProcessDetails();
-            setData(updatedData);
-            handleClose();
-        } catch (error) {
-            console.error("공정 저장 중 오류 발생:", error); // TODO 에러페이지 반환
-        }
-    }
-
-
     // handleClose
     const handleClose = (e) => {
         setIsProcessModalVisible(false);
@@ -181,19 +147,6 @@ export const useProcessDetails = (initialData) => {
         setIsProcessModalVisible(true);
     };
 
-    // // 기존 백엔드 구현 활용한 검색 핸들러
-    // const handleSearch = async (name) => {
-    //     try {
-    //         setIsSearchActive(true); // 검색이 실행됨을 표시
-    //         const results = await searchProcessDetails(name);
-    //         setSearchData(results);
-    //     } catch (error) {
-    //         console.error("검색 중 오류 발생:", error);
-    //         setSearchData([]); // 검색 오류 시 빈 결과로 설정
-    //     }
-    // };
-
-
     // 클라이언트에서 필터링
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -213,13 +166,13 @@ export const useProcessDetails = (initialData) => {
 
     return {
         data,
+        setData,
         processDetail,
         setProcessDetail,
         isProcessModalVisible,
         handleDeleteProcessDetail,
         handleSelectedRow,
         handleInputChange,
-        handleSave,
         handleClose,
         handleAddProcess,
         handleSearch,

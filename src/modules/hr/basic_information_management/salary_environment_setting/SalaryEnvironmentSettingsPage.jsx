@@ -200,7 +200,7 @@ const RetirementManagementPage = ({ initialData }) => {
                                                         dataIndex: ['allowances', allowance.allowanceId - 1, 'amount'],
                                                         key: `allowance_${allowance.allowanceId}`,
                                                         align: 'center',
-                                                        render: (text) => text ? <div className="small-text">{text.toLocaleString()} 원</div> : ''
+                                                        render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{text.toLocaleString()}</div> : ''
                                                     }))
                                                     : []
                                             ),
@@ -209,7 +209,7 @@ const RetirementManagementPage = ({ initialData }) => {
                                                 dataIndex: 'totalAllowance',
                                                 key: 'totalAllowance',
                                                 align: 'center',
-                                                render: (text) => text ? <div className="small-text">{text.toLocaleString()} 원</div> : ''
+                                                render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{text.toLocaleString()}</div> : ''
                                             }
                                         ]}
                                         rowKey="positionSalaryStepId"

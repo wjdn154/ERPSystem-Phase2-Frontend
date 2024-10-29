@@ -111,6 +111,7 @@ export const EMPLOYEE_API = {
     SAVE_DEPARTMENT_DATA_API: `${API_BASE_URL}/api/hr/department/createDepartment`,
     DEPARTMENT_DATA_DETAIL_API:(id) => `${API_BASE_URL}/api/hr/department/${id}`,
     DELETE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/delete/${id}`,
+    UPDATE_DEPARTMENT_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
 
     ALLOWANCE_DATA_API: `${API_BASE_URL}/api/hr/basicconfiguration/allowance/show`,
     UPDATE_DEPARTMENT_DATA_API:(id)=> `${API_BASE_URL}/api/hr/department/update/${id}`,
@@ -130,12 +131,35 @@ export const EMPLOYEE_API = {
 
     //  인사관리 - 휴가
     LEAVE_DATA_API: `${API_BASE_URL}/api/hr/leaves/list`,
-    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/{id}`,
+    LEAVE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/api/hr/leaves/${id}`,
     SAVE_LEAVE_API:`${API_BASE_URL}/api/hr/leaves/createLeaves`,
+
+    // 인사관리  - 성과
+    PERFORMANCE_DATA_API: `${API_BASE_URL}/api/hr/performance/list`,
+    PERFORMANCE_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/performance/employee/${id}`,
+    SAVE_PERFORMANCE_API:  `${API_BASE_URL}/api/hr/performance/save`,
+    UPDATE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/put/${performanceId}`,
+    DELETE_PERFORMANCE_API:(performanceId) =>  `${API_BASE_URL}/api/hr/performance/del/${performanceId}`,
+    // 인사관리  - 발령
+    SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
+    TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
+    SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
+    UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/api/hr/transfer/update/${id}`,
+    TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
+
 
     //  인사관리 - 급여
     POSITION_SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/show`,
     POSITION_SALARY_STEP_DATE_CATEGORY_API: `${API_BASE_URL}/api/hr/basicconfiguration/positionsalarystep/datecategoryshow`,
+    SALARY_ENTRY_API: `${API_BASE_URL}/api/hr/salary/entry`, // 급여 등록
+    SALARY_SHOW_API: `${API_BASE_URL}/api/hr/salary/show`, // 급여 조회
+    SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/salarystep/show`, // 호봉 조회
+    LONG_TERM_CARE_INSURANCE_PENSION_API: `${API_BASE_URL}/api/hr/long_term_care_insurance_pension/show`, // 장기요양보험 연금 조회
+    EMPLOYMENT_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/employment_insurance_pension/calculator`, // 고용보험 연금 계산
+    HEALTH_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/health_insurance_pension/calculator`, // 건강보험 연금 계산
+    NATIONAL_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/national_pension/calculator`, // 국민연금 계산
+
+
 
 
 }
@@ -298,6 +322,7 @@ export const PRODUCTION_API = {
     MPS_LIST_API: `${API_BASE_URL}/api/production/mps/search`, // 전체 MPS 목록 조회 API
     MPS_CREATE: `${API_BASE_URL}/api/production/mps/new`,             // MPS 생성 API
     MPS_COMPLETE: (id) => `${API_BASE_URL}/api/production/mps/${id}/complete`, // MPS 완료 처리 API
+    MPS_CONFIRM: (id) => `${API_BASE_URL}/api/production/mps/${id}/confirm`, // MPS 완료 처리 API
     MPS_GET_BY_ID: (id) => `${API_BASE_URL}/api/production/mps/${id}`, // 특정 MPS 조회 API
     MPS_UPDATE: (id) => `${API_BASE_URL}/api/production/mps/update/${id}`, // MPS 업데이트 API
     MPS_DELETE: (id) => `${API_BASE_URL}/api/production/mps/delete/${id}`, // MPS 삭제 API
@@ -320,6 +345,7 @@ export const PRODUCTION_API = {
     WORKER_ASSIGNMENT_WORKER_HISTORY_API: (workerId) => `${API_BASE_URL}/api/production/workerAssignment/worker/${workerId}/assignments`, // 작업자별 배치이력 조회 API
 
     PRODUCTION_ORDER_LIST_API: `${API_BASE_URL}/api/production/productionOrder/all`, // 전체 작업 지시 목록 조회 API
+    PRODUCTION_ORDER_UNCONFIRMED_LIST_API: `${API_BASE_URL}/api/production/productionOrder/unconfirmed`, // 미확정인 전체 작업 지시 목록 조회 API
     PRODUCTION_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}`, // 특정 작업 지시 조회 API
     PRODUCTION_ORDER_SAVE_API: `${API_BASE_URL}/api/production/productionOrder/save`, // 작업 지시 생성 API
     PRODUCTION_ORDER_ASSIGN_WORKERS_API: (id) => `${API_BASE_URL}/api/production/productionOrder/${id}/assignWorkers`, // 작업 지시 작업자 배정 API
