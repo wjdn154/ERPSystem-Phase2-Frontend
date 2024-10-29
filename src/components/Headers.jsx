@@ -50,7 +50,7 @@ function Headers() {
                             console.log("구독 성공:", event.data);
                             try {
                                 const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
-                                console.log("알림 목록:", response2);
+                                console.log(response2);
                                 setNotificationItems(response2.data);
                                 setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
                             } catch (error) {
@@ -59,16 +59,18 @@ function Headers() {
                         });
 
                         eventSourceRef.current.addEventListener("notification", async (event) => {
-                            console.log("알림 수신:", event.data);
+                            console.log(event.data);
                             notify('info', "알림", event.data, 'topRight');
-                            try {
-                                const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
-                                console.log("알림 생성:", response2);
-                                setNotificationItems(response2.data);
-                                setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
-                            } catch (error) {
-                                console.error("알림 생성 에러:", error);
-                            }
+                            setTimeout(async () => {
+                                try {
+                                    const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
+                                    console.log(response2);
+                                    setNotificationItems(response2.data);
+                                    setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
+                                } catch (error) {
+                                    console.error("알림 생성 에러:", error);
+                                }
+                            }, 300);  // 300ms 지연
                         });
 
 
@@ -106,6 +108,7 @@ function Headers() {
             const response = await apiClient.post(
                 COMMON_API.CREATE_NOTIFICATION_API(employeeId, module, permissionLevel)
             );
+            console.log(response.data);
             setNotificationItems(response.data);
             setUnreadCount(response.data.filter((item) => !item.readStatus).length);
         } catch (error) {
