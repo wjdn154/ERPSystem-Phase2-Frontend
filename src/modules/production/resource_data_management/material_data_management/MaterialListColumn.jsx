@@ -19,21 +19,21 @@ const MaterialType = {
 export const
     materialListColumn = [
         {
-            title: <span>코드</span>,  // 컬럼 제목
+            title: <div className="title-text">코드</div>,
             dataIndex: 'materialCode',  // 데이터 인덱스: 이 필드는 데이터 객체의 'materialCode' 속성과 연결됩니다.
             key:'materialCode',
             width: '15%',  // 컬럼 너비 설정
             align: 'center',
         },
         {
-            title: <span>자재 명</span>,
+            title: <div className="title-text">자재명</div>,
             dataIndex: 'materialName',
             key: 'materialName',
             width: '20%',
             align: 'center',
         },
         {
-            title: <span>유형</span>,
+            title: <div className="title-text">자재유형</div>,
             dataIndex: 'materialType',
             key:'materialType',
             width: '15%',
@@ -43,28 +43,28 @@ export const
             }
         },
         {
-            title: <span>재고 수량</span>,
+            title: <div className="title-text">재고수량</div>,
             dataIndex: 'stockQuantity',
             key:'stockQuantity',
             width: '10%',
             align: 'center',
         },
         {
-            title: <span>구매 가격</span>,
+            title: <div className="title-text">매입가(원)</div>,
             dataIndex: 'purchasePrice',
             key:'purchasePrice',
             width: '15%',
             align: 'center',
         },
         {
-            title: <span>거래처 명</span>,
+            title: <div className="title-text">거래처명</div>,
             dataIndex: 'representativeName',
             key:'representativeName',
             width: '15%',
             align: 'center',
         },
         {
-            title: <span>유해물질 개수</span>,
+            title: <div className="title-text">유해물질 포함수량</div>,
             dataIndex: 'hazardousMaterialQuantity',
             key:'hazardousMaterialQuantity',
             width: '10%',

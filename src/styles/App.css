@@ -216,6 +216,17 @@ input.ant-input[readonly] {
   background-color: #F7F7F7;
 }
 
+.summary-row-level-1 {
+  background-color: #F7F7F7;
+}
+.summary-row-level-2 {
+  background-color: #F7F7F7;
+}
+.summary-row-level-3 {
+  background-color: #F7F7F7;
+}
+
+
 
 .title-text {
   font-size: 0.8rem;

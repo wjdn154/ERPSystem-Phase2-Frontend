@@ -13,8 +13,6 @@ import UserPermissionPage
     from "../../integration/pages/basic_information_management/UserPermission/UserPermissionPage.jsx";
 import PendingVoucherApprovalPage
     from "../../financial/voucher_entry/pending_voucher_approval/PendingVoucherApprovalPage.jsx";
-import CompanyInfoEditPage
-    from "../../integration/pages/basic_information_management/company_info_edit/CompanyInfoEditPage.jsx";
 import AccountLedgerPage from "../../financial/ledger/account_ledger/AccountLedgerPage.jsx";
 import ClientLedgerPage from "../../financial/ledger/client_ledger/ClientLedgerPage.jsx";
 import ClosingDataEntryPage
@@ -135,14 +133,14 @@ import QuotationPage from "../../logistics/sales_management/quotation/QuotationP
 import OrderFormPage from "../../logistics/sales_management/order_form/OrderFormPage.jsx";
 import SalesPage from "../../logistics/sales_management/sales/SalesPage.jsx";
 import ShipmentInstructionPage from "../../logistics/sales_management/sales_management/ShipmentInstructionPage.jsx";
-import ShipmentPage from "../../logistics/sales_management/shipment/ShipmentPage.jsx";
+import ShippingOrderPage from "../../logistics/sales_management/shipping_order/ShippingOrderPage.jsx";
 import PurchaseRequestPage from "../../logistics/purchase_management/purchase_request/PurchaseRequestPage.jsx";
 import PurchasePlanPage from "../../logistics/purchase_management/purchase_plan/PurchasePlanPage.jsx";
 import PriceRequestPage from "../../logistics/purchase_management/price_request/PriceRequestPage.jsx";
 import PurchaseOrderPage from "../../logistics/purchase_management/purchase_order/PurchaseOrderPage.jsx";
 import PurchasePage from "../../logistics/purchase_management/purchase/PurchasePage.jsx";
-import ReceivingInstructionPage
-    from "../../logistics/purchase_management/receiving_instruction/ReceivingInstructionPage.jsx";
+import ReceivingOrderPage
+    from "../../logistics/purchase_management/receiving_order/ReceivingOrderPage.jsx";
 import ReturnRequestPage from "../../logistics/return_management/return_request/ReturnRequestPage.jsx";
 import ReturnStatusPage from "../../logistics/return_management/return_status/ReturnStatusPage.jsx";
 import ShipmentInstructionInquiryPage
@@ -181,9 +179,9 @@ import MakeToOrderPlanPage
     from "../../production/production_schedule_management/make_to_order_plan/MakeToOrderPlanPage.jsx";
 import MakeToStockPlanPage
     from "../../production/production_schedule_management/make_to_stock_plan/MakeToStockPlanPage.jsx";
-import ShiftTypePage from "../../production/work_order_management/shift_type_management/ShiftTypePage.jsx";
-import ProductionOrderPage
-    from "../../production/work_order_management/production_order_management/ProductionOrderPage.jsx";
+import ProductionOrderConfirmationPage from "../../production/work_order_management/production_order_confirmation/ProductionOrderConfirmationPage.jsx";
+import ProductionOrderRegistrationPage
+    from "../../production/work_order_management/production_order_registration/ProductionOrderRegistrationPage.jsx";
 import AssignmentHistoryPage
     from "../../production/work_order_management/assignment_history_management/AssignmentHistoryPage.jsx";
 import WorkPerformancePage
@@ -205,13 +203,18 @@ import OutsourcingInspectionPage
     from "../../production/outsourcing_management/outsourcing_inspection_management/OutsourcingInspectionPage.jsx";
 import PendingSalesPurchaseVoucherApprovalPage
     from "../../financial/voucher_entry/pending_sales_purchase_voucher_approval/PendingSalesPurchaseVoucherApprovalPage.jsx";
+import SalaryEnvironmentSettingsPage
+    from "../../hr/basic_information_management/salary_environment_setting/SalaryEnvironmentSettingsPage.jsx";
+import SalaryRegistrationPage from "../../hr/payroll_management/salary_registration/SalaryRegistrationPage.jsx";
+import ProductionOrderClosingPage
+    from "../../production/work_order_management/production_order_closing/ProductionOrderClosingPage.jsx";
 
 // 필요한 페이지 컴포넌트들
 
 // 컴포넌트 매핑 객체 생성
 const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistoryPage, ClientRegistrationPage,
     WorkerPage, IntegrationDashboardPage,FinanceDashboardPage, ProductionDashboardPage, HRDashboardPage, LogisticsDashboardPage, PendingVoucherInputPage,
-    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, CompanyInfoEditPage, VoucherListPage,
+    UserPermissionPage, SystemEnvironmentSettingsPage, PendingVoucherApprovalPage, BomPage, VoucherListPage,
     PendingSalesPurchaseVoucherInputPage, PendingSalesPurchaseVoucherApprovalPage, ElectronicTaxInvoicePage, ClientLedgerPage, ClientAccountLedgerPage, AccountLedgerPage, CashBookPage, DailyMonthlyReportPage,
     JournalPage, GeneralLedgerPage, SalesPurchaseLedgerPage, TaxInvoiceStatusPage, VoucherPrintPage, ClosingDataEntryPage, TrialBalancePage, FinancialPositionPage, IncomeStatementPage, CostStatementPage, ProfitDistributionStatementPage,
     CashFlowStatementPage, EquityChangesStatementPage, ClosingAnnexStatementPage, PreviousFinancialPositionPage, PreviousIncomeStatementPage,
@@ -222,14 +225,14 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     ApplicantManagementPage, ApplicationManagementPage, InterviewManagementPage, JobOfferManagementPage, SalarySettlementPage, DeductionManagementPage,
     PaymentItemManagementPage, SocialInsurancePage, PayStatementPage, RetirementBenefitEstimationPage, RetirementSettlementPage, PensionManagementPage,
     WithholdingTaxDeclarationPage, LocalIncomeTaxDeclarationPage, PaymentStatementIssuancePage, BusinessIncomeManagementPage, OtherIncomeManagementPage,
-    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShipmentPage,
-    PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingInstructionPage, ReturnRequestPage, ReturnStatusPage,
+    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShippingOrderPage,
+    PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingOrderPage: ReceivingOrderPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
     AdjustmentStatusPage, WorkcenterManagementPage, ProcessDetailsPage, RoutingManagementPage, MaterialDataPage, WasteManagementPage, ProductionRequestPage,
-    MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ShiftTypePage, ProductionOrderPage, AssignmentHistoryPage,
+    MasterProductionPage, MaterialInputStatusPage, MrpPage, MakeToOrderPlanPage, MakeToStockPlanPage, ProductionOrderConfirmationPage, ProductionOrderRegistrationPage, AssignmentHistoryPage,
     WorkPerformancePage, MonthlyWorkReportPage, DailyWorkReportPage, DefectTypeManagementPage, QualityInspectionPage, LotManagementPage, SerialNumberPage, GoodsReceiptPage,
-    OutsourcingOrderPage, OutsourcingInspectionPage,
+    OutsourcingOrderPage, OutsourcingInspectionPage, SalaryEnvironmentSettingsPage, SalaryRegistrationPage, ProductionOrderClosingPage
 };
 
 // MainContentPage 컴포넌트
