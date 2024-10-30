@@ -82,6 +82,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
+            console.log(formData);
             const response = await apiClient.post(COMMON_API.LOGIN_API, formData);
             // 서버로부터 토큰과 권한 정보를 받아옴
             const { token, permission, isAdmin } = response.data;
