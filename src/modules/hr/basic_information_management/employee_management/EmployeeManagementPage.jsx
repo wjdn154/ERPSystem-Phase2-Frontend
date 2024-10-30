@@ -299,6 +299,14 @@ const EmployeeManagementPage = ({ initialData }) => {
             },
         });
     };
+    // 사업자등록번호, 주민등록번호, 전화번호, 팩스번호 포맷 함수
+    const formatPhoneNumber = (value) => {
+        if (!value) return '';
+        const cleanValue = value.replace(/[^\d]/g, ''); // 숫자 외의 모든 문자 제거
+        if (cleanValue.length <= 3) return cleanValue;
+        if (cleanValue.length <= 7) return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3)}`;
+        return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 7)}-${cleanValue.slice(7)}`;
+    };
     // 탭 변경 핸들러
     const handleTabChange = (key) => {
         setEditEmployee(false);
@@ -354,7 +362,9 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                         display: 'flex',
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
-                                                        height: '100%', // 모든 행의 높이를 동일하게 고정
+                                                        padding: '5px', // padding 추가
+                                                        backgroundColor: '#f9f9f9', // 약간의 배경색 추가
+                                                        borderRadius: '8px' // 테두리 둥글게
                                                     }}>
                                                         <img
                                                             src={record.imagePath ? record.imagePath: defaultImage}
@@ -362,13 +372,12 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                             style={{
                                                                 width: '60px',
                                                                 height: '60px',
-                                                                objectFit: 'cover',
+                                                                objectFit: 'contain', // contain으로 설정하여 비율 유지
                                                                 borderRadius: '5px',
                                                             }}
                                                         />
                                                     </div>
                                                 ),
-                                                width: '15%'
                                             },
                                             {
                                                 title: <div className="title-text">입사일자</div>,
@@ -511,7 +520,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                             }
                                         ]}
                                         rowKey={(record) => record.id}
-                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
                                         size="small"
                                         rowSelection={{
                                             type: 'radio',
@@ -599,7 +608,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                             </Form.Item>
                                                         </Col>
                                                         <Col span={12}>
-                                                            <Form.Item name="registrationNumber" rules={[{ required: true, message: '생년월일을 입력하세요.' }]}>
+                                                            <Form.Item name="registrationNumber" rules={[{ required: true, message: '주민등록번호를 입력하세요.' }]}>
                                                                 <Input addonBefore="주민등록번호" disabled={'registrationNumber'}/>
                                                             </Form.Item>
                                                         </Col>
@@ -612,7 +621,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                         </Col>
                                                         <Col span={12}>
                                                             <Form.Item name="employeeNumber">
-                                                                <Input addonAfter="사원번호" disabled={'employeeNumber'} placeholder ="입사일자에 맞춰 사원번호 자동 지정"/>
+                                                                <Input addonBefore="사원번호" disabled={'employeeNumber'} placeholder ="입사일자에 맞춰 사원번호 자동 지정"/>
                                                             </Form.Item>
                                                         </Col>
                                                     </Row>
@@ -631,8 +640,8 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={12}>
-                                                    <Form.Item name="phoneNumber" rules={[{ required: true, message: '휴대폰 번호를 입력하세요.' }]}>
-                                                        <Input addonBefore="휴대폰 번호" />
+                                                    <Form.Item name='phoneNumber' rules={[{ required: true, message: '전화번호를 입력하세요.' }]}>
+                                                        <Input addonBefore="전화번호" onChange={(e) => form.setFieldValue( 'phoneNumber', formatPhoneNumber(e.target.value))} />
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
@@ -849,7 +858,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     rowKey="code"
                                                                     size={'small'}
                                                                     pagination={{
-                                                                        pageSize: 15,
+                                                                        pageSize: 10,
                                                                         position: ['bottomCenter'],
                                                                         showSizeChanger: false,
                                                                         showTotal: (total) => `총 ${total}개`,
@@ -908,7 +917,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     rowKey="positionCode"
                                                                     size={'small'}
                                                                     pagination={{
-                                                                        pageSize: 15,
+                                                                        pageSize: 10,
                                                                         position: ['bottomCenter'],
                                                                         showSizeChanger: false,
                                                                         showTotal: (total) => `총 ${total}개`,
@@ -967,7 +976,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     rowKey="titleCode"
                                                                     size={'small'}
                                                                     pagination={{
-                                                                        pageSize: 15,
+                                                                        pageSize: 10,
                                                                         position: ['bottomCenter'],
                                                                         showSizeChanger: false,
                                                                         showTotal: (total) => `총 ${total}개`,
@@ -1309,7 +1318,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                 rowKey="code"
                                                                 size={'small'}
                                                                 pagination={{
-                                                                    pageSize: 15,
+                                                                    pageSize: 10,
                                                                     position: ['bottomCenter'],
                                                                     showSizeChanger: false,
                                                                     showTotal: (total) => `총 ${total}개`,
@@ -1368,7 +1377,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                 rowKey="positionCode"
                                                                 size={'small'}
                                                                 pagination={{
-                                                                    pageSize: 15,
+                                                                    pageSize: 10,
                                                                     position: ['bottomCenter'],
                                                                     showSizeChanger: false,
                                                                     showTotal: (total) => `총 ${total}개`,
@@ -1427,7 +1436,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                 rowKey="titleCode"
                                                                 size={'small'}
                                                                 pagination={{
-                                                                    pageSize: 15,
+                                                                    pageSize: 10,
                                                                     position: ['bottomCenter'],
                                                                     showSizeChanger: false,
                                                                     showTotal: (total) => `총 ${total}개`,
