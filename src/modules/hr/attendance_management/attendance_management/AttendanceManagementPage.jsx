@@ -8,7 +8,6 @@ import {EMPLOYEE_API} from '../../../../config/apiConstants.jsx';
 import { Divider } from 'antd';
 import { useNotificationContext } from "../../../../config/NotificationContext.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
-import api from "js-cookie";
 const { Option } = Select;
 const { confirm } = Modal;
 
@@ -131,6 +130,7 @@ const AttendanceManagementPage = ({initialData}) => {
 
                 const formattedValues = {
                     id: values.id,
+                    employeeId:values.employeeId,
                     employeeName:values.employeeName,
                     employeeNumber: attendanceParam.employeeNumber,
                     attendancesCode: values.attendancesCode,
@@ -144,8 +144,15 @@ const AttendanceManagementPage = ({initialData}) => {
                 try {
                     //console.log(formattedValues);
                     const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_ATTENDANCE_API(attendanceParam.id)  : EMPLOYEE_API.SAVE_ATTENDANCE_API;
-                    const response = await apiClient.post(API_PATH,formattedValues);
+                    console.log("확인용 : ", formattedValues);
+                    const response = await apiClient.post(API_PATH, formattedValues, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
                     const updatedData = response.data;
+                    console.log("updatedData:",updatedData);
 
                     if (type === 'update') {
                         setAttendanceList((prevList) =>
@@ -357,18 +364,165 @@ const AttendanceManagementPage = ({initialData}) => {
                 </Grid>
                     )}
 
-            {/*{editAttendance &&(*/}
-            {/*    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>*/}
-            {/*        <Grow in={true} timeout={200}>*/}
-            {/*            <Paper elevation={3} sx={{ height: '100%' }}>*/}
-            {/*                <Typography variant="h6" sx={{ padding: '20px' }}>근태 수정</Typography>*/}
-            {/*                <Grid sx={{ padding: '0px 20px 0px 20px' }}>*/}
-            {/*                    <Form*/}
-            {/*                        initialValues={fetchAttendanceData}*/}
-            {/*                        form={form}*/}
-            {/*                        onFinish={(values) => { handleFormSubmit(values, 'update'); }}*/}
-            {/*                    >*/}
-            {/*)}*/}
+            {editAttendance &&(
+                <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                    <Grow in={true} timeout={200}>
+                        <Paper elevation={3} sx={{ height: '100%' }}>
+                            <Typography variant="h6" sx={{ padding: '20px' }}>근태기록 수정</Typography>
+                            <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                <Table
+                                    dataSource={fetchAttendanceData}
+                                    columns={[
+                                        {
+                                            title: <div className="title-text">근태코드</div>,
+                                            dataIndex: 'attendanceCode',
+                                            key: 'attendanceCode',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>,
+                                        },
+                                        {
+                                            title: <div className="title-text">사원번호</div>,
+                                            dataIndex: 'employeeNumber',
+                                            key: 'employeeNumber',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>,
+                                        },
+                                        {
+                                            title: <div className="title-text">사원이름</div>,
+                                            dataIndex: 'employeeName',
+                                            key: 'employeeName',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>,
+                                        },
+                                        {
+                                            title: <div className="title-text">직위</div>,
+                                            dataIndex: 'positionName',
+                                            key: 'positionName',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>,
+                                        },
+                                        {
+                                            title: <div className="title-text">날짜</div>,
+                                            dataIndex: 'date',
+                                            key: 'date',
+                                            align: 'center',
+                                            render: (text) => <div className="small-text">{text}</div>,
+                                        },
+                                        {
+                                            title: <div className="title-text">출근시간</div>,
+                                            dataIndex: 'checkInTime',
+                                            key: 'checkInTime',
+                                            align: 'center',
+                                            render: (text) => {
+                                                const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                }) : '';
+                                                return <div className="small-text">{formattedTime}</div>;
+                                            },
+                                        },
+                                        {
+                                            title: <div className="title-text">퇴근시간</div>,
+                                            dataIndex: 'checkOutTime',
+                                            key: 'checkOutTime',
+                                            align: 'center',
+                                            render: (text) => {
+                                                const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                }) : '';
+                                                return <div className="small-text">{formattedTime}</div>;
+                                            },
+                                        },
+                                        {
+                                            title: <div className="title-text">근무상태</div>,
+                                            dataIndex: 'status',
+                                            key: 'status',
+                                            align: 'center',
+                                            render: (text) => {
+                                                let value;
+                                                switch (text) {
+                                                    case 'PRESENT':
+                                                        value = '출근';
+                                                        break;
+                                                    case 'ABSENT':
+                                                        value = '결근';
+                                                        break;
+                                                    case 'LEAVE':
+                                                        value = '휴가';
+                                                        break;
+                                                    case 'PUBLIC_HOLIDAY':
+                                                        value = '공휴일';
+                                                        break;
+                                                    case 'EARLY_LEAVE':
+                                                        value = '조퇴';
+                                                        break;
+                                                    case 'LATE':
+                                                        value = '지각';
+                                                        break;
+                                                    case 'BUSINESS_TRIP':
+                                                        value = '출장';
+                                                        break;
+                                                    case 'TRAINING':
+                                                        value = '교육';
+                                                        break;
+                                                    case 'SABBATICAL':
+                                                        value = '휴직';
+                                                        break;
+                                                    case 'SICK_LEAVE':
+                                                        value = '병가';
+                                                        break;
+                                                    case 'REMOTE_WORK':
+                                                        value = '자택 근무';
+                                                        break;
+                                                    case 'ON_DUTY':
+                                                        value = '근무';
+                                                        break;
+                                                    case 'OVERTIME':
+                                                        value = '야근';
+                                                        break;
+                                                    case 'SHIFT_WORK':
+                                                        value = '교대 근무';
+                                                        break;
+                                                    case 'LATE_AND_EARLY_LEAVE':
+                                                        value = '지각 및 조퇴';
+                                                        break;
+                                                }
+                                                return <div className="small-text">{value}</div>;
+                                            },
+                                        },
+                                    ]}
+                                    rowKey={(record) => record.id}
+                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                    size="small"
+                                    rowSelection={{
+                                        type: 'radio',
+                                        selectedRowKeys,
+                                        onChange: (newSelectedRowKeys) => {
+                                            setSelectedRowKeys(newSelectedRowKeys);
+                                        }
+                                    }}
+                                    onRow={(record) => ({
+                                        style: { cursor: 'pointer' },
+                                        onClick: async () => {
+                                            setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
+                                            const id = record.id;
+                                            try {
+                                                const response = await apiClient.post(EMPLOYEE_API.ATTENDANCE_DETAIL_DATA_API(id));
+                                                setFetchAttendanceData(response.data);
+                                                setEditAttendance(true);
+                                                notify('success', '근태 조회', '근태 정보 조회 성공.', 'bottomRight')
+                                            } catch (error) {
+                                                notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                            }
+                                        },
+                                    })}
+                                />
+                            </Grid>
+                        </Paper>
+                    </Grow>
+                </Grid>
+            )}
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>

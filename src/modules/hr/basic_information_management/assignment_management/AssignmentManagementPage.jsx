@@ -32,7 +32,10 @@ const AssignmentManagementPage = ({ initialData }) => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [transfer, setTransfer] = useState([]); // 부서 데이터 상태
     const [departments, setDepartments] = useState([]); // 부서 데이터 상태
-    const [transferTypes, setTransferTypes] = useState([]);
+    const [transferType, setTransferType] = useState([]);
+
+
+
 
 
     const fetchEmployee = async () => {
@@ -86,26 +89,6 @@ const AssignmentManagementPage = ({ initialData }) => {
             fetchTransfer();
         }, []);
 
-
-// 발령유형 데이터를 API에서 가져오는 함수 예시
-    const fetchTransferTypes = async () => {
-        try {
-            const response = await apiClient.post(EMPLOYEE_API.TRANSFER_TYPE_DATA_API); // 발령유형 API 엔드포인트
-
-            if (Array.isArray(response.data)) {
-                setTransferTypes(response.data); // 배열인 경우에만 상태 업데이트
-            } else {
-            }
-        } catch (error) {
-            console.error('발령유형 목록을 가져오는 중 오류 발생:', error);
-        }
-    };
-
-// 컴포넌트가 처음 렌더링될 때 발령유형 목록 가져오기
-    useEffect(() => {
-        fetchTransferTypes();
-    }, []);
-
         // 부서 목록 가져오는 함수
         const fetchDepartments = async () => {
             try {
@@ -139,10 +122,15 @@ const AssignmentManagementPage = ({ initialData }) => {
             setTransferParam(fetchTransferData);
 
             setDisplayValues({
-                employeeName: `${fetchTransferData.employeeLastName} ${fetchTransferData.employeeFirstName}`,
-                fromDepartmentName: `[${fetchTransferData.fromDepartmentCode}] ${fetchTransferData.fromDepartmentName}`,
-                toDepartmentName: `[${fetchTransferData.toDepartmentCode}] ${fetchTransferData.toDepartmentName}`,
-                transferTypes:`[${fetchTransferData.transferTypeCode}] ${fetchTransferData.transferTypeDescription}`
+                employeeName: fetchTransferData.employeeLastName && fetchTransferData.employeeFirstName
+                    ? `${fetchTransferData.employeeLastName} ${fetchTransferData.employeeFirstName}`
+                    : '',
+                fromDepartmentName: fetchTransferData.fromDepartmentCode && fetchTransferData.fromDepartmentName
+                    ? `[${fetchTransferData.fromDepartmentCode}] ${fetchTransferData.fromDepartmentName}`
+                    : '',
+                toDepartmentName: fetchTransferData.toDepartmentCode && fetchTransferData.toDepartmentName
+                    ? `[${fetchTransferData.toDepartmentCode}] ${fetchTransferData.toDepartmentName}`
+                    : ''
             });
         }, [fetchTransferData, form]);
 
@@ -164,13 +152,11 @@ const AssignmentManagementPage = ({ initialData }) => {
             let apiPath;
             if (fieldName === 'transfer') apiPath = EMPLOYEE_API.TRANSFER_DATA_API;
             if (fieldName === 'employee') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
-            if (fieldName === 'transferTypes') apiPath = EMPLOYEE_API.TRANSFER_TYPE_DATA_API;
 
             try {
                 const response = await apiClient.post(apiPath);
-                if (fieldName === 'transferTypes' && Array.isArray(response.data)) {
-                    setModalData(response.data); // 모달에 사용될 데이터 설정
-                    setTransfer(response.data); // 선택 데이터를 저장할 state 업데이트
+                if (Array.isArray(response.data)) {
+                    setModalData(response.data); // 모달 데이터 상태 업데이트 추가
                 }
             } catch (error) {
                 notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -205,29 +191,13 @@ const AssignmentManagementPage = ({ initialData }) => {
                 case 'employee':
                     setTransferParam((prevParams) => ({
                         ...prevParams,
-                        employee: {
                             employeeId: record.id,
                             employeeNumber: record.employeeNumber,
                             employeeName: `${record.lastName}${record.firstName}`,
-
-                        },
                     }));
                     setDisplayValues((prevValues) => ({
                         ...prevValues,
                         employeeName: `[${record.employeeNumber}] ${record.lastName}${record.firstName}`,
-
-                    }));
-                    break;
-                case 'transferTypes':
-                    setTransferParam((prevParams) => ({
-                        ...prevParams,
-                            id: record.id,
-                            transferTypeCode: record.transferTypeCode || '',
-                            transferTypeDescription: record.transferTypeDescription || '',
-                    }));
-                    setDisplayValues((prevValues) => ({
-                        ...prevValues,
-                        transferTypes: `[${record.transferTypeCode}] ${record.transferTypeDescription}`,
 
                     }));
                     break;
@@ -237,6 +207,8 @@ const AssignmentManagementPage = ({ initialData }) => {
         };
 
         const handleFormSubmit = async (values, type) => {
+            console.log('values111: ', values)
+
             confirm({
                 title: '저장 확인',
                 content: '정말로 저장하시겠습니까?',
@@ -245,25 +217,24 @@ const AssignmentManagementPage = ({ initialData }) => {
                 onOk: async () => {
                     const employeeName = values.employeeName || '';
                     const formattedValues = {
-                        ...transferParam,
                         id: transferParam.id,
                         transferDate: values.transferDate,
                         employeeId: transferParam.employeeId,
                         employeeNumber: transferParam.employeeNumber,
                         employeeName: transferParam.employeeName,
-                        fromDepartmentId: transferParam.fromDepartmentId,
-                        toDepartmentId: transferParam.toDepartmentId,
                         fromDepartmentCode: transferParam.fromDepartmentCode,
                         fromDepartmentName: transferParam.fromDepartmentName,
                         toDepartmentName: transferParam.toDepartmentName,
                         toDepartmentCode: transferParam.toDepartmentCode,
-                        transferTypeCode: transferParam.transferTypeCode,
-                        transferTypeId: transferParam.id,
-                        transferTypeDescription: transferParam.transferTypeDescription,
                         reason: values.reason,
+                        transferType: transferParam.transferType
                     };
 
-                    console.log("Formatted Values for API Call:", formattedValues);
+                    // 신규 등록 시에는 id 필드를 삭제
+                    if (type === 'register') {
+                        delete formattedValues.id;
+                    }
+
 
                     const formData = new FormData();
                     formData.append("formattedValues", JSON.stringify(formattedValues));
@@ -278,6 +249,7 @@ const AssignmentManagementPage = ({ initialData }) => {
                         });
 
                         const updatedData = response.data;
+                        console.log("updatedData:",updatedData);
 
                         if (type === 'update') {
                             setTransferList((prevList) =>
@@ -385,22 +357,14 @@ const AssignmentManagementPage = ({ initialData }) => {
                                                     dataIndex: 'fromDepartmentName',
                                                     key: 'fromDepartmentName',
                                                     align: 'center',
-                                                    render: (text, record) => (
-                                                        <div className="small-text">
-                                                            [{record.toDepartmentCode}]{record.fromDepartmentName}
-                                                        </div>
-                                                    ),
+                                                    render: (text) => <div className="small-text">{text}</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">발령부서</div>,
                                                     dataIndex: 'toDepartmentName',
                                                     key: 'toDepartmentName',
                                                     align: 'center',
-                                                    render: (text, record) => (
-                                                        <div className="small-text">
-                                                            [{record.fromDepartmentCode}]{record.toDepartmentName}
-                                                        </div>
-                                                    ),
+                                                    render: (text) => <div className="small-text">{text}</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">발령유형명</div>,
@@ -592,9 +556,6 @@ const AssignmentManagementPage = ({ initialData }) => {
                                                         </Form.Item>
                                                     </Col>
                                                 </Row>
-                                                <Row gutter={16}>
-
-                                                </Row>
                                                 {/* 저장 버튼 */}
                                                 <Box sx={{
                                                     display: 'flex',
@@ -605,82 +566,6 @@ const AssignmentManagementPage = ({ initialData }) => {
                                                         저장
                                                     </Button>
                                                 </Box>
-                                                <Modal
-                                                    open={isModalVisible}
-                                                    onCancel={handleModalCancel}
-                                                    width="40vw"
-                                                    footer={null}
-                                                >{isLoading ? (
-                                                    <Spin />  // 로딩 스피너
-                                                ) : (
-                                                    <>
-                                                    {currentField === 'transferTypes' && (
-                                                        <>
-                                                            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                                                발령유형 선택
-                                                            </Typography>
-                                                            <Input
-                                                                placeholder="검색"
-                                                                prefix={<SearchOutlined />}
-                                                                onChange={(e) => {
-                                                                    const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
-                                                                    if (!value) {
-                                                                        setModalData(initialModalData);
-                                                                    } else {
-                                                                        const filtered = initialModalData.filter((item) => {
-                                                                            return (
-                                                                                (item.transferTypeCode && item.transferTypeCode.toLowerCase().includes(value)) ||
-                                                                                (item.transferTypeDescription && item.transferTypeDescription.toLowerCase().includes(value))
-                                                                            );
-                                                                        });
-                                                                        setModalData(filtered);
-                                                                    }
-                                                                }}
-                                                                style={{ marginBottom: 16 }}
-                                                            />
-                                                            {modalData && (
-                                                                <Table
-                                                                    columns={[
-                                                                        {
-                                                                            title: <div className="title-text">발령유형코드</div>,
-                                                                            dataIndex: 'transferTypeCode',
-                                                                            key: 'transferTypeCode',
-                                                                            align: 'center',
-                                                                            render: (text) => <div className="small-text">{text}</div>
-                                                                        },
-                                                                        {
-                                                                            title: <div className="title-text">발령유형설명</div>,
-                                                                            dataIndex: 'transferTypeDescription',
-                                                                            key: 'transferTypeDescription',
-                                                                            align: 'center',
-                                                                            render: (text) => <div className="small-text">{text}</div>
-                                                                        },
-                                                                    ]}
-                                                                    dataSource={modalData}
-                                                                    rowKey="transferTypeCode"
-                                                                    size={'small'}
-                                                                    pagination={{
-                                                                        pageSize: 10,
-                                                                        position: ['bottomCenter'],
-                                                                        showSizeChanger: false,
-                                                                        showTotal: (total) => `총 ${total}개`,
-                                                                    }}
-                                                                    onRow={(record) => ({
-                                                                        style: { cursor: 'pointer' },
-                                                                        onClick: () => handleModalSelect(record), // 선택 시 처리
-                                                                    })}
-                                                                />
-                                                            )}
-                                                        </>
-                                                    )}
-                                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                                            <Button onClick={handleModalCancel} variant="contained" type="danger" sx={{ mr: 1 }}>
-                                                                닫기
-                                                            </Button>
-                                                        </Box>
-                                                    </>
-                                                )}
-                                                </Modal>
                                             </Form>
                                         </Grid>
                                     </Paper>
@@ -742,11 +627,11 @@ const AssignmentManagementPage = ({ initialData }) => {
                                                             {/* 부서명 Select */}
                                                             <Select
                                                                 placeholder="이전부서 선택" // 안내 메시지 설정
-                                                                value={transferParam.toDepartmentCode ? `[${transferParam.toDepartmentCode}] ${transferParam.fromDepartmentName}` : undefined}
+                                                                value={transferParam.fromDepartmentCode ? `[${transferParam.fromDepartmentCode}] ${transferParam.fromDepartmentName}` : undefined}
                                                                 onChange={(value, option) => {
                                                                     setTransferParam((prevState) => ({
                                                                         ...prevState,
-                                                                        toDepartmentCode: value, // 부서 코드 설정
+                                                                        fromDepartmentCode: value, // 부서 코드 설정
                                                                         fromDepartmentName: option.children[3]
                                                                     }));
                                                                 }}
@@ -778,11 +663,11 @@ const AssignmentManagementPage = ({ initialData }) => {
                                                             {/* 부서명 Select */}
                                                             <Select
                                                                 placeholder="발령부서 선택" // 안내 메시지 설정
-                                                                value={transferParam.fromDepartmentCode ? `[${transferParam.fromDepartmentCode}] ${transferParam.toDepartmentName}` : undefined}
+                                                                value={transferParam.toDepartmentCode ? `[${transferParam.toDepartmentCode}] ${transferParam.toDepartmentName}` : undefined}
                                                                 onChange={(value, option) => {
                                                                     setTransferParam((prevState) => ({
                                                                         ...prevState,
-                                                                        fromDepartmentCode: value, // 부서 코드 설정
+                                                                        toDepartmentCode: value, // 부서 코드 설정
                                                                         toDepartmentName: option.children[3]
                                                                     }));
                                                                 }}
@@ -798,17 +683,35 @@ const AssignmentManagementPage = ({ initialData }) => {
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-                                            <Row gutter={12}>
-                                                <Col span={6}>
-                                                    <Form.Item name="transferTypeCode"
-                                                               rules={[{required: true, message: '발령유형코드를 입력하세요.'}]}>
-                                                        <Input addonBefore="발령유형코드"/>
+                                            <Row gutter={16}>
+                                                <Col span={12}>
+                                                    <Form.Item name="transferType">
+                                                        <Space.Compact>
+                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="발령유형명" disabled />
+                                                            <Select
+                                                                style={{ width: '40%' }}
+                                                                value={transferParam.transferType}
+                                                                onChange={(value) => {
+                                                                    setTransferParam((prevState) => ({
+                                                                        ...prevState,
+                                                                        transferType: value,
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                <Option value="PROMOTION">승진</Option>
+                                                                <Option value="DEMOTION">강등</Option>
+                                                                <Option value="LATERAL">전보</Option>
+                                                                <Option value="TEMPORARY_ASSIGNMENT">임시배치</Option>
+                                                                <Option value="RELOCATION">이전</Option>
+                                                                <Option value="RETURN">복귀</Option>
+                                                            </Select>
+                                                        </Space.Compact>
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="transferTypeDescription"
-                                                               rules={[{required: true, message: '발령유형설명을 입력하세요.'}]}>
-                                                        <Input addonBefore="발령유형설명"/>
+                                                <Col span={16}>
+                                                    <Form.Item name="reason"
+                                                               rules={[{required: true, message: '발령사유를 입력하세요.'}]}>
+                                                        <Input addonBefore="발령 사유"/>
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
