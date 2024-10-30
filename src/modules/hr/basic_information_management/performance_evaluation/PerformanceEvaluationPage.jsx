@@ -55,6 +55,20 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
     // 모달창 닫기 핸들러
     const handleModalCancel = () => setIsModalVisible(false);
 
+    const updatePerformance = async (performanceId, performanceData) => {
+        if (!performanceId) {
+            console.error("Performance ID가 없습니다.");
+            return;
+        }
+
+        try {
+            const response = await apiClient.post(`/api/performance/put/${performanceId}`, performanceData);
+            // 응답 처리
+        } catch (error) {
+            console.error("API 호출 오류:", error);
+        }
+    };
+
     // 모달창 데이터 가져오기 함수
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
@@ -100,7 +114,7 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
                 formData.append("formattedValues", JSON.stringify(formattedValues));
 
                 try {
-                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_PERFORMANCE_API(performanceParam.performanceId ) : EMPLOYEE_API.SAVE_PERFORMANCE_API;
+                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_PERFORMANCE_API(performanceParam.id ) : EMPLOYEE_API.SAVE_PERFORMANCE_API;
                     const response = await apiClient.post(API_PATH,formData,{
                         headers: { 'Content-Type': 'multipart/form-data' },
                     });
@@ -147,6 +161,8 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
         registrationForm.setFieldValue(true);
         setActiveTabKey(key);
     };
+
+
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -258,8 +274,6 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                </Grid>
-            )}
             {editPerformance && (
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
@@ -332,6 +346,8 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
                     </Grow>
                 </Grid>
             )}
+        </Grid>
+    )}
 
 
             {activeTabKey === '2' && (
