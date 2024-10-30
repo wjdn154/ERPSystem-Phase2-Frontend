@@ -130,7 +130,7 @@ export const EMPLOYEE_API = {
 
     //  인사관리 - 근태
     ATTENDANCE_DATA_API: `${API_BASE_URL}/api/hr/attendance/records/all`,
-    ATTENDANCE_DETAIL_DATA_API:(employeeId) => `${API_BASE_URL}/api/hr/records/${employeeId}`,
+    ATTENDANCE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/attendance/records/${id}`,
     SAVE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/check-in`,
     DELETE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/del`,
     UPDATE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/update`,
@@ -149,10 +149,8 @@ export const EMPLOYEE_API = {
     // 인사관리  - 발령
     SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
     TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
-    SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
     UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/transfer/update/${id}`,
     TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
-    UPDATE_TRANSFER_TYPE_API:(id) => `${API_BASE_URL}/api/hr/transferType/update/${id}`,
 
 
     //  인사관리 - 급여

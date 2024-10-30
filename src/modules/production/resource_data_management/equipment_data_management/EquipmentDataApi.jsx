@@ -6,6 +6,7 @@ import apiClient from "../../../../config/apiClient.jsx";
 export const fetchEquipmentData = async () => {
     try {
         const response = await apiClient.post(PRODUCTION_API.EQUIPMENT_DATA_API);
+        console.log("설비 호출 성공",response.data);
         return response.data;
     }catch (error){
         console.error("설비 정보를 가져오는 중 오류 발생 : " + error);
@@ -44,13 +45,18 @@ export const saveEquipmentDataDetail = async (equipmentDataDetail) => {
 }
 
 //설비정보 수정 함수
-export const updateEquipmentDataDetail = async (id , equipmentDataDetail) => {
-    console.log('api 정보 : ',id,equipmentDataDetail);
+export const updateEquipmentDataDetail = async (id , formData) => {
+    console.log('api 정보 : ',id,formData);
     try {
         // axios 요청의 결과를 response에 저장
         const response = await apiClient.put(
             PRODUCTION_API.UPDATE_EQUIPMENT_DATA_API(id),
-            equipmentDataDetail
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
         );
 
         // 응답 데이터 출력
