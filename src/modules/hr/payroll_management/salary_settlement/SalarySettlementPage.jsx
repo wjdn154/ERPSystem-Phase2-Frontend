@@ -14,8 +14,9 @@ const { RangePicker } = DatePicker;
 const SalarySettlementPage = () => {
     const notify = useNotificationContext();
     const [form] = Form.useForm();
-    const [employees, setEmployees] = useState([]);
+    const [formBackup, setFormBackup] = useState({}); // 폼 백업용 상태 선언
 
+    const [employees, setEmployees] = useState([]);
     const [employeeId, setEmployeeId] = useState(null); // 사원 ID
     const [salaryDates, setSalaryDates] = useState([]);
     const [selectedDateId, setSelectedDateId] = useState(null);
@@ -180,8 +181,9 @@ const SalarySettlementPage = () => {
 
     // 자동 계산
     const calculateSalary = async () => {
-        console.log("Request Payload:", { salaryLedgerId: salaryLedgerData.ledgerId });
-
+        const currentFormValues = form.getFieldsValue();
+        setFormBackup(currentFormValues); // 백업 저장
+        console.log("Request Payload of calculateSalary:", { salaryLedgerId: salaryLedgerData.ledgerId });
 
         if (!salaryLedgerData?.ledgerId) {
             notify('error', '계산 오류', '급여 정보가 존재하지 않습니다.');
@@ -202,17 +204,20 @@ const SalarySettlementPage = () => {
             console.log("API Response Data:", response.data); // 응답 데이터 확인
             console.log("After Calculation - isFinalized:", response.data.finalized);
 
-            setSalaryLedgerData(response.data);
-
+            // 응답 데이터를 상태와 폼에 반영
+            const updatedData = { ...form.getFieldsValue(), ...response.data }; // 기존 폼 값과 병합
+            setSalaryLedgerData(updatedData);
+            form.setFieldsValue(updatedData); // 폼 값 동기화
             // 계산 후 finalized 상태 확인
-            console.log("After Calculation - isFinalized:", response.data.finalized);
+            console.log("After Calculation - isFinalized:", updatedData.finalized);
             setIsFinalized(response.data.finalized);
 
-            console.log("Is Finalized (After API Call):", response.data.finalized); // 마감 상태 확인
+            console.log("Is Finalized (After API Call):", updatedData.finalized); // 마감 상태 확인
             notify('success', '계산 완료', '급여 자동 계산이 완료되었습니다.', 'bottomRight');
         } catch (error) {
 // 에러 발생 시 응답 객체에서 finalized 여부를 확인
             console.error("Calculation Error:", error);
+            form.setFieldsValue(formBackup);
 
             const finalized = error?.response?.data?.finalized ?? salaryLedgerData.finalized;
             console.log("Error Calculation - isFinalized:", finalized);
@@ -222,6 +227,18 @@ const SalarySettlementPage = () => {
             console.error("Calculation Error:", error); // 오류 로그
         }
     };
+
+    const handleAllowanceChange = (index, value) => {
+        const numericValue = parseInt(value || '0', 10);
+
+        const updatedAllowances = [...form.getFieldValue('allowances')];
+        updatedAllowances[index].amount = numericValue;
+
+        // 상태와 폼 값 동기화
+        form.setFieldsValue({ allowances: updatedAllowances });
+        setSalaryLedgerData((prev) => ({ ...prev, allowances: updatedAllowances }));
+    };
+
 
 
 // 마감 처리
@@ -558,15 +575,15 @@ const SalarySettlementPage = () => {
                                     >
                                         <Row gutter={32}>
                                             {/* 공제 항목: 왼쪽에 세로로 배치 */}
-                                            <Col span={8}>
+                                            <Col span={12}>
                                                 <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>공제항목</Divider>
 
                                                 <Form.Item name="nationalPensionAmount">
                                                     <Input
-                                                        addonBefore="국민연금 공제액"
+                                                        addonBefore="국민연금"
                                                         onChange={(e) => {
-                                                            const value = handleNumericInput(e);
-                                                            form.setFieldsValue({ nationalPensionAmount: value });
+                                                            const numericValue = handleNumericInput(e.target.value); // 숫자만 추출
+                                                                form.setFieldsValue({ nationalPensionAmount: value });
                                                         }}
                                                         onBlur={(e) => {
                                                             const formattedValue = formatNumberWithComma(e.target.value);
@@ -579,7 +596,7 @@ const SalarySettlementPage = () => {
                                                 </Form.Item>
                                                 <Form.Item name="privateSchoolPensionAmount">
                                                     <Input
-                                                        addonBefore="사학연금 공제액"
+                                                        addonBefore="사학연금"
                                                         onChange={(e) => form.setFieldsValue({ privateSchoolPensionAmount: e.target.value })}
                                                         disabled={isFinalized}  // 마감 시 수정 불가 처리
 
@@ -587,7 +604,7 @@ const SalarySettlementPage = () => {
                                                 </Form.Item>
                                                 <Form.Item name="healthInsurancePensionAmount">
                                                     <Input
-                                                        addonBefore="건강보험 공제액"
+                                                        addonBefore="건강보험"
                                                         onChange={(e) => form.setFieldsValue({ healthInsurancePensionAmount: e.target.value })}
                                                         disabled={isFinalized}  // 마감 시 수정 불가 처리
 
@@ -603,7 +620,7 @@ const SalarySettlementPage = () => {
                                                 </Form.Item>
                                                 <Form.Item name="longTermCareInsurancePensionAmount">
                                                     <Input
-                                                        addonBefore="장기요양보험 공제액"
+                                                        addonBefore="장기요양보험"
                                                         onChange={(e) => form.setFieldsValue({ employmentInsuranceAmount: e.target.value })}
                                                         disabled={isFinalized}  // 마감 시 수정 불가 처리
 
@@ -625,7 +642,7 @@ const SalarySettlementPage = () => {
                                                     />
                                                 </Form.Item>
                                                 {/* 공제 총액 표시 */}
-                                                <Typography variant="h6" sx={{ marginTop: '10px' }}>공제 총액</Typography>
+                                                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>공제총액</Divider>
                                                 <Typography>
                                                     {salaryLedgerData?.totalDeductionAmount?.toLocaleString()} 원
                                                 </Typography>
@@ -647,7 +664,7 @@ const SalarySettlementPage = () => {
                                                             title: <div className="title-text">금액</div>,
                                                             dataIndex: 'amount',
                                                             key: 'amount',
-                                                            align: 'right',
+                                                            align: 'center',
                                                             // render: (text) => `${Number(text).toLocaleString()} 원`,
                                                             render: (_, record, index) => (
                                                                 <Form.Item
@@ -664,24 +681,12 @@ const SalarySettlementPage = () => {
                                                                             const updatedAllowances = [...form.getFieldValue('allowances')];
                                                                             updatedAllowances[index].amount = numericValue || '0';
                                                                             form.setFieldsValue({ allowances: updatedAllowances });
-                                                                            // const numericValue = handleNumericInput(e.target.value);
-                                                                            // form.setFieldsValue({
-                                                                            //     allowances: form.getFieldValue('allowances').map((allowance, i) =>
-                                                                            //         i === index ? { ...allowance, amount: numericValue || '0' } : allowance
-                                                                            //     ),
-                                                                            // });
                                                                         }}
                                                                         onBlur={(e) => {
                                                                             const formattedValue = formatNumberWithComma(e.target.value);
                                                                             const updatedAllowances = [...form.getFieldValue('allowances')];
                                                                             updatedAllowances[index].amount = formattedValue;
                                                                             form.setFieldsValue({ allowances: updatedAllowances });
-                                                                            // const formattedValue = formatNumberWithComma(e.target.value);
-                                                                            // form.setFieldsValue({
-                                                                            //     allowances: form.getFieldValue('allowances').map((allowance, i) =>
-                                                                            //         i === index ? { ...allowance, amount: formattedValue } : allowance
-                                                                            //     ),
-                                                                            // });
                                                                         }}
                                                                         disabled={isFinalized}
                                                                         style={{ textAlign: 'right' }}
