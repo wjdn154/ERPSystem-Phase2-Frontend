@@ -6,7 +6,7 @@ import apiClient from "../../../../config/apiClient.jsx";
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './SalarySettlementUtil.jsx';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
-import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
+import {DownSquareOutlined, ReloadOutlined, SearchOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {EMPLOYEE_API} from "../../../../config/apiConstants.jsx";
 const { RangePicker } = DatePicker;
@@ -15,9 +15,12 @@ const SalarySettlementPage = () => {
     const notify = useNotificationContext();
     const [form] = Form.useForm();
     const [employees, setEmployees] = useState([]);
-    const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+    const [employeeId, setEmployeeId] = useState(null); // 사원 ID
     const [salaryDates, setSalaryDates] = useState([]);
     const [selectedDateId, setSelectedDateId] = useState(null);
+    const [isEditable, setIsEditable] = useState(true);
+    const [isFinalized, setIsFinalized] = useState(null);
 
     const [salaryLedgerData, setSalaryLedgerData] = useState(null);
     const [activeTabKey, setActiveTabKey] = useState('1');
@@ -37,19 +40,50 @@ const SalarySettlementPage = () => {
         setSalaryDateId: '',
     });
 
+    // 사원 선택 → 급여 조회
+    // 조회 결과 표시 → 수정 가능 여부 확인
+    // 수정 → 수정된 데이터 저장
+    // 자동 계산 → 계산 결과 반영
+    // 마감 처리 → 수정 불가 처리
+
     useEffect(() => {
-        setModalData(salaryDates);  // 초기 데이터 설정
+        if (salaryDates.length > 0) {
+            setModalData(salaryDates);  // 초기 데이터 설정
+        }
     }, [salaryDates]);
 
+    useEffect(() => {
+        if (salaryLedgerData) {
+            console.log("Received finalized value:", typeof salaryLedgerData?.finalized, salaryLedgerData?.finalized);
+
+            console.log("Updated SalaryLedgerData:", salaryLedgerData);
+            console.log("Updating isFinalized:", salaryLedgerData.finalized);
+            setIsFinalized(salaryLedgerData.finalized);
+        }
+    }, [salaryLedgerData]);
+
+    // 페이지 로드 시 전체 사원 목록과 급여지급일 목록 조회
+    useEffect(() => {
+        fetchSalaryDates();
+        fetchAllEmployees();
+    }, []);
 
     const handleTabChange = (key) => {
         setActiveTabKey(key);
     };
 
-    useEffect(() => {
-        fetchSalaryDates();
-        // fetchEmployees();
-    }, []);
+    const handleReset = () => {
+        setSelectedDateId(null);  // 선택한 지급일 코드 초기화
+        setSalaryLedgerData({});  // 급여 데이터 초기화
+        setDisplayValue(null)
+        setSelectedDateId(null);
+        setEmployeeId();
+        setIsFinalized(false);
+        setSelectedRowKeys()
+        form.resetFields();  // Form 필드 초기화
+
+        // notify('info', '초기화 완료', '선택한 지급일 코드와 관련 데이터가 초기화되었습니다.', 'bottomRight');
+    };
 
     // 급여 지급일 데이터 가져오기
     const fetchSalaryDates = async () => {
@@ -63,44 +97,37 @@ const SalarySettlementPage = () => {
         }
     };
 
-    const fetchEmployees = async () => {
+    // 모든 사원 목록
+    const fetchAllEmployees = async () => {
         try {
-            console.log("Selected Date ID: ", selectedDateId); // 선택된 지급일 ID 확인
-
-            // selectedDateId가 유효한지 확인
-            if (!selectedDateId) {
-                notify('warning', '입력 오류', '지급일을 선택해 주세요.', 'bottomRight');
-                return;
-            }
-
-            const response = await apiClient.post(
-                EMPLOYEE_API.EMPLOYEE_DATA_API,
-                { salaryLedgerDateId: selectedDateId }, // 정확한 ID 전달
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-
-            console.log("Filtered Employees: ", response.data); // 로그 추가
+            const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
             setEmployees(response.data);
         } catch (error) {
-            console.error("fetchEmployees error: ", error);
-            notify('error', '사원 조회 실패', '사원 목록을 불러오는 중 오류가 발생했습니다.', 'top');
+            console.error("전체 사원 목록 조회 오류:", error);
+            notify('error', '사원 조회 실패', '전체 사원 목록을 불러오는 중 오류가 발생했습니다.', 'top');
         }
     };
 
-
     // 급여 조회
     const fetchSalaryLedger = async () => {
-        if (!selectedEmployee || !selectedDateId) {
-            notify('warning', '입력 오류', '사원과 지급일을 선택해 주세요.', 'bottomRight');
+        if (!employeeId || !selectedDateId) {
+            notify('warning', '입력 오류', '사원과 지급일을 선택해 주세요.', 'top');
             return;
         }
+
+        console.log("Request Payload:", { employeeId, salaryLedgerDateId: selectedDateId });
         setIsLoading(true);
         try {
             const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_SHOW_API, {
-                employeeId: selectedEmployee.id, // selectedEmployee.id vs selectedEmployee
-                salaryLedgerDateId: salaryLedgerDateId,
+                employeeId, // employeeId 자체가 숫자인 경우
+                salaryLedgerDateId: selectedDateId,
             });
-            setSalaryLedgerData(response.data);
+            const data = response.data;
+            setSalaryLedgerData(data);
+            form.setFieldsValue(data);
+
+            // 상태를 설정합니다.
+            setIsFinalized(data.finalized);
         } catch (error) {
             notify('error', '조회 실패', '급여 정보를 조회하는 중 오류가 발생했습니다.', 'top');
             console.error("fetchSalaryLedger error: ", error);
@@ -111,62 +138,114 @@ const SalarySettlementPage = () => {
     };
 
     const handleFormSubmit = async (values) => {
+        console.log('폼 제출 값:', values); // 제출된 값을 확인
+
+        if (isFinalized) {
+            notify('warning', '수정 불가', '마감된 급여는 수정할 수 없습니다.');
+            return;
+        }
         try {
             await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_UPDATE_API, values);
             notify('success', '수정 완료', '급여 정산 정보가 수정되었습니다.');
             fetchSalaryLedger(); // 수정 후 데이터 갱신
         } catch (error) {
-            notify('error', '수정 실패', '급여 정산 정보 수정 중 오류가 발생했습니다.');
+            console.error('급여 정보 수정 오류:', error);
+            notify('error', '수정 실패', '급여 정보 수정 중 오류가 발생했습니다.', 'top');
         }
     };
 
-    // // 자동 계산
-    // const calculateSalary = async () => {
-    //     if (!salaryLedgerData?.ledgerId) return;
-    //     try {
-    //         const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_CALCULATION_API, {
-    //             salaryLedgerId: salaryLedgerData.ledgerId,
-    //         });
-    //         setSalaryLedgerData(response.data);
-    //         notify('success', '계산 완료', '급여 자동 계산이 완료되었습니다.', 'bottomRight');
-    //     } catch (error) {
-    //         notify('error', '계산 실패', '자동 계산 중 오류가 발생했습니다.', 'top');
-    //     }
-    // };
+    // 금액 포맷 함수
+    const formatNumberWithComma = (value) => {
+        if (!value) return '';
+        const cleanValue = value.toString().replace(/[^\d]/g, '');
+        return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
 
-    const isFinalized = salaryLedgerData?.finalized;
+    // 숫자 입력 핸들러 (숫자만 입력 가능하게 처리)
+    const handleNumericInput = (value) => {
+        return value.replace(/[^0-9]/g, '');
+    };
 
-    // // 마감 처리
-    // const handleDeadline = async () => {
-    //     if (!salaryLedgerData?.ledgerId) return;
-    //     try {
-    //         const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_DEADLINE_API, {
-    //             salaryLedgerId: salaryLedgerData.ledgerId,
-    //         });
-    //         setSalaryLedgerData({ ...salaryLedgerData, finalized: response.data.finalized });
-    //         notify('success', '마감 처리 완료', response.data.message, 'bottomRight');
-    //     } catch (error) {
-    //         notify('error', '마감 실패', '마감 처리 중 오류가 발생했습니다.', 'top');
-    //     }
-    // };
-    //
-    // // 마감 해제 핸들러
-    // const handleDeadlineOff = async () => {
-    //     if (!salaryLedgerData?.ledgerId) return;
-    //     try {
-    //         const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_DEADLINE_OFF_API, {
-    //             salaryLedgerId: salaryLedgerData.ledgerId,
-    //         });
-    //         setSalaryLedgerData({ ...salaryLedgerData, finalized: response.data.finalized });
-    //         notify('success', '마감 해제 완료', response.data.message, 'bottomRight');
-    //     } catch (error) {
-    //         notify('error', '마감 해제 실패', '마감 해제 중 오류가 발생했습니다.', 'top');
-    //     }
-    // };
+    // 자동 계산
+    const calculateSalary = async () => {
+        console.log("Request Payload:", { salaryLedgerId: salaryLedgerData.ledgerId });
 
-    const handleSearch = async () => {
 
-    }
+        if (!salaryLedgerData?.ledgerId) {
+            notify('error', '계산 오류', '급여 정보가 존재하지 않습니다.');
+            return;
+        }
+
+        console.log("Is Finalized (Before API Call):", salaryLedgerData.finalized);
+        if (salaryLedgerData?.finalized) {
+            notify('warning', '마감된 급여', '이미 마감된 급여는 계산할 수 없습니다.');
+            return;
+        }
+
+        try {
+            const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_CALCULATION_API, {
+                salaryLedgerId: salaryLedgerData.ledgerId,
+            });
+
+            console.log("API Response Data:", response.data); // 응답 데이터 확인
+            console.log("After Calculation - isFinalized:", response.data.finalized);
+
+            setSalaryLedgerData(response.data);
+
+            // 계산 후 finalized 상태 확인
+            console.log("After Calculation - isFinalized:", response.data.finalized);
+            setIsFinalized(response.data.finalized);
+
+            console.log("Is Finalized (After API Call):", response.data.finalized); // 마감 상태 확인
+            notify('success', '계산 완료', '급여 자동 계산이 완료되었습니다.', 'bottomRight');
+        } catch (error) {
+// 에러 발생 시 응답 객체에서 finalized 여부를 확인
+            console.error("Calculation Error:", error);
+
+            const finalized = error?.response?.data?.finalized ?? salaryLedgerData.finalized;
+            console.log("Error Calculation - isFinalized:", finalized);
+
+            setIsFinalized(finalized); // 에러 발생 시에도 상태 갱신
+            notify('error', '계산 실패', '자동 계산 중 오류가 발생했습니다.', 'top');
+            console.error("Calculation Error:", error); // 오류 로그
+        }
+    };
+
+
+// 마감 처리
+    const handleDeadline = async () => {
+        if (!salaryLedgerData?.ledgerId) return;
+        try {
+            const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_DEADLINE_API, {
+                salaryLedgerId: salaryLedgerData.ledgerId,
+            });
+
+            const updatedData = { ...salaryLedgerData, finalized: response.data.finalized };
+            setSalaryLedgerData(updatedData); // 데이터 갱신
+            setIsFinalized(response.data.finalized); // 상태 동기화
+            notify('success', '마감 처리 완료', response.data.message, 'bottomRight');
+        } catch (error) {
+            notify('error', '마감 실패', '마감 처리 중 오류가 발생했습니다.', 'top');
+        }
+    };
+
+// 마감 해제 핸들러
+    const handleDeadlineOff = async () => {
+        if (!salaryLedgerData?.ledgerId) return;
+        try {
+            const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_DEADLINE_OFF_API, {
+                salaryLedgerId: salaryLedgerData.ledgerId,
+            });
+
+            const updatedData = { ...salaryLedgerData, finalized: response.data.finalized };
+            setSalaryLedgerData(updatedData);
+            setIsFinalized(response.data.finalized); // 상태 동기화
+            notify('success', '마감 해제 완료', response.data.message, 'bottomRight');
+        } catch (error) {
+            notify('error', '마감 해제 실패', '마감 해제 중 오류가 발생했습니다.', 'top');
+        }
+    };
+
 
     // 지급일 선택 모달 열기
     const handleInputClick = () => {
@@ -175,17 +254,29 @@ const SalarySettlementPage = () => {
 
     // 사원 선택 시 급여 데이터 조회
     const handleEmployeeSelect = async (employee) => {
-        setSelectedEmployee(employee);
-        console.log("Selected Employee: ", employee); // 로그 추가
+        setEmployeeId(employee.id);
+        console.log("Selected Employee: ", employee.id); // 로그 추가
 
+        // 급여 지급일 코드가 선택되지 않은 경우 안내
+        if (!selectedDateId) {
+            notify('warning', '입력 필요', '급여 지급일 코드를 선택해 주세요.', 'top');
+            return; // 코드 종료
+        }
 
         try {
             const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_SHOW_API, {
                 employeeId: employee.id,
                 salaryLedgerDateId: selectedDateId,
             });
+
+            console.log("Server Response:", response.data); // 로그 추가
+
+            const data = response.data; // response.data를 변수 data에 저장
             setSalaryLedgerData(response.data);
             form.setFieldsValue(response.data);
+            setIsFinalized(data.finalized); // 여기서 상태 업데이트가 필요
+
+            notify('success', '조회 성공', '급여 정보를 조회했습니다.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '급여 정산 정보 조회 중 오류가 발생했습니다.');
             console.error("handleEmployeeSelect error: ", error)
@@ -194,18 +285,19 @@ const SalarySettlementPage = () => {
 
     // 모달에서 지급일 코드 선택 시 처리
     const handleDateSelect = (record) => {
-        setSelectedDateId(record.id);
-        setDisplayValue(`[${record.code}] ${record.description}`); // Input에 표시할 값 설정
-        setIsModalVisible(false);
+        console.log("Selecting Date:", record);  // 모달 선택 로그
+        setSelectedDateId(record.id);  // 상태 변경
+        setDisplayValue(`[${record.code}] ${record.description}`);  // 표시할 값 설정
+        setTimeout(() => setIsModalVisible(false), 0);
 
-        console.log("Selected Date ID: ", record.id); // 로그 추가
-
-        // fetchEmployees(record.id); // 지급일에 맞는 사원 목록 조회
+        console.log("Confirmed Selected Date ID:", record.id);  // 로그 추가
     };
+
 
     return (
         <Box sx={{ margin: '20px' }}>
             <Grid container spacing={3}>
+                {/* 왼쪽: 사원 목록 */}
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
                         title="급여 정산"
@@ -223,14 +315,14 @@ const SalarySettlementPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={3} sx={{ minWidth: '300px'}}>
+                    <Grid item xs={12} md={3} sx={{ maxWidth: '300px' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >급여정산 정보</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
-                                            <Col>
+                                            <Col span={16}>
                                                 <Form.Item
                                                     label="지급일 코드"
                                                     required
@@ -251,16 +343,16 @@ const SalarySettlementPage = () => {
                                                     </Form.Item>
                                                 </Form.Item>
                                             </Col>
-                                            <Col>
+                                            <Col span={8}>
                                                 <Form.Item>
                                                     <Button
                                                         style={{ width: '100px' }}
-                                                        type="primary"
-                                                        icon={<SearchOutlined />}
-                                                        onClick={() => fetchEmployees()}  // 화살표 함수로 감싸기 : 화살표 함수를 사용하여 이벤트 객체가 전달되지 않도록 해야 원형 참조 오류
+                                                        type="default"
+                                                        icon={<ReloadOutlined />}  // 초기화 아이콘 사용
+                                                        onClick={handleReset}  // 초기화 함수 호출
                                                         block
                                                     >
-                                                        검색
+                                                        초기화
                                                     </Button>
                                                 </Form.Item>
 
@@ -356,8 +448,13 @@ const SalarySettlementPage = () => {
                                                 )}
                                             </>
                                         )}
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                                            <Button onClick={() => {setIsModalVisible(false)}} type="primary">
+                                                닫기
+                                            </Button>
+                                        </Box>
                                     </Modal>
-
+                                    {/* 사원 정보 테이블 */}
                                     <Typography variant="h6" sx={{ padding: '20px' }} >사원 정보</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                         <Table
@@ -415,141 +512,250 @@ const SalarySettlementPage = () => {
                                                 },
                                             ]}
                                             rowKey="id"
-                                            pagination={{pageSize: 15, position: ['bottomCenter'], showSizeChanger: false}}
+                                            pagination={{pageSize: 25, position: ['bottomCenter'], showSizeChanger: false}}
                                             size="small"
                                             style={{ marginBottom: '20px' }}
-                                            rowSelection={{
-                                                type: 'radio',
-                                                selectedRowKeys,
-                                                // onChange: async (newSelectedRowKeys, record) => {
-                                                    // setEmployeeId(record[0].id);
-                                                    // setPositionId(record[0].positionId);
-                                                    // setSelectedRowKeys(newSelectedRowKeys);
-                                                    //
-                                                    // try {
-                                                    //     const response = await apiClient.post(EMPLOYEE_API.SALARY_SHOW_API, {employeeId: record[0].id});
-                                                    //     setSearchData2(response.data);
-                                                    //
-                                                    //     setDisplayValues({
-                                                    //         salaryStep: response.data.salaryStepName,
-                                                    //         longTermCareInsurancePensionCode: `[${response.data.longTermCareInsurancePensionCode}] ${response.data.longTermCareInsurancePensionDescription}`,
-                                                    //     })
-                                                    //     form.setFieldsValue({
-                                                    //         ...response.data,
-                                                    //         privateSchoolPensionAmount: '0',
-                                                    //     });
-                                                    //     setDisplayValues({
-                                                    //         salaryStep: response.data.salaryStepName,
-                                                    //         longTermCareInsurancePensionCode: `[${response.data.longTermCareInsurancePensionCode}] ${response.data.longTermCareInsurancePensionDescription}`,
-                                                    //     })
-                                                    //
-                                                    //     notify('success', '급여정보 조회', '급여정보 조회 성공.', 'bottomRight');
-                                                    // } catch (error) {
-                                                    //     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
-                                                    // }
-                                                // }
-                                            }}
                                             onRow={(record) => ({
                                                 style: { cursor: 'pointer' },
                                                 onClick: async () => {
-                                                    setEmployeeId(record.id);
-                                                    console.log(record.id);
-                                                    setSelectedRowKeys([record.id]);
-                                                    // setPositionId(record.positionId);
-
-                                                    // try {
-                                                    //     const response = await apiClient.post(EMPLOYEE_API.SALARY_SHOW_API, { employeeId: record.id });
-                                                    //     setSearchData2(response.data);
-                                                    //
-                                                    //     setDisplayValues({
-                                                    //         salaryStep: response.data.salaryStepName,
-                                                    //         longTermCareInsurancePensionCode: `[${response.data.longTermCareInsurancePensionCode}] ${response.data.longTermCareInsurancePensionDescription}`,
-                                                    //     })
-                                                    //     form.setFieldsValue({
-                                                    //         ...response.data,
-                                                    //         privateSchoolPensionAmount: '0',
-                                                    //     });
-                                                    //     setDisplayValues({
-                                                    //         salaryStep: response.data.salaryStepName,
-                                                    //         longTermCareInsurancePensionCode: `[${response.data.longTermCareInsurancePensionCode}] ${response.data.longTermCareInsurancePensionDescription}`,
-                                                    //     })
-                                                    //
-                                                    //     notify('success', '급여정보 조회', '급여정보 조회 성공.', 'bottomRight');
-                                                    // } catch (error) {
-                                                    //     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
-                                                    // }
+                                                    await handleEmployeeSelect(record); // 사원 선택 후 급여 정보 조회
+                                                    setSelectedRowKeys([record.id]); // 선택한 행 강조
                                                 },
                                             })}
+                                            rowSelection={{
+                                                type: 'radio',
+                                                selectedRowKeys,
+                                                onChange: (keys) => setSelectedRowKeys(keys),
+                                            }}
                                         />
                                     </Grid>
-
-                                    {salaryLedgerData && (
-                                        <Form form={form} layout="vertical" onFinish={(values) => console.log(values)}>
-                                            <Divider>급여 정보</Divider>
-                                            <Grid container spacing={3}>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="nationalPensionAmount" label="국민연금">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="privateSchoolPensionAmount" label="사학연금">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="healthInsurancePensionAmount" label="건강보험">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="employmentInsuranceAmount" label="고용보험">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="incomeTaxAmount" label="소득세">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="localIncomeTaxPensionAmount" label="지방소득세">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                            </Grid>
-
-                                            <Divider>총계 및 마감 상태</Divider>
-                                            <Grid container spacing={3}>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="totalSalaryAmount" label="지급 총액">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="netPayment" label="차인지급액">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Form.Item name="finalized" label="마감 여부">
-                                                        <Input readOnly />
-                                                    </Form.Item>
-                                                </Grid>
-                                            </Grid>
-
-                                            <Button type="primary" htmlType="submit">
-                                                저장
-                                            </Button>
-                                        </Form>
-                                    )}
-
                                 </Grid>
                             </Paper>
                         </Grow>
                     </Grid>
+
+                    <Grid item xs={12} md={6} sx={{ minWidth: '400px'}}>
+                        <Grow in={true} timeout={200}>
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>공제항목 및 수당목록</Typography>
+                                <Grid sx={{ padding: '0px 20px 20px 20px' }}>
+                                    <Form
+                                        form={form}
+                                        initialValues={salaryLedgerData} // 초기 값 설정
+                                        onFinish={(values) => handleFormSubmit(values)}
+                                    >
+                                        <Row gutter={32}>
+                                            {/* 공제 항목: 왼쪽에 세로로 배치 */}
+                                            <Col span={8}>
+                                                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>공제항목</Divider>
+
+                                                <Form.Item name="nationalPensionAmount">
+                                                    <Input
+                                                        addonBefore="국민연금 공제액"
+                                                        onChange={(e) => {
+                                                            const value = handleNumericInput(e);
+                                                            form.setFieldsValue({ nationalPensionAmount: value });
+                                                        }}
+                                                        onBlur={(e) => {
+                                                            const formattedValue = formatNumberWithComma(e.target.value);
+                                                            form.setFieldsValue({ nationalPensionAmount: formattedValue });
+                                                        }}
+                                                        disabled={isFinalized}
+                                                        value={form.getFieldValue('nationalPensionAmount')} // 폼 값 유지
+
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item name="privateSchoolPensionAmount">
+                                                    <Input
+                                                        addonBefore="사학연금 공제액"
+                                                        onChange={(e) => form.setFieldsValue({ privateSchoolPensionAmount: e.target.value })}
+                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
+
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item name="healthInsurancePensionAmount">
+                                                    <Input
+                                                        addonBefore="건강보험 공제액"
+                                                        onChange={(e) => form.setFieldsValue({ healthInsurancePensionAmount: e.target.value })}
+                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
+
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item name="employmentInsuranceAmount">
+                                                    <Input
+                                                        addonBefore="고용보험"
+                                                        onChange={(e) => form.setFieldsValue({ employmentInsuranceAmount: e.target.value })}
+                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
+
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item name="longTermCareInsurancePensionAmount">
+                                                    <Input
+                                                        addonBefore="장기요양보험 공제액"
+                                                        onChange={(e) => form.setFieldsValue({ employmentInsuranceAmount: e.target.value })}
+                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
+
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item name="incomeTaxAmount">
+                                                    <Input
+                                                        addonBefore="소득세"
+                                                        onChange={(e) => form.setFieldsValue({ incomeTaxAmount: e.target.value })}
+                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item name="localIncomeTaxPensionAmount">
+                                                    <Input
+                                                        addonBefore="지방소득세"
+                                                        onChange={(e) => form.setFieldsValue({ localIncomeTaxPensionAmount: e.target.value })}
+                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
+
+                                                    />
+                                                </Form.Item>
+                                                {/* 공제 총액 표시 */}
+                                                <Typography variant="h6" sx={{ marginTop: '10px' }}>공제 총액</Typography>
+                                                <Typography>
+                                                    {salaryLedgerData?.totalDeductionAmount?.toLocaleString()} 원
+                                                </Typography>
+                                            </Col>
+                                            {/* 수당 항목: 오른쪽에 테이블로 구성 */}
+                                            <Col span={12}>
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>수당 목록</Divider>
+                                                <Table
+                                                    dataSource={salaryLedgerData?.allowances}  // 수당 목록 데이터
+                                                    columns={[
+                                                        {
+                                                            title: <div className="title-text">수당명</div>,
+                                                            dataIndex: 'name',
+                                                            key: 'name',
+                                                            align: 'center',
+                                                            render: (text) => <div className="small-text">{text}</div>
+                                                        },
+                                                        {
+                                                            title: <div className="title-text">금액</div>,
+                                                            dataIndex: 'amount',
+                                                            key: 'amount',
+                                                            align: 'right',
+                                                            // render: (text) => `${Number(text).toLocaleString()} 원`,
+                                                            render: (_, record, index) => (
+                                                                <Form.Item
+                                                                    name={['allowances', index, 'amount']}
+                                                                    initialValue={record.amount || 0}
+                                                                    rules={[{ required: true, message: '금액을 입력하세요' }]}
+                                                                    style={{ marginBottom: '10px' }}
+                                                                >
+                                                                    <Input
+                                                                        addonAfter="원"
+                                                                        type="text"
+                                                                        onChange={(e) => {
+                                                                            const numericValue = handleNumericInput(e.target.value);
+                                                                            form.setFieldsValue({
+                                                                                allowances: form.getFieldValue('allowances').map((allowance, i) =>
+                                                                                    i === index ? { ...allowance, amount: numericValue || '0' } : allowance
+                                                                                ),
+                                                                            });
+                                                                        }}
+                                                                        onBlur={(e) => {
+                                                                            const formattedValue = formatNumberWithComma(e.target.value);
+                                                                            form.setFieldsValue({
+                                                                                allowances: form.getFieldValue('allowances').map((allowance, i) =>
+                                                                                    i === index ? { ...allowance, amount: formattedValue } : allowance
+                                                                                ),
+                                                                            });
+                                                                        }}
+                                                                        disabled={isFinalized}
+                                                                        style={{ textAlign: 'right' }}
+                                                                    />
+                                                                </Form.Item>
+
+                                                            ),
+                                                        },
+                                                    ]}
+                                                    pagination={false}
+                                                    size="small"
+                                                    bordered
+                                                    style={{
+                                                        marginBottom: '10px', // 테이블 하단 여백 줄이기
+                                                        maxWidth: '400px', // 테이블 전체 너비 제한
+                                                    }}
+                                                    rowClassName={() => 'custom-row'} // 줄 간격을 커스터마이즈할 클래스 추가
+                                                    summary={() => (
+                                                        salaryLedgerData?.allowances?.length > 0 && (
+                                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                                <Table.Summary.Cell index={0}>
+                                                                    <div className="medium-text">합계</div>
+                                                                </Table.Summary.Cell>
+                                                                <Table.Summary.Cell index={1}>
+                                                                    <div style={{ textAlign: 'right' }} className="medium-text">
+                                                                        {salaryLedgerData?.allowances
+                                                                            .reduce((acc, curr) => acc + curr.amount, 0)
+                                                                            .toLocaleString()} 원
+                                                                    </div>
+                                                                </Table.Summary.Cell>
+                                                            </Table.Summary.Row>
+                                                        )
+                                                    )}
+                                                />
+
+                                            </Col>
+                                        </Row>
+                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>합계</Divider>
+
+                                        {/* 집계 항목들 */}
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name="nonTaxableAmount">
+                                                    <Input addonBefore="비과세 금액" readOnly />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="taxableAmount">
+                                                    <Input addonBefore="과세 금액" readOnly />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="taxableIncome">
+                                                    <Input addonBefore="과세 소득" readOnly />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="netPayment">
+                                                    <Input addonBefore="차인지급액" readOnly />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: '10px'}}>
+                                            <Button onClick={calculateSalary}>
+                                                계산
+                                            </Button>
+                                            {!isFinalized && (
+                                                <Button type="default" onClick={handleDeadline}>
+                                                    마감 처리
+                                                </Button>
+                                            )}
+                                            {isFinalized && (
+                                                <Button onClick={handleDeadlineOff}>
+                                                    마감 해제
+                                                </Button>
+                                            )}
+                                            <Button type="primary" htmlType="submit">
+                                                저장
+                                            </Button>
+                                        </Box>
+                                    </Form>
+                                </Grid>
+                            </Paper>
+                        </Grow>
+                    </Grid>
+
+
                 </Grid>
             )}
+
+            {/*{employeeId && salaryLedgerData && (*/}
+
+            {/*)}*/}
 
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
