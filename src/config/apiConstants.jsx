@@ -130,7 +130,7 @@ export const EMPLOYEE_API = {
 
     //  인사관리 - 근태
     ATTENDANCE_DATA_API: `${API_BASE_URL}/api/hr/attendance/records/all`,
-    ATTENDANCE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/records/${id}`,
+    ATTENDANCE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/attendance/records/${id}`,
     SAVE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/check-in`,
     DELETE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/del`,
     UPDATE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/update`,

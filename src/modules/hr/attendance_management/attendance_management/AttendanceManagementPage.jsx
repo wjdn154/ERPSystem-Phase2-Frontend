@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Box, Grid, Grow, Paper, Typography } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './AttendanceManagementUtil.jsx';
-import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, Spin, Select, notification, Upload} from 'antd';
+import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, Spin, Select, notification} from 'antd';
 import apiClient from '../../../../config/apiClient.jsx';
 import {EMPLOYEE_API} from '../../../../config/apiConstants.jsx';
 import { Divider } from 'antd';
-import { useNotificationContext } from "../../../../config/NotificationContext.jsx";
+import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 const { Option } = Select;
 const { confirm } = Modal;
@@ -14,13 +14,13 @@ const { confirm } = Modal;
 
 
 
-const AttendanceManagementPage = ({initialData}) => {
+const AttendanceManagementPage = ( {initialData} ) => {
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
     const [attendanceList, setAttendanceList] = useState(initialData);
     const [activeTabKey, setActiveTabKey] = useState('1'); // 활성 탭 키 상태
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
+    const [selectedRow, setSelectedRow] = useState(null); // 선택된 행 키 상태
     const [editAttendance, setEditAttendance] = useState(false);
     const [fetchAttendanceData, setFetchAttendanceData] = useState(false);
     const [attendanceParam, setAttendanceParam] = useState(false);
@@ -31,6 +31,7 @@ const AttendanceManagementPage = ({initialData}) => {
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
     const [displayValues, setDisplayValues] = useState({});
     const [initialModalData, setInitialModalData] = useState(null);
+    const [showDetail, setShowDetail] = useState(false);
 
     const fetchAttendance = async () => {
         try{
@@ -52,6 +53,41 @@ const AttendanceManagementPage = ({initialData}) => {
     useEffect(()=>{
         fetchAttendance();
     }, []);
+
+    // 행 선택 핸들러 설정
+    const handleRowSelection =  {
+        type:'radio',
+        selectedRowKeys: selectedRow ? [selectedRow.id] : [],
+        onChange: (selectedRowKeys, selectedRows) => {
+            if (selectedRows.length > 0) {
+                handleSelectedRow(selectedRows[0]);
+            } else{
+                console.warn("비어있음.");
+            }
+        },
+    };
+
+    // 행 선택 시 설비정보 상세 정보를 가져오는 로직
+    const handleSelectedRow = async (selectedRow) => {
+
+        if(!selectedRow) return;
+        setSelectedRow(selectedRow);
+        setShowDetail(false);   //상세정보 로딩중일때 기존 상세정보 숨기기
+
+        console.log("selectedRow",selectedRow.id);
+
+        try {
+            console.log("selectedRow",selectedRow.id);
+            const response = await apiClient.post(EMPLOYEE_API.ATTENDANCE_DETAIL_DATA_API(selectedRow.id));
+            console.log("response.data",response.data);
+            setFetchAttendanceData(response.data);
+            setEditAttendance(true);
+            notify('success', '근태 조회', '근태 정보 조회 성공.', 'bottomRight');
+        } catch (error) {
+            notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+        }
+    };
+
 
 
 
@@ -331,39 +367,21 @@ const AttendanceManagementPage = ({initialData}) => {
                                                 },
                                             },
                                         ]}
-                                        rowKey={(record) => record.id}
+                                        rowKey= "id"
                                         pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                         size="small"
-                                        rowSelection={{
-                                            type: 'radio',
-                                            selectedRowKeys,
-                                            onChange: (newSelectedRowKeys) => {
-                                                setSelectedRowKeys(newSelectedRowKeys);
-                                            }
-                                        }}
+                                        rowSelection={handleRowSelection}
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
-                                            onClick: async () => {
-                                                setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
-                                                const id = record.id;
-                                                try {
-                                                    const response = await apiClient.get(EMPLOYEE_API.ATTENDANCE_DETAIL_DATA_API(id));
-                                                    setFetchAttendanceData(response.data);
-                                                    setEditAttendance(true);
-                                                    notify('success', '근태 조회', '근태 정보 조회 성공.', 'bottomRight')
-                                                } catch (error) {
-                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
-                                                }
-                                            },
+                                            onClick: async () => handleSelectedRow(record),
                                         })}
                                     />
                                 </Grid>
                         </Paper>
                     </Grow>
                 </Grid>
-                </Grid>
-                    )}
-
+            {/*    </Grid>*/}
+            {/*)}*/}
             {editAttendance &&(
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
@@ -371,7 +389,7 @@ const AttendanceManagementPage = ({initialData}) => {
                             <Typography variant="h6" sx={{ padding: '20px' }}>근태기록 수정</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Table
-                                    dataSource={fetchAttendanceData}
+                                    dataSource={fetchAttendanceData ? [fetchAttendanceData] : []} // 객체를 배열로 감싸서 전달
                                     columns={[
                                         {
                                             title: <div className="title-text">근태코드</div>,
@@ -492,50 +510,22 @@ const AttendanceManagementPage = ({initialData}) => {
                                             },
                                         },
                                     ]}
-                                    rowKey={(record) => record.id}
-                                    pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
-                                    size="small"
-                                    rowSelection={{
-                                        type: 'radio',
-                                        selectedRowKeys,
-                                        onChange: (newSelectedRowKeys) => {
-                                            setSelectedRowKeys(newSelectedRowKeys);
-                                        }
-                                    }}
-                                    onRow={(record) => ({
-                                        style: { cursor: 'pointer' },
-                                        onClick: async () => {
-                                            setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
-                                            const id = record.id;
-                                            try {
-                                                const response = await apiClient.post(EMPLOYEE_API.ATTENDANCE_DETAIL_DATA_API(id));
-                                                setFetchAttendanceData(response.data);
-                                                setEditAttendance(true);
-                                                notify('success', '근태 조회', '근태 정보 조회 성공.', 'bottomRight')
-                                            } catch (error) {
-                                                notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
-                                            }
-                                        },
-                                    })}
                                 />
                             </Grid>
                         </Paper>
                     </Grow>
                 </Grid>
             )}
-
+                </Grid>
+            )}
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
                     <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
                         </Grow>
                     </Grid>
                 </Grid>
-            )}
-
+            )}`
         </Box>
     );
 };
