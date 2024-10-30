@@ -53,7 +53,7 @@ const WorkerPage = ({initialData}) => {
                             description={(
                                 <Typography>
                                     작업자 관리 페이지는 <span>생산 현장에서 일하는 작업자의 정보</span>를 관리하는 곳임.
-                                    이 페이지에서는 <span>작업자 추가, 수정, 삭제</span>가 가능하며, 각 작업자의 <span>역할, 담당 공정, 근무 시간</span> 등을 기록하고 관리할 수 있음. 작업자들의 배치와 작업량을 효율적으로 조정하여 <span>생산성과 작업 효율성</span>을 극대화하는 데 도움이 됨.
+                                    이 페이지에서는 <span>작업자 수정</span>이 가능하며, 각 작업자의 <span>역할, 담당 공정, 근무 시간</span> 등을 기록을 확인할 수 있음. 작업자들의 배치와 작업량을 효율적으로 조정하여 <span>생산성과 작업 효율성</span>을 극대화하는 데 도움이 됨.
                                 </Typography>
                             )}
                             tabItems={workerTabItems()}

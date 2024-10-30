@@ -9,7 +9,13 @@ import apiClient from "../../../../config/apiClient.jsx";
 import {LOGISTICS_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload.js";
-
+import {
+    fetchEquipmentData,
+    fetchEquipmentDataDetail,
+    updateEquipmentDataDetail,
+    saveEquipmentDataDetail,
+    deleteEquipmentDataDetail
+} from "./EquipmentDataApi.jsx";
 const EquipmentDataDetailSection = ({
                                         data,
                                         equipmentDataDetail,
@@ -23,9 +29,10 @@ const EquipmentDataDetailSection = ({
                                         handleUpdateCancel,
                                         isUpdateModalVisible,
                                         handleCostInput,
-                                        handleUpdate
+                                        setShowDetail,
+                                        setData
+
                                     }) => {
-    const [selectedFile, setSelectedFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentField, setCurrentField] = useState('');
     const [modalData, setModalData] = useState(null);
@@ -33,6 +40,7 @@ const EquipmentDataDetailSection = ({
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [displayValues, setDisplayValues] = useState({});
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
+    const [selectedFile, setSelectedFile] = useState(null);
 
     const handleInputClick = (fieldName) => {
         setCurrentField(fieldName);
@@ -103,6 +111,40 @@ const EquipmentDataDetailSection = ({
         const stringValue = String(value);
         return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
     };
+// 수정 버튼 클릭 시 실행되는 함수
+    const handleUpdate = async () => {
+        console.log("handleupdate 함수 호출됨");
+        try {
+            console.log("FormData 준비 시작");
+            const formData = new FormData();
+
+            // equipmentDataDetail 객체의 각 필드를 FormData에 추가
+            for (let key in equipmentDataDetail) {
+                if (equipmentDataDetail.hasOwnProperty(key)) {
+                    console.log(`FormData에 추가 중 - ${key}: ${equipmentDataDetail[key]}`);
+                    formData.append(key, equipmentDataDetail[key]);
+                }
+            }
+
+            // 이미지 파일이 선택된 경우 FormData에 추가
+            if (equipmentDataDetail.imageFile) {
+                formData.append("imageFile", equipmentDataDetail.imageFile); // 백엔드 컨트롤러에서 받을 이름과 동일하게 설정
+                console.log("이미지파일 추가 완료", equipmentDataDetail.imageFile);
+            }else if (equipmentDataDetail.imagePath) {
+                console.log("기존 이미지 경로 추가 중:", equipmentDataDetail.imagePath);
+                formData.append("imagePath", equipmentDataDetail.imagePath); // 기존 이미지 경로 전달
+            }
+
+            console.log("수정버튼 클릭 시 FormData:", formData);
+            await updateEquipmentDataDetail(equipmentDataDetail.id, formData);
+            const updatedData = await fetchEquipmentData();
+            setData(updatedData);
+            notify("success", "설비 수정", "설비 수정 성공.", "bottomRight");
+            setShowDetail(false);
+        } catch (error) {
+            notify("error", "수정 실패", "데이터 수정 중 오류가 발생했습니다.", "top");
+        }
+    };
 
     return(
     <Paper elevation={3} sx={{p: 2}}>
@@ -154,7 +196,7 @@ const EquipmentDataDetailSection = ({
                         <Form.Item>
                             <Input
                                 addonBefore="구매 비용"
-                                value={formatNumberWithComma(equipmentDataDetail.cost)}
+                                value={formatNumberWithComma(equipmentDataDetail.cost || '')}
                                 onChange={(e) => handleInputChange(e, 'cost')}
                             />
                         </Form.Item>
@@ -264,8 +306,8 @@ const EquipmentDataDetailSection = ({
                                 <img
                                     src={selectedFile
                                         ? URL.createObjectURL(selectedFile)
-                                        : equipmentDataDetail?.profilePicture
-                                            ? equipmentDataDetail?.profilePicture
+                                        : equipmentDataDetail?.imagePath
+                                            ? equipmentDataDetail?.imagePath
                                             : '/src/assets/img/uploads/defaultImage.png'}
                                     alt="미리보기 이미지"
                                     style={{ width: '100px', height: '100px', objectFit: 'cover' }}
@@ -278,9 +320,11 @@ const EquipmentDataDetailSection = ({
                                 beforeUpload={() => false}
                                 onChange={(info) => {
                                     const file = info.fileList[info.fileList.length - 1]?.originFileObj;
-                                    setSelectedFile(file);
+                                    console.log("선택한 파일 :", file);
+                                    setSelectedFile(file); // 미리보기 이미지를 위해 selectedFile 설정
+                                    setEquipmentDataDetail(prev => ({ ...prev, imageFile: file })); // FormData에 넣을 imageFile 설정
                                 }}
-                                fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []}
+                                fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: URL.createObjectURL(selectedFile) }] : []}
                             >
                                 <Button icon={<CloudUploadIcon />}>파일 선택</Button>
                             </Upload>
