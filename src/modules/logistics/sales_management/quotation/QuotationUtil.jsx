@@ -13,7 +13,7 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '견적서 작성',
+            label: '견적서 입력',
             children: (
                 <Typography>
                     새로운 견적서를 작성하는 탭으로, 고객 정보와 견적 항목을 입력할 수 있음.

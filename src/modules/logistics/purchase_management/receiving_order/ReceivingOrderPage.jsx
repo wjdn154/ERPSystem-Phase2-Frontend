@@ -33,7 +33,17 @@ const ReceivingOrderPage = ({initialData}) => {
     const [editReceivingOrder, setEditReceivingOrder] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [clientSearch, setClientSearch] = useState(
+        {
+            clientId: null,
+            clientName: null
+        }
+    );
 
+    useEffect(() => {
+        setSearchData(receivingOrderList);
+    }, [receivingOrderList]);
+    
     useEffect(() => {
 
         if(!detailReceivingOrder) return;
@@ -48,7 +58,7 @@ const ReceivingOrderPage = ({initialData}) => {
             managerName: detailReceivingOrder.managerCode ? `[${detailReceivingOrder.managerCode}] ${detailReceivingOrder.managerName}` : null,
             warehouseName:  detailReceivingOrder.warehouseCode ? `[${detailReceivingOrder.warehouseCode}] ${detailReceivingOrder.warehouseName}` : null,
             client: detailReceivingOrder.clientCode ?`[${detailReceivingOrder.clientCode}] ${detailReceivingOrder.clientName}` : null,
-            clientSearch: detailReceivingOrder.clientCode ?`[${detailReceivingOrder.clientCode}] ${detailReceivingOrder.clientName}` : null,
+            clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
 
         }, [detailReceivingOrder, form, receivingOrderDetails]);
 
@@ -172,6 +182,7 @@ const ReceivingOrderPage = ({initialData}) => {
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 client: null,
+                clientSearch: null
             }));
         }
         setCurrentField(null);
@@ -230,6 +241,7 @@ const ReceivingOrderPage = ({initialData}) => {
                 setSearchParams((prevParams) => ({
                     ...prevParams,
                     clientId: record.id,
+
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
@@ -245,9 +257,11 @@ const ReceivingOrderPage = ({initialData}) => {
                 console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('standard', record.standard, editingRow);
+                updateField('remarks', record.remarks, editingRow)
 
 
                 setReceivingOrderParam((prevParams) => ({
@@ -257,19 +271,6 @@ const ReceivingOrderPage = ({initialData}) => {
                 setEditingRow(null);
                 break;
 
-            case 'vatType':
-                setReceivingOrderParam((prevParams) => ({
-                    ...prevParams,
-                    vatType: {
-                        code: record.code,
-                        name: record.name,
-                    },
-                }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    vatType: `[${record.code}] ${record.name}`,
-                }));
-                break;
         }
 
         // 모달창 닫기
@@ -280,7 +281,7 @@ const ReceivingOrderPage = ({initialData}) => {
     const handleRegiDateChange = (date) => {
         setReceivingOrderParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
     };
 
@@ -288,7 +289,7 @@ const ReceivingOrderPage = ({initialData}) => {
     const handleDeliveryDateChange = (date) => {
         setReceivingOrderParam((prevState) => ({
             ...prevState,
-            deliveryDate: dayjs(date),
+            deliveryDate: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
     };
 
@@ -320,25 +321,6 @@ const ReceivingOrderPage = ({initialData}) => {
         setEditingRow(null);
     };
 
-    const calculateSupplyPrice = (quantity, price) => {
-        return quantity * price;
-    };
-
-    const calculateVat = (supplyPrice) => {
-        return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
-    };
-
-    // 수량 또는 단가 변경 시 공급가액과 부가세를 자동 계산하는 함수
-    const updateSupplyAndVat = (quantity, price, recordKey) => {
-
-        const supplyPrice = calculateSupplyPrice(quantity, price);
-
-        const vat = calculateVat(supplyPrice);
-
-        updateField('supplyPrice', supplyPrice, recordKey);
-        updateField('vat', vat, recordKey);
-        console.log('vat', vat)
-    };
 
     const updateField = (fieldName, value) => {
         const updatedDetails = [...receivingOrderParam.receivingOrderDetails];
@@ -348,16 +330,6 @@ const ReceivingOrderPage = ({initialData}) => {
         updatedDetails[editingRow][fieldName] = value;
 
         console.log('updatedDetails: ', updatedDetails)
-
-        // 수량이나 단가가 변경되면 공급가액을 재계산
-        if (fieldName === 'quantity' || fieldName === 'price') {
-            const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
-
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
-        }
 
         setReceivingOrderParam((prevParams) => ({
             ...prevParams,
@@ -410,6 +382,89 @@ const ReceivingOrderPage = ({initialData}) => {
                 } catch (error) {
                     notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
                 }
+            },
+        });
+    };
+
+    // 폼 제출 핸들러
+    const handleFormSubmit = async (values, type) => {
+        console.log('Form values:', values); // 폼 값 확인
+        console.log('detailReceivingOrder', detailReceivingOrder)
+        console.log('receivingOrderParam: ', receivingOrderParam)
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                try {
+                    const orderData = {
+                        clientId: receivingOrderParam.client ? receivingOrderParam.client.id : receivingOrderParam.clientId,
+                        managerId: receivingOrderParam.manager ? receivingOrderParam.manager.id : receivingOrderParam.managerId,
+                        warehouseId: receivingOrderParam.warehouse ? receivingOrderParam.warehouse.id : receivingOrderParam.warehouseId,
+                        date: receivingOrderParam.date,
+                        shippingDate: receivingOrderParam.shippingDate,
+                        items: Array.isArray(receivingOrderParam.receivingOrderDetails
+                        ) ? receivingOrderParam.receivingOrderDetails.map(item => ({
+                            productId: item.productId,
+                            quantity: item.quantity,
+                            remarks: item.remarks,
+                        })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
+                        remarks: values.remarks
+                    };
+
+                    console.log('Sending data to API:', orderData); // API로 전송할 데이터 확인
+
+                    const API_PATH = type === 'update' ? LOGISTICS_API.RECEIVING_ORDER_UPDATE_API(receivingOrderParam.id) : LOGISTICS_API.RECEIVING_ORDER_CREATE_API;
+                    const method = type === 'update' ? 'put' : 'post';
+
+                    const response = await apiClient[method](API_PATH, orderData, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const updatedData = response.data;
+
+                    if (type === 'update') {
+                        setReceivingOrderList((prevList) =>
+                            prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
+                        );
+                    } else {
+                        setReceivingOrderList((prevList) => [...prevList, updatedData]);
+                        registrationForm.resetFields();
+                    }
+
+                    handleSearch()
+
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
+
+                    setEditReceivingOrder(false);
+                    setReceivingOrderParam({
+                        receivingOrderDetails: [],
+                    });
+                    setDetailReceivingOrder(receivingOrderParam.receivingOrderDetails || []);
+                    setDisplayValues({});
+
+                    type === 'update'
+                        ? notify('success', '발주서 수정', '발주서 정보 수정 성공.', 'bottomRight')
+                        : notify('success', '발주서 저장', '발주서 정보 저장 성공.', 'bottomRight');
+                } catch (error) {
+                    console.error('Error saving data:', error); // 오류 로그 출력
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '저장 취소',
+                    description: '저장이 취소되었습니다.',
+                    placement: 'bottomLeft',
+                });
             },
         });
     };
@@ -467,6 +522,14 @@ const ReceivingOrderPage = ({initialData}) => {
             width: '10%',
         },
         {
+            title: <div className="title-text">입고예정일자</div>,
+            dataIndex: 'deliveryDate',
+            key: 'deliveryDate',
+            align: 'center',
+            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            width: '15%',
+        },
+        {
             title: <div className="title-text">품목명</div>,
             dataIndex: 'productName',
             key: 'productName',
@@ -479,14 +542,6 @@ const ReceivingOrderPage = ({initialData}) => {
             key: 'totalQuantity',
             align: 'center',
             width: '10%',
-        },
-        {
-            title: <div className="title-text">입고 예정 일자</div>,
-            dataIndex: 'deliveryDate',
-            key: 'deliveryDate',
-            align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
-            width: '15%',
         },
     ];
 
@@ -589,7 +644,7 @@ const ReceivingOrderPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? receivingOrderList : searchData} // 발주서 리스트 데이터
+                                        dataSource={searchData} // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -646,20 +701,20 @@ const ReceivingOrderPage = ({initialData}) => {
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(receivingOrderParam.date)}
-                                                            onChange={handleDeliveryDateChange}
+                                                            onChange={handleRegiDateChange}handleDeliveryDateChange
                                                         />
                                                     </Form.Item>
                                                 </Col>
 
                                                 <Col>
-                                                    <Typography>납기 일자</Typography>
+                                                    <Typography>입고예정일자</Typography>
                                                 </Col>
                                                 <Col>
                                                     <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(receivingOrderParam.deliveryDate)}
-                                                            onChange={handleRegiDateChange}
+                                                            onChange={handleDeliveryDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -1154,7 +1209,7 @@ const ReceivingOrderPage = ({initialData}) => {
                                             <Typography>납기 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '납기 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(receivingOrderParam.deliveryDate)}

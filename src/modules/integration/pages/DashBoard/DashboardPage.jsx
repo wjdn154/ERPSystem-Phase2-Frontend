@@ -174,7 +174,6 @@ function Card({ title, children }) {
 function ActivityTimeline({reportData}) {
     const [activityShowAll, setActivityShowAll] = useState(false);
     const activitiesToShow = activityShowAll ? reportData.activities : reportData.activities.slice(0, 4);
-    console.log(activitiesToShow);
     return (
         <div className="flow-root">
             <ul className="-mb-8">

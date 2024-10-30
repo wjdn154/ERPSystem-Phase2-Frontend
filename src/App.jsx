@@ -1,7 +1,7 @@
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeSettings } from './config/AppUtil.jsx';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
@@ -32,53 +32,6 @@ const AppContent = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
-    // SSE 연결을 설정하고 구독
-    useEffect(() => {
-        if (token) {
-            const employeeId = jwtDecode(token).employeeId;
-            const tenantId = `tenant_${jwtDecode(token).companyId}`;
-
-            const initializeSSE = async () => {
-                let response;
-                try {
-                    response = await apiClient.post(COMMON_API.GET_USER_SUBSCRIPTION_INFO_API(employeeId, isAdmin));
-                } catch (error) {
-                    console.error("사용자 정보 조회 에러:", error);
-                }
-
-                if (response) {
-                    const module = response.data.module;
-                    const permission = response.data.permission;
-
-                    const eventSource = new EventSource(COMMON_API.NOTIFICATION_SUBSCRIBE_API(employeeId, tenantId, module, permission));
-
-                    // eventSource.addEventListener("subscribe", (event) => {
-                    //     console.log("구독 이벤트 수신:", event.data);
-                    //     notify('info', "구독 알림", event.data, 'topRight');
-                    // });
-
-                    eventSource.addEventListener("notification", (event) => {
-                        console.log("알림 수신:", event.data);
-                        notify('info', "알림", event.data, 'topRight');
-                    });
-
-                    eventSource.onmessage = (event) => {
-                        const notification = JSON.parse(event.data);
-                        notify('info', notification.type, notification.content, 'topRight');
-                    };
-
-                    eventSource.onerror = (error) => {
-                        console.error("SSE 연결 에러:", error);
-                        eventSource.close(); // 에러 발생 시 연결 종료
-                    };
-                }
-            };
-
-            initializeSSE();
-        }
-    }, [token, isAdmin, dispatch]);
-
 
 
     useEffect(() => {
