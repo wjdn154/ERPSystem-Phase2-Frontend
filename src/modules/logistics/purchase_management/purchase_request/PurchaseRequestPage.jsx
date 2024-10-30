@@ -417,20 +417,23 @@ const PurchaseRequestPage = ( {initialData} ) => {
     const handleFieldChange = (value, index, field) => {
         const newDetails = [...purchaseRequestParam.purchaseRequestDetails];
 
+        setEditingRow(index);
+
         newDetails[index][field] = value;
 
         if (field === 'quantity') {
             const quantity = value;
             console.log(quantity)
-            const price = newDetails[index].price;
+            const price = removeComma(newDetails[index].price);
             newDetails[index].supplyPrice = quantity * price; // 공급가액 = 수량 * 단가
-            updateSupplyAndVat(quantity, price, index);
         }
 
+        setPurchaseRequestDetails(newDetails);
         setPurchaseRequestParam({
             ...purchaseRequestParam,
             purchaseRequestDetails: newDetails,
         });
+        setEditingRow(null);
     };
 
     const handleSearch = async () => {

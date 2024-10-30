@@ -27,10 +27,10 @@ const OrderFormPage = ({initialData}) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [orderParam, setOrderParam] = useState({
-        purchaseOrderDetails: [], });
+        orderDetails: [], });
     const [detailOrder, setDetailOrder] = useState(false);
     const [form] = Form.useForm();
-    const [purchaseOrderDetails, setOrdersDetails] = useState(detailOrder.purchaseOrderDetails || []);
+    const [orderDetails, setOrdersDetails] = useState(detailOrder.orderDetails || []);
     const [editOrder, setEditOrder] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
@@ -51,7 +51,7 @@ const OrderFormPage = ({initialData}) => {
 
         form.setFieldsValue(detailOrder);
         form.setFieldsValue({
-            purchaseOrderDetails: purchaseOrderDetails,
+            orderDetails: orderDetails,
         })
         setOrderParam((prevParam) => ({
             ...prevParam,
@@ -84,7 +84,7 @@ const OrderFormPage = ({initialData}) => {
         setEditOrder(false);
         setEditingRow(null);
         setOrderParam({
-            purchaseOrderDetails: [],
+            orderDetails: [],
             date: dayjs().format('YYYY-MM-DD'),
         });
         setSearchParams({
@@ -93,7 +93,7 @@ const OrderFormPage = ({initialData}) => {
             clientId: null,
             state: null,
         });
-        setDetailOrder(orderParam.purchaseOrderDetails || [])
+        setDetailOrder(orderParam.orderDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
@@ -265,7 +265,7 @@ const OrderFormPage = ({initialData}) => {
 
             case 'product':
                 // 제품 선택 시 해당 제품을 상태에 반영
-                const updatedDetails = [...orderParam.purchaseOrderDetails];
+                const updatedDetails = [...orderParam.orderDetails];
 
                 console.log(editingRow)
 
@@ -284,7 +284,7 @@ const OrderFormPage = ({initialData}) => {
 
                 setOrderParam((prevParams) => ({
                     ...prevParams,
-                    purchaseOrderDetails: updatedDetails,
+                    orderDetails: updatedDetails,
                 }));
                 setEditingRow(null);
                 break;
@@ -326,7 +326,7 @@ const OrderFormPage = ({initialData}) => {
 
     // 필드 값 변경 시 호출되는 함수
     const handleFieldChange = (value, index, field) => {
-        const updatedDetails = [...orderParam.purchaseOrderDetails];
+        const updatedDetails = [...orderParam.orderDetails];
 
         setEditingRow(index);
 
@@ -347,7 +347,7 @@ const OrderFormPage = ({initialData}) => {
         setOrdersDetails(updatedDetails); // 상태 업데이트
         setOrderParam( {
             ...orderParam,
-            purchaseOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+            orderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
         });
         setEditingRow(null);
     };
@@ -361,7 +361,7 @@ const OrderFormPage = ({initialData}) => {
     };
 
     const updateField = (fieldName, value) => {
-        const updatedDetails = [...orderParam.purchaseOrderDetails];
+        const updatedDetails = [...orderParam.orderDetails];
 
         console.log('editingRow: ', editingRow)
 
@@ -381,7 +381,7 @@ const OrderFormPage = ({initialData}) => {
 
         setOrderParam((prevParams) => ({
             ...prevParams,
-            purchaseOrderDetails: updatedDetails,
+            orderDetails: updatedDetails,
         }));
     };
 
@@ -405,7 +405,7 @@ const OrderFormPage = ({initialData}) => {
         // 기존 항목에 새로운 항목 추가
         setOrderParam((prev) => ({
             ...prev,
-            purchaseOrderDetails: [...prev.purchaseOrderDetails, newRow],
+            orderDetails: [...prev.orderDetails, newRow],
         }));
     };
 
@@ -419,13 +419,13 @@ const OrderFormPage = ({initialData}) => {
             onOk: async () => {
                 try {
                     // 삭제 API 호출해서 해야함 (수정)
-                    const updatedDetails = [...orderParam.purchaseOrderDetails]; // 배열을 복사
+                    const updatedDetails = [...orderParam.orderDetails]; // 배열을 복사
                     updatedDetails.splice(index, 1); // 인덱스에 해당하는 항목 삭제
 
                     setOrdersDetails(updatedDetails); // 상태 업데이트
                     setOrderParam((prev) => ({
                             ...prev,
-                            purchaseOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+                            orderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
                         })
                     );
 
@@ -458,8 +458,8 @@ const OrderFormPage = ({initialData}) => {
                         vatId: orderParam.vatType ? Number(orderParam.vatType.code) : orderParam.vatId,
                         journalEntryCode: orderParam.journalEntryCode,
                         electronicTaxInvoiceStatus: orderParam.electronicTaxInvoiceStatus,
-                        items: Array.isArray(orderParam.purchaseOrderDetails
-                        ) ? orderParam.purchaseOrderDetails.map(item => ({
+                        items: Array.isArray(orderParam.orderDetails
+                        ) ? orderParam.orderDetails.map(item => ({
                             productId: item.productId,
                             quantity: item.quantity,
                             remarks: item.remarks,
@@ -482,7 +482,7 @@ const OrderFormPage = ({initialData}) => {
 
                     if (type === 'update') {
                         setOrderList((prevList) =>
-                            prevList.map((purchaseOrderDetails) => (purchaseOrderDetails.id === updatedData.id ? updatedData : purchaseOrderDetails))
+                            prevList.map((orderDetails) => (orderDetails.id === updatedData.id ? updatedData : orderDetails))
                         );
                     } else {
                         setOrderList((prevList) => [...prevList, updatedData]);
@@ -500,9 +500,9 @@ const OrderFormPage = ({initialData}) => {
 
                     setEditOrder(false);
                     setOrderParam({
-                        purchaseOrderDetails: [],
+                        orderDetails: [],
                     });
-                    setDetailOrder(orderParam.purchaseOrderDetails || []);
+                    setDetailOrder(orderParam.orderDetails || []);
                     setDisplayValues({});
 
                     type === 'update'
@@ -941,7 +941,7 @@ const OrderFormPage = ({initialData}) => {
                                             {/* 주문 상세 항목 */}
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>주문 상세 항목</Divider>
                                             <Table
-                                                dataSource={orderParam?.purchaseOrderDetails || []}
+                                                dataSource={orderParam?.orderDetails || []}
                                                 columns={[
                                                     {
                                                         title: '품목',
@@ -1622,7 +1622,7 @@ const OrderFormPage = ({initialData}) => {
                                     {/* 주문 상세 항목 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>주문 상세 항목</Divider>
                                     <Table
-                                        dataSource={orderParam?.purchaseOrderDetails || []}
+                                        dataSource={orderParam?.orderDetails || []}
                                         columns={[
                                             {
                                                 title: '품목',

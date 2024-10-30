@@ -41,8 +41,10 @@ const PurchasePage = ({initialData}) => {
             clientName: null
         }
     );
+    const [vat, setVat] = useState({});
+
+
     useEffect(() => {
-        // quotationList가 업데이트될 때마다 searchData를 최신 상태로 설정
         setSearchData(purchaseList);
     }, [purchaseList]);
 
@@ -55,7 +57,12 @@ const PurchasePage = ({initialData}) => {
         form.setFieldsValue({
             purchaseDetails: purchaseDetails,
         })
-        setPurchaseParam(detailPurchase);
+
+        setPurchaseParam((prevParam) => ({
+            ...prevParam,
+            ...detailPurchase,
+        }));
+
 
         setDisplayValues({
             managerName: detailPurchase.managerCode ? `[${detailPurchase.managerCode}] ${detailPurchase.managerName}` : null,
@@ -79,16 +86,26 @@ const PurchasePage = ({initialData}) => {
 
 
     const handleTabChange = (key) => {
+
+        setActiveTabKey(key);
         setEditPurchase(false);
         setEditingRow(null);
-        setPurchaseDetails(null)
-
+        setPurchaseParam({
+            purchaseDetails: [],
+            date: dayjs().format('YYYY-MM-DD'),
+        });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        })
+        setDetailPurchase(purchaseParam.purchaseDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
 
-        setActiveTabKey(key);
     };
 
     // 날짜 선택 처리
@@ -306,7 +323,7 @@ const PurchasePage = ({initialData}) => {
     const handleRegiDateChange = (date) => {
         setPurchaseParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
     };
 
@@ -325,7 +342,7 @@ const PurchasePage = ({initialData}) => {
 
             updatedDetails[index].supplyPrice = quantity * price; // 공급가액 = 수량 * 단가
 
-            updateSupplyAndVat(quantity, price, index);
+            setTimeout(() => updateSupplyAndVat(quantity, price, index), 500);
 
         }
 
@@ -342,7 +359,11 @@ const PurchasePage = ({initialData}) => {
         return quantity * price;
     };
 
-    const calculateVat = (supplyPrice) => {
+    const calculateVat = async () => {
+        let vatAmount = 0;
+
+        const searchVatTypeId = (await apiClient.post(FINANCIAL_API.VAT_TYPE_ID_API, { vatTypeCode: detailPurchase.vatCode})).data;
+
         return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
     };
 
@@ -838,8 +859,17 @@ const PurchasePage = ({initialData}) => {
                                                 </Col>
 
                                                 <Col span={6}>
-                                                    <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                        <Checkbox>세금계산서 발행 여부</Checkbox>
+                                                    <Form.Item name="electronicTaxInvoiceStatus">
+                                                        <Checkbox
+                                                            onChange={(e) => {
+                                                                setPurchaseParam((prevState) => ({
+                                                                    ...prevState,
+                                                                    electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
+                                                                }));
+                                                            }}
+                                                        >
+                                                            세금계산서 발행 여부
+                                                        </Checkbox>
                                                     </Form.Item>
                                                 </Col>
 
@@ -855,9 +885,19 @@ const PurchasePage = ({initialData}) => {
                                                                 style={{ width: '70%' }}
                                                                 value={purchaseParam.currency}
                                                                 onChange={(value) => {
+                                                                    const currencyIdMapping = {
+                                                                        KRW: 6,
+                                                                        USD: 1,
+                                                                        EUR: 2,
+                                                                        JPY: 3,
+                                                                        CNY: 4,
+                                                                        GBP: 5,
+                                                                    };
+
                                                                     setPurchaseParam((prevState) => ({
                                                                         ...prevState,
                                                                         currency: value,
+                                                                        currencyId: currencyIdMapping[value],
                                                                     }));
                                                                 }}
                                                             >
@@ -1394,8 +1434,8 @@ const PurchasePage = ({initialData}) => {
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
                                     initialValues={detailPurchase}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
                                     {/* 구매 정보 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매서 정보</Divider>
@@ -1487,8 +1527,17 @@ const PurchasePage = ({initialData}) => {
                                         </Col>
 
                                         <Col span={6}>
-                                            <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
-                                                <Checkbox>세금계산서 발행 여부</Checkbox>
+                                            <Form.Item name="electronicTaxInvoiceStatus">
+                                                <Checkbox
+                                                    onChange={(e) => {
+                                                        setPurchaseParam((prevState) => ({
+                                                            ...prevState,
+                                                            electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
+                                                        }));
+                                                    }}
+                                                >
+                                                    세금계산서 발행 여부
+                                                </Checkbox>
                                             </Form.Item>
                                         </Col>
 
@@ -1504,9 +1553,19 @@ const PurchasePage = ({initialData}) => {
                                                         style={{ width: '70%' }}
                                                         value={purchaseParam.currency}
                                                         onChange={(value) => {
+                                                            const currencyIdMapping = {
+                                                                KRW: 6,
+                                                                USD: 1,
+                                                                EUR: 2,
+                                                                JPY: 3,
+                                                                CNY: 4,
+                                                                GBP: 5,
+                                                            };
+
                                                             setPurchaseParam((prevState) => ({
                                                                 ...prevState,
                                                                 currency: value,
+                                                                currencyId: currencyIdMapping[value],
                                                             }));
                                                         }}
                                                     >
