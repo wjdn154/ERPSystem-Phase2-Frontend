@@ -114,7 +114,7 @@ const WorkerPage = ({initialData}) => {
             {/* 작업자 작업배치 및 근태목록 영역 */}
             {activeTabKey === '2' &&  (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={11}>
+                    <Grid item xs={12}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <WorkerAttendanceListSection

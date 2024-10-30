@@ -42,7 +42,7 @@ function Headers() {
 
                         eventSourceRef.current = new EventSource(COMMON_API.NOTIFICATION_SUBSCRIBE_API(
                             decodedToken.employeeId,
-                            `tenant_${decodedToken.companyId}`,
+                            decodedToken["X-Tenant-ID"],
                             response.data.module,
                             response.data.permission
                         ));
@@ -117,13 +117,15 @@ function Headers() {
     const markAsRead = async (notificationId) => {
         try {
             const response = await apiClient.post(COMMON_API.MARK_AS_READ_NOTIFICATION_API(employeeId, notificationId));
+            console.log("읽음 처리 결과:", response.data);
+            console.log("읽음 처리 결과:", notificationItems);
             setNotificationItems((prevItems) =>
                 prevItems.map((item) =>
-                    item.notification.id === response.data ? { ...item, readStatus: true } : item
+                    item.notification.id === notificationId ? { ...item, readStatus: true } : item
                 )
             );
             setUnreadCount((prevCount) => {
-                const item = notificationItems.find((item) => item.notification.id === response.data);
+                const item = notificationItems.find((item) => item.notification.id === notificationId);
                 return item && !item.readStatus ? prevCount - 1 : prevCount;
             });
         } catch (error) {
@@ -210,8 +212,12 @@ function Headers() {
                                                 title={
                                                     <span className="notification-title">
                                                         {notification.type ? notification.type.replace('_', ' ') : '알림이 없습니다'}
-                                                        {notification.module ? <Tooltip title="알림을 받을 대상의 부서 입니다."><Tag style={{ marginLeft: '20px' }} color='green'>{notification.module}</Tag></Tooltip> : null}
-                                                        {notification.module ? <Tooltip title="알림을 받을 대상의 권한 입니다."><Tag color='red'>{notification.permission}</Tag></Tooltip> : null}
+                                                        {notification.module ? <Tooltip title="알림을 받을 대상의 부서 입니다.">
+                                                            <Tag style={{ marginLeft: '20px' }} color={notification.readStatus ? 'default' : 'green'}>{notification.module}</Tag>
+                                                        </Tooltip> : null}
+                                                        {notification.module ? <Tooltip title="알림을 받을 대상의 권한 입니다.">
+                                                            <Tag color={notification.readStatus ? 'default' : 'red'}>{notification.permission}</Tag>
+                                                        </Tooltip> : null}
                                                     </span>
                                                 }
                                                 description={

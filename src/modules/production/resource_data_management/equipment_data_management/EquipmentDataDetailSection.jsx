@@ -98,6 +98,11 @@ const EquipmentDataDetailSection = ({
         }
         setIsModalVisible(false);
     };
+    const formatNumberWithComma = (value) => {
+        // value가 숫자인 경우 문자열로 변환
+        const stringValue = String(value);
+        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+    };
 
     return(
     <Paper elevation={3} sx={{p: 2}}>
@@ -149,7 +154,7 @@ const EquipmentDataDetailSection = ({
                         <Form.Item>
                             <Input
                                 addonBefore="구매 비용"
-                                value={`${equipmentDataDetail.cost}원` || ''}
+                                value={formatNumberWithComma(equipmentDataDetail.cost)}
                                 onChange={(e) => handleInputChange(e, 'cost')}
                             />
                         </Form.Item>
@@ -254,26 +259,28 @@ const EquipmentDataDetailSection = ({
                 </Divider>
                 <Row gutter={16}>
                     <Col span={12}>
-                        <Form.Item label="설비 이미지">
-                            {/* 이미지 미리보기 */}
-                            <div style={{ marginBottom: '20px' }}>
+                        <Form.Item>
+                            <div style={{ marginBottom: '1px' }}>
                                 <img
-                                    src={selectedFile ? URL.createObjectURL(selectedFile) : defaultImage}
-                                    alt="프로필 사진"
+                                    src={selectedFile
+                                        ? URL.createObjectURL(selectedFile)
+                                        : equipmentDataDetail?.profilePicture
+                                            ? equipmentDataDetail?.profilePicture
+                                            : '/src/assets/img/uploads/defaultImage.png'}
+                                    alt="미리보기 이미지"
                                     style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                 />
                             </div>
+                        </Form.Item>
+
+                        <Form.Item name="imageFile">
                             <Upload
-                                beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
+                                beforeUpload={() => false}
                                 onChange={(info) => {
-                                    const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
-                                    setSelectedFile(file); // 선택된 파일을 상태로 설정
+                                    const file = info.fileList[info.fileList.length - 1]?.originFileObj;
+                                    setSelectedFile(file);
                                 }}
-                                fileList={
-                                    selectedFile
-                                        ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }]
-                                        : []
-                                } // 파일 리스트 설정
+                                fileList={selectedFile ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }] : []}
                             >
                                 <Button icon={<CloudUploadIcon />}>파일 선택</Button>
                             </Upload>
