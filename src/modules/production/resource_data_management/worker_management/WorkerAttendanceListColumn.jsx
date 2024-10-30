@@ -21,28 +21,28 @@ const attendanceStatusMap={
 export const
     workerAttendanceListColumn = [
     {
-        title: <span>근태 일자</span>,  // 컬럼 제목
+        title: <div className="title-text">근태일자</div>,
         dataIndex: 'attendanceDate',  // 데이터 인덱스: 이 필드는 데이터 객체의 'jobTitleName' 속성과 연결됩니다.
         key:'attendanceDate',
         width: '16%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
-        title: <span>출근시간</span>,  // 컬럼 제목
+        title: <div className="title-text">출근시각</div>,
         dataIndex: 'checkTime',  // 데이터 인덱스: 이 필드는 데이터 객체의 'employmentStatus' 속성과 연결됩니다.
         key:'checkTime',
         width: '16%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
-        title: <span>퇴근시간</span>,  // 컬럼 제목
+        title: <div className="title-text">퇴근시각</div>,
         dataIndex: 'checkoutTime',  // 데이터 인덱스: 이 필드는 데이터 객체의 'employmentType' 속성과 연결됩니다.
         key:'checkoutTime',
         width: '16%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
-        title: <span>근무상태</span>,  // 컬럼 제목
+        title: <div className="title-text">근무상태</div>,
         dataIndex: 'attendanceStatus',  // 데이터 인덱스: 이 필드는 데이터 객체의 'trainingStatus' 속성과 연결됩니다.
         key:'attendanceStatus',
         width: '14%',  // 컬럼 너비 설정
@@ -66,14 +66,14 @@ export const
         }
     },
     {
-        title: <span>작업배치 일자</span>,  // 컬럼 제목
+        title: <div className="title-text">작업배치일자</div>,
         dataIndex: 'assignmentDate',  // 데이터 인덱스: 이 필드는 데이터 객체의 'positionName' 속성과 연결됩니다.
         key:'assignmentDate',
         width: '18%',  // 컬럼 너비 설정
         align: 'center',
     },
     {
-        title: <span>배치된 작업장</span>,  // 컬럼 제목
+        title: <div className="title-text">배치 작업장</div>,
         dataIndex: 'workcenterName',  // 데이터 인덱스: 이 필드는 데이터 객체의 'departmentName' 속성과 연결됩니다.
         key:'workcenterName',
         width: '20%',  // 컬럼 너비 설정

@@ -13,7 +13,7 @@ export const tabItems = () => {
         },
         {
             key: '2',
-            label: '구매 진행',
+            label: '구매 입력',
             children: (
                 <Typography>
                     진행 중인 구매를 관리하며, 상태를 업데이트하거나 필요한 정보를 입력할 수 있음.

@@ -89,12 +89,11 @@ const ShipmentInquiryPage = () => {
                 setLoading(false);
                 return;
             }
-            apiPath = LOGISTICS_API.WAREHOUSE_INVENTORY_DETAIL_API(selectedWarehouseId);
+            apiPath = LOGISTICS_API.INVENTORY_BY_WAREHOUSE_API(selectedWarehouseId);
         }
 
         try {
             const response = await apiClient.post(apiPath);
-            console.log('모달데이터:', response.data);
             // 데이터가 문자열이고 JSON 배열 형식일 경우 파싱, 아니면 그대로 배열로 처리
             let data = response.data;
             if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {

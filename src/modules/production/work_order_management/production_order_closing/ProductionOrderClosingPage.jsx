@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import {tabItems} from './ShiftTypeUtil.jsx';
+import {tabItems} from './ProductionOrderClosingUtil.jsx';
 import {Button, Col, DatePicker, Form, InputNumber, Row, Table, Tag} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import dayjs from "dayjs";
@@ -9,7 +9,7 @@ import {useNotificationContext} from "../../../../config/NotificationContext.jsx
 import apiClient from "../../../../config/apiClient.jsx";
 import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 
-const ShiftTypePage = ({ initialData }) => {
+const ProductionOrderClosingPage = ({ initialData }) => {
     const [form] = Form.useForm();
     const notify = useNotificationContext();
     const [activeTabKey, setActiveTabKey] = useState('1');
@@ -54,31 +54,6 @@ const ShiftTypePage = ({ initialData }) => {
     const handleTabChange = (key) => {
         setActiveTabKey(key);
     };
-
-    const handleConfirm = async (e) => {
-        const selectedRow = searchData.find((data) => data.id === selectedRowKeys[0]);
-        if(selectedRow.confirmed) {
-            notify('error', '확정 실패', '이미 확정된 작업 지시입니다.');
-            return;
-        }
-        try {
-            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_ORDER_CONFIRM_API(selectedRow.id));
-
-            const updatedData = searchData.map((item) =>
-                item.id === saveParams.id ? {
-                    ...item,
-                    confirmed: true,
-                } : item
-            );
-
-            setSearchData(updatedData);
-
-            notify('success', '작업지시 확정 성공', '작업지시가 성공적으로 확정되었습니다.');
-        } catch (error) {
-            notify('error', '오류 발생', '작업 지시 확정 처리 중 오류가 발생했습니다.');
-        }
-    };
-
 
     const generateQuantities = (totalQuantity) => {
         const defectiveRate = Math.random() * 0.08 + 0.02;
@@ -146,10 +121,10 @@ const ShiftTypePage = ({ initialData }) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="교대 유형"
+                        title="작업 지시 확정"
                         description={(
                             <Typography>
-                                교대 유형 관리 페이지는 <span>작업장 내에서 다양한 교대 근무 유형을 관리</span>하는 곳임. 이 페이지에서는 <span>교대 근무 유형을 추가, 수정, 삭제</span>할 수 있으며, 각 교대의 <span>근무 시간, 근무 인원, 교대 간 겹침 시간</span> 등의 정보를 설정할 수 있음. 이를 통해 <span>교대 근무 스케줄</span>을 체계적으로 관리하고, 생산 현장에서의 <span>근무 효율성</span>을 높일 수 있음.
+                                작업 지시 확정 페이지는 <span>생산 과정에서 각 작업의 지시를 확정하고 관리</span>하는 곳임. 이 페이지에서는 <span>작업 지시를 추가, 수정, 삭제</span>할 수 있으며, 각 작업의 <span>작업 내용, 작업 인원, 작업 시간</span> 등의 정보를 설정할 수 있음. 이를 통해 <span>생산 작업의 효율성</span>을 높이고, 현장의 <span>생산 스케줄을 체계적으로 관리</span>할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -268,6 +243,7 @@ const ShiftTypePage = ({ initialData }) => {
                                             },
                                         })}
                                         pagination={false}
+                                        style={{ marginBottom: '20px' }}
                                         size="small"
                                         rowKey="id"
                                     />
@@ -339,10 +315,7 @@ const ShiftTypePage = ({ initialData }) => {
                                             </Col>
                                         </Row>
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                                            <Button onClick={handleConfirm} type="primary" style={{ marginRight: '10px' }}>
-                                                작업지시 확정
-                                            </Button>
-                                            <Button onClick={handleCloseOrder} type="danger">
+                                            <Button onClick={handleCloseOrder} type="primary">
                                                 작업지시 마감
                                             </Button>
                                         </Box>
@@ -369,4 +342,4 @@ const ShiftTypePage = ({ initialData }) => {
     );
 };
 
-export default ShiftTypePage;
+export default ProductionOrderClosingPage;

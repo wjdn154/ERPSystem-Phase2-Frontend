@@ -52,21 +52,18 @@ export const processDetailsColumn = [
         title: <div className="title-text">코드</div>,
         dataIndex: 'code',  // DTO의 code 필드에 접근
         key: 'code',
-        width: '10%',
         align: 'center',
     },
     {
         title: <div className="title-text">공정명</div>,
         dataIndex: 'name',  // DTO의 name 필드에 접근
         key: 'name',
-        width: '20%',
         align: 'center',
     },
     {
         title: <div className="title-text">생산구분</div>,
         dataIndex: 'isOutsourced',  // DTO의 isOutsourced 필드에 접근
         key: 'isOutsourced',
-        width: '10%',
         align: 'center',
         render: (isOutsourced) => {
             return (
@@ -80,23 +77,20 @@ export const processDetailsColumn = [
         title: <div className="title-text">소요 시간</div>,
         dataIndex: 'duration',  // DTO의 duration 필드에 접근
         key: 'duration',
-        width: '10%',
-        align: 'center',
+        align: 'right',
         render: (duration) => `${duration}시간`,
     },
     {
         title: <div className="title-text">공정 비용</div>,
         dataIndex: 'cost',  // DTO의 cost 필드에 접근
         key: 'cost',
-        width: '15%',
-        align: 'center',
+        align: 'right',
         render: (cost) => formatNumberWithComma(cost),
     },
     {
         title: <div className="title-text">불량률(%)</div>,
         dataIndex: 'defectRate',  // DTO의 defectRate 필드에 접근
         key: 'defectRate',
-        width: '10%',
         align: 'center',
         render: (defectRate) => {
             if (defectRate != null) {
@@ -110,7 +104,6 @@ export const processDetailsColumn = [
         title: <div className="title-text">사용여부</div>,
         dataIndex: 'isUsed',  // DTO의 isUsed 필드에 접근
         key: 'isUsed',
-        width: '5%',
         align: 'center',
         render: (isActive) => {
             return (

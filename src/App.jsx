@@ -1,7 +1,7 @@
 import './styles/App.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeSettings } from './config/AppUtil.jsx';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // 쿠키 사용
@@ -20,6 +20,8 @@ import { notification } from 'antd';
 import { NotificationProvider, useNotificationContext } from "./config/NotificationContext.jsx";
 import { jwtDecode } from "jwt-decode";
 import UnauthorizedPage from "./modules/common/unauthorized/UnauthorizedPage.jsx";
+import {COMMON_API} from "./config/apiConstants.jsx";
+import apiClient from "./config/apiClient.jsx";
 
 const { Sider, Content } = Layout;
 const theme = createTheme(themeSettings);
@@ -30,6 +32,7 @@ const AppContent = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
 
     useEffect(() => {
         if (location.state?.login) {

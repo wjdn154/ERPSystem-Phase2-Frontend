@@ -29,7 +29,7 @@ const ShipmentStatusPage = () => {
     const [modalData, setModalData] = useState(null);
     const [initialModalData, setInitialModalData] = useState(null);
     const [currentFieldIndex, setCurrentFieldIndex] = useState(null); // 현재 수정하려는 리스트 항목의 인덱스
-    const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
+    const [selectedWarehouseId, setSelectedWarehouseId] = useState(false);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
     const [selectedClientId, setSelectedClientId] = useState(null);
     const [selectedProductId, setSelectedProductId] = useState(null);
@@ -77,7 +77,7 @@ const ShipmentStatusPage = () => {
                 setLoading(false);
                 return;
             }
-            apiPath = LOGISTICS_API.WAREHOUSE_INVENTORY_DETAIL_API(selectedWarehouseId);
+            apiPath = LOGISTICS_API.INVENTORY_BY_WAREHOUSE_API(selectedWarehouseId);
         }
 
         try {
@@ -330,7 +330,7 @@ const ShipmentStatusPage = () => {
                     <Grid item xs={12} md={5} sx={{minWidth: '1000px !important', maxWidth: '1500px !important'}}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{height: '100%'}}>
-                                <Typography variant="h6" sx={{padding: '20px'}}>재고 조정 진행 단계 조회</Typography>
+                                <Typography variant="h6" sx={{padding: '20px'}}>출하 현황</Typography>
                                 <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{
@@ -370,16 +370,6 @@ const ShipmentStatusPage = () => {
                                     <Table
                                         dataSource={[
                                             ...shipmentProductsData.map((item, index) => ({ ...item, key: index })),  // 각 품목에 key로 index 추가
-                                            {
-                                                id: 'total',  // 총합 행을 위한 고유 ID
-                                                shipmentNumber: '',  // 다른 컬럼은 빈 값으로 설정
-                                                productName: '',
-                                                quantity: totalQuantity,  // 총합 수량
-                                                warehouseName: '',
-                                                clientName: '',
-                                                contactInfo: '',
-                                                comment: '총 수량 합계',  // 비고란에 총합임을 표시
-                                            }
                                         ]}
                                         columns={[
                                             {
@@ -450,6 +440,7 @@ const ShipmentStatusPage = () => {
                                                 try {
                                                     const response = await apiClient.post(LOGISTICS_API.SHIPMENT_DETAIL_API(id));
                                                     console.log(response.data);
+                                                    setSelectedWarehouseId(record.id);
                                                     setDetailShipmentData(response.data);
                                                     setEditDetailShipmentData(true);
                                                     notify('success', '품목 조회', '출하 정보 조회 성공.', 'bottomRight')
@@ -457,8 +448,22 @@ const ShipmentStatusPage = () => {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
                                             },
-                                        })}>
-                                    </Table>
+                                        })}
+                                        summary={() => (
+                                            <Table.Summary fixed>
+                                                <Table.Summary.Row>
+                                                    <Table.Summary.Cell colSpan={2} align="center">
+                                                        총 수량 합계
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell/>
+                                                    <Table.Summary.Cell align="center">
+                                                        {totalQuantity}
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell colSpan={4} />
+                                                </Table.Summary.Row>
+                                            </Table.Summary>
+                                        )}
+                                    />
                                 </Grid>
                             </Paper>
                         </Grow>
@@ -491,9 +496,7 @@ const ShipmentStatusPage = () => {
                                                         <DatePicker format="YYYY-MM-DD"/>
                                                     </Form.Item>
                                                 </Col>
-                                                <Col>
                                                     <Typography>-</Typography>
-                                                </Col>
                                                 <Col span={1}>
                                                     <Form.Item
                                                         name="shipmentNumber"
@@ -501,7 +504,7 @@ const ShipmentStatusPage = () => {
                                                         <Input disabled/>
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={6}>
+                                                <Col span={5}>
                                                     <Form.Item
                                                         name="clientName"
                                                         required
@@ -514,6 +517,16 @@ const ShipmentStatusPage = () => {
                                                             onFocus={(e) => e.target.blur()}
                                                             suffix={<DownSquareOutlined/>}
                                                         />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={5}>
+                                                    <Form.Item name="contactInfo">
+                                                        <Input addonBefore="연락처" value={displayValues.contactInfo}/>
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <Form.Item name="address">
+                                                        <Input addonBefore="주소" value={displayValues.address}/>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={6}>
@@ -553,17 +566,7 @@ const ShipmentStatusPage = () => {
                                                         <Input/>
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={5}>
-                                                    <Form.Item name="contactInfo">
-                                                        <Input addonBefore="연락처" value={displayValues.contactInfo}/>
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <Form.Item name="address">
-                                                        <Input addonBefore="주소" value={displayValues.address}/>
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={11}>
+                                                <Col span={12}>
                                                     <Form.Item name="comment">
                                                         <Input
                                                             addonBefore="비고"
@@ -643,8 +646,7 @@ const ShipmentStatusPage = () => {
                                                                     display: 'flex',
                                                                     justifyContent: 'flex-end'
                                                                 }}>
-                                                                    <Button type="danger"
-                                                                            onClick={() => remove(name)}>삭제</Button>
+                                                                    <Button type="danger" onClick={() => remove(name)}>삭제</Button>
                                                                 </Col>
                                                             </Row>
                                                         ))}

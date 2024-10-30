@@ -1,12 +1,12 @@
 import React, {useMemo, useState} from 'react';
 import { Box, Grid, Grow } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './ReceivingInstructionUtil.jsx';
+import { tabItems } from './IncomingScheduleUtil.jsx';
 import {Typography} from '@mui/material';
 import {Button} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 
-const ReceivingInstructionPage = () => {
+const IncomingSchedulePage = () => {
     const [activeTabKey, setActiveTabKey] = useState('1');
 
     const handleTabChange = (key) => {
@@ -18,10 +18,10 @@ const ReceivingInstructionPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="입고지시서"
+                        title="입고예정"
                         description={(
                             <Typography>
-                                입고지시서 페이지는 <span>구매한 물품이 회사에 도착하기 전에 해당 물품을 창고로 입고하도록 지시</span>하는 문서를 관리함. 이 페이지에서는 <span>입고지시서를 생성, 수정, 삭제</span>할 수 있으며, 물품의 <span>입고 일정과 장소</span>를 지정할 수 있음. <span>입고 과정에서 발생하는 문제</span>도 이 페이지에서 관리됨.
+                                입고예정 페이지는 <span>구매한 상품이나 자재가 창고에 도착하기 전, 입고 일정을 관리</span>하는 곳임. 이 페이지에서는 <span>입고 예정 품목과 수량, 입고 예정일</span>을 확인할 수 있으며, 구매 및 물류 담당자가 <span>입고 스케줄을 조정</span>하고 <span>재고 확보</span>를 미리 준비할 수 있음. 입고 예정 내역을 통해 창고가 물품을 받을 준비 상태를 유지할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -59,4 +59,4 @@ const ReceivingInstructionPage = () => {
     );
 };
 
-export default ReceivingInstructionPage;
+export default IncomingSchedulePage;

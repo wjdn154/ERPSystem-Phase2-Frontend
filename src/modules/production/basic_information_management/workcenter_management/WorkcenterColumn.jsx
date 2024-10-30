@@ -7,14 +7,12 @@ export const workcenterColumns = [
         title: <div className="title-text">코드</div>,
         dataIndex: 'code',  // DTO의 code 필드에 접근
         key: 'code',
-        width: '5%',
         align: 'center',
     },
     {
         title: <div className="title-text">유형</div>,
         dataIndex: 'workcenterType',  // DTO의 workcenterType 필드에 접근
         key: 'workcenterType',
-        width: '10%',
         align: 'center',
 
         render: (workcenterType) => {
@@ -59,7 +57,6 @@ export const workcenterColumns = [
         title: <div className="title-text">이름</div>,
         dataIndex: 'name',  // DTO의 name 필드에 접근
         key: 'name',
-        width: '20%',
         align: 'center',
 
     },
@@ -77,7 +74,6 @@ export const workcenterColumns = [
             // 값이 없는 경우 대체 텍스트
             return '-';
         },
-        width: '15%',
         align: 'center',
     },
     {
@@ -95,27 +91,25 @@ export const workcenterColumns = [
             // 값이 없는 경우 대체 텍스트
             return '공정 미등록';
         },
-        width: '15%',
         align: 'center',
     },
     {
         title: <div className="title-text">작업자</div>,
         dataIndex: 'todayWorkers',  // JSON의 todayWorkers 배열에 맞게 수정
         key: 'todayWorkers',
-        width: '15%',
         align: 'center',
         render: (workers) => {
             if (!Array.isArray(workers) || workers.length === 0) {
-                return '배정없음'; // 모델명이 없을 때
+                return '배정없음'; // 작업자 없을 때
             }
 
-            const modelCount = workers.length;
+            const workerCount = workers.length;
 
-            if (modelCount === 1) {
+            if (workerCount === 1) {
                 return workers[0]; // 모델명이 하나일 때
             } else {
                 // 여러 개일 경우 첫 번째 모델명 + 외 N건
-                return `${workers[0]} 외 ${modelCount - 1}명`;
+                return `${workers[0]} 외 ${workerCount - 1}명`;
             }
         }
     },
@@ -127,7 +121,7 @@ export const workcenterColumns = [
         align: 'center',
         render: (modelNames) => {
             if (!Array.isArray(modelNames) || modelNames.length === 0) {
-                return '설비 미등록'; // 모델명이 없을 때
+                return '미등록'; // 모델명이 없을 때
             }
 
             const modelCount = modelNames.length;

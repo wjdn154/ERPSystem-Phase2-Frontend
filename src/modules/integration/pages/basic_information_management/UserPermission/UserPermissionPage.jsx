@@ -13,8 +13,8 @@ import { jwtDecode } from "jwt-decode";
 import apiClient from "../../../../../config/apiClient.jsx";
 const { confirm } = Modal;
 
-const UserPermissionPage = ( ) => {
-
+const UserPermissionPage = () => {
+    // EMPLOYEE_API.USERS_PERMISSION_API(token ? jwtDecode(token).sub : null)
     const { token, isAdmin, permission, companyId } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
@@ -80,9 +80,12 @@ const UserPermissionPage = ( ) => {
                     const response = await apiClient.post(EMPLOYEE_API.UPDATE_USERS_PERMISSION_API, requestBody);
                     const permission = response.data;
 
-                    dispatch(setAuth({token, permission}));
+
                     setPermissions(permission);
-                    if (selectedUser.email === jwtDecode(token).sub) setMyPermissions(permission);
+                    if (selectedUser.email === jwtDecode(token).sub) {
+                        dispatch(setAuth({permission}));
+                        setMyPermissions(permission);
+                    }
 
                     notification.success({
                         message: '성공',

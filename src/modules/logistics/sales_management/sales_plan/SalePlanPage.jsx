@@ -1,7 +1,7 @@
 import React, {useMemo, useEffect, useState} from 'react';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './SalesUtil.jsx';
+import { tabItems } from './SalePlanUtil.jsx';
 import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, InputNumber, notification, Upload, Divider, Tooltip} from 'antd';
 import dayjs from 'dayjs';
 import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
@@ -12,10 +12,10 @@ const { confirm } = Modal;
 
 const { RangePicker } = DatePicker;
 
-const SalesPage = ({initialData}) => {
+const SalePlanPage = ({initialData}) => {
     const [activeTabKey, setActiveTabKey] = useState('1');
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
-    const [salesList, setSalesList] = useState(initialData)
+    const [salePlanList, setSalePlanList] = useState(initialData)
     const [displayValues, setDisplayValues] = useState({});
     const [status, setStatus] = useState({});
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -25,12 +25,13 @@ const SalesPage = ({initialData}) => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [salesParam, setSalesParam] = useState({
-        saleDetails: [], });
-    const [detailSales, setDetailSales] = useState(false);
+    const [detailSalePlan, setDetailSalePlan] = useState(false);
+    const [salePlanDetails, setSalePlanDetails] = useState(detailSalePlan?.salePlanDetails || []);
+    const [salePlanParam, setSalePlanParam] = useState({
+        salePlanDetails: [],
+    });
     const [form] = Form.useForm();
-    const [saleDetails, setSaleDetails] = useState(detailSales.saleDetails || []);
-    const [editSales, setEditSales] = useState(false);
+    const [editSalePlan, setEditSalePlan] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
     const [clientSearch, setClientSearch] = useState(
@@ -41,34 +42,35 @@ const SalesPage = ({initialData}) => {
     );
 
     useEffect(() => {
-        // quotationList가 업데이트될 때마다 searchData를 최신 상태로 설정
-        setSearchData(salesList);
-    }, [salesList]);
+        setSearchData(salePlanList);
+    }, [salePlanList]);
 
     useEffect(() => {
 
-        if(!detailSales) return;
+        if(!detailSalePlan) return;
 
-        form.setFieldsValue(detailSales);
+
+        form.setFieldsValue(detailSalePlan);
         form.setFieldsValue({
-            salesOrderDetails: saleDetails,
+            salePlanDetails: salePlanDetails,
         })
 
-        setSalesParam((prevParam) => ({
+        setSalePlanParam((prevParam) => ({
             ...prevParam,
-            ...detailSales,
+            ...detailSalePlan,
         }));
 
+        console.log('SalePlanParam', salePlanParam)
+
         setDisplayValues({
-            managerName: detailSales.managerCode ? `[${detailSales.managerCode}] ${detailSales.managerName}` : null,
-            warehouseName:  detailSales.warehouseCode ? `[${detailSales.warehouseCode}] ${detailSales.warehouseName}` : null,
-            client: detailSales.clientId ?`[${detailSales.clientId}] ${detailSales.clientName}` : null,
+            managerName: detailSalePlan.managerCode ? `[${detailSalePlan.managerCode}] ${detailSalePlan.managerName}` : null,
+            warehouseName:  detailSalePlan.warehouseCode ? `[${detailSalePlan.warehouseCode}] ${detailSalePlan.warehouseName}` : null,
+            client: detailSalePlan.clientId ?`[${detailSalePlan.clientId}] ${detailSalePlan.clientName}` : null,
             clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
-            vatType: detailSales.vatCode ? `[${detailSales.vatCode}] ${detailSales.vatName}` : null
 
-        }, [detailSales, form, saleDetails]);
+        });
 
-    }, [detailSales], form);
+    }, [detailSalePlan], form);
 
     const [searchParams, setSearchParams] = useState({
         startDate: null,
@@ -81,24 +83,27 @@ const SalesPage = ({initialData}) => {
 
 
     const handleTabChange = (key) => {
+
         setActiveTabKey(key);
-        setEditSales(false);
+        setEditSalePlan(false);
         setEditingRow(null);
-        setSalesParam({
-            saleDetails: [],
+        setSalePlanParam({
+            salePlanDetails: [],
             date: dayjs().format('YYYY-MM-DD'),
+            expectedSalesDate: dayjs().format('YYYY-MM-DD'),
         });
         setSearchParams({
             startDate: null,
             endDate: null,
             clientId: null,
             state: null,
-        });
-        setDetailSales(salesParam.saleDetails || [])
+        })
+        setDetailSalePlan(salePlanParam.salePlanDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
+
     };
 
     // 날짜 선택 처리
@@ -116,7 +121,7 @@ const SalesPage = ({initialData}) => {
     const formatNumberWithComma = (value) => {
         // value가 숫자인 경우 문자열로 변환
         const stringValue = String(value);
-        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+        return stringValue.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
     };
 
     // 콤마 제거 함수
@@ -133,18 +138,20 @@ const SalesPage = ({initialData}) => {
     };
 
     const handleSearch = async () => {
-        const { startDate, endDate, clientCode, state } = searchParams;
+        const { startDate, endDate, clientId, state } = searchParams;
 
         try {
-            const response = await apiClient.post(LOGISTICS_API.SALES_LIST_API, searchParams);
+            const response = await apiClient.post(LOGISTICS_API.SALE_PLAN_LIST_API, searchParams);
             const data = response.data;
             setSearchData(data);
             console.log(data)
 
-            notify('success', '조회 성공', '판매서 조회 성공.', 'bottomRight');
+            notify('success', '조회 성공', '판매계획 조회 성공.', 'bottomRight');
+            return response.data;
         } catch (error) {
-            notify('error', '조회 오류', '판매서 조회 중 오류가 발생했습니다.', 'top');
+            notify('error', '조회 오류', '판매계획 조회 중 오류가 발생했습니다.', 'top');
         }
+
     };
 
     // 입력 필드 클릭 시 모달 열기
@@ -166,7 +173,6 @@ const SalesPage = ({initialData}) => {
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
-        if(fieldName === 'vatType') apiPath = FINANCIAL_API.VAT_TYPE_SEARCH_API;
 
         try {
             const response = await apiClient.post(apiPath);
@@ -208,7 +214,7 @@ const SalesPage = ({initialData}) => {
 
         switch (currentField) {
             case 'managerName':
-                setSalesParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     manager: {
                         id: record.id,
@@ -223,7 +229,7 @@ const SalesPage = ({initialData}) => {
                 break;
 
             case 'warehouseName':
-                setSalesParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     warehouse: {
                         id: record.id,
@@ -238,7 +244,7 @@ const SalesPage = ({initialData}) => {
                 break;
 
             case 'client':
-                setSalesParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     client: {
                         id: record.id,
@@ -264,10 +270,9 @@ const SalesPage = ({initialData}) => {
                 }));
                 break;
 
-
             case 'product':
                 // 제품 선택 시 해당 제품을 상태에 반영
-                const updatedDetails = [...salesParam.saleDetails];
+                const updatedDetails = [...salePlanParam.salePlanDetails];
 
                 console.log(editingRow)
 
@@ -276,33 +281,18 @@ const SalesPage = ({initialData}) => {
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('price', record.salesPrice, editingRow);
-                updateField('remarks', record.remarks, editingRow)
 
                 const { quantity } = updatedDetails[editingRow].quantity;
-                const supplyPrice = calculateSupplyPrice(quantity, (record.salesPrice));
-                console.log(supplyPrice)
-                const vat = calculateVat(supplyPrice);
+                const expectedSales = calculateExpectedSales(quantity, (record.salesPrice));
 
 
-                setSalesParam((prevParams) => ({
+
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
-                    saleDetails: updatedDetails,
+                    salePlanDetails: updatedDetails,
                 }));
+                console.log('salePlanParam:', salePlanParam)
                 setEditingRow(null);
-                break;
-
-            case 'vatType':
-                setSalesParam((prevParams) => ({
-                    ...prevParams,
-                    vatType: {
-                        code: record.vatTypeCode,
-                        name: record.vatTypeName,
-                    },
-                }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    vatType: `[${record.vatTypeCode}] ${record.vatTypeName}`,
-                }));
                 break;
         }
 
@@ -310,52 +300,57 @@ const SalesPage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
-        setSalesParam((prevState) => ({
+        setSalePlanParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
+        console.log(salePlanParam.date)
+    };
+
+    const handleExpectedDateChange = (date) => {
+        setSalePlanParam((prevState) => ({
+            ...prevState,
+            expectedSalesDate: date ? dayjs(date).format('YYYY-MM-DD') : null,
+        }));
+        console.log(salePlanParam.date)
     };
 
     // 필드 값 변경 시 호출되는 함수
     const handleFieldChange = (value, index, field) => {
-        const updatedDetails = [...salesParam.saleDetails];
+        const updatedDetails = [...salePlanParam.salePlanDetails];
 
         setEditingRow(index);
+        console.log('PRICE: ', value)
 
         updatedDetails[index][field] = value;
 
         if (field === 'quantity') {
             const quantity = value;
-
-            const price = updatedDetails[index].price;
-
-            updatedDetails[index].supplyPrice = quantity * price; // 공급가액 = 수량 * 단가
-
-            updatedDetails[index].vat = calculateVat(updatedDetails[index].supplyPrice);
-
+            const price = removeComma(updatedDetails[index].price);
+            updatedDetails[index].expectedSales = quantity * price; // 공급가액 = 수량 * 단가
+        }
+        if (field === 'price') {
+            const quantity = updatedDetails[index].quantity;
+            const price = removeComma(value);
+            updatedDetails[index].expectedSales = quantity * price; // 공급가액 = 수량 * 단가
         }
 
 
-        setSaleDetails(updatedDetails); // 상태 업데이트
-        setSalesParam( {
-            ...salesParam,
-            saleDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+        setSalePlanDetails(updatedDetails); // 상태 업데이트
+        setSalePlanParam( {
+            ...salePlanParam,
+            salePlanDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
         });
         setEditingRow(null);
     };
 
-    const calculateSupplyPrice = (quantity, price) => {
+    const calculateExpectedSales = (quantity, price) => {
         return quantity * price;
     };
 
-    const calculateVat = (supplyPrice) => {
-        return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
-    };
-
     const updateField = (fieldName, value) => {
-        const updatedDetails = [...salesParam.saleDetails];
+        const updatedDetails = [...salePlanParam.salePlanDetails];
 
         console.log('editingRow: ', editingRow)
 
@@ -366,16 +361,14 @@ const SalesPage = ({initialData}) => {
         // 수량이나 단가가 변경되면 공급가액을 재계산
         if (fieldName === 'quantity' || fieldName === 'price') {
             const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
+            const expectedSales = calculateExpectedSales(quantity, price);
 
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
+            updatedDetails[editingRow].expectedSales = expectedSales;
         }
 
-        setSalesParam((prevParams) => ({
+        setSalePlanParam((prevParams) => ({
             ...prevParams,
-            salesOrderDetails: updatedDetails,
+            salePlanDetails: updatedDetails,
         }));
     };
 
@@ -397,9 +390,9 @@ const SalesPage = ({initialData}) => {
         };
 
         // 기존 항목에 새로운 항목 추가
-        setSalesParam((prev) => ({
+        setSalePlanParam((prev) => ({
             ...prev,
-            saleDetails: [...prev.saleDetails, newRow],
+            salePlanDetails: [...prev.salePlanDetails, newRow],
         }));
     };
 
@@ -413,13 +406,13 @@ const SalesPage = ({initialData}) => {
             onOk: async () => {
                 try {
                     // 삭제 API 호출해서 해야함 (수정)
-                    const updatedDetails = [...salesParam.saleDetails]; // 배열을 복사
+                    const updatedDetails = [...salePlanParam.salePlanDetails]; // 배열을 복사
                     updatedDetails.splice(index, 1); // 인덱스에 해당하는 항목 삭제
 
-                    setSaleDetails(updatedDetails); // 상태 업데이트
-                    setSalesParam((prev) => ({
+                    setSalePlanDetails(updatedDetails); // 상태 업데이트
+                    setSalePlanParam((prev) => ({
                             ...prev,
-                            saleDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+                            salePlanDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
                         })
                     );
 
@@ -433,39 +426,38 @@ const SalesPage = ({initialData}) => {
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
         console.log('Form values:', values); // 폼 값 확인
-        console.log('detailSales', detailSales)
-        console.log('salesParam: ', salesParam)
+        console.log('detailSalePlan', detailSalePlan)
+        console.log('salePlanParam: ', salePlanParam)
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
+                console.log(salePlanParam.salePlanDetails)
                 try {
-                    const salesData = {
-                        clientId: salesParam.client ? salesParam.client.id : salesParam.clientId,
-                        managerId: salesParam.manager ? salesParam.manager.id : salesParam.managerId,
-                        warehouseId: salesParam.warehouse ? salesParam.warehouse.id : salesParam.warehouseId,
-                        currencyId: salesParam.currencyId,
-                        date: salesParam.date,
-                        vatId: salesParam.vatType ? Number(salesParam.vatType.code) : salesParam.vatId,
-                        journalEntryCode: salesParam.journalEntryCode,
-                        electronicTaxInvoiceStatus: salesParam.electronicTaxInvoiceStatus,
-                        items: Array.isArray(salesParam.saleDetails
-                        ) ? salesParam.saleDetails.map(item => ({
+                    const salePlanData = {
+                        clientId: salePlanParam.client ? salePlanParam.client.id : salePlanParam.clientId,
+                        managerId: salePlanParam.manager ? salePlanParam.manager.id : salePlanParam.managerId,
+                        warehouseId: salePlanParam.warehouse ? salePlanParam.warehouse.id : salePlanParam.warehouseId,
+                        date: dayjs(salePlanParam.date).format('YYYY-MM-DD'),
+                        expectedSalesDate: salePlanParam.expectedSalesDate,
+                        items: Array.isArray(salePlanParam.salePlanDetails
+                        ) ? salePlanParam.salePlanDetails.map(item => ({
                             productId: item.productId,
-                            quantity: item.quantity,
+                            quantity: item.quantity ? item.quantity : 0,
+                            expectedSales: Number(item.expectedSales),
                             remarks: item.remarks,
                         })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
                         remarks: values.remarks
                     };
 
-                    console.log('Sending data to API:', salesData); // API로 전송할 데이터 확인
+                    console.log('Sending data to API:', salePlanData); // API로 전송할 데이터 확인
 
-                    const API_PATH = type === 'update' ? LOGISTICS_API.SALES_UPDATE_API(salesParam.id) : LOGISTICS_API.SALES_CREATE_API;
+                    const API_PATH = type === 'update' ? LOGISTICS_API.SALE_PLAN_UPDATE_API(salePlanParam.id) : LOGISTICS_API.SALE_PLAN_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
 
-                    const response = await apiClient[method](API_PATH, salesData, {
+                    const response = await apiClient[method](API_PATH, salePlanData, {
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -473,14 +465,20 @@ const SalesPage = ({initialData}) => {
 
                     const updatedData = response.data;
 
+                    console.log('updateData: ', updatedData)
+
                     if (type === 'update') {
-                        setSalesList((prevList) =>
+                        setSalePlanList((prevList) =>
                             prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
                         );
                     } else {
-                        setSalesList((prevList) => [...prevList, updatedData]);
+                        setSalePlanList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
+                        console.log("일로옴??")
+                        console.log('salePlanList: ', salePlanList)
                     }
+
+                    console.log('searchParams:', searchParams)
                     handleSearch()
 
                     setSearchParams({
@@ -490,16 +488,16 @@ const SalesPage = ({initialData}) => {
                         state: null,
                     });
 
-                    setEditSales(false);
-                    setSalesParam({
-                        saleDetails: [],
+                    setEditSalePlan(false);
+                    setSalePlanParam({
+                        salePlanDetails: [],
                     });
-                    setDetailSales(salesParam.saleDetails || []);
+                    setDetailSalePlan(salePlanParam.salePlanDetails || []);
                     setDisplayValues({});
 
                     type === 'update'
-                        ? notify('success', '발주서 수정', '발주서 정보 수정 성공.', 'bottomRight')
-                        : notify('success', '발주서 저장', '발주서 정보 저장 성공.', 'bottomRight');
+                        ? notify('success', '판매계획 수정', '판매계획 정보 수정 성공.', 'bottomRight')
+                        : notify('success', '판매계획 저장', '판매계획 정보 저장 성공.', 'bottomRight');
                 } catch (error) {
                     console.error('Error saving data:', error); // 오류 로그 출력
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -517,44 +515,7 @@ const SalesPage = ({initialData}) => {
 
     const columns = [
         {
-            title: <div className="title-text">상태</div>,
-            dataIndex: 'status',
-            key: 'status',
-            align: 'center',
-            render: (text) => {
-                let color;
-                let value;
-                switch (text) {
-                    case "WAITING_FOR_SHIPMENT":
-                        color = "orange";
-                        value = "출하 대기";
-                        break;
-                    case "SHIPMENT_COMPLETED":
-                        color = "green";
-                        value = "출하 완료";
-                        break;
-                    case "IN_PROGRESS":
-                        color = "purple";
-                        value = "진행중";
-                        break;
-                    case "COMPLETED":
-                        color = "blue";
-                        value = "진행완료";
-                        break;
-                    case "CANCELED":
-                        color = "red";
-                        value = "취소";
-                        break;
-                    default:
-                        color = "gray"; // 기본 색상
-                        value = "미확인";
-                }
-                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
-            },
-            width: '10%',
-        },
-        {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">등록 일자</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
@@ -566,8 +527,16 @@ const SalesPage = ({initialData}) => {
             dataIndex: 'clientName',
             key: 'clientName',
             align: 'center',
-            width: '15%',
+            width: '20%',
         },
+        {
+            title: <div className="title-text">담당자명</div>,
+            dataIndex: 'managerName',
+            key: 'managerName',
+            align: 'center',
+            width: '10%',
+        },
+
         {
             title: <div className="title-text">품목명</div>,
             dataIndex: 'productName',
@@ -576,10 +545,11 @@ const SalesPage = ({initialData}) => {
             width: '25%',
         },
         {
-            title: <div className="title-text">과세 유형</div>,
-            dataIndex: 'vatName',
-            key: 'vatName',
+            title: <div className="title-text">예상매출일자</div>,
+            dataIndex: 'expectedSaleDate',
+            key: 'expectedSaleDate',
             align: 'center',
+            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
             width: '10%',
         },
         {
@@ -590,13 +560,14 @@ const SalesPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">총 가격</div>,
-            dataIndex: 'totalPrice',
-            key: 'totalPrice',
+            title: <div className="title-text">총 예상매출액</div>,
+            dataIndex: 'totalExpectedSales',
+            key: 'totalExpectedSales',
             align: 'center',
             render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
             width: '15%',
         },
+
     ];
 
     return (
@@ -604,10 +575,10 @@ const SalesPage = ({initialData}) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="판매"
+                        title="판매계획"
                         description={(
                             <Typography>
-                                판매 페이지는 <span>완료된 거래와 관련된 판매 기록을 관리</span>하는 곳임. 이 페이지에서는 <span>판매 내역을 조회, 수정, 삭제</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음. 또한, <span>판매 실적</span>을 분석하여 보고서를 작성하는 기능도 포함되어 있음.
+                                판매계획 페이지는 <span>완료된 거래와 관련된 판매계획 기록을 관리</span>하는 곳임. 이 페이지에서는 <span>판매계획 내역을 조회, 수정, 삭제</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음. 또한, <span>판매계획 실적</span>을 분석하여 보고서를 작성하는 기능도 포함되어 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -622,7 +593,7 @@ const SalesPage = ({initialData}) => {
                     <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%'}}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>판매서 목록</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -696,7 +667,7 @@ const SalesPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={searchData} // 발주서 리스트 데이터
+                                        dataSource={searchData} // 판매계획 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -714,13 +685,15 @@ const SalesPage = ({initialData}) => {
                                                 setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
                                                 const id = record.id;
                                                 try {
-                                                    const response = await apiClient.post(LOGISTICS_API.SALES_DETAIL_API(id));
-                                                    setDetailSales(response.data);
-                                                    console.log('detailSales: ', response.data)
-                                                    setSaleDetails(detailSales)
-                                                    setEditSales(true);
+                                                    const response = await apiClient.post(LOGISTICS_API.SALE_PLAN_DETAIL_API(id));
+                                                    setDetailSalePlan(response.data);
+                                                    console.log('detailSalePlan: ', response.data)
+                                                    setSalePlanParam(response.data)
 
-                                                    notify('success', '판매서 조회', '판매서 정보 조회 성공.', 'bottomRight')
+                                                    setSalePlanDetails(detailSalePlan)
+                                                    setEditSalePlan(true);
+
+                                                    notify('success', '판매계획 조회', '판매계획 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -731,19 +704,19 @@ const SalesPage = ({initialData}) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    {editSales && (
+                    {editSalePlan && (
                         <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                             <Grow in={true} timeout={200}>
                                 <Paper elevation={3} sx={{ height: '100%' }}>
-                                    <Typography variant="h6" sx={{ padding: '20px' }}>판매서 상세정보 및 수정</Typography>
+                                    <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 상세정보 및 수정</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                         <Form
-                                            initialValues={detailSales}
+                                            initialValues={detailSalePlan}
                                             form={form}
                                             onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                         >
-                                            {/* 판매서 정보 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매서 정보</Divider>
+                                            {/* 판매계획 정보 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
                                                     <Typography>등록 일자</Typography>
@@ -752,8 +725,20 @@ const SalesPage = ({initialData}) => {
                                                     <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
-                                                            value={dayjs(salesParam.date)}
+                                                            value={salePlanParam.date ? dayjs(salePlanParam.date) : null}
                                                             onChange={handleRegiDateChange}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                                <Col>
+                                                    <Typography>예상매출일자</Typography>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '예상매출일자를 입력하세요.' }]}>
+                                                        <DatePicker
+                                                            disabledDate={(current) => current && current.year() !== 2024}
+                                                            value={salePlanParam.expectedSalesDate ? dayjs(salePlanParam.expectedSalesDate) : null}
+                                                            onChange={handleExpectedDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -766,17 +751,6 @@ const SalesPage = ({initialData}) => {
                                                             addonBefore="담당자"
                                                             value={displayValues.managerName}
                                                             onClick={() => handleInputClick('managerName')}
-                                                            onFocus={(e) => e.target.blur()}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <Form.Item style={{ marginBottom: 0 }} >
-                                                        <Input
-                                                            addonBefore="출하창고"
-                                                            value={displayValues.warehouseName}
-                                                            onClick={() => handleInputClick('warehouseName')}
                                                             onFocus={(e) => e.target.blur()}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -795,112 +769,21 @@ const SalesPage = ({initialData}) => {
                                                 </Col>
                                             </Row>
 
-                                            <Row gutter={16} >
+                                            <Row gutter={16}>
+
                                                 <Col span={6}>
                                                     <Form.Item style={{ marginBottom: 0 }} >
                                                         <Input
-                                                            addonBefore="과세 유형"
-                                                            value={displayValues.vatType}
-                                                            onClick={() => handleInputClick('vatType')}
+                                                            addonBefore="출하창고"
+                                                            value={displayValues.warehouseName}
+                                                            onClick={() => handleInputClick('warehouseName')}
                                                             onFocus={(e) => e.target.blur()}
                                                             suffix={<DownSquareOutlined />}
                                                         />
                                                     </Form.Item>
                                                 </Col>
 
-                                                <Col span={6}>
-                                                    <Form.Item name="journalEntry">
-                                                        <Space.Compact>
-                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
-                                                            <Select
-                                                                style={{ width: '70%' }}
-                                                                value={salesParam.journalEntryCode}
-                                                                onChange={(value) => {
-                                                                    setSalesParam((prevState) => ({
-                                                                        ...prevState,
-                                                                        journalEntryCode: value,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <Select.Option value="4">현금</Select.Option>
-                                                                <Select.Option value="5">외상</Select.Option>
-                                                                <Select.Option value="6">카드</Select.Option>
-
-                                                            </Select>
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-
-                                                <Col span={6}>
-                                                    <Form.Item name="electronicTaxInvoiceStatus">
-                                                        <Checkbox
-                                                            onChange={(e) => {
-                                                                setSalesParam((prevState) => ({
-                                                                    ...prevState,
-                                                                    electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
-                                                                }));
-                                                            }}
-                                                        >
-                                                            세금계산서 발행 여부
-                                                        </Checkbox>
-                                                    </Form.Item>
-                                                </Col>
-
-                                            </Row>
-
-                                            <Row gutter={16}>
-
-                                                <Col span={6}>
-                                                    <Form.Item name="currency">
-                                                        <Space.Compact>
-                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
-                                                            <Select
-                                                                style={{ width: '70%' }}
-                                                                value={salesParam.currency}
-                                                                onChange={(value) => {
-                                                                    const currencyIdMapping = {
-                                                                        KRW: 6,
-                                                                        USD: 1,
-                                                                        EUR: 2,
-                                                                        JPY: 3,
-                                                                        CNY: 4,
-                                                                        GBP: 5,
-                                                                    };
-
-                                                                    setSalesParam((prevState) => ({
-                                                                        ...prevState,
-                                                                        currency: value,
-                                                                        currencyId: currencyIdMapping[value],
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <Select.Option value="KRW">한국 [원]</Select.Option>
-                                                                <Select.Option value="USD">미국 [달러]</Select.Option>
-                                                                <Select.Option value="EUR">유럽 [유로]</Select.Option>
-                                                                <Select.Option value="JPY">일본 [엔]</Select.Option>
-                                                                <Select.Option value="CNY">중국 [위안]</Select.Option>
-                                                                <Select.Option value="GBP">영국 [파운드]</Select.Option>
-                                                            </Select>
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-
-
-                                                {(salesParam.currency !== '한국 [원]' && salesParam.currency !== 'KRW') && (
-                                                    <Col span={6}>
-                                                        <Form.Item  style={{ marginBottom: 0 }} >
-                                                            <Input
-                                                                addonBefore="환율"
-                                                                value={salesParam.exchangeRate}
-                                                                onClick={() => handleInputClick('exchangeRate')}
-                                                                onFocus={(e) => e.target.blur()}
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                )}
-
-
-                                                <Col span={12}>
+                                                <Col span={16}>
                                                     <Form.Item name="remarks">
                                                         <Input addonBefore="비고" />
                                                     </Form.Item>
@@ -908,10 +791,10 @@ const SalesPage = ({initialData}) => {
 
                                             </Row>
 
-                                            {/* 판매서 상세 항목 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매서 상세 항목</Divider>
+                                            {/* 판매계획 상세 항목 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 상세 항목</Divider>
                                             <Table
-                                                dataSource={salesParam?.saleDetails || []}
+                                                dataSource={salePlanParam?.salePlanDetails || []}
                                                 columns={[
                                                     {
                                                         title: '품목',
@@ -952,24 +835,29 @@ const SalesPage = ({initialData}) => {
                                                         dataIndex: 'price',
                                                         key: 'price',
                                                         align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                        render: (text, record, index) => (
+
+                                                            <Input
+                                                                value={formatNumberWithComma(text)}
+                                                                onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'price')}
+                                                                className="small-text"
+                                                            />
+                                                        ),
 
                                                     },
                                                     {
-                                                        title: '공급가액',
-                                                        dataIndex: 'supplyPrice',
-                                                        key: 'supplyPrice',
+                                                        title: '예상매출액',
+                                                        dataIndex: 'expectedSales',
+                                                        key: 'expectedSales',
                                                         align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                        render: (text, record, index) => (
 
-                                                    },
-                                                    {
-                                                        title: '부가세',
-                                                        dataIndex: 'vat',
-                                                        key: 'vat',
-                                                        align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
+                                                            <Input
+                                                                value={formatNumberWithComma(text)}
+                                                                onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'expectedSales')}
+                                                                className="small-text"
+                                                            />
+                                                        ),
                                                     },
                                                     {
                                                         title: '비고',
@@ -1290,25 +1178,10 @@ const SalesPage = ({initialData}) => {
 
                                     <Table
                                         columns={[
-                                            {
-                                                title: '코드',
-                                                dataIndex: 'vatTypeCode',
-                                                key: 'vatTypeCode',
-                                                align: 'center'
-                                            },
-                                            {
-                                                title: '과세명',
-                                                dataIndex: 'vatTypeName',
-                                                key: 'vatTypeName',
-                                                align: 'center',
-                                                render: (text, record) => (
-                                                    <Tooltip title={record.description}>
-                                                        <span>{text}</span>
-                                                    </Tooltip>
-                                                )
-                                            }
+                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
+                                            { title: '과세명', dataIndex: 'name', key: 'name', align: 'center' }
                                         ]}
-                                        dataSource={modalData[0].salesVatTypeShowDTO}
+                                        dataSource={modalData}
                                         rowKey="code"
                                         size="small"
                                         pagination={{
@@ -1403,15 +1276,15 @@ const SalesPage = ({initialData}) => {
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
                         <Paper elevation={3} sx={{ height: '100%' }}>
-                            <Typography variant="h6" sx={{ padding: '20px' }}>판매서 등록</Typography>
+                            <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 입력</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
-                                    initialValues={detailSales}
+                                    initialValues={detailSalePlan}
                                     form={registrationForm}
                                     onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
-                                    {/* 판매서 정보 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매서 정보</Divider>
+                                    {/* 판매계획 정보 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
                                             <Typography>등록 일자</Typography>
@@ -1420,8 +1293,20 @@ const SalesPage = ({initialData}) => {
                                             <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={dayjs(salesParam.date)}
+                                                    value={dayjs(salePlanParam.date)}
                                                     onChange={handleRegiDateChange}
+                                                />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col>
+                                            <Typography>예상매출일자</Typography>
+                                        </Col>
+                                        <Col>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '예상매출일자를 입력하세요.' }]}>
+                                                <DatePicker
+                                                    disabledDate={(current) => current && current.year() !== 2024}
+                                                    value={dayjs(salePlanParam.expectedSalesDate)}
+                                                    onChange={handleExpectedDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>
@@ -1434,17 +1319,6 @@ const SalesPage = ({initialData}) => {
                                                     addonBefore="담당자"
                                                     value={displayValues.managerName}
                                                     onClick={() => handleInputClick('managerName')}
-                                                    onFocus={(e) => e.target.blur()}
-                                                    suffix={<DownSquareOutlined />}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item style={{ marginBottom: 0 }} >
-                                                <Input
-                                                    addonBefore="출하창고"
-                                                    value={displayValues.warehouseName}
-                                                    onClick={() => handleInputClick('warehouseName')}
                                                     onFocus={(e) => e.target.blur()}
                                                     suffix={<DownSquareOutlined />}
                                                 />
@@ -1463,112 +1337,21 @@ const SalesPage = ({initialData}) => {
                                         </Col>
                                     </Row>
 
-                                    <Row gutter={16} >
+                                    <Row gutter={16}>
+
                                         <Col span={6}>
                                             <Form.Item style={{ marginBottom: 0 }} >
                                                 <Input
-                                                    addonBefore="과세 유형"
-                                                    value={displayValues.vatType}
-                                                    onClick={() => handleInputClick('vatType')}
+                                                    addonBefore="출하창고"
+                                                    value={displayValues.warehouseName}
+                                                    onClick={() => handleInputClick('warehouseName')}
                                                     onFocus={(e) => e.target.blur()}
                                                     suffix={<DownSquareOutlined />}
                                                 />
                                             </Form.Item>
                                         </Col>
 
-                                        <Col span={6}>
-                                            <Form.Item name="journalEntry">
-                                                <Space.Compact>
-                                                    <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
-                                                    <Select
-                                                        style={{ width: '70%' }}
-                                                        value={salesParam.journalEntryCode}
-                                                        onChange={(value) => {
-                                                            setSalesParam((prevState) => ({
-                                                                ...prevState,
-                                                                journalEntryCode: value,
-                                                            }));
-                                                        }}
-                                                    >
-                                                        <Select.Option value="4">현금</Select.Option>
-                                                        <Select.Option value="5">외상</Select.Option>
-                                                        <Select.Option value="6">카드</Select.Option>
-
-                                                    </Select>
-                                                </Space.Compact>
-                                            </Form.Item>
-                                        </Col>
-
-                                        <Col span={6}>
-                                            <Form.Item name="electronicTaxInvoiceStatus">
-                                                <Checkbox
-                                                    onChange={(e) => {
-                                                        setSalesParam((prevState) => ({
-                                                            ...prevState,
-                                                            electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
-                                                        }));
-                                                    }}
-                                                >
-                                                    세금계산서 발행 여부
-                                                </Checkbox>
-                                            </Form.Item>
-                                        </Col>
-
-                                    </Row>
-
-                                    <Row gutter={16}>
-
-                                        <Col span={6}>
-                                            <Form.Item name="currency">
-                                                <Space.Compact>
-                                                    <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
-                                                    <Select
-                                                        style={{ width: '70%' }}
-                                                        value={salesParam.currency}
-                                                        onChange={(value) => {
-                                                            const currencyIdMapping = {
-                                                                KRW: 6,
-                                                                USD: 1,
-                                                                EUR: 2,
-                                                                JPY: 3,
-                                                                CNY: 4,
-                                                                GBP: 5,
-                                                            };
-
-                                                            setSalesParam((prevState) => ({
-                                                                ...prevState,
-                                                                currency: value,
-                                                                currencyId: currencyIdMapping[value],
-                                                            }));
-                                                        }}
-                                                    >
-                                                        <Select.Option value="KRW">한국 [원]</Select.Option>
-                                                        <Select.Option value="USD">미국 [달러]</Select.Option>
-                                                        <Select.Option value="EUR">유럽 [유로]</Select.Option>
-                                                        <Select.Option value="JPY">일본 [엔]</Select.Option>
-                                                        <Select.Option value="CNY">중국 [위안]</Select.Option>
-                                                        <Select.Option value="GBP">영국 [파운드]</Select.Option>
-                                                    </Select>
-                                                </Space.Compact>
-                                            </Form.Item>
-                                        </Col>
-
-
-                                        {(salesParam.currency !== '한국 [원]' && salesParam.currency !== 'KRW') && (
-                                            <Col span={6}>
-                                                <Form.Item  style={{ marginBottom: 0 }} >
-                                                    <Input
-                                                        addonBefore="환율"
-                                                        value={salesParam.exchangeRate}
-                                                        onClick={() => handleInputClick('exchangeRate')}
-                                                        onFocus={(e) => e.target.blur()}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                        )}
-
-
-                                        <Col span={12}>
+                                        <Col span={16}>
                                             <Form.Item name="remarks">
                                                 <Input addonBefore="비고" />
                                             </Form.Item>
@@ -1576,10 +1359,10 @@ const SalesPage = ({initialData}) => {
 
                                     </Row>
 
-                                    {/* 판매서 상세 항목 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매서 상세 항목</Divider>
+                                    {/* 판매계획 상세 항목 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 상세 항목</Divider>
                                     <Table
-                                        dataSource={salesParam?.saleDetails || []}
+                                        dataSource={salePlanParam?.salePlanDetails || []}
                                         columns={[
                                             {
                                                 title: '품목',
@@ -1620,24 +1403,29 @@ const SalesPage = ({initialData}) => {
                                                 dataIndex: 'price',
                                                 key: 'price',
                                                 align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                render: (text, record, index) => (
+
+                                                    <Input
+                                                        value={formatNumberWithComma(text)}
+                                                        onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'price')}
+                                                        className="small-text"
+                                                    />
+                                                ),
 
                                             },
                                             {
-                                                title: '공급가액',
-                                                dataIndex: 'supplyPrice',
-                                                key: 'supplyPrice',
+                                                title: '예상매출액',
+                                                dataIndex: 'expectedSales',
+                                                key: 'expectedSales',
                                                 align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
+                                                render: (text, record, index) => (
 
-                                            },
-                                            {
-                                                title: '부가세',
-                                                dataIndex: 'vat',
-                                                key: 'vat',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
+                                                    <Input
+                                                        value={formatNumberWithComma(text)}
+                                                        onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'expectedSales')}
+                                                        className="small-text"
+                                                    />
+                                                ),
                                             },
                                             {
                                                 title: '비고',
@@ -1694,4 +1482,4 @@ const SalesPage = ({initialData}) => {
     );
 };
 
-export default SalesPage;
+export default SalePlanPage;
