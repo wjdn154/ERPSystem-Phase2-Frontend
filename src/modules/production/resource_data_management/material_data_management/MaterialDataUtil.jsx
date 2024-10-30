@@ -11,11 +11,6 @@ export const materialTabItems = () => {
             key: '2',
             label: '자재 등록',
             children: <Typography>자재를 등록할 수 있음.</Typography>, // 탭 클릭 시 보여질 내용
-        },
-        {
-            key: '3',
-            label: '해당 자재의 품목 & 유해물질 목록',
-            children: <Typography>해당 자재의 품목, 유해물질을 등록하고 수정할 수 있음.</Typography>, // 탭 클릭 시 보여질 내용
         }
     ];
 }

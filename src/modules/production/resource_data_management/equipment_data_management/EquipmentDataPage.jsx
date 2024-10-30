@@ -123,6 +123,11 @@ const EquipmentDataPage = ({initialData}) => {
         //모달창 닫기
         setIsModalVisible(false);
     };
+    const formatNumberWithComma = (value) => {
+        // value가 숫자인 경우 문자열로 변환
+        const stringValue = String(value);
+        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+    };
 
     return (
         <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -240,7 +245,7 @@ const EquipmentDataPage = ({initialData}) => {
                                                 <Form.Item>
                                                     <Input
                                                         addonBefore="구매 비용"
-                                                        value={equipmentDataDetail.cost}
+                                                        value={formatNumberWithComma(equipmentDataDetail.cost)}
                                                         onChange={(e) => handleInputChange(e, 'cost')}
                                                     />
                                                 </Form.Item>
