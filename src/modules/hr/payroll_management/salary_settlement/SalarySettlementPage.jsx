@@ -20,7 +20,8 @@ const SalarySettlementPage = () => {
     const [salaryDates, setSalaryDates] = useState([]);
     const [selectedDateId, setSelectedDateId] = useState(null);
     const [isEditable, setIsEditable] = useState(true);
-    const [isFinalized, setIsFinalized] = useState(null);
+    const [isFinalized, setIsFinalized] = useState(true); // 마감여부 초기값
+    // const [isFinalized, setIsFinalized] = useState(null); // 마감여부 초기값
 
     const [salaryLedgerData, setSalaryLedgerData] = useState(null);
     const [activeTabKey, setActiveTabKey] = useState('1');
@@ -58,6 +59,9 @@ const SalarySettlementPage = () => {
 
             console.log("Updated SalaryLedgerData:", salaryLedgerData);
             console.log("Updating isFinalized:", salaryLedgerData.finalized);
+            form.setFieldsValue({
+                allowances: salaryLedgerData.allowances || [],
+            })
             setIsFinalized(salaryLedgerData.finalized);
         }
     }, [salaryLedgerData]);
@@ -123,11 +127,19 @@ const SalarySettlementPage = () => {
                 salaryLedgerDateId: selectedDateId,
             });
             const data = response.data;
-            setSalaryLedgerData(data);
+            // setSalaryLedgerData(data);
             form.setFieldsValue(data);
 
             // 상태를 설정합니다.
-            setIsFinalized(data.finalized);
+            // setIsFinalized(data.finalized);
+
+            if (data && typeof data.finalized === "boolean") {
+                setSalaryLedgerData(data);
+                setIsFinalized(data.finalized); // 정확한 상태 설정
+            } else {
+                console.warn("Invalid data format received.");
+            }
+
         } catch (error) {
             notify('error', '조회 실패', '급여 정보를 조회하는 중 오류가 발생했습니다.', 'top');
             console.error("fetchSalaryLedger error: ", error);
@@ -622,7 +634,7 @@ const SalarySettlementPage = () => {
                                             <Col span={12}>
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>수당 목록</Divider>
                                                 <Table
-                                                    dataSource={salaryLedgerData?.allowances}  // 수당 목록 데이터
+                                                    dataSource={salaryLedgerData?.allowances || []}
                                                     columns={[
                                                         {
                                                             title: <div className="title-text">수당명</div>,
@@ -640,7 +652,7 @@ const SalarySettlementPage = () => {
                                                             render: (_, record, index) => (
                                                                 <Form.Item
                                                                     name={['allowances', index, 'amount']}
-                                                                    initialValue={record.amount || 0}
+                                                                    // initialValue={record.amount || 0} initialValues 대신 폼 필드로 값 설정
                                                                     rules={[{ required: true, message: '금액을 입력하세요' }]}
                                                                     style={{ marginBottom: '10px' }}
                                                                 >
@@ -649,19 +661,27 @@ const SalarySettlementPage = () => {
                                                                         type="text"
                                                                         onChange={(e) => {
                                                                             const numericValue = handleNumericInput(e.target.value);
-                                                                            form.setFieldsValue({
-                                                                                allowances: form.getFieldValue('allowances').map((allowance, i) =>
-                                                                                    i === index ? { ...allowance, amount: numericValue || '0' } : allowance
-                                                                                ),
-                                                                            });
+                                                                            const updatedAllowances = [...form.getFieldValue('allowances')];
+                                                                            updatedAllowances[index].amount = numericValue || '0';
+                                                                            form.setFieldsValue({ allowances: updatedAllowances });
+                                                                            // const numericValue = handleNumericInput(e.target.value);
+                                                                            // form.setFieldsValue({
+                                                                            //     allowances: form.getFieldValue('allowances').map((allowance, i) =>
+                                                                            //         i === index ? { ...allowance, amount: numericValue || '0' } : allowance
+                                                                            //     ),
+                                                                            // });
                                                                         }}
                                                                         onBlur={(e) => {
                                                                             const formattedValue = formatNumberWithComma(e.target.value);
-                                                                            form.setFieldsValue({
-                                                                                allowances: form.getFieldValue('allowances').map((allowance, i) =>
-                                                                                    i === index ? { ...allowance, amount: formattedValue } : allowance
-                                                                                ),
-                                                                            });
+                                                                            const updatedAllowances = [...form.getFieldValue('allowances')];
+                                                                            updatedAllowances[index].amount = formattedValue;
+                                                                            form.setFieldsValue({ allowances: updatedAllowances });
+                                                                            // const formattedValue = formatNumberWithComma(e.target.value);
+                                                                            // form.setFieldsValue({
+                                                                            //     allowances: form.getFieldValue('allowances').map((allowance, i) =>
+                                                                            //         i === index ? { ...allowance, amount: formattedValue } : allowance
+                                                                            //     ),
+                                                                            // });
                                                                         }}
                                                                         disabled={isFinalized}
                                                                         style={{ textAlign: 'right' }}
