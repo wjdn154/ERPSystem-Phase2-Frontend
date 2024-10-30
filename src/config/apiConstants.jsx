@@ -153,6 +153,7 @@ export const EMPLOYEE_API = {
     UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/transfer/update/${id}`,
     TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
     UPDATE_TRANSFER_TYPE_API:(id) => `${API_BASE_URL}/api/hr/transferType/update/${id}`,
+    TRANSFER_TYPE_DATA_API: `${API_BASE_URL}/api/hr/transferType/list`,
 
 
     //  인사관리 - 급여
