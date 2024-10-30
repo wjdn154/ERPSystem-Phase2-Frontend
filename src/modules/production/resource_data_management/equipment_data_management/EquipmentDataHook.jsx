@@ -149,6 +149,7 @@ export const equipmentDataHook = (initialData) => {
             const updatedData = await fetchEquipmentData();
             setData(updatedData);
             notify('success', '설비 수정', '설비 수정 성공.', 'bottomRight');
+            setShowDetail(false);
         } catch (error) {
             notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }

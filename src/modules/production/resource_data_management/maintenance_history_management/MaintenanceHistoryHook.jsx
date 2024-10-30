@@ -153,6 +153,7 @@ export const maintenanceHistoryHook = (initialData) => {
             const updatedData = await fetchMaintenanceHistoryList();
             notify('success', '유지보수 이력 수정', '유지보수 이력 수정 성공', 'bottomRight')
             setData(updatedData);
+            setShowDetail(false);
             console.log("업데이트 된 유지보수 이력 리스트", updatedData);
         } catch (error) {
             notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
