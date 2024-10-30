@@ -851,7 +851,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                                             { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
                                         ]}
                                         dataSource={modalData}
-                                        rowKey="id"
+                                        rowKey={(record) => record.id}
                                         size="small"
                                         pagination={{
                                             pageSize: 15,
