@@ -236,7 +236,7 @@ export const subMenuItems = {
         {
             text: '입고관리',
             items: [
-                { text: '입고예정', component: 'IncomingSchedulePage', apiPath: undefined, url: '/logistics/inbound-management/expected', requiredPermission: 'inboundExpectedPermission', permissionLevel: 'GENERAL' },  // 입고예정 권한
+                { text: '입고예정', component: 'IncomingSchedulePage', apiPath: LOGISTICS_API.RECEIVING_ORDER_LIST_API, url: '/logistics/inbound-management/expected', requiredPermission: 'inboundExpectedPermission', permissionLevel: 'GENERAL' },  // 입고예정 권한
                 { text: '입고처리', component: 'IncomingProcessingPage', apiPath:undefined, url: '/logistics/inbound-management/processing', requiredPermission: 'inboundProcessingPermission', permissionLevel: 'GENERAL' },  // 입고처리 권한
             ]
         },
