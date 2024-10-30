@@ -12,8 +12,6 @@ import {
     PRODUCTION_API,
 } from "./apiConstants.jsx";
 
-import {jwtDecode} from "jwt-decode";
-import Cookies from "js-cookie";
 
 export const menuItems = [
     { text: '통합관리', icon: <FeaturedPlayListIcon /> },
@@ -32,7 +30,7 @@ export const subMenuItems = {
             text: '기초정보관리',
             items: [
                 // { text: '회사정보수정', component: 'CompanyInfoEditPage', apiPath: undefined, url: '/integration/basic-info/company-edit', requiredPermission: 'adminPermission', permissionLevel: 'ADMIN' }, // 관리자 권한
-                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: EMPLOYEE_API.USERS_PERMISSION_API(Cookies.get('jwt') ? jwtDecode(Cookies.get('jwt')).sub : null), url: '/integration/basic-info/user-management' }, // 사용자 관리 권한
+                { text: '사용자권한관리', component: 'UserPermissionPage', apiPath: undefined, url: '/integration/basic-info/user-management' }, // 사용자 관리 권한
             ]
         }
     ],

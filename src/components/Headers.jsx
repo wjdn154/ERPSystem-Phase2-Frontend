@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Menu, List, Badge, Layout, Row, Col, Avatar, Dropdown, Button, notification} from 'antd';
+import {Tag, Menu, List, Badge, Layout, Row, Col, Avatar, Dropdown, Button, notification, Tooltip} from 'antd';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 import { useDispatch, useSelector } from "react-redux";
@@ -30,6 +30,7 @@ function Headers() {
             const decodedToken = jwtDecode(token);
             setEmployeeId(decodedToken.employeeId);
             setTenantId(`tenant_${decodedToken.companyId}`);
+            console.log(decodedToken);
 
             const initializeSSE = async () => {
                 try {
@@ -50,7 +51,6 @@ function Headers() {
                             console.log("구독 성공:", event.data);
                             try {
                                 const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
-                                console.log(response2);
                                 setNotificationItems(response2.data);
                                 setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
                             } catch (error) {
@@ -64,7 +64,6 @@ function Headers() {
                             setTimeout(async () => {
                                 try {
                                     const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
-                                    console.log(response2);
                                     setNotificationItems(response2.data);
                                     setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
                                 } catch (error) {
@@ -108,7 +107,6 @@ function Headers() {
             const response = await apiClient.post(
                 COMMON_API.CREATE_NOTIFICATION_API(employeeId, module, permissionLevel)
             );
-            console.log(response.data);
             setNotificationItems(response.data);
             setUnreadCount(response.data.filter((item) => !item.readStatus).length);
         } catch (error) {
@@ -118,71 +116,19 @@ function Headers() {
 
     const markAsRead = async (notificationId) => {
         try {
-            await apiClient.post(COMMON_API.MARK_AS_READ_NOTIFICATION_API(employeeId, notificationId));
+            const response = await apiClient.post(COMMON_API.MARK_AS_READ_NOTIFICATION_API(employeeId, notificationId));
             setNotificationItems((prevItems) =>
                 prevItems.map((item) =>
-                    item.notification.id === notificationId ? { ...item, readStatus: true } : item
+                    item.notification.id === response.data ? { ...item, readStatus: true } : item
                 )
             );
-            setUnreadCount((prevCount) => prevCount - 1);
+            setUnreadCount((prevCount) => {
+                const item = notificationItems.find((item) => item.notification.id === response.data);
+                return item && !item.readStatus ? prevCount - 1 : prevCount;
+            });
         } catch (error) {
             console.error('알림 읽음 처리 에러:', error);
         }
-    };
-
-    const renderNotificationMenu = () => {
-        const menuItems = notificationItems.length
-            ? notificationItems.map((notification) => ({
-                key: notification.notification.id,
-                label: (
-                    <div
-                        className={`notification-item ${
-                            notification.readStatus ? 'read' : 'unread'
-                        }`}
-                        onClick={() => markAsRead(notification.notification.id)}
-                    >
-                        <List.Item.Meta
-                            avatar={
-                                <Avatar
-                                    style={{
-                                        backgroundColor: notification.readStatus
-                                            ? '#d9d9d9'
-                                            : '#1890ff',
-                                    }}
-                                    icon={<BellOutlined />}
-                                />
-                            }
-                            title={
-                                <span className="notification-title">
-                  {notification.type.replace('_', ' ')}
-                </span>
-                            }
-                            description={
-                                <div className="notification-description">
-                  <span className="notification-content">
-                    {notification.content}
-                  </span>
-                                    <span className="notification-timestamp">
-                    <br />
-                                        {new Date(notification.createAt).toLocaleString()}
-                  </span>
-                                </div>
-                            }
-                        />
-                    </div>
-                ),
-            }))
-            : [
-                {
-                    key: 'no-notifications',
-                    label: (
-                        <div className="no-notifications">알림이 없습니다</div>
-                    ),
-                    disabled: true,
-                },
-            ];
-
-        return { items: menuItems };
     };
 
     const handleProfile = () => {
@@ -263,19 +209,18 @@ function Headers() {
                                                 }
                                                 title={
                                                     <span className="notification-title">
-                                    {notification.type ? notification.type.replace('_', ' ') : '알림이 없습니다'}
-                                </span>
+                                                        {notification.type ? notification.type.replace('_', ' ') : '알림이 없습니다'}
+                                                        {notification.module ? <Tooltip title="알림을 받을 대상의 부서 입니다."><Tag style={{ marginLeft: '20px' }} color='green'>{notification.module}</Tag></Tooltip> : null}
+                                                        {notification.module ? <Tooltip title="알림을 받을 대상의 권한 입니다."><Tag color='red'>{notification.permission}</Tag></Tooltip> : null}
+                                                    </span>
                                                 }
                                                 description={
                                                     <div className="notification-description">
-                                    <span className="notification-content">
-                                        {notification.content || '내용이 없습니다.'}
-                                    </span>
+                                                        <span className="notification-content">
+                                                            {notification.content || '내용이 없습니다.'}
+                                                        </span>
                                                         {notification.createAt && (
-                                                            <span className="notification-timestamp">
-                                            <br />
-                                                                {new Date(notification.createAt).toLocaleString()}
-                                        </span>
+                                                            <span className="notification-timestamp"><br />{new Date(notification.createAt).toLocaleString()}</span>
                                                         )}
                                                     </div>
                                                 }
