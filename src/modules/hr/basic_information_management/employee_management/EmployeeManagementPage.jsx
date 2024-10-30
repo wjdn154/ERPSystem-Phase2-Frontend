@@ -362,7 +362,9 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                         display: 'flex',
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
-                                                        height: '100%', // 모든 행의 높이를 동일하게 고정
+                                                        padding: '5px', // padding 추가
+                                                        backgroundColor: '#f9f9f9', // 약간의 배경색 추가
+                                                        borderRadius: '8px' // 테두리 둥글게
                                                     }}>
                                                         <img
                                                             src={record.imagePath ? record.imagePath: defaultImage}
@@ -370,13 +372,12 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                             style={{
                                                                 width: '60px',
                                                                 height: '60px',
-                                                                objectFit: 'cover',
+                                                                objectFit: 'contain', // contain으로 설정하여 비율 유지
                                                                 borderRadius: '5px',
                                                             }}
                                                         />
                                                     </div>
                                                 ),
-                                                width: '15%'
                                             },
                                             {
                                                 title: <div className="title-text">입사일자</div>,
@@ -519,7 +520,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                             }
                                         ]}
                                         rowKey={(record) => record.id}
-                                        pagination={{ pageSize: 36, position: ['bottomCenter'], showSizeChanger: false }}
+                                        pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
                                         size="small"
                                         rowSelection={{
                                             type: 'radio',
@@ -857,7 +858,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     rowKey="code"
                                                                     size={'small'}
                                                                     pagination={{
-                                                                        pageSize: 15,
+                                                                        pageSize: 10,
                                                                         position: ['bottomCenter'],
                                                                         showSizeChanger: false,
                                                                         showTotal: (total) => `총 ${total}개`,
@@ -916,7 +917,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     rowKey="positionCode"
                                                                     size={'small'}
                                                                     pagination={{
-                                                                        pageSize: 15,
+                                                                        pageSize: 10,
                                                                         position: ['bottomCenter'],
                                                                         showSizeChanger: false,
                                                                         showTotal: (total) => `총 ${total}개`,
@@ -975,7 +976,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     rowKey="titleCode"
                                                                     size={'small'}
                                                                     pagination={{
-                                                                        pageSize: 15,
+                                                                        pageSize: 10,
                                                                         position: ['bottomCenter'],
                                                                         showSizeChanger: false,
                                                                         showTotal: (total) => `총 ${total}개`,
@@ -1317,7 +1318,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                 rowKey="code"
                                                                 size={'small'}
                                                                 pagination={{
-                                                                    pageSize: 15,
+                                                                    pageSize: 10,
                                                                     position: ['bottomCenter'],
                                                                     showSizeChanger: false,
                                                                     showTotal: (total) => `총 ${total}개`,
@@ -1376,7 +1377,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                 rowKey="positionCode"
                                                                 size={'small'}
                                                                 pagination={{
-                                                                    pageSize: 15,
+                                                                    pageSize: 10,
                                                                     position: ['bottomCenter'],
                                                                     showSizeChanger: false,
                                                                     showTotal: (total) => `총 ${total}개`,
@@ -1435,7 +1436,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                 rowKey="titleCode"
                                                                 size={'small'}
                                                                 pagination={{
-                                                                    pageSize: 15,
+                                                                    pageSize: 10,
                                                                     position: ['bottomCenter'],
                                                                     showSizeChanger: false,
                                                                     showTotal: (total) => `총 ${total}개`,
