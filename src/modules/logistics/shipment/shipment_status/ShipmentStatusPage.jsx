@@ -391,7 +391,7 @@ const ShipmentStatusPage = () => {
                                                 dataIndex: 'quantity',
                                                 key: 'quantity',
                                                 align: 'center',
-                                                render: (text) => <div className="small-text">{text}</div>
+                                                render: (text) => <div style={{textAlign:'right'}} className="small-text">{text}</div>
                                             },
                                             {
                                                 title: <div className="title-text">창고명</div>,
@@ -450,16 +450,24 @@ const ShipmentStatusPage = () => {
                                             },
                                         })}
                                         summary={() => (
-                                            <Table.Summary fixed>
-                                                <Table.Summary.Row>
-                                                    <Table.Summary.Cell colSpan={2} align="center">
-                                                        총 수량 합계
+                                            <Table.Summary>
+                                                <Table.Summary.Row style={{textAlign:'center'}}>
+                                                    <Table.Summary.Cell index={0}/>
+                                                    <Table.Summary.Cell index={1}>
+                                                        <div className="medium-text">
+                                                            총 수량 합계
+                                                        </div>
                                                     </Table.Summary.Cell>
-                                                    <Table.Summary.Cell/>
-                                                    <Table.Summary.Cell align="center">
-                                                        {totalQuantity}
+                                                    <Table.Summary.Cell index={2}/>
+                                                    <Table.Summary.Cell index={3}>
+                                                        <div style={{textAlign:"right"}} className="medium-text">
+                                                            {totalQuantity}
+                                                        </div>
                                                     </Table.Summary.Cell>
-                                                    <Table.Summary.Cell colSpan={4} />
+                                                    <Table.Summary.Cell index={4}/>
+                                                    <Table.Summary.Cell index={5}/>
+                                                    <Table.Summary.Cell index={6}/>
+                                                    <Table.Summary.Cell index={7}/>
                                                 </Table.Summary.Row>
                                             </Table.Summary>
                                         )}
