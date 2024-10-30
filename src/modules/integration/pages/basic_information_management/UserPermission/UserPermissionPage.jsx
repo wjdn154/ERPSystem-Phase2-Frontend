@@ -46,7 +46,7 @@ const UserPermissionPage = () => {
 
     const fetchEmployee = async () => {
         try {
-            const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
+            const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_USER_DATA_API);
             const data = response.data;
             setEmployee(data);
         } catch (error) {

@@ -209,6 +209,10 @@ const PendingVoucherInputPage = () => {
     };
 
     const handleAddRow = () => {
+        if ((!voucher.debitAmount && !voucher.creditAmount) || isNaN(voucher.debitAmount) || isNaN(voucher.creditAmount)) {
+            notify('warning', '입력 오류', '금액을 입력하세요.', 'bottomRight');
+            return;
+        }
 
         if (voucher.voucherType === 'Deposit' || voucher.voucherType === 'Withdrawal') {
             if (vouchers.length > 0) {
