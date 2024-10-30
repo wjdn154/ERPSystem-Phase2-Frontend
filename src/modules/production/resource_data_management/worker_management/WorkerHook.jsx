@@ -136,6 +136,7 @@ export const workerHook = (initialData) => {
             const updatedData = await fetchWorkerList();
             notify('success', '안전교육 이수 여부 수정', '안전교육 이수 여부 수정 성공', 'bottomRight')
             setData(updatedData);
+            setShowDetail(false);
         } catch (error) {
             notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }

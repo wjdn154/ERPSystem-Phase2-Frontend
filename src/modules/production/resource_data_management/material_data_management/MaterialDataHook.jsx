@@ -171,13 +171,19 @@ export const materialDataHook = (initialData) => {
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
-            console.log("수정버튼 클릭시 id ,materialDataDetail : ",materialDataDetail.id, materialDataDetail);
+            const updateData = {
+                ...materialDataDetail,
+                product: filteredProductData,
+                hazardousMaterial: filterHazardousData,
+            };
 
-            await updateMaterialData(materialDataDetail.id, materialDataDetail);
+            console.log("수정버튼 클릭시 id ,materialDataDetail : ",updateData.id, updateData);
+
+            await updateMaterialData(updateData.id, updateData);
             const updatedData = await fetchMaterialDataList();
-            setData(updatedData);
             notify('success', '자재 수정', '자재 수정 성공', 'bottomRight')
-            setIsUpdateModalVisible(false);
+            setData(updatedData);
+            setShowDetail(false);
         } catch (error) {
             notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
@@ -321,7 +327,9 @@ export const materialDataHook = (initialData) => {
         activeTabKey,
         handleTabChange,
         filteredProductData,
+        setFilteredProductData,
         filterHazardousData,
+        setFilterHazardousData,
         onMaterialRowClick,
         onProductRowClick,
         handleDeleteProduct,

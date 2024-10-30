@@ -106,6 +106,7 @@ export const EMPLOYEE_API = {
     USERS_PERMISSION_API: (username) => `${API_BASE_URL}/api/hr/users/permission/${username}`, // 사용자 권한 조회 API
     UPDATE_USERS_PERMISSION_API: `${API_BASE_URL}/api/hr/users/permission/update`,
     USERS_DATA_API: `${API_BASE_URL}/api/hr/users/all`,
+    EMPLOYEE_USER_DATA_API: `${API_BASE_URL}/api/hr/employee/user/all`, // ERP 사용자인 Employee 목록 조회 API
     USERS_DATA_DETAIL_API: (id) => `${API_BASE_URL}/api/hr/users/${id}`,
     SAVE_USERS_DATA_API: `${API_BASE_URL}/api/hr/users/create`,
     UPDATE_USERS_DATA_API: (id)=> `${API_BASE_URL}/api/hr/users/put/${id}`,
@@ -161,7 +162,15 @@ export const EMPLOYEE_API = {
     SALARY_ENTRY_API: `${API_BASE_URL}/api/hr/salary/entry`, // 급여 등록
     SALARY_SHOW_API: `${API_BASE_URL}/api/hr/salary/show`, // 급여 조회
     SALARY_STEP_API: `${API_BASE_URL}/api/hr/basicconfiguration/salarystep/show`, // 호봉 조회
+
+    EMPLOYMENT_INSURANCE_PENSION_API: `${API_BASE_URL}/api/hr/employment_insurance_pension/show`, // 고용보험 조회
+    HEALTH_INSURANCE_PENSION_API: `${API_BASE_URL}/api/hr/health_insurance_pension/show`,     // 건강보험 조회
     LONG_TERM_CARE_INSURANCE_PENSION_API: `${API_BASE_URL}/api/hr/long_term_care_insurance_pension/show`, // 장기요양보험 연금 조회
+    NATIONAL_PENSION_API: `${API_BASE_URL}/api/hr/national_pension/show`, // 국민연금 조회
+    INCOME_TAX_API: `${API_BASE_URL}/api/hr/incometax/show`, // 소득세 조회
+
+    // 국민연금 조회
+    // 소득세 조회
     EMPLOYMENT_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/employment_insurance_pension/calculator`, // 고용보험 연금 계산
     HEALTH_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/health_insurance_pension/calculator`, // 건강보험 연금 계산
     NATIONAL_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/national_pension/calculator`, // 국민연금 계산
@@ -351,7 +360,7 @@ export const PRODUCTION_API = {
     MPS_CREATE: `${API_BASE_URL}/api/production/mps/new`,             // MPS 생성 API
     MPS_COMPLETE: (id) => `${API_BASE_URL}/api/production/mps/${id}/complete`, // MPS 완료 처리 API
     MPS_CONFIRM: (id) => `${API_BASE_URL}/api/production/mps/${id}/confirm`, // MPS 완료 처리 API
-    MPS_GET_BY_ID: (id) => `${API_BASE_URL}/api/production/mps/${id}`, // 특정 MPS 조회 API
+    MPS_DETAIL_ID: (id) => `${API_BASE_URL}/api/production/mps/${id}`, // 특정 MPS 조회 API
     MPS_UPDATE: (id) => `${API_BASE_URL}/api/production/mps/update/${id}`, // MPS 업데이트 API
     MPS_DELETE: (id) => `${API_BASE_URL}/api/production/mps/delete/${id}`, // MPS 삭제 API
 

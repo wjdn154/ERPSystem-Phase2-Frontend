@@ -98,8 +98,8 @@ const SalesPurchaseLedgerPage = () => {
                                                                 try {
                                                                     const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
                                                                     const data = response.data;
-                                                                    console.log(data);
                                                                     setSearchData(data);
+                                                                    notify('success', '조회 성공', '매입매출장 조회가 성공적으로 완료되었습니다.', 'bottomRight');
                                                                 } catch (error) {
                                                                     notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
                                                                 }
