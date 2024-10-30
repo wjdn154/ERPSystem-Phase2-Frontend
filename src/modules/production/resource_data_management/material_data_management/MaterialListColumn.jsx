@@ -14,7 +14,12 @@ const MaterialType = {
     "COMPOSITE" : "복합재료",
     "OTHER" : "기타 자재",
 };
-
+// 콤마 적용
+const formatNumberWithComma = (value) => {
+    // value가 숫자인 경우 문자열로 변환
+    const stringValue = String(value);
+    return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+};
 
 export const
     materialListColumn = [
@@ -53,8 +58,9 @@ export const
             title: <div className="title-text">매입가(원)</div>,
             dataIndex: 'purchasePrice',
             key:'purchasePrice',
-            width: '15%',
+            width: '13%',
             align: 'center',
+            render: (text) => <div style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
         },
         {
             title: <div className="title-text">거래처명</div>,
@@ -67,7 +73,7 @@ export const
             title: <div className="title-text">유해물질 포함수량</div>,
             dataIndex: 'hazardousMaterialQuantity',
             key:'hazardousMaterialQuantity',
-            width: '10%',
+            width: '12%',
             align: 'center',
         },
     ];

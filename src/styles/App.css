@@ -362,7 +362,7 @@ input.ant-input[readonly] {
 /* 공통 드롭다운 스타일 */
 .notification-dropdown {
   width: 30vw;
-  min-width: 300px;
+  min-width: 400px;
   max-width: 450px;
   max-height: 80vh;
   overflow-y: auto; /* 스크롤 활성화 */
@@ -371,16 +371,25 @@ input.ant-input[readonly] {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.ant-list-item-meta {
-  padding: 15px;
 
+.ant-list-item-meta:hover {
+  transform: scale(1.02);
 }
+
+.ant-list-item-meta {
+  margin: 15px;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.ant-avatar-icon {
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
 /* 개별 알림 항목 스타일 */
 .notification-item {
   padding: 10px 16px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s ease;
 }
 
 .notification-item:hover {

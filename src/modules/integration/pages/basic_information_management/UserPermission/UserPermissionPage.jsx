@@ -13,8 +13,8 @@ import { jwtDecode } from "jwt-decode";
 import apiClient from "../../../../../config/apiClient.jsx";
 const { confirm } = Modal;
 
-const UserPermissionPage = ( ) => {
-
+const UserPermissionPage = () => {
+    // EMPLOYEE_API.USERS_PERMISSION_API(token ? jwtDecode(token).sub : null)
     const { token, isAdmin, permission, companyId } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
@@ -46,7 +46,7 @@ const UserPermissionPage = ( ) => {
 
     const fetchEmployee = async () => {
         try {
-            const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
+            const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_USER_DATA_API);
             const data = response.data;
             setEmployee(data);
         } catch (error) {

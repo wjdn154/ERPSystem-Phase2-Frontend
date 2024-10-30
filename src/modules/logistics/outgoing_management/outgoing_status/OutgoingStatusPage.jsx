@@ -19,7 +19,8 @@ const OutgoingStatusPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [shippingDetailList, setShippingDetailList] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
+    const [detailShipmentData, setDetailShipmentData] = useState(false);
+    const [editDetailShipmentData, setEditDetailShipmentData] = useState(false);
 
     const [searchParams, setSearchParams] = useState({
         startDate: dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
@@ -167,30 +168,31 @@ const OutgoingStatusPage = () => {
                                             }
                                         ]}
                                         pagination={{pageSize: 15, position: ['bottomCenter'], showSizeChanger: false}}
-                                        rowKey={(record) => record.id}
                                         size="small"
-                                        rowSelection={{
-                                            type: 'radio',
-                                            selectedRowKeys,
-                                            onChange: (newSelectedRowKeys) => {
-                                                setSelectedRowKeys(newSelectedRowKeys);
-                                            }
-                                        }}
-                                        onRow={(record) => ({
-                                            style: {cursor: 'pointer'},
-                                            onClick: async () => {
-                                                setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
-                                                const id = record.id;
-                                                try {
-                                                    const response = await apiClient.post(LOGISTICS_API.SHIPMENT_DETAIL_API(id));
-                                                    setDetailShipmentData(response.data);
-                                                    setEditDetailShipmentData(true);
-                                                    notify('success', '품목 조회', '출하 정보 조회 성공.', 'bottomRight')
-                                                } catch (error) {
-                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
-                                                }
-                                            },
-                                        })}>
+                                        rowKey={(record) => record.id}
+                                        // rowSelection={{
+                                        //     type: 'radio',
+                                        //     selectedRowKeys,
+                                        //     onChange: (newSelectedRowKeys) => {
+                                        //         setSelectedRowKeys(newSelectedRowKeys);
+                                        //     }
+                                        // }}
+                                        // onRow={(record) => ({
+                                        //     style: {cursor: 'pointer'},
+                                        //     onClick: async () => {
+                                        //         setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
+                                        //         const id = record.id;
+                                        //         try {
+                                        //             const response = await apiClient.post(LOGISTICS_API.SHIPMENT_DETAIL_API(id));
+                                        //             console.log(response.data);
+                                        //             setDetailShipmentData(response.data);
+                                        //             setEditDetailShipmentData(true);
+                                        //             notify('success', '품목 조회', '출하 정보 조회 성공.', 'bottomRight')
+                                        //         } catch (error) {
+                                        //             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                        //         }
+                                        //     },})}
+                                    >
                                     </Table>
                                 </Grid>
                             </Paper>
