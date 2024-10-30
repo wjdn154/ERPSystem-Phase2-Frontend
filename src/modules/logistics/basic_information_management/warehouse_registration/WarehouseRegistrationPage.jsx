@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Box, Grid, Card, Paper, Typography, Divider} from '@mui/material';
+import {Box, Grid, Card, Paper, Typography, Divider, Grow} from '@mui/material';
 import {Table, Tag, Input, Form, Space, Button, Modal, Tree, Select} from 'antd';
 import {LOGISTICS_API, PRODUCTION_API} from '../../../../config/apiConstants';
 import apiClient from '../../../../config/apiClient';
@@ -192,7 +192,7 @@ const WarehouseRegistrationPage = () => {
                     notify('success', '삭제 성공', '계층 그룹이 성공적으로 삭제되었습니다.', 'bottomRight');
                     fetchHierarchyGroups(); // 삭제 후 계층 그룹 목록 갱신
                 } catch (error) {
-                    notify('error', '삭제 실패', '계층 그룹 삭제 중 오류가 발생했습니다.' , 'top');
+                    notify('error', '삭제 실패', '계층 그룹 삭제 중 오류가 발생했습니다.', 'top');
                 }
             }
         });
@@ -321,177 +321,186 @@ const WarehouseRegistrationPage = () => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid container spacing={2}>
+                <Grid sx={{padding: '0px 20px 0px 20px'}} container spacing={3}>
                     <Grid item xs={12} md={6}>
-                        <Card className="blue-card" sx={{height: '100%', overflow: 'auto'}}>
-                            <Table
-                                dataSource={warehouseList}
-                                columns={[
-                                    {
-                                        title: <div className="title-text">창고 코드</div>,
-                                        dataIndex: 'code',
-                                        key: 'code',
-                                        align: 'center'
-                                    },
-                                    {
-                                        title: <div className="title-text">창고 이름</div>,
-                                        dataIndex: 'name',
-                                        key: 'name',
-                                        align: 'center'
-                                    },
-                                    {
-                                        title: <div className="title-text">창고 유형</div>,
-                                        dataIndex: 'warehouseType',
-                                        key: 'warehouseType',
-                                        align: 'center',
-                                        render: (type) => (
-                                            <Tag color={type === 'WAREHOUSE' ? 'green' : 'blue'}>
-                                                {type === 'WAREHOUSE' ? '창고' : '공장'}
-                                            </Tag>
-                                        ),
-                                    },
-                                    {
-                                        title: <div className="title-text">생산공정명</div>,
-                                        dataIndex: 'productionProcess',
-                                        key: 'productionProcess',
-                                        align: 'center'
-                                    },
-                                    {
-                                        title: <div className="title-text">활성화 여부</div>,
-                                        dataIndex: 'isActive',
-                                        key: 'isActive',
-                                        align: 'center',
-                                        render: (isActive) => (
-                                            <Tag color={isActive ? 'green' : 'red'}>
-                                                {isActive ? '사용중' : '사용중단'}
-                                            </Tag>
-                                        ),
-                                    },
-                                ]}
-                                rowKey="id"
-                                pagination={{position: ['bottomCenter'], defaultPageSize: 10}}
-                                className="ant-table-wrapper"
-                                rowSelection={{
-                                    type: 'radio',
-                                    selectedRowKeys: [selectedWarehouseId],
-                                    onChange: (selectedRowKeys) => setSelectedWarehouseId(selectedRowKeys[0])
-                                }}
-                                onRow={(record) => ({
-                                    onClick: () => {
-                                        setSelectedWarehouseId(record.id);
-                                        setIsCreating(false);
-                                        fetchWarehouseDetail(record.id);
-                                        setSelectedProcess(record.productionProcess);
-                                    },
-                                })}
-                            />
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                                marginBottom: '8px',
-                                marginRight: '8px'
-                            }}>
-                                <Button
-                                    type="primary"
-                                    onClick={() => {
-                                        setIsCreating(true);
-                                        form.resetFields();
-                                        setSelectedProcess(null);
-                                        setSelectedGroupData([]);
-                                        setCheckedKeys([]);
-                                    }}
-                                    className="ant-btn-primary"
-                                >
-                                    신규 창고
-                                </Button>
-                            </div>
-                        </Card>
+                        <Grow in={true} timeout={200}>
+                            <Paper elevation={3} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{padding: '20px'}}>창고 조회</Typography>
+                                <Grid sx={{padding: '0px 20px 0px 20px'}}>
+                                        <Table
+                                            dataSource={warehouseList}
+                                            columns={[
+                                                {
+                                                    title: <div className="title-text">창고 코드</div>,
+                                                    dataIndex: 'code',
+                                                    key: 'code',
+                                                    align: 'center'
+                                                },
+                                                {
+                                                    title: <div className="title-text">창고 이름</div>,
+                                                    dataIndex: 'name',
+                                                    key: 'name',
+                                                    align: 'center'
+                                                },
+                                                {
+                                                    title: <div className="title-text">창고 유형</div>,
+                                                    dataIndex: 'warehouseType',
+                                                    key: 'warehouseType',
+                                                    align: 'center',
+                                                    render: (type) => (
+                                                        <Tag color={type === 'WAREHOUSE' ? 'green' : 'blue'}>
+                                                            {type === 'WAREHOUSE' ? '창고' : '공장'}
+                                                        </Tag>
+                                                    ),
+                                                },
+                                                {
+                                                    title: <div className="title-text">생산공정명</div>,
+                                                    dataIndex: 'productionProcess',
+                                                    key: 'productionProcess',
+                                                    align: 'center'
+                                                },
+                                                {
+                                                    title: <div className="title-text">활성화 여부</div>,
+                                                    dataIndex: 'isActive',
+                                                    key: 'isActive',
+                                                    align: 'center',
+                                                    render: (isActive) => (
+                                                        <Tag color={isActive ? 'green' : 'red'}>
+                                                            {isActive ? '사용중' : '사용중단'}
+                                                        </Tag>
+                                                    ),
+                                                },
+                                            ]}
+                                            rowKey="id"
+                                            pagination={{position: ['bottomCenter'], defaultPageSize: 10}}
+                                            rowSelection={{
+                                                type: 'radio',
+                                                selectedRowKeys: [selectedWarehouseId],
+                                                onChange: (selectedRowKeys) => setSelectedWarehouseId(selectedRowKeys[0])
+                                            }}
+                                            onRow={(record) => ({
+                                                onClick: () => {
+                                                    setSelectedWarehouseId(record.id);
+                                                    setIsCreating(false);
+                                                    fetchWarehouseDetail(record.id);
+                                                    setSelectedProcess(record.productionProcess);
+                                                },
+                                            })}
+                                        />
+                                    <Box sx={{
+                                        display: 'flex',
+                                        justifyContent: 'flex-end',
+                                        marginBottom: '20px',
+                                    }}>
+                                        <Button
+                                            type="primary"
+                                            onClick={() => {
+                                                setIsCreating(true);
+                                                form.resetFields();
+                                                setSelectedProcess(null);
+                                                setSelectedGroupData([]);
+                                                setCheckedKeys([]);
+                                            }}
+                                            className="ant-btn-primary"
+                                        >
+                                            신규 창고
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                            </Paper>
+                        </Grow>
                     </Grid>
 
-                    <Grid item xs={12} md={6}>
-                        {(isCreating || selectedWarehouseId) && (
-                            <Paper className="purple-card" sx={{padding: '20px'}}>
-                                <Typography variant="h6" className="ant-typography" sx={{marginBottom: '24px'}}>
-                                    {isCreating ? '신규 창고 등록' : '창고 상세 정보 수정'}
-                                </Typography>
-                                <Form form={form} onFinish={handleFormSubmit} layout="vertical">
-                                    <Form.Item name="code" rules={[{required: true}]}>
-                                        <Input className="search-input" addonBefore="창고 코드" disabled={!isCreating}/>
-                                    </Form.Item>
-                                    <Form.Item name="name" rules={[{required: true}]}>
-                                        <Input className="search-input" addonBefore="창고 이름"/>
-                                    </Form.Item>
-                                    <Form.Item name="warehouseType" label="창고 유형" rules={[{required: true}]}>
-                                        <Select
-                                            onChange={(value) => {
-                                                if (value !== 'FACTORY') {
-                                                    setSelectedProcess(null);
-                                                    form.setFieldsValue({productionProcess: ''});
-                                                }
-                                            }}
-                                        >
-                                            <Select.Option value="WAREHOUSE">창고</Select.Option>
-                                            <Select.Option value="FACTORY">공장</Select.Option>
-                                        </Select>
-                                    </Form.Item>
-                                    <Form.Item
-                                        name="productionProcess"
-                                        label="생산공정명"
-                                        rules={form.getFieldValue('warehouseType') === 'FACTORY' ? [{
-                                            required: true,
-                                            message: '생산공정을 선택해주세요.'
-                                        }] : []}
-                                    >
-                                        <div
-                                            className="process-selection"
-                                            style={{
-                                                padding: '10px',
-                                                border: '1px solid #d9d9d9',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer'
-                                            }}
-                                            onClick={handleProductionProcessClick}
-                                        >
-                                            {selectedProcess ? `[${selectedProcess.code}] ${selectedProcess.name}` : '생산공정명을 선택하세요'}
-                                        </div>
-                                    </Form.Item>
-                                    <Form.Item name="hierarchyGroups" label="계층 그룹">
-                                        <div
-                                            className="hierarchy-group-selection"
-                                            style={{
-                                                padding: '10px',
-                                                border: '1px solid #d9d9d9',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer'
-                                            }}
-                                            onClick={openHierarchyModal}
-                                        >
-                                            {selectedGroupData.length > 0
-                                                ? selectedGroupData.map(group => `[${group.code}]${group.name}`).join(', ')
-                                                : '계층 그룹을 선택하세요'}
-                                        </div>
-                                    </Form.Item>
-                                    <Form.Item name="isActive" label="활성화 여부" rules={[{required: true}]}>
-                                        <Select>
-                                            <Select.Option value={true}>사용중</Select.Option>
-                                            <Select.Option value={false}>사용중단</Select.Option>
-                                        </Select>
-                                    </Form.Item>
-                                    <Space style={{marginTop: '20px', display: 'flex', justifyContent: 'flex-end'}}>
-                                        <Button type="primary" htmlType="submit" className="ant-btn-primary">
-                                            {isCreating ? '등록하기' : '수정하기'}
-                                        </Button>
-                                        {!isCreating && (
-                                            <Button onClick={() => handleDeleteWarehouse(selectedWarehouseId)}
-                                                    className="ant-btn-danger">
-                                                삭제하기
-                                            </Button>
-                                        )}
-                                    </Space>
-                                </Form>
-                            </Paper>
-                        )}
-                    </Grid>
+                    {(isCreating || selectedWarehouseId) && (
+                        <Grid item xs={12} md={6}>
+                            <Grow in={true} timeout={200}>
+                                <Paper elevation={3} sx={{height: '100%'}}>
+                                    <Typography variant="h6" sx={{padding: '20px'}}>
+                                        {isCreating ? '신규 창고 등록' : '창고 상세 정보 수정'}
+                                    </Typography>
+                                    <Grid sx={{padding: '0px 20px 0px 20px'}}>
+                                        <Form form={form} onFinish={handleFormSubmit} layout="vertical">
+                                            <Form.Item name="code" rules={[{required: true}]}>
+                                                <Input addonBefore="창고 코드"
+                                                       disabled={!isCreating}/>
+                                            </Form.Item>
+                                            <Form.Item name="name" rules={[{required: true}]}>
+                                                <Input addonBefore="창고 이름"/>
+                                            </Form.Item>
+                                            <Form.Item name="warehouseType" label="창고 유형" rules={[{required: true}]}>
+                                                <Select
+                                                    onChange={(value) => {
+                                                        if (value !== 'FACTORY') {
+                                                            setSelectedProcess(null);
+                                                            form.setFieldsValue({productionProcess: ''});
+                                                        }
+                                                    }}
+                                                >
+                                                    <Select.Option value="WAREHOUSE">창고</Select.Option>
+                                                    <Select.Option value="FACTORY">공장</Select.Option>
+                                                </Select>
+                                            </Form.Item>
+                                            <Form.Item
+                                                name="productionProcess"
+                                                label="생산공정명"
+                                                rules={form.getFieldValue('warehouseType') === 'FACTORY' ? [{
+                                                    required: true,
+                                                    message: '생산공정을 선택해주세요.'
+                                                }] : []}
+                                            >
+                                                <div
+                                                    style={{
+                                                        padding: '10px',
+                                                        border: '1px solid #d9d9d9',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    onClick={handleProductionProcessClick}
+                                                >
+                                                    {selectedProcess ? `[${selectedProcess.code}] ${selectedProcess.name}` : '생산공정명을 선택하세요'}
+                                                </div>
+                                            </Form.Item>
+                                            <Form.Item name="hierarchyGroups" label="계층 그룹">
+                                                <div
+                                                    style={{
+                                                        padding: '10px',
+                                                        border: '1px solid #d9d9d9',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    onClick={openHierarchyModal}
+                                                >
+                                                    {selectedGroupData.length > 0
+                                                        ? selectedGroupData.map(group => `[${group.code}]${group.name}`).join(', ')
+                                                        : '계층 그룹을 선택하세요'}
+                                                </div>
+                                            </Form.Item>
+                                            <Form.Item name="isActive" label="활성화 여부" rules={[{required: true}]}>
+                                                <Select>
+                                                    <Select.Option value={true}>사용중</Select.Option>
+                                                    <Select.Option value={false}>사용중단</Select.Option>
+                                                </Select>
+                                            </Form.Item>
+                                            <Space style={{
+                                                marginTop: '20px',
+                                                display: 'flex',
+                                                justifyContent: 'flex-end'
+                                            }}>
+                                                <Button type="primary" htmlType="submit" >
+                                                    {isCreating ? '등록하기' : '수정하기'}
+                                                </Button>
+                                                {!isCreating && (
+                                                    <Button onClick={() => handleDeleteWarehouse(selectedWarehouseId)} type="danger">
+                                                        삭제하기
+                                                    </Button>
+                                                )}
+                                            </Space>
+                                        </Form>
+                                    </Grid>
+                                </Paper>
+                            </Grow>
+                        </Grid>
+                    )}
                 </Grid>
             )}
 

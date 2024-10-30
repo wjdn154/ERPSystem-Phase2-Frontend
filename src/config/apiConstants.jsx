@@ -13,6 +13,11 @@ export const COMMON_API = {
     COMPANY_SEARCH_API: `${API_BASE_URL}/api/financial/company/search`, // 회사 검색 API
     REGISTER_API: `${API_BASE_URL}/api/hr/auth/register`, // 회원가입 API
     DASHBOARD_API: `${API_BASE_URL}/api/integrated/dashboard`, // 대시보드 조회 API
+    GET_USER_SUBSCRIPTION_INFO_API: (employeeId, isAdmin) => `${API_BASE_URL}/api/notifications/get-user-subscription-info?employeeId=${employeeId}&isAdmin=${isAdmin}`, // 사용자 구독 정보 조회 API
+    NOTIFICATION_SUBSCRIBE_API: (employeeId, tenantId, module, permission) => `${API_BASE_URL}/api/notifications/subscribe?employeeId=${employeeId}&tenantId=${tenantId}&module=${module}&permission=${permission}`, // 알림 구독 API
+    NOTIFICATION_UNSUBSCRIBE_API: `${API_BASE_URL}/api/notifications/unsubscribe`, // 알림 구독 취소 API
+    CREATE_NOTIFICATION_API: (employeeId, module, permission) => `${API_BASE_URL}/api/notifications/create-notification?employeeId=${employeeId}&module=${module}&permission=${permission}`, // 알림 생성 및 조회 API
+    MARK_AS_READ_NOTIFICATION_API: (employeeId, notificationId) => `${API_BASE_URL}/api/notifications/mark-as-read?employeeId=${employeeId}&notificationId=${notificationId}`, // 알림 읽음 처리 API
 };
 
 // 재무회계
@@ -144,8 +149,9 @@ export const EMPLOYEE_API = {
     SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
     TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
     SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
-    UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/api/hr/transfer/update/${id}`,
+    UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/transfer/update/${id}`,
     TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
+    UPDATE_TRANSFER_TYPE_API:(id) => `${API_BASE_URL}/api/hr/transferType/update/${id}`,
 
 
     //  인사관리 - 급여
@@ -178,7 +184,7 @@ export const LOGISTICS_API = {
     WAREHOUSE_CREATE_API: `${API_BASE_URL}/api/logistics/warehouse/createWarehouse`, // 창고 생성 API
     WAREHOUSE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/updateWarehouse/${id}`, // 창고 수정 API
     WAREHOUSE_DELETE_API: (id) => `${API_BASE_URL}/api/logistics/warehouse/deleteWarehouse/${id}`, // 창고 삭제 API
-    LOCATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/location/${id}`, // 창고 위치 상세 조회 API
+    LOCATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/location/${id}`, // 창고별 로케이션 조회
     HIERARCHY_GROUP_LIST_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/`, // 계층 그룹 목록 조회 API
     HIERARCHY_GROUP_WAREHOUSES_API: (groupId) => `${API_BASE_URL}/api/logistics/hierarchyGroup/${groupId}/warehouses`, // 계층 그룹의 창고 조회 API
     HIERARCHY_GROUP_SAVE_API: `${API_BASE_URL}/api/logistics/hierarchyGroup/saveHierarchyGroup`, // 계층 그룹 저장 API
@@ -189,27 +195,49 @@ export const LOGISTICS_API = {
     PURCHASE_REQUEST_LIST_API: `${API_BASE_URL}/api/logistics/purchase-requests/`, // 발주 요청 목록 조회 API
     PURCHASE_REQUEST_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchase-requests/${id}`, // 발주 요청 상세 정보 조회 API
     PURCHASE_REQUEST_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/purchase-requests/update/${id}`, // 발주 요청 수정 조회 API
-    PURCHASE_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/purchase-orders/`, // 발주 요청 목록 조회 API
+    PURCHASE_REQUEST_CREATE_API: `${API_BASE_URL}/api/logistics/purchase-requests/create`, // 발주 요청 등록 API
+    
+    PURCHASE_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/purchase-orders/`, // 발주서 목록 조회 API
     PURCHASE_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchase-orders/${id}`, // 발주서 상세 정보 조회 API
     PURCHASE_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/purchase-orders/update/${id}`, // 발주서 수정 조회 API
+    PURCHASE_ORDER_CREATE_API: `${API_BASE_URL}/api/logistics/purchase-orders/create`, // 발주서 등록 API
+    
     PURCHASE_LIST_API: `${API_BASE_URL}/api/logistics/purchases/`, // 구매서 목록 조회 API
-    PURCHASE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchases/${id}`, // 발주서 상세 정보 조회 API
+    PURCHASE_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/purchases/${id}`, // 구매서 상세 정보 조회 API
+    PURCHASE_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/purchases/update/${id}`, // 구매서 수정 API
+    PURCHASE_CREATE_API: `${API_BASE_URL}/api/logistics/purchases/create`, // 구매서 등록 API
+    
+    
     RECEIVING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/receiving-orders/`, // 입고 지시서 목록 조회 API
-    RECEIVING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/${id}`, // 입고지시서 상세 정보 조회 API
+    RECEIVING_ORDER_CREATE_API: `${API_BASE_URL}/api/logistics/receiving-orders/create`, // 입고 지시서 등록 API
 
     // 영업 관리
+    SALE_PLAN_LIST_API: `${API_BASE_URL}/api/logistics/sale-plans/`, // 판매계획 목록 조회 API
+    SALE_PLAN_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/sale-plans/${id}`, // 판매계획 상세 정보 조회 API
+    SALE_PLAN_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/sale-plans/update/${id}`, // 판매계획 수정 API
+    SALE_PLAN_CREATE_API: `${API_BASE_URL}/api/logistics/sale-plans/create`, // 판매계획 등록 API
     QUOTATION_LIST_API: `${API_BASE_URL}/api/logistics/quotations/`, // 견적서 목록 조회 API
     QUOTATION_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/quotations/${id}`, // 견적서 상세 정보 조회 API
-    QUOTATION_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/quotations/update/${id}`, // 견적서 수정 조회 API
+    QUOTATION_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/quotations/update/${id}`, // 견적서 수정 API
+    QUOTATION_CREATE_API: `${API_BASE_URL}/api/logistics/quotations/create`, // 견적서 등록 API
+
     ORDER_LIST_API: `${API_BASE_URL}/api/logistics/orders/`, // 주문서 목록 조회 API
     ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/orders/${id}`, // 주문서 상세 정보 조회 API
     ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/update/${id}`, // 주문서 수정 조회 API
+    ORDER_CREATE_API: `${API_BASE_URL}/api/logistics/orders/create`, // 주문서 등록 API
+
     SALES_LIST_API: `${API_BASE_URL}/api/logistics/sales/`, // 판매서 목록 조회 API
     SALES_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/sales/${id}`, // 판매서 상세 정보 조회 API
-    SALES_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/sales/${id}`, // 판매서 수정 조회 API
+    SALES_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/sales/update/${id}`, // 판매서 수정 조회 API
+    SALES_CREATE_API: `${API_BASE_URL}/api/logistics/sales/create`, // 판매서 목록 조회 API
+
     SHIPPING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/shipping-orders/`, // 출하지시서 목록 조회 API
     SHIPPING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/shipping-orders/${id}`, // 출하지시서 상세 정보 조회 API
-    SHIPPING_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/orders/shipping-orders/${id}`, // 출하지시서 수정 조회 API
+    SHIPPING_ORDER_UPDATE_API: (id) => `${API_BASE_URL}/api/logistics/shipping-orders/update/${id}`, // 출하지시서 수정 조회 API
+    SHIPPING_ORDER_CREATE_API: `${API_BASE_URL}/api/logistics/shipping-orders/create`, // 출하지시서 목록 조회 API
+
+
+    INVENTORY_API: `${API_BASE_URL}/api/logistics/inventory/`, // 재고 조회 API
 
     //재고 실사 조회
     INVENTORY_INSPECTION_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/?startDate=${startDate}&endDate=${endDate}`,
@@ -233,7 +261,12 @@ export const LOGISTICS_API = {
     RECEIVING_SCHEDULE_PROCESS_API: () => `${API_BASE_URL}/api/logistics/receivingSchedules/process`, // 입고 처리 요청 API
     RECEIVING_SCHEDULE_WAITING_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/receivingSchedules/waiting?startDate=${startDate}&endDate=${endDate}`, // 특정 날짜 범위 내 대기 중인 입고 일정 조회 API
     INVENTORY_BY_LOCATION_API: (locationId) => `${API_BASE_URL}/api/logistics/inventory/byLocation/${locationId}`, // 특정 위치의 재고 조회 API
+    INVENTORY_BY_WAREHOUSE_API: (warehouseId) => `${API_BASE_URL}/api/logistics/inventory/warehouse/${warehouseId}`, // 특정 위치의 재고 조회 API
     RECEIVING_SCHEDULE_PROCESS_CREATE_API: (id) => `${API_BASE_URL}/api/logistics/receivingSchedules/process/${id}`, // ReceivingSchedule 입고 처리 API
+    SHIPPING_ORDER_DETAILS_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipping-order-details/details?startDate=${startDate}&endDate=${endDate}`, // 특정 날짜 범위의 출하지시서 상세 정보 조회 API
+    SHIPPING_PROCESS_REGISTER_API: `${API_BASE_URL}/api/logistics/shipping-process/register`, // ShippingProcessing 등록 API
+    SHIPPING_PROCESS_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipping-process/list?startDate=${startDate}&endDate=${endDate}`, // 출고 처리 목록 조회 API
+    SHIPPING_PROCESS_PROCESS_API: (shippingProcessingId) => `${API_BASE_URL}/api/logistics/shipping-process/process/${shippingProcessingId}`, // ShippingProcessing 출고 처리 요청 API
 
 };
 // 생산관리
