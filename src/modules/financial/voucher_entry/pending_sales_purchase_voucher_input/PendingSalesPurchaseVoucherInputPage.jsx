@@ -246,6 +246,7 @@ const PendingSalesPurchaseVoucherInputPage = () => {
             notify('success', '조회 성공', '전표 목록 데이터 조회 성공.', 'bottomRight');
 
         } catch (err) {
+            console.log(err)
             notify('error', '조회 오류', '데이터를 불러오는 중 오류가 발생했습니다.', 'top');
         }
     }
