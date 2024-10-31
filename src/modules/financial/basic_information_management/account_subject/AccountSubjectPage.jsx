@@ -43,10 +43,10 @@ const AccountSubjectPage = ({ initialData }) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="계정과목 및 적요등록"
+                        title="계정과목관리"
                         description={(
                             <Typography>
-                                계정과목 및 적요 등록 페이지는 재무 관리 시스템에서{' '}
+                                계정과목관리 페이지는 재무 관리 시스템에서{' '}
                                 <span>계정과목과 적요</span>
                                 (거래의 내역이나 설명)를 <span>관리하고 등록</span>하는 중요한 기능을 제공하는 페이지임.
                                 <br/>

@@ -243,7 +243,7 @@ const ClientLedgerPage = () => {
                         title="거래처 원장"
                         description={(
                             <Typography>
-                                거래처 원장 페이지는 <span>거래처별로 발생한 거래 내역을 관리</span>하는 기능을 제공함.
+                                거래처 원장 페이지는 <span>거래처별로 발생한 거래 내역을 관리</span>하는 기능을 제공함.<br/>
                                 기업은 각 거래처와의 <span>거래 기록을 한눈에 확인</span>할 수 있으며, <span>매출, 매입, 미수금, 미지급금</span> 등 모든 거래 내역을 체계적으로 관리할 수 있음.<br/>
                                 이 페이지를 통해 <span>각 거래처와의 재무 상태</span>를 명확히 파악할 수 있음.
                             </Typography>
