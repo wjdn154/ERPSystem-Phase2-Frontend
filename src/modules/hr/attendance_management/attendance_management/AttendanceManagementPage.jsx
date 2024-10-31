@@ -38,10 +38,9 @@ const AttendanceManagementPage = ( {initialData} ) => {
             const response = await apiClient.post(EMPLOYEE_API.ATTENDANCE_DATA_API);
             const attendanceData = response.data.map(item => ({
                 ...item,
-                fullName: `${item.lastName || ''}${item.firstName || ''}`,  // 성과 이름을 결합하여 fullName 필드로 설정
             }));
             setAttendanceList(attendanceData);
-            console.log("근태 데이터:", response.data);
+            console.log("근태 데이터:", attendanceData);
         } catch(error){
             notification.error({
                 message: '근태 목록 조회 실패',
@@ -89,14 +88,18 @@ const AttendanceManagementPage = ( {initialData} ) => {
     };
 
 
-
+// 시간 형식 변환 함수
+    const formatTime = (datetime) => {
+        return datetime ? new Date(datetime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '';
+    };
 
     useEffect(() => {
         if(!fetchAttendanceData) return;
-        console.log('Fetched Employee Data:', fetchAttendanceData);
         form.setFieldsValue({
             ...fetchAttendanceData,
-            employeeName: `${fetchAttendanceData.lastName}${fetchAttendanceData.firstName}`
+                employeeName: fetchAttendanceData.employeeName || `${fetchAttendanceData.lastName || ''} ${fetchAttendanceData.firstName || ''}`,
+                checkInTime: formatTime(fetchAttendanceData.checkInTime),
+                checkOutTime: formatTime(fetchAttendanceData.checkOutTime),
         });
         setAttendanceParam(fetchAttendanceData);
 
@@ -166,11 +169,10 @@ const AttendanceManagementPage = ( {initialData} ) => {
                 const formattedValues = {
                     id: values.id,
                     employeeId:values.employeeId,
-                    employeeFirstName: attendanceParam.employeeFirstName,
-                    employeeLastName: attendanceParam.employeeLastName,
-                    employeeName:values.employeeName,
+                    employeeName:attendanceParam.employeeName,
                     employeeNumber: attendanceParam.employeeNumber,
                     attendancesCode: values.attendancesCode,
+                    positionId:values.positionId,
                     positionName: values.positionName,
                     date: attendanceParam.date,
                     checkInTime: attendanceParam.checkInTime,
@@ -193,7 +195,7 @@ const AttendanceManagementPage = ( {initialData} ) => {
 
                     if (type === 'update') {
                         setAttendanceList((prevList) =>
-                            prevList.map((attendacne) => attendances.id === updatedData.id ? updatedData : attendacne)
+                            prevList.map((attendance) => attendances.id === updatedData.id ? updatedData : attendance)
                         );
                     } else {
                         setAttendanceList((prevList) => [...prevList, updatedData]);
@@ -290,6 +292,10 @@ const AttendanceManagementPage = ( {initialData} ) => {
                                                 key: 'checkInTime',
                                                 align: 'center',
                                                 render: (text) => {
+                                                    // 출근 시간이 없으면 "X" 표시
+                                                    if (!text) {
+                                                        return <div className="small-text">X</div>;
+                                                    }
                                                     const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
                                                         hour: '2-digit',
                                                         minute: '2-digit',
@@ -303,6 +309,9 @@ const AttendanceManagementPage = ( {initialData} ) => {
                                                 key: 'checkOutTime',
                                                 align: 'center',
                                                 render: (text) => {
+                                                    if (!text) {
+                                                        return <div className="small-text">퇴근 시간이 없음</div>;
+                                                    }
                                                     const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
                                                         hour: '2-digit',
                                                         minute: '2-digit',
@@ -397,22 +406,22 @@ const AttendanceManagementPage = ( {initialData} ) => {
                                     <Row gutter={16}>
                                         <Col span={6}>
                                             <Form.Item name="attendanceCode" rules={[{ required: true, message: '근태코드를 입력하세요.' }]}>
-                                                <Input addonBefore="근태코드" />
+                                                <Input addonBefore="근태코드" disabled />
                                             </Form.Item>
                                         </Col>
                                         <Col span={6}>
                                             <Form.Item name="employeeNumber" rules={[{ required: true, message: '사원번호를 입력하세요.' }]}>
-                                                <Input addonBefore="사원번호" />
+                                                <Input addonBefore="사원번호" disabled/>
                                             </Form.Item>
                                         </Col>
                                         <Col span={6}>
                                             <Form.Item name="employeeName" rules={[{ required: true, message: '사원이름을 입력하세요.' }]}>
-                                                <Input addonBefore="사원이름" />
+                                                <Input addonBefore="사원이름" disabled/>
                                             </Form.Item>
                                         </Col>
                                         <Col span={6}>
                                             <Form.Item name="positionName" rules={[{ required: true, message: '직위를 입력하세요.' }]}>
-                                                <Input addonBefore="직위" />
+                                                <Input addonBefore="직위" disabled/>
                                             </Form.Item>
                                         </Col>
                                     </Row>

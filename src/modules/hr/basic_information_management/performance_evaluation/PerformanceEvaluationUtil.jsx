@@ -11,14 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '성과 평가 등록/수정',
-            children: (
-                <Typography>
-                    새로운 평가 데이터를 등록하거나 기존 평가 결과를 수정할 수 있는 탭임.
-                </Typography>
-            ),
-        },
     ];
 }

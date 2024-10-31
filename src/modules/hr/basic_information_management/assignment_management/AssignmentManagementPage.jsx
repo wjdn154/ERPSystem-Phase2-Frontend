@@ -309,8 +309,8 @@ const AssignmentManagementPage = ({ initialData }) => {
                             title="발령 관리"
                             description={(
                                 <Typography>
-                                    발령 관리 페이지는 <span>사원의 부서 이동이나 직책 변경과 같은 발령 사항을 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>발령 내역을 기록하고 이력을 관리</span>할
-                                    수 있으며, 사원의 <span>현재 직책 및 근무 위치</span>를 쉽게 파악할 수 있음. 이를 통해 <span>조직 내 인사 이동 사항을 효율적으로 관리</span>하고
+                                    발령 관리 페이지는 <span>사원의 부서 이동과 같은 발령 사항을 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>발령 내역을 기록하고 이력을 관리</span>할
+                                    수 있으며, 사원의 <span>현재 근무 위치</span>를 쉽게 파악할 수 있음. 이를 통해 <span>조직 내 인사 이동 사항을 효율적으로 관리</span>하고
                                     기록할 수 있음.
                                 </Typography>
                             )}

@@ -67,16 +67,19 @@ const UserManagementPage = ({initialData}) => {
     const columns = [
         {
             title: <div className="title-text">사용자 아이디</div>,
-            dataIndex: 'usersId',
-            key: 'usersId',
+            dataIndex: 'userName',
+            key: 'userName',
             align: 'center',
+            width: '25%',
             render: (text) => <div className="small-text">{text}</div>,
         },
         {
             title: <div className="title-text">사용자 이름</div>,
-            dataIndex: 'userName',
-            key: 'userName',
+            dataIndex: 'userNickname',
+            key: 'userNickname',
             align: 'center',
+            width: '20%',
+
             render: (text) => <div className="small-text">{text}</div>,
         },
         {
@@ -84,6 +87,7 @@ const UserManagementPage = ({initialData}) => {
             dataIndex: 'employeeNumber',
             key: 'employeeNumber',
             align: 'center',
+            width: '20%',
             render: (text) => <div className="small-text">{text}</div>,
         },
         {
@@ -91,40 +95,37 @@ const UserManagementPage = ({initialData}) => {
             dataIndex: 'employeeName',
             key: 'employeeName',
             align: 'center',
-            render: (text, record) => (
-                <div className="small-text">
-                    {record.lastName}{record.firstName}
-                </div>
-            ),
+            width: '35%',
+            render: (text) => <div className="small-text">{text}</div>,
         },
-        {
-            title: <div className="title-text">비밀번호</div>,
-            dataIndex: 'password',
-            key: 'password',
-            align: 'center',
-            render: (text, record) => (
-                <div className="small-text">
-                    {record.passwordVisible ? text : '●●●●●●'}
-                    <span
-                        onClick={() => togglePasswordVisibility(record)}
-                        style={{ marginLeft: 8, cursor: 'pointer' }}
-                    >
-                        {record.passwordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-                    </span>
-                </div>
-            ),
-        },
+        // {
+        //     title: <div className="title-text">비밀번호</div>,
+        //     dataIndex: 'password',
+        //     key: 'password',
+        //     align: 'center',
+        //     render: (text, record) => (
+        //         <div className="small-text">
+        //             {record.passwordVisible ? text : '●●●●●●'}
+        //             <span
+        //                 onClick={() => togglePasswordVisibility(record)}
+        //                 style={{ marginLeft: 8, cursor: 'pointer' }}
+        //             >
+        //                 {record.passwordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+        //             </span>
+        //         </div>
+        //     ),
+        // },
     ];
 
     return (
         <Box sx={{ margin: '20px' }}>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={12}>
+                <Grid item xs={12} >
                     <WelcomeSection
                         title="사용자 관리"
                         description={(
                             <Typography>
-                                사용자 관리 페이지는 <span>시스템에 접근할 수 있는 사용자 계정</span>을 관리하는 기능을 제공함. 이 페이지에서는 <span>사용자의 계정 생성, 수정, 삭제</span>가 가능하며, 각 사용자의 <span>권한 및 역할</span>을 설정할 수 있음. 이를 통해 <span>기업 내 시스템 보안</span>을 강화하고, 사용자별로 적합한 <span>업무 권한을 부여</span>할 수 있음.
+                                사용자 관리 페이지는 <span>시스템에 접근할 수 있는 사용자 계정</span>을 관리하는 기능을 제공함. 이 페이지에서는 <span>사용자 목록 조회가 가능함.</span>
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -136,11 +137,10 @@ const UserManagementPage = ({initialData}) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
+                    <Grid item xs={12} sx={{ minWidth: '800px', maxWidth: '1200px', margin: 'auto' }}>
                         <Grow in={true} timeout={200}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>사용자 목록</Typography>
-                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                            <Paper elevation={3} sx={{ padding: '20px' }}>
+                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>사용자 목록</Typography>
                                     <Table
                                         dataSource={userList}
                                         columns={columns}
@@ -179,23 +179,66 @@ const UserManagementPage = ({initialData}) => {
                                             },
                                         })}
                                     />
-                                </Grid>
                             </Paper>
                         </Grow>
                     </Grid>
                 </Grid>
             )}
 
-            {activeTabKey === '2' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
-                        <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
+            {editUser && (
+                <Grid item xs={12} md={12}
+                      sx={{minWidth: '1000px !important', maxWidth: '1500px !important'}}>
+                    <Grow in={true} timeout={200}>
+                        <Paper elevation={3} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{padding: '20px'}}>사용자정보 수정</Typography>
+                                <Grid sx={{padding: '0px 20px 0px 20px'}}>
+                                    <Form
+                                        initialValues={fetchUserData}
+                                        form={form}
+                                        onFinish={(values) => {
+                                            handleFormSubmit(values, 'update')
+                                        }}
+                                    >
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name="userName"
+                                                           rules={[{required: true, message: '사용자 아이디를 입력하세요.'}]}>
+                                                    <Input addonBefore="사용자 아이디"/>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="userNickname"
+                                                           rules={[{required: true, message: '사용자 이름을 입력하세요.'}]}>
+                                                    <Input addonBefore="사용자 이름"/>
+                                                </Form.Item>
+                                            </Col>
+                                            {/*<Col span={6}>*/}
+                                            {/*    <Form.Item name="password"*/}
+                                            {/*               rules={[{required: true, message: '비밀번호를 입력하세요.'}]}>*/}
+                                            {/*        <Input addonBefore="비밀번호"/>*/}
+
+                                            {/*    </Form.Item>*/}
+                                            {/*</Col>*/}
+                                        </Row>
+                                        <Row gutter={16}>
+                                            <Col span={6}>
+                                                <Form.Item name="employeeNumber"
+                                                           rules={[{required: true, message: '사원번호를 입력하세요.'}]}>
+                                                    <Input addonBefore="사원번호" disabled/>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Form.Item name="employeeName"
+                                                           rules={[{required: true, message: '사원이름을 입력하세요.'}]}>
+                                                    <Input addonBefore="사원이름" disabled/>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                </Grid>
+                            </Paper>
                         </Grow>
                     </Grid>
-                </Grid>
             )}
 
         </Box>
