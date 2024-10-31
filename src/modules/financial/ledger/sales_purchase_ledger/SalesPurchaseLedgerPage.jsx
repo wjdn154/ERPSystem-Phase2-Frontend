@@ -34,7 +34,8 @@ const SalesPurchaseLedgerPage = () => {
                         title="매입매출장"
                         description={(
                             <Typography>
-                                매입매출장 페이지는 기업의 <span>매입 및 매출 내역을 종합적으로 관리</span>하는 페이지임. 이 페이지를 통해 기업의 <span>총 매출, 매입 내역</span>을 파악하고, 각 거래의 세부 내용을 확인할 수 있음. 이를 통해 <span>재고 관리 및 구매, 판매 내역</span>을 체계적으로 관리 가능함.<br/>
+                                매입매출장 페이지는 기업의 <span>매입 및 매출 내역을 종합적으로 관리</span>하는 페이지임. <br/>
+                                이 페이지를 통해 기업의 <span>총 매출, 매입 내역</span>을 파악하고, 각 거래의 세부 내용을 확인할 수 있음. 이를 통해 <span>재고 관리 및 구매, 판매 내역</span>을 체계적으로 관리 가능함.<br/>
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -98,8 +99,8 @@ const SalesPurchaseLedgerPage = () => {
                                                                 try {
                                                                     const response = await apiClient.post(FINANCIAL_API.PURCHASE_SALES_LEDGER_API, searchParams);
                                                                     const data = response.data;
-                                                                    console.log(data);
                                                                     setSearchData(data);
+                                                                    notify('success', '조회 성공', '매입매출장 조회가 성공적으로 완료되었습니다.', 'bottomRight');
                                                                 } catch (error) {
                                                                     notify('error', '조회 오류', '매입매출장 조회 중 오류가 발생했습니다.', 'top');
                                                                 }
@@ -517,18 +518,6 @@ const SalesPurchaseLedgerPage = () => {
 
                                 </Grid>
                             </Paper>
-                        </Grow>
-                    </Grid>
-                </Grid>
-            )}
-
-            {activeTabKey === '2' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
-                        <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
                         </Grow>
                     </Grid>
                 </Grid>

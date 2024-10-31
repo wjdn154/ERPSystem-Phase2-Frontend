@@ -60,10 +60,11 @@ const CashBookPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="현금 출납장"
+                        title="현금출납장"
                         description={(
                             <Typography>
-                                현금 출납장은 기업의 <span>현금 흐름을 관리</span>하는 페이지임. 현금의 <span>입출금 내역</span>을 기록하고, <span>일별, 월별 현금 흐름</span>을 조회할 수 있어 재무 상태를 명확하게 파악할 수 있음. 이를 통해 <span>현금 관리의 효율성을 극대화</span>할 수 있음.
+                                현금 출납장은 기업의 <span>현금 흐름을 관리</span>하는 페이지임.<br/>
+                                현금의 <span>입출금 내역</span>을 기록하고, <span>일별, 월별 현금 흐름</span>을 조회할 수 있어 재무 상태를 명확하게 파악할 수 있음. 이를 통해 <span>현금 관리의 효율성을 극대화</span>할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -78,7 +79,7 @@ const CashBookPage = () => {
                     <Grid item xs={12} md={8} sx={{ minWidth: '800px'}}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }} >현금출납장 조회</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >입출금내역 조회</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>

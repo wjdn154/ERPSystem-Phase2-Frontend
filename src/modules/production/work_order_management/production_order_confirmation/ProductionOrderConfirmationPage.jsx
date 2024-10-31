@@ -82,7 +82,7 @@ const ProductionOrderConfirmationPage = ({ initialData }) => {
                         title="작업 지시 확정"
                         description={(
                             <Typography>
-                                작업 지시 확정 페이지는 <span>생산 과정에서 각 작업의 지시를 확정하고 관리</span>하는 곳임. 이 페이지에서는 <span>작업 지시를 추가, 수정, 삭제</span>할 수 있으며, 각 작업의 <span>작업 내용, 작업 인원, 작업 시간</span> 등의 정보를 설정할 수 있음. 이를 통해 <span>생산 작업의 효율성</span>을 높이고, 현장의 <span>생산 스케줄을 체계적으로 관리</span>할 수 있음.
+                                작업 지시 확정 페이지는 <span>생산 과정에서 각 작업의 지시를 확정하고 관리</span>하는 곳임. 이 페이지에서는 <span>계획 상태인 작업 지시를 확정</span>할 수 있으며, 각 작업의 <span>작업 내용, 작업 인원, 작업 시간</span> 등의 정보를 조회할 수 있음. <br/>이를 통해 <span>생산 작업의 효율성</span>을 높이고, 현장의 <span>생산 스케줄을 체계적으로 관리</span>할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}

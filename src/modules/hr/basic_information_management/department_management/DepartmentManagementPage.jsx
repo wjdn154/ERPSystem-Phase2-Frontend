@@ -205,9 +205,9 @@ const DepartmentManagementPage = ({ initialData }) => {
                         title="부서 관리"
                         description={(
                             <Typography>
-                                부서 관리 페이지는 <span>기업 내 모든 부서를 체계적으로 관리</span>하는 기능을 제공함.
-                                이 페이지에서는 <span>부서의 이름, 역할, 소속 직원</span> 등을 등록하고 수정할 수 있으며,
-                                <span>부서별 인원과 조직도를 파악</span>할 수 있음. 부서 간 <span>인력 배치와 변경 사항</span>을
+                                부서 관리 페이지는 <span>기업 내 모든 부서를 체계적으로 관리</span>하는 기능을 제공함.<br/>
+                                이 페이지에서는 <span>부서의 이름, 부서 위치</span> 등을 등록하고 수정할 수 있으며,
+                                <span>부서별 인원을 파악</span>할 수 있음. 부서 간 <span>인력 배치와 변경 사항</span>을
                                 효율적으로 관리하여 기업의 인사 구조를 강화함.
                             </Typography>
                         )}
@@ -255,13 +255,33 @@ const DepartmentManagementPage = ({ initialData }) => {
                                         rowSelection={{
                                             type: 'radio',
                                             selectedRowKeys,
-                                            onChange: (newSelectedRowKeys) => {
+                                            onChange: async (newSelectedRowKeys) => {
                                                 setSelectedRowKeys(newSelectedRowKeys);
+                                                const id = newSelectedRowKeys[0];
+                                                try {
+                                                    const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_DETAIL_API(id));
+                                                    setFetchDepartmentData(response.data);
+                                                    setEditDepartment(true);
+                                                    notify('success', '부서 조회', '부서 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
                                             }
                                         }}
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
-                                            onClick: () => handleRowClick(record),
+                                            onClick: async () => {
+                                                setSelectedRowKeys([record.id]);
+                                                const id = record.id;
+                                                try {
+                                                    const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_DETAIL_API(id));
+                                                    setFetchDepartmentData(response.data);
+                                                    setEditDepartment(true);
+                                                    notify('success', '부서 조회', '부서 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                            },
                                         })}
                                     />
                                 </Grid>

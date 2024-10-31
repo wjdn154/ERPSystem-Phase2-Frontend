@@ -33,6 +33,16 @@ const ShippingOrderPage = ({initialData}) => {
     const [editShippingOrder, setEditShippingOrder] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [clientSearch, setClientSearch] = useState(
+        {
+            clientId: null,
+            clientName: null
+        }
+    );
+
+    useEffect(() => {
+        setSearchData(shippingOrderList);
+    }, [shippingOrderList]);
 
     useEffect(() => {
 
@@ -40,17 +50,23 @@ const ShippingOrderPage = ({initialData}) => {
 
         form.setFieldsValue(detailShippingOrder);
         form.setFieldsValue({
-            shippingOrderOrderDetails: shippingOrderDetails,
+            shippingOrderDetails: shippingOrderDetails,
         })
-        setShippingOrderParam(detailShippingOrder);
+
+        setShippingOrderParam((prevParam) => ({
+            ...prevParam,
+            ...detailShippingOrder,
+        }));
+
 
         setDisplayValues({
             managerName: detailShippingOrder.managerCode ? `[${detailShippingOrder.managerCode}] ${detailShippingOrder.managerName}` : null,
             warehouseName:  detailShippingOrder.warehouseCode ? `[${detailShippingOrder.warehouseCode}] ${detailShippingOrder.warehouseName}` : null,
             client: detailShippingOrder.clientCode ?`[${detailShippingOrder.clientCode}] ${detailShippingOrder.clientName}` : null,
-            clientSearch: detailShippingOrder.clientCode ?`[${detailShippingOrder.clientCode}] ${detailShippingOrder.clientName}` : null,
+            clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
 
-        }, [detailShippingOrder, form, shippingOrderDetails]);
+
+        });
 
     }, [detailShippingOrder], form);
 
@@ -64,16 +80,25 @@ const ShippingOrderPage = ({initialData}) => {
     const [searchData, setSearchData] = useState(null);
 
     const handleTabChange = (key) => {
+        setActiveTabKey(key);
         setEditShippingOrder(false);
         setEditingRow(null);
-        setShippingOrderDetails(null)
-        setDetailShippingOrder([]);
+        setShippingOrderParam({
+            shippingOrderDetails: [],
+            date: dayjs().format('YYYY-MM-DD'),
+            shippingDate: dayjs().format('YYYY-MM-DD'),
+        });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        });
+        setDetailShippingOrder(shippingOrderParam.shippingOrderDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
-
-        setActiveTabKey(key);
     };
 
     // 날짜 선택 처리
@@ -87,17 +112,6 @@ const ShippingOrderPage = ({initialData}) => {
         }
     };
 
-    // 콤마 적용
-    const formatNumberWithComma = (value) => {
-        // value가 숫자인 경우 문자열로 변환
-        const stringValue = String(value);
-        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
-    };
-
-    // 콤마 제거 함수
-    const removeComma = (value) => {
-        return value ? value.toString().replace(/,/g, '') : value;
-    };
 
     const handleStatusChange = (value) => {
         setStatus(value);
@@ -172,6 +186,7 @@ const ShippingOrderPage = ({initialData}) => {
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 client: null,
+                clientSearch: null
             }));
         }
         setCurrentField(null);
@@ -230,6 +245,7 @@ const ShippingOrderPage = ({initialData}) => {
                 setSearchParams((prevParams) => ({
                     ...prevParams,
                     clientId: record.id,
+
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
@@ -245,10 +261,11 @@ const ShippingOrderPage = ({initialData}) => {
                 console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('standard', record.standard, editingRow);
-
+                updateField('remarks', record.remarks, editingRow)
 
                 setShippingOrderParam((prevParams) => ({
                     ...prevParams,
@@ -276,19 +293,19 @@ const ShippingOrderPage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
+    // 입력 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
         setShippingOrderParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
     };
 
     // 납기 일자 변경 핸들러
-    const handleDeliveryDateChange = (date) => {
+    const handleShippingDateChange = (date) => {
         setShippingOrderParam((prevState) => ({
             ...prevState,
-            deliveryDate: dayjs(date),
+            shippingDate: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
     };
 
@@ -361,7 +378,7 @@ const ShippingOrderPage = ({initialData}) => {
 
         setShippingOrderParam((prevParams) => ({
             ...prevParams,
-            shippingOrderOrderDetails: updatedDetails,
+            shippingOrderDetails: updatedDetails,
         }));
     };
 
@@ -414,6 +431,89 @@ const ShippingOrderPage = ({initialData}) => {
         });
     };
 
+    // 폼 제출 핸들러
+    const handleFormSubmit = async (values, type) => {
+        console.log('Form values:', values); // 폼 값 확인
+        console.log('detailShippingOrder', detailShippingOrder)
+        console.log('shippingOrderParam: ', shippingOrderParam)
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                try {
+                    const orderData = {
+                        clientId: shippingOrderParam.client ? shippingOrderParam.client.id : shippingOrderParam.clientId,
+                        managerId: shippingOrderParam.manager ? shippingOrderParam.manager.id : shippingOrderParam.managerId,
+                        warehouseId: shippingOrderParam.warehouse ? shippingOrderParam.warehouse.id : shippingOrderParam.warehouseId,
+                        date: shippingOrderParam.date,
+                        shippingDate: shippingOrderParam.shippingDate,
+                        items: Array.isArray(shippingOrderParam.shippingOrderDetails
+                        ) ? shippingOrderParam.shippingOrderDetails.map(item => ({
+                            productId: item.productId,
+                            quantity: item.quantity,
+                            remarks: item.remarks,
+                        })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
+                        remarks: values.remarks
+                    };
+
+                    console.log('Sending data to API:', orderData); // API로 전송할 데이터 확인
+
+                    const API_PATH = type === 'update' ? LOGISTICS_API.SHIPPING_ORDER_UPDATE_API(shippingOrderParam.id) : LOGISTICS_API.SHIPPING_ORDER_CREATE_API;
+                    const method = type === 'update' ? 'put' : 'post';
+
+                    const response = await apiClient[method](API_PATH, orderData, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const updatedData = response.data;
+
+                    if (type === 'update') {
+                        setShippingOrderList((prevList) =>
+                            prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
+                        );
+                    } else {
+                        setShippingOrderList((prevList) => [...prevList, updatedData]);
+                        registrationForm.resetFields();
+                    }
+
+                    handleSearch()
+
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
+
+                    setEditShippingOrder(false);
+                    setShippingOrderParam({
+                        shippingOrderDetails: [],
+                    });
+                    setDetailShippingOrder(shippingOrderParam.ordersDetails || []);
+                    setDisplayValues({});
+
+                    type === 'update'
+                        ? notify('success', '발주서 수정', '발주서 정보 수정 성공.', 'bottomRight')
+                        : notify('success', '발주서 저장', '발주서 정보 저장 성공.', 'bottomRight');
+                } catch (error) {
+                    console.error('Error saving data:', error); // 오류 로그 출력
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '저장 취소',
+                    description: '저장이 취소되었습니다.',
+                    placement: 'bottomLeft',
+                });
+            },
+        });
+    };
+
     const columns = [
         {
             title: <div className="title-text">상태</div>,
@@ -453,11 +553,11 @@ const ShippingOrderPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '15%',
         },
         {
@@ -489,7 +589,7 @@ const ShippingOrderPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">출하 예정 일자</div>,
+            title: <div className="title-text">출하예정일자</div>,
             dataIndex: 'shippingDate',
             key: 'shippingDate',
             align: 'center',
@@ -595,7 +695,7 @@ const ShippingOrderPage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? shippingOrderList : searchData} // 발주서 리스트 데이터
+                                        dataSource={searchData} // 발주서 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -645,27 +745,27 @@ const ShippingOrderPage = ({initialData}) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출하지시서 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(shippingOrderParam.date)}
-                                                            onChange={handleDeliveryDateChange}
+                                                            onChange={handleRegiDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
 
                                                 <Col>
-                                                    <Typography>납기 일자</Typography>
+                                                    <Typography>출하예정일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
-                                                            value={dayjs(shippingOrderParam.deliveryDate)}
-                                                            onChange={handleRegiDateChange}
+                                                            value={dayjs(shippingOrderParam.shippingDate)}
+                                                            onChange={handleShippingDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -710,8 +810,12 @@ const ShippingOrderPage = ({initialData}) => {
                                             <Row gutter={16}>
 
                                                 <Col span={12}>
-                                                    <Form.Item name="remarks">
-                                                        <Input addonBefore="비고" />
+                                                    <Form.Item >
+                                                        <Input
+                                                            addonBefore="비고"
+                                                            vaalue={shippingOrderParam.remarks}
+
+                                                        />
                                                     </Form.Item>
                                                 </Col>
 
@@ -879,7 +983,7 @@ const ShippingOrderPage = ({initialData}) => {
                             </>
                         )}
 
-                        {/* 거래처 선택 모달 */}
+                        {/* 거래처 검색 선택 모달 */}
                         {currentField === 'clientSearch' && (
                             <>
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
@@ -1137,21 +1241,21 @@ const ShippingOrderPage = ({initialData}) => {
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
                                     initialValues={detailShippingOrder}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
                                     {/* 출하지시서 정보 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출하지시서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(shippingOrderParam.date)}
-                                                    onChange={handleDeliveryDateChange}
+                                                    onChange={handleRegiDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>
@@ -1160,11 +1264,11 @@ const ShippingOrderPage = ({initialData}) => {
                                             <Typography>납기 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={dayjs(shippingOrderParam.deliveryDate)}
-                                                    onChange={handleRegiDateChange}
+                                                    value={dayjs(shippingOrderParam.shippingDate)}
+                                                    onChange={handleShippingDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>

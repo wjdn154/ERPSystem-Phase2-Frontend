@@ -1,22 +1,21 @@
 import React, {useMemo, useEffect, useState} from 'react';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './OutgoingScheduleUtil.jsx';
+import { tabItems } from './SalePlanUtil.jsx';
 import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, InputNumber, notification, Upload, Divider, Tooltip} from 'antd';
 import dayjs from 'dayjs';
 import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-
 const { confirm } = Modal;
 
 const { RangePicker } = DatePicker;
 
-const OutgoingSchedulePage = ({initialData}) => {
+const SalePlanPage = ({initialData}) => {
     const [activeTabKey, setActiveTabKey] = useState('1');
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
-    const [shippingOrderList, setShippingOrderList] = useState(initialData)
+    const [salePlanList, setSalePlanList] = useState(initialData)
     const [displayValues, setDisplayValues] = useState({});
     const [status, setStatus] = useState({});
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -26,34 +25,52 @@ const OutgoingSchedulePage = ({initialData}) => {
     const [initialModalData, setInitialModalData] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [shippingOrderParam, setShippingOrderParam] = useState({
-        shippingOrderDetails: [], });
-    const [detailShippingOrder, setDetailShippingOrder] = useState(false);
+    const [detailSalePlan, setDetailSalePlan] = useState(false);
+    const [salePlanDetails, setSalePlanDetails] = useState(detailSalePlan?.salePlanDetails || []);
+    const [salePlanParam, setSalePlanParam] = useState({
+        salePlanDetails: [],
+    });
     const [form] = Form.useForm();
-    const [shippingOrderDetails, setShippingOrderDetails] = useState(detailShippingOrder.shippingOrderDetails || []);
-    const [editShippingOrder, setEditShippingOrder] = useState(false);
+    const [editSalePlan, setEditSalePlan] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [clientSearch, setClientSearch] = useState(
+        {
+            clientId: null,
+            clientName: null
+        }
+    );
+
+    useEffect(() => {
+        setSearchData(salePlanList);
+    }, [salePlanList]);
 
     useEffect(() => {
 
-        if(!detailShippingOrder) return;
+        if(!detailSalePlan) return;
 
-        form.setFieldsValue(detailShippingOrder);
+
+        form.setFieldsValue(detailSalePlan);
         form.setFieldsValue({
-            shippingOrderOrderDetails: shippingOrderDetails,
+            salePlanDetails: salePlanDetails,
         })
-        setShippingOrderParam(detailShippingOrder);
+
+        setSalePlanParam((prevParam) => ({
+            ...prevParam,
+            ...detailSalePlan,
+        }));
+
+        console.log('SalePlanParam', salePlanParam)
 
         setDisplayValues({
-            managerName: detailShippingOrder.managerCode ? `[${detailShippingOrder.managerCode}] ${detailShippingOrder.managerName}` : null,
-            warehouseName:  detailShippingOrder.warehouseCode ? `[${detailShippingOrder.warehouseCode}] ${detailShippingOrder.warehouseName}` : null,
-            client: detailShippingOrder.clientCode ?`[${detailShippingOrder.clientCode}] ${detailShippingOrder.clientName}` : null,
-            clientSearch: detailShippingOrder.clientCode ?`[${detailShippingOrder.clientCode}] ${detailShippingOrder.clientName}` : null,
+            managerName: detailSalePlan.managerCode ? `[${detailSalePlan.managerCode}] ${detailSalePlan.managerName}` : null,
+            warehouseName:  detailSalePlan.warehouseCode ? `[${detailSalePlan.warehouseCode}] ${detailSalePlan.warehouseName}` : null,
+            client: detailSalePlan.clientId ?`[${detailSalePlan.clientId}] ${detailSalePlan.clientName}` : null,
+            clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
 
-        }, [detailShippingOrder, form, shippingOrderDetails]);
+        });
 
-    }, [detailShippingOrder], form);
+    }, [detailSalePlan], form);
 
     const [searchParams, setSearchParams] = useState({
         startDate: null,
@@ -64,17 +81,29 @@ const OutgoingSchedulePage = ({initialData}) => {
 
     const [searchData, setSearchData] = useState(null);
 
+
     const handleTabChange = (key) => {
-        setEditShippingOrder(false);
+
+        setActiveTabKey(key);
+        setEditSalePlan(false);
         setEditingRow(null);
-        setShippingOrderDetails(null)
-        setDetailShippingOrder([]);
+        setSalePlanParam({
+            salePlanDetails: [],
+            date: dayjs().format('YYYY-MM-DD'),
+            expectedSalesDate: dayjs().format('YYYY-MM-DD'),
+        });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        })
+        setDetailSalePlan(salePlanParam.salePlanDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
 
-        setActiveTabKey(key);
     };
 
     // 날짜 선택 처리
@@ -92,7 +121,7 @@ const OutgoingSchedulePage = ({initialData}) => {
     const formatNumberWithComma = (value) => {
         // value가 숫자인 경우 문자열로 변환
         const stringValue = String(value);
-        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+        return stringValue.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
     };
 
     // 콤마 제거 함수
@@ -109,17 +138,20 @@ const OutgoingSchedulePage = ({initialData}) => {
     };
 
     const handleSearch = async () => {
-        const { startDate, endDate, clientCode, state } = searchParams;
+        const { startDate, endDate, clientId, state } = searchParams;
 
         try {
-            const response = await apiClient.post(LOGISTICS_API.SHIPPING_ORDER_LIST_API, searchParams);
+            const response = await apiClient.post(LOGISTICS_API.SALE_PLAN_LIST_API, searchParams);
             const data = response.data;
             setSearchData(data);
+            console.log(data)
 
-            notify('success', '조회 성공', '출고지시서서 조회 성공.', 'bottomRight');
+            notify('success', '조회 성공', '판매계획 조회 성공.', 'bottomRight');
+            return response.data;
         } catch (error) {
-            notify('error', '조회 오류', '출고지시서서 조회 중 오류가 발생했습니다.', 'top');
+            notify('error', '조회 오류', '판매계획 조회 중 오류가 발생했습니다.', 'top');
         }
+
     };
 
     // 입력 필드 클릭 시 모달 열기
@@ -141,13 +173,13 @@ const OutgoingSchedulePage = ({initialData}) => {
         if(fieldName === 'managerName') apiPath = EMPLOYEE_API.EMPLOYEE_DATA_API;
         if(fieldName === 'warehouseName') apiPath = LOGISTICS_API.WAREHOUSE_LIST_API;
         if(fieldName === 'product') apiPath = LOGISTICS_API.PRODUCT_LIST_API;
-        if(fieldName === 'vatType') apiPath = FINANCIAL_API.VAT_TYPE_SEARCH_API;
 
         try {
             const response = await apiClient.post(apiPath);
 
             // 데이터가 문자열이고 JSON 배열 형식일 경우 파싱, 아니면 그대로 배열로 처리
             let data = response.data;
+            console.log(data);
             if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
                 data = JSON.parse(data);
             }
@@ -171,6 +203,7 @@ const OutgoingSchedulePage = ({initialData}) => {
             setDisplayValues((prevValues) => ({
                 ...prevValues,
                 client: null,
+                clientSearch: null
             }));
         }
         setCurrentField(null);
@@ -181,7 +214,7 @@ const OutgoingSchedulePage = ({initialData}) => {
 
         switch (currentField) {
             case 'managerName':
-                setShippingOrderParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     manager: {
                         id: record.id,
@@ -196,7 +229,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                 break;
 
             case 'warehouseName':
-                setShippingOrderParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     warehouse: {
                         id: record.id,
@@ -211,7 +244,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                 break;
 
             case 'client':
-                setShippingOrderParam((prevParams) => ({
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
                     client: {
                         id: record.id,
@@ -229,6 +262,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                 setSearchParams((prevParams) => ({
                     ...prevParams,
                     clientId: record.id,
+
                 }));
                 setDisplayValues((prevValues) => ({
                     ...prevValues,
@@ -236,36 +270,29 @@ const OutgoingSchedulePage = ({initialData}) => {
                 }));
                 break;
 
-
             case 'product':
                 // 제품 선택 시 해당 제품을 상태에 반영
-                const updatedDetails = [...shippingOrderParam.shippingOrderDetails];
+                const updatedDetails = [...salePlanParam.salePlanDetails];
+
+                console.log(editingRow)
 
                 // 해당 품목 코드와 이름을 업데이트
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
-                updateField('standard', record.standard, editingRow);
+                updateField('price', record.salesPrice, editingRow);
+
+                const { quantity } = updatedDetails[editingRow].quantity;
+                const expectedSales = calculateExpectedSales(quantity, (record.salesPrice));
 
 
-                setShippingOrderParam((prevParams) => ({
+
+                setSalePlanParam((prevParams) => ({
                     ...prevParams,
-                    shippingOrderDetails: updatedDetails,
+                    salePlanDetails: updatedDetails,
                 }));
+                console.log('salePlanParam:', salePlanParam)
                 setEditingRow(null);
-                break;
-
-            case 'vatType':
-                setShippingOrderParam((prevParams) => ({
-                    ...prevParams,
-                    vatType: {
-                        code: record.code,
-                        name: record.name,
-                    },
-                }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    vatType: `[${record.code}] ${record.name}`,
-                }));
                 break;
         }
 
@@ -273,25 +300,25 @@ const OutgoingSchedulePage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
-        setShippingOrderParam((prevState) => ({
+        setSalePlanParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
+        console.log(salePlanParam.date)
     };
 
-    // 납기 일자 변경 핸들러
-    const handleDeliveryDateChange = (date) => {
-        setShippingOrderParam((prevState) => ({
+    const handleExpectedDateChange = (date) => {
+        setSalePlanParam((prevState) => ({
             ...prevState,
-            deliveryDate: dayjs(date),
+            expectedSalesDate: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
+        console.log(salePlanParam.date)
     };
 
     // 필드 값 변경 시 호출되는 함수
     const handleFieldChange = (value, index, field) => {
-        const updatedDetails = [...shippingOrderParam.shippingOrderDetails];
+        const updatedDetails = [...salePlanParam.salePlanDetails];
 
         setEditingRow(index);
 
@@ -299,67 +326,54 @@ const OutgoingSchedulePage = ({initialData}) => {
 
         if (field === 'quantity') {
             const quantity = value;
-
-            const price = updatedDetails[index].price;
-
-            updatedDetails[index].supplyPrice = quantity * price; // 공급가액 = 수량 * 단가
-
-            updateSupplyAndVat(quantity, price, index);
-
+            const price = removeComma(updatedDetails[index].price);
+            updatedDetails[index].expectedSales = quantity * price; // 공급가액 = 수량 * 단가
+        }
+        if (field === 'price') {
+            const quantity = updatedDetails[index].quantity;
+            const price = removeComma(value);
+            updatedDetails[index].expectedSales = quantity * price; // 공급가액 = 수량 * 단가
         }
 
 
-        setShippingOrderDetails(updatedDetails); // 상태 업데이트
-        setShippingOrderParam( {
-            ...shippingOrderParam,
-            shippingOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+        setSalePlanDetails(updatedDetails); // 상태 업데이트
+        setSalePlanParam( {
+            ...salePlanParam,
+            salePlanDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
         });
         setEditingRow(null);
     };
 
-    const calculateSupplyPrice = (quantity, price) => {
+    const calculateExpectedSales = (quantity, price) => {
         return quantity * price;
     };
 
-    const calculateVat = (supplyPrice) => {
-        return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
-    };
-
-    // 수량 또는 단가 변경 시 공급가액과 부가세를 자동 계산하는 함수
-    const updateSupplyAndVat = (quantity, price, recordKey) => {
-
-        const supplyPrice = calculateSupplyPrice(quantity, price);
-
-        const vat = calculateVat(supplyPrice);
-
-        updateField('supplyPrice', supplyPrice, recordKey);
-        updateField('vat', vat, recordKey);
-    };
-
     const updateField = (fieldName, value) => {
-        const updatedDetails = [...shippingOrderParam.shippingOrderDetails];
+        const updatedDetails = [...salePlanParam.salePlanDetails];
 
+        console.log('editingRow: ', editingRow)
 
         updatedDetails[editingRow][fieldName] = value;
+
+        console.log('updatedDetails: ', updatedDetails)
 
         // 수량이나 단가가 변경되면 공급가액을 재계산
         if (fieldName === 'quantity' || fieldName === 'price') {
             const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
+            const expectedSales = calculateExpectedSales(quantity, price);
 
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
+            updatedDetails[editingRow].expectedSales = expectedSales;
         }
 
-        setShippingOrderParam((prevParams) => ({
+        setSalePlanParam((prevParams) => ({
             ...prevParams,
-            shippingOrderOrderDetails: updatedDetails,
+            salePlanDetails: updatedDetails,
         }));
     };
 
     const handleRowSelectionChange = (selectedRowKeys) => {
         setSelectedDetailRowKeys(selectedRowKeys);  // 선택된 행의 키 상태 업데이트
+        console.log('선택된 행 키:', selectedRowKeys);  // 선택된 키 출력
 
     };
 
@@ -367,19 +381,22 @@ const OutgoingSchedulePage = ({initialData}) => {
         const newRow = {
             productCode: '',
             productName: '',
-            standard: '',
             quantity: 0,
+            price: 0,
+            supplyPrice: 0,
+            vat: 0,
             remarks: '',
         };
 
         // 기존 항목에 새로운 항목 추가
-        setShippingOrderParam((prev) => ({
+        setSalePlanParam((prev) => ({
             ...prev,
-            shippingOrderDetails: [...prev.shippingOrderDetails, newRow],
+            salePlanDetails: [...prev.salePlanDetails, newRow],
         }));
     };
 
     const handleDeleteRow = (index) => {
+        console.log(index)
         confirm({
             title: '삭제 확인',
             content: '정말로 삭제하시겠습니까?',
@@ -388,13 +405,13 @@ const OutgoingSchedulePage = ({initialData}) => {
             onOk: async () => {
                 try {
                     // 삭제 API 호출해서 해야함 (수정)
-                    const updatedDetails = [...shippingOrderParam.shippingOrderDetails]; // 배열을 복사
+                    const updatedDetails = [...salePlanParam.salePlanDetails]; // 배열을 복사
                     updatedDetails.splice(index, 1); // 인덱스에 해당하는 항목 삭제
 
-                    setShippingOrderDetails(updatedDetails); // 상태 업데이트
-                    setShippingOrderParam((prev) => ({
+                    setSalePlanDetails(updatedDetails); // 상태 업데이트
+                    setSalePlanParam((prev) => ({
                             ...prev,
-                            shippingOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+                            salePlanDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
                         })
                     );
 
@@ -405,51 +422,104 @@ const OutgoingSchedulePage = ({initialData}) => {
         });
     };
 
+    // 폼 제출 핸들러
+    const handleFormSubmit = async (values, type) => {
+        console.log('Form values:', values); // 폼 값 확인
+        console.log('detailSalePlan', detailSalePlan)
+        console.log('salePlanParam: ', salePlanParam)
+        confirm({
+            title: '저장 확인',
+            content: '정말로 저장하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                console.log(salePlanParam.salePlanDetails)
+                try {
+                    const salePlanData = {
+                        clientId: salePlanParam.client ? salePlanParam.client.id : salePlanParam.clientId,
+                        managerId: salePlanParam.manager ? salePlanParam.manager.id : salePlanParam.managerId,
+                        warehouseId: salePlanParam.warehouse ? salePlanParam.warehouse.id : salePlanParam.warehouseId,
+                        date: dayjs(salePlanParam.date).format('YYYY-MM-DD'),
+                        expectedSalesDate: salePlanParam.expectedSalesDate,
+                        items: Array.isArray(salePlanParam.salePlanDetails
+                        ) ? salePlanParam.salePlanDetails.map(item => ({
+                            productId: item.productId,
+                            quantity: item.quantity ? item.quantity : 0,
+                            expectedSales: Number(item.expectedSales),
+                            remarks: item.remarks,
+                        })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
+                        remarks: values.remarks
+                    };
+
+                    console.log('Sending data to API:', salePlanData); // API로 전송할 데이터 확인
+
+                    const API_PATH = type === 'update' ? LOGISTICS_API.SALE_PLAN_UPDATE_API(salePlanParam.id) : LOGISTICS_API.SALE_PLAN_CREATE_API;
+                    const method = type === 'update' ? 'put' : 'post';
+
+                    const response = await apiClient[method](API_PATH, salePlanData, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const updatedData = response.data;
+
+                    console.log('updateData: ', updatedData)
+
+                    if (type === 'update') {
+                        setSalePlanList((prevList) =>
+                            prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
+                        );
+                    } else {
+                        setSalePlanList((prevList) => [...prevList, updatedData]);
+                        registrationForm.resetFields();
+                        console.log("일로옴??")
+                        console.log('salePlanList: ', salePlanList)
+                    }
+
+                    console.log('searchParams:', searchParams)
+                    handleSearch()
+
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
+
+                    setEditSalePlan(false);
+                    setSalePlanParam({
+                        salePlanDetails: [],
+                    });
+                    setDetailSalePlan(salePlanParam.salePlanDetails || []);
+                    setDisplayValues({});
+
+                    type === 'update'
+                        ? notify('success', '판매계획 수정', '판매계획 정보 수정 성공.', 'bottomRight')
+                        : notify('success', '판매계획 저장', '판매계획 정보 저장 성공.', 'bottomRight');
+                } catch (error) {
+                    console.error('Error saving data:', error); // 오류 로그 출력
+                    notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '저장 취소',
+                    description: '저장이 취소되었습니다.',
+                    placement: 'bottomLeft',
+                });
+            },
+        });
+    };
+
     const columns = [
         {
-            title: <div className="title-text">상태</div>,
-            dataIndex: 'status',
-            key: 'status',
-            align: 'center',
-            render: (text) => {
-                let color;
-                let value;
-                switch (text) {
-                    case "WAITING_FOR_SHIPMENT":
-                        color = "orange";
-                        value = "출고 대기";
-                        break;
-                    case "SHIPMENT_COMPLETED":
-                        color = "green";
-                        value = "출고 완료";
-                        break;
-                    case "IN_PROGRESS":
-                        color = "purple";
-                        value = "진행중";
-                        break;
-                    case "COMPLETED":
-                        color = "blue";
-                        value = "진행완료";
-                        break;
-                    case "CANCELED":
-                        color = "red";
-                        value = "취소";
-                        break;
-                    default:
-                        color = "gray"; // 기본 색상
-                        value = "미확인";
-                }
-                return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
-            },
-            width: '10%',
-        },
-        {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
-            width: '15%',
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
+            width: '10%',
         },
         {
             title: <div className="title-text">거래처명</div>,
@@ -465,12 +535,21 @@ const OutgoingSchedulePage = ({initialData}) => {
             align: 'center',
             width: '10%',
         },
+
         {
             title: <div className="title-text">품목명</div>,
             dataIndex: 'productName',
             key: 'productName',
             align: 'center',
-            width: '20%',
+            width: '25%',
+        },
+        {
+            title: <div className="title-text">예상매출일자</div>,
+            dataIndex: 'expectedSaleDate',
+            key: 'expectedSaleDate',
+            align: 'center',
+            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            width: '10%',
         },
         {
             title: <div className="title-text">총 수량</div>,
@@ -480,13 +559,14 @@ const OutgoingSchedulePage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">출고 예정 일자</div>,
-            dataIndex: 'shippingDate',
-            key: 'shippingDate',
+            title: <div className="title-text">총 예상매출액</div>,
+            dataIndex: 'totalExpectedSales',
+            key: 'totalExpectedSales',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
             width: '15%',
         },
+
     ];
 
     return (
@@ -494,10 +574,11 @@ const OutgoingSchedulePage = ({initialData}) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="출고"
+                        title="판매계획"
                         description={(
                             <Typography>
-                                출고지시서 페이지는 <span>회사에서 출고할 물품을 창고에서 출고하도록 지시</span>하는 문서를 관리합니다. 이 페이지에서는 <span>출고지시서를 생성, 수정, 삭제</span>할 수 있으며, 물품의 <span>출고 일정과 장소</span>를 지정할 수 있습니다. 또한, <span>출고 과정에서 발생하는 문제</span>도 이 페이지에서 관리됩니다.                            </Typography>
+                                판매계획 페이지는 <span>완료된 거래와 관련된 판매계획 기록을 관리</span>하는 곳임. 이 페이지에서는 <span>판매계획 내역을 조회, 수정, 삭제</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음. 또한, <span>판매계획 실적</span>을 분석하여 보고서를 작성하는 기능도 포함되어 있음.
+                            </Typography>
                         )}
                         tabItems={tabItems()}
                         activeTabKey={activeTabKey}
@@ -511,7 +592,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                     <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%'}}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>출고지시서 목록</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 목록</Typography>
                                 <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                     <Form layout="vertical">
                                         <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -566,10 +647,10 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                         value={status.status}
                                                         onChange={handleStatusChange}
                                                     >
-                                                        <Select.Option value="WAITING_FOR_RECEIPT">입고 예정</Select.Option>
-                                                        <Select.Option value="RECEIPT_COMPLETED">입고 완료</Select.Option>
-                                                        <Select.Option value="INVOICED">결제중</Select.Option>
-                                                        <Select.Option value="ACCOUNTED">회계 반영 완료</Select.Option>
+                                                        <Select.Option value="WAITING_FOR_SHIPMENT">출하 대기</Select.Option>
+                                                        <Select.Option value="SHIPMENT_COMPLETED">출하 완료</Select.Option>
+                                                        <Select.Option value="IN_PROGRESS">진행중</Select.Option>
+                                                        <Select.Option value="COMPLETED">진행완료</Select.Option>
                                                         <Select.Option value="CANCELED">취소</Select.Option>
                                                     </Select>
                                                 </Form.Item>
@@ -585,7 +666,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                                     </Form>
 
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? shippingOrderList : searchData} // 발주서 리스트 데이터
+                                        dataSource={searchData} // 판매계획 리스트 데이터
                                         columns={columns} // 테이블 컬럼 정의
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -603,12 +684,15 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                 setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
                                                 const id = record.id;
                                                 try {
-                                                    const response = await apiClient.post(LOGISTICS_API.SHIPPING_ORDER_DETAIL_API(id));
-                                                    setDetailShippingOrder(response.data);
-                                                    setShippingOrderDetails(detailShippingOrder)
-                                                    setEditShippingOrder(true);
+                                                    const response = await apiClient.post(LOGISTICS_API.SALE_PLAN_DETAIL_API(id));
+                                                    setDetailSalePlan(response.data);
+                                                    console.log('detailSalePlan: ', response.data)
+                                                    setSalePlanParam(response.data)
 
-                                                    notify('success', '출고지시서 조회', '출고지시서 정보 조회 성공.', 'bottomRight')
+                                                    setSalePlanDetails(detailSalePlan)
+                                                    setEditSalePlan(true);
+
+                                                    notify('success', '판매계획 조회', '판매계획 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
                                                 }
@@ -619,42 +703,41 @@ const OutgoingSchedulePage = ({initialData}) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                    {editShippingOrder && (
+                    {editSalePlan && (
                         <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                             <Grow in={true} timeout={200}>
                                 <Paper elevation={3} sx={{ height: '100%' }}>
-                                    <Typography variant="h6" sx={{ padding: '20px' }}>출고 지시서 상세정보 및 수정</Typography>
+                                    <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 상세정보 및 수정</Typography>
                                     <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                         <Form
-                                            initialValues={detailShippingOrder}
+                                            initialValues={detailSalePlan}
                                             form={form}
                                             onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                         >
-                                            {/* 출하지시서 정보 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출고지시서 정보</Divider>
+                                            {/* 판매계획 정보 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
-                                                            value={dayjs(shippingOrderParam.date)}
-                                                            onChange={handleDeliveryDateChange}
+                                                            value={salePlanParam.date ? dayjs(salePlanParam.date) : null}
+                                                            onChange={handleRegiDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
-
                                                 <Col>
-                                                    <Typography>납기 일자</Typography>
+                                                    <Typography>예상매출일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '예상매출일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
-                                                            value={dayjs(shippingOrderParam.deliveryDate)}
-                                                            onChange={handleRegiDateChange}
+                                                            value={salePlanParam.expectedSalesDate ? dayjs(salePlanParam.expectedSalesDate) : null}
+                                                            onChange={handleExpectedDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -667,17 +750,6 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                             addonBefore="담당자"
                                                             value={displayValues.managerName}
                                                             onClick={() => handleInputClick('managerName')}
-                                                            onFocus={(e) => e.target.blur()}
-                                                            suffix={<DownSquareOutlined />}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <Form.Item style={{ marginBottom: 0 }} >
-                                                        <Input
-                                                            addonBefore="입고창고"
-                                                            value={displayValues.warehouseName}
-                                                            onClick={() => handleInputClick('warehouseName')}
                                                             onFocus={(e) => e.target.blur()}
                                                             suffix={<DownSquareOutlined />}
                                                         />
@@ -698,7 +770,19 @@ const OutgoingSchedulePage = ({initialData}) => {
 
                                             <Row gutter={16}>
 
-                                                <Col span={12}>
+                                                <Col span={6}>
+                                                    <Form.Item style={{ marginBottom: 0 }} >
+                                                        <Input
+                                                            addonBefore="출하창고"
+                                                            value={displayValues.warehouseName}
+                                                            onClick={() => handleInputClick('warehouseName')}
+                                                            onFocus={(e) => e.target.blur()}
+                                                            suffix={<DownSquareOutlined />}
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+
+                                                <Col span={16}>
                                                     <Form.Item name="remarks">
                                                         <Input addonBefore="비고" />
                                                     </Form.Item>
@@ -706,10 +790,10 @@ const OutgoingSchedulePage = ({initialData}) => {
 
                                             </Row>
 
-                                            {/* 출하지시서 상세 항목 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출고지시서 상세 항목</Divider>
+                                            {/* 판매계획 상세 항목 */}
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 상세 항목</Divider>
                                             <Table
-                                                dataSource={shippingOrderParam?.shippingOrderDetails || []}
+                                                dataSource={salePlanParam?.salePlanDetails || []}
                                                 columns={[
                                                     {
                                                         title: '품목',
@@ -728,15 +812,6 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                                 />
                                                             );
                                                         },
-                                                        width: '25%'
-                                                    },
-                                                    {
-                                                        title: '규격',
-                                                        dataIndex: 'standard',
-                                                        key: 'standard',
-                                                        align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'center' }}>{text}</div>,
-
                                                         width: '20%'
                                                     },
                                                     {
@@ -752,7 +827,36 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                                 className="small-text"
                                                             />
                                                         ),
-                                                        width: '10%'
+                                                        width: '6%'
+                                                    },
+                                                    {
+                                                        title: '단가',
+                                                        dataIndex: 'price',
+                                                        key: 'price',
+                                                        align: 'center',
+                                                        render: (text, record, index) => (
+
+                                                            <Input
+                                                                value={formatNumberWithComma(text)}
+                                                                onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'price')}
+                                                                className="small-text"
+                                                            />
+                                                        ),
+
+                                                    },
+                                                    {
+                                                        title: '예상매출액',
+                                                        dataIndex: 'expectedSales',
+                                                        key: 'expectedSales',
+                                                        align: 'center',
+                                                        render: (text, record, index) => (
+
+                                                            <Input
+                                                                value={formatNumberWithComma(text)}
+                                                                onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'expectedSales')}
+                                                                className="small-text"
+                                                            />
+                                                        ),
                                                     },
                                                     {
                                                         title: '비고',
@@ -851,7 +955,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                                             { title: '거래처명', dataIndex: 'printClientName', key: 'printClientName', align: 'center' }
                                         ]}
                                         dataSource={modalData}
-                                        rowKey={(record) => record.id}
+                                        rowKey="id"
                                         size="small"
                                         pagination={{
                                             pageSize: 15,
@@ -868,7 +972,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                             </>
                         )}
 
-                        {/* 거래처 선택 모달 */}
+                        {/* 거래처 검색 선택 모달 */}
                         {currentField === 'clientSearch' && (
                             <>
                                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
@@ -1045,6 +1149,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                             </>
                         )}
 
+
                         {/* 품목 선택 모달 */}
                         {currentField === 'product' && (
                             <>
@@ -1122,38 +1227,37 @@ const OutgoingSchedulePage = ({initialData}) => {
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
                         <Paper elevation={3} sx={{ height: '100%' }}>
-                            <Typography variant="h6" sx={{ padding: '20px' }}>출고지시서 등록</Typography>
+                            <Typography variant="h6" sx={{ padding: '20px' }}>판매계획 입력</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
-                                    initialValues={detailShippingOrder}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    initialValues={detailSalePlan}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
-                                    {/* 출하지시서 정보 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출고지시서 정보</Divider>
+                                    {/* 판매계획 정보 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={dayjs(shippingOrderParam.date)}
-                                                    onChange={handleDeliveryDateChange}
+                                                    value={dayjs(salePlanParam.date)}
+                                                    onChange={handleRegiDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>
-
                                         <Col>
-                                            <Typography>납기 일자</Typography>
+                                            <Typography>예상매출일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '예상매출일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
-                                                    value={dayjs(shippingOrderParam.deliveryDate)}
-                                                    onChange={handleRegiDateChange}
+                                                    value={dayjs(salePlanParam.expectedSalesDate)}
+                                                    onChange={handleExpectedDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>
@@ -1166,17 +1270,6 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                     addonBefore="담당자"
                                                     value={displayValues.managerName}
                                                     onClick={() => handleInputClick('managerName')}
-                                                    onFocus={(e) => e.target.blur()}
-                                                    suffix={<DownSquareOutlined />}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item style={{ marginBottom: 0 }} >
-                                                <Input
-                                                    addonBefore="입고창고"
-                                                    value={displayValues.warehouseName}
-                                                    onClick={() => handleInputClick('warehouseName')}
                                                     onFocus={(e) => e.target.blur()}
                                                     suffix={<DownSquareOutlined />}
                                                 />
@@ -1197,7 +1290,19 @@ const OutgoingSchedulePage = ({initialData}) => {
 
                                     <Row gutter={16}>
 
-                                        <Col span={12}>
+                                        <Col span={6}>
+                                            <Form.Item style={{ marginBottom: 0 }} >
+                                                <Input
+                                                    addonBefore="출하창고"
+                                                    value={displayValues.warehouseName}
+                                                    onClick={() => handleInputClick('warehouseName')}
+                                                    onFocus={(e) => e.target.blur()}
+                                                    suffix={<DownSquareOutlined />}
+                                                />
+                                            </Form.Item>
+                                        </Col>
+
+                                        <Col span={16}>
                                             <Form.Item name="remarks">
                                                 <Input addonBefore="비고" />
                                             </Form.Item>
@@ -1205,9 +1310,10 @@ const OutgoingSchedulePage = ({initialData}) => {
 
                                     </Row>
 
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출고지시서 상세 항목</Divider>
+                                    {/* 판매계획 상세 항목 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 상세 항목</Divider>
                                     <Table
-                                        dataSource={shippingOrderParam?.shippingOrderDetails || []}
+                                        dataSource={salePlanParam?.salePlanDetails || []}
                                         columns={[
                                             {
                                                 title: '품목',
@@ -1226,15 +1332,6 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                         />
                                                     );
                                                 },
-                                                width: '25%'
-                                            },
-                                            {
-                                                title: '규격',
-                                                dataIndex: 'standard',
-                                                key: 'standard',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'center' }}>{text}</div>,
-
                                                 width: '20%'
                                             },
                                             {
@@ -1250,7 +1347,36 @@ const OutgoingSchedulePage = ({initialData}) => {
                                                         className="small-text"
                                                     />
                                                 ),
-                                                width: '10%'
+                                                width: '6%'
+                                            },
+                                            {
+                                                title: '단가',
+                                                dataIndex: 'price',
+                                                key: 'price',
+                                                align: 'center',
+                                                render: (text, record, index) => (
+
+                                                    <Input
+                                                        value={formatNumberWithComma(text)}
+                                                        onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'price')}
+                                                        className="small-text"
+                                                    />
+                                                ),
+
+                                            },
+                                            {
+                                                title: '예상매출액',
+                                                dataIndex: 'expectedSales',
+                                                key: 'expectedSales',
+                                                align: 'center',
+                                                render: (text, record, index) => (
+
+                                                    <Input
+                                                        value={formatNumberWithComma(text)}
+                                                        onChange={(e) => handleFieldChange(removeComma(e.target.value), index, 'expectedSales')}
+                                                        className="small-text"
+                                                    />
+                                                ),
                                             },
                                             {
                                                 title: '비고',
@@ -1307,4 +1433,4 @@ const OutgoingSchedulePage = ({initialData}) => {
     );
 };
 
-export default OutgoingSchedulePage;
+export default SalePlanPage;

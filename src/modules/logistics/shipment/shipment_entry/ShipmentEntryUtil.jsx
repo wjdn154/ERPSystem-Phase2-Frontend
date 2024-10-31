@@ -11,14 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '송장 정보 입력',
-            children: (
-                <Typography>
-                    출하와 관련된 송장 번호를 입력하고 배송 상태를 업데이트할 수 있음.
-                </Typography>
-            ),
-        },
     ];
 }

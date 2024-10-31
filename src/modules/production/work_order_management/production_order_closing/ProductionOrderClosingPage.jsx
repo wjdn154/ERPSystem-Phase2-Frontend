@@ -96,6 +96,7 @@ const ProductionOrderClosingPage = ({ initialData }) => {
 
         try {
             const response = await apiClient.post(PRODUCTION_API.PRODUCTION_ORDER_CLOSE_API, closureParams);
+            console.log(response);
 
             const updatedData = searchData.map((item) =>
                 item.id === saveParams.id ? {
@@ -107,6 +108,7 @@ const ProductionOrderClosingPage = ({ initialData }) => {
                     closed: true,
                 } : item
             );
+            console.log(updatedData);
 
             setSearchData(updatedData);
 
@@ -121,10 +123,10 @@ const ProductionOrderClosingPage = ({ initialData }) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="작업 지시 확정"
+                        title="작업 지시 마감"
                         description={(
                             <Typography>
-                                작업 지시 확정 페이지는 <span>생산 과정에서 각 작업의 지시를 확정하고 관리</span>하는 곳임. 이 페이지에서는 <span>작업 지시를 추가, 수정, 삭제</span>할 수 있으며, 각 작업의 <span>작업 내용, 작업 인원, 작업 시간</span> 등의 정보를 설정할 수 있음. 이를 통해 <span>생산 작업의 효율성</span>을 높이고, 현장의 <span>생산 스케줄을 체계적으로 관리</span>할 수 있음.
+                                작업 지시 마감 페이지는 <span>완료된 생산 작업의 지시를 정리하고 마감여부를 관리</span>하는 곳임. 이 페이지에서는 <span>확정된 작업지시가 완료되면 마감처리</span>할 수 있음. 이를 통해 <span>생산공정의 종료 단계까지 체계적으로 관리</span>할 수 있으며, 향후 생산 계획에 필요한 데이터를 축적할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -139,7 +141,7 @@ const ProductionOrderClosingPage = ({ initialData }) => {
                     <Grid item xs={12} md={10} sx={{ minWidth: '1400px'}}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ marginBottom: '20px'}}>
-                                <Typography variant="h6" sx={{ padding: '20px' }} >작업 지시 생성</Typography>
+                                <Typography variant="h6" sx={{ padding: '20px' }} >작업 지시 마감</Typography>
                                 <Grid sx={{ padding: '0px 20px 20px 20px' }}>
                                     <Table
                                         dataSource={searchData ? searchData : []}

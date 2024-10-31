@@ -120,10 +120,10 @@ export const BomPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="BOM"
+                        title="BOM 관리"
                         description={(
                             <Typography>
-                                BOM 페이지는 <span>품목별 자재명세</span>를 관리하는 곳임. 이 페이지에서는 <span>명세 내역을 조회, 수정, 삭제</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음. 또한, <span>BOM</span>을 목적에 따라 Green BOM을 작성함.
+                                BOM 페이지는 <span>품목별 자재명세</span>를 관리하는 곳임. 이 페이지에서는 <span>명세 내역을 조회</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음. 또한, <span>BOM</span>을 목적에 따라 Green BOM을 작성함.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -198,33 +198,33 @@ export const BomPage = () => {
                 </Grid>
             )}
 
-            {activeTabKey === '2' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={8} sx={{ minWidth: '610px' }}>
-                        <Grow in={true} timeout={200}>
-                            <Grow in={true} timeout={200}>
-                                <Paper elevation={3} sx={{ height: '100%' }}>
-                                    <Typography variant="h6" sx={{ padding: '20px' }} >친환경 BOM 조회</Typography>
-                                    <Grid sx={{ margin: '20px' }}>
-                                        <Table
-                                            dataSource={data}
-                                            columns={sbomColumns}
-                                            rowKey="id"
-                                            rowSelection={{
-                                                type: 'radio',
-                                                selectedRowKeys,
-                                                onChange: (newSelectedRowKeys) => setSelectedSBom(newSelectedRowKeys),
-                                            }}
-                                            pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
-                                            size={'small'}
-                                        />
-                                    </Grid>
-                                </Paper>
-                            </Grow>
-                        </Grow>
-                    </Grid>
-                </Grid>
-            )}
+            {/*{activeTabKey === '2' && (*/}
+            {/*    <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>*/}
+            {/*        <Grid item xs={12} md={8} sx={{ minWidth: '610px' }}>*/}
+            {/*            <Grow in={true} timeout={200}>*/}
+            {/*                <Grow in={true} timeout={200}>*/}
+            {/*                    <Paper elevation={3} sx={{ height: '100%' }}>*/}
+            {/*                        <Typography variant="h6" sx={{ padding: '20px' }} >친환경 BOM 조회</Typography>*/}
+            {/*                        <Grid sx={{ margin: '20px' }}>*/}
+            {/*                            <Table*/}
+            {/*                                dataSource={data}*/}
+            {/*                                columns={sbomColumns}*/}
+            {/*                                rowKey="id"*/}
+            {/*                                rowSelection={{*/}
+            {/*                                    type: 'radio',*/}
+            {/*                                    selectedRowKeys,*/}
+            {/*                                    onChange: (newSelectedRowKeys) => setSelectedSBom(newSelectedRowKeys),*/}
+            {/*                                }}*/}
+            {/*                                pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}*/}
+            {/*                                size={'small'}*/}
+            {/*                            />*/}
+            {/*                        </Grid>*/}
+            {/*                    </Paper>*/}
+            {/*                </Grow>*/}
+            {/*            </Grow>*/}
+            {/*        </Grid>*/}
+            {/*    </Grid>*/}
+            {/*)}*/}
 
         </Box>
     );

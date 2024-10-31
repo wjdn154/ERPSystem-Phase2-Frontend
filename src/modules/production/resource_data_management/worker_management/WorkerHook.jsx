@@ -62,16 +62,14 @@ export const workerHook = (initialData) => {
         setShowDetail(false);   //상세정보 로딩중일때 기존 상세정보 숨기기
 
         try {
-            console.log('selectedRow.id : ',selectedRow.id);
             const detail = await fetchWorkerDetail(selectedRow.id);     //비동기 api 호출
-            console.log('fetch detail : ',detail);
             setWorkerDetail({
                 ...detail,
                 originalEmployeeNumber: detail.employeeNumber  // 원래 사원번호 저장
             });
             showUpdateModal();
         } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+            notify('error', '수정 실패', 'API에서 데이터를 가져오는 중 오류 발생.', 'top');
         }
     };
 
@@ -84,15 +82,13 @@ export const workerHook = (initialData) => {
         setShowDetail(false);   //상세정보 로딩중일때 기존 상세정보 숨기기
 
         try {
-            console.log('attendanceSelectedRow.id : ',selectedRow.id);
             const detail = await fetchWorkerAttendanceAssignmentList(selectedRow.id);     //비동기 api 호출
-            console.log('fetch detail : ',detail);
             setWorkerAttendanceDetail({
                 ...detail
             });
             showUpdateModal();
         } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+            notify('error', '수정 실패', 'API에서 데이터를 가져오는 중 오류 발생.', 'top');
         }
     };
 
@@ -116,26 +112,15 @@ export const workerHook = (initialData) => {
         setIsUpdateModalVisible(false);
     };
 
-    const handleUpdateOk = async () => {
-        if (workerDetail.trainingStatus === undefined || workerDetail.trainingStatus === null) {
-            alert("안전교육 이수 여부를 입력하세요.");
-            return;
-        }
-
-        await handleUpdate();
-
-    };
-
-
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
-            console.log("수정버튼 클릭 시 workerDetail : ",workerDetail);
 
             await updateWorkerDetail(workerDetail.id, workerDetail);
             const updatedData = await fetchWorkerList();
             notify('success', '안전교육 이수 여부 수정', '안전교육 이수 여부 수정 성공', 'bottomRight')
             setData(updatedData);
+            setShowDetail(false);
         } catch (error) {
             notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
@@ -152,7 +137,6 @@ export const workerHook = (initialData) => {
         setWorkerDetail,
         handleInputChange,
         showUpdateModal,
-        handleUpdateOk,
         handleUpdateCancel,
         isUpdateModalVisible,
         activeTabKey,

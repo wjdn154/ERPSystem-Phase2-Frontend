@@ -82,6 +82,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
+            console.log(formData);
             const response = await apiClient.post(COMMON_API.LOGIN_API, formData);
             // 서버로부터 토큰과 권한 정보를 받아옴
             const { token, permission, isAdmin } = response.data;
@@ -93,6 +94,7 @@ const LoginPage = () => {
             // 로그인 성공 시 메인 페이지로 이동
             navigate('/integration', { state: { login: true } });
         } catch (error) {
+
             notify('error', '로그인 실패', error.response.data, 'top');
         }
     };

@@ -66,18 +66,15 @@ export const materialDataHook = (initialData) => {
     // 행 선택 시 자재 상세 정보를 가져오는 로직
     const handleSelectedRow = async (selectedRow) => {
 
-        console.log('선택된 행 : ',selectedRow);
         if(!selectedRow) return;
         setSelectedRow(selectedRow);
         setShowDetail(false);   //상세정보 로딩중일때 기존 상세정보 숨기기
 
         try {
-            console.log('selectedRow.id : ',selectedRow.id);
             const detail = await fetchMaterialDetail(selectedRow.id);     //비동기 api 호출
-            console.log('fetch detail : ',detail);
             //'detail'이 제대로 받아졌는지 확인하기
             if(!detail) {
-                console.warn("api로부터 유효한 상세정보를 받지 못했습니다.");
+                notify('error', '조회 실패', 'api로부터 유효한 상세정보를 받지 못했습니다.', 'top');
                 return;
             }
             // 원래 유해물질 코드 따로 저장
@@ -87,7 +84,7 @@ export const materialDataHook = (initialData) => {
             });
 
         } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+            notify('error', '조회 실패', 'api로부터 유효한 상세정보를 받지 못했습니다.', 'top');
         }
     };
 
@@ -125,8 +122,6 @@ export const materialDataHook = (initialData) => {
     // 저장 버튼 클릭 시 실행되는 함수
     const handleSave = async () => {
         try {
-
-            console.log("저장버튼 클릭 시 hazardousMaterial : ",materialDataDetail);
             await saveMaterialData(materialDataDetail);
             const savedData = await fetchMaterialDataList();  //등록 후 새로운 리스트 반환
             notify('success', '자재 등록', '자재 등록 성공', 'bottomRight')
@@ -137,55 +132,26 @@ export const materialDataHook = (initialData) => {
         }
     };
 
-    //등록 버튼 클릭 시 모달 창 띄우는 함수
-    const insertModal = () => {
-        setIsInsertModalVisible(true);
-    };
-    //등록 취소 버튼 클릭 함수
-    const handleInsertCancel = () => {
-        setIsInsertModalVisible(false);
-    }
-
-
-    //등록 모달창 ok 눌렀을 때 실행되는 함수
-    const handleInsertOk = async () => {
-
-        alertMaterial();
-
-        await handleSave();
-    }
-
-    //수정 버튼 클릭 시 모달창 띄우는 함수
-    const updateModal = () => {
-        setIsUpdateModalVisible(true);
-    };
-
-    //수정 모달창 ok 눌렀을 때 실행되는 함수
-    const handleUpdateOk = async () => {
-
-        alertMaterial();
-
-        await handleUpdate();
-    };
 
     // 수정 버튼 클릭 시 실행되는 함수
     const handleUpdate = async () => {
         try {
-            console.log("수정버튼 클릭시 id ,materialDataDetail : ",materialDataDetail.id, materialDataDetail);
+            const updateData = {
+                ...materialDataDetail,
+                product: filteredProductData,
+                hazardousMaterial: filterHazardousData,
+            };
 
-            await updateMaterialData(materialDataDetail.id, materialDataDetail);
+            await updateMaterialData(updateData.id, updateData);
             const updatedData = await fetchMaterialDataList();
-            setData(updatedData);
             notify('success', '자재 수정', '자재 수정 성공', 'bottomRight')
-            setIsUpdateModalVisible(false);
+            setData(updatedData);
+            setShowDetail(false);
         } catch (error) {
             notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
         }
     }
 
-    const handleUpdateCancel = () => {
-        setIsUpdateModalVisible(false);
-    };
 
     //삭제 버튼 선택 클릭 시 실행되는 함수
     const handleDelete = async () => {
@@ -223,79 +189,6 @@ export const materialDataHook = (initialData) => {
         setSelectedProductCode(record.productCode);
     };
 
-    // 행 선택 핸들러 설정
-    const handleProductRowSelection =  {
-        type:'radio',
-        selectedRowKeys: selectedRow ? [selectedRow.id] : [],
-        onChange: (selectedRowKeys, selectedRows) => {
-            if (selectedRows.length > 0) {
-                handleDeleteProduct();
-            } else{
-                console.warn("비어있음.");
-            }
-        },
-    };
-
-
-    // 품목 삭제 함수
-    const handleDeleteProduct = async () => {
-        if (selectedMaterialId && selectedProductCode) {
-            try {
-                const confirmDelete = window.confirm("정말로 삭제 하시겠습니까?");
-
-                if(!confirmDelete) return;
-                await deleteMaterialProduct(selectedMaterialId, selectedProductCode);
-                window.alert('품목이 삭제되었습니다.');
-                // 여기서 삭제 후 품목 리스트를 다시 불러옵니다.
-            } catch (error) {
-                notify('error', '삭제 실패', '데이터 삭제 중 오류가 발생했습니다.', 'top');
-            }
-        } else {
-            window.alert('삭제할 품목을 선택해주세요.');
-        }
-    };
-
-    //등록 모달창 ok 눌렀을 때 실행되는 함수
-    const handleProductInsertOk = async () => {
-
-        await handleProductSave();
-    }
-    // 저장 버튼 클릭 시 실행되는 함수
-    const handleProductSave = async () => {
-        try {
-            const confirmSave = window.confirm("저장하시겠습니까?");
-
-            if (!confirmSave) return;
-            console.log("저장버튼 클릭 시 materialProduct : ",materialDataDetail.product);
-            await updateMaterialProductList(materialDataDetail.id, materialDataDetail.product);
-            const savedData = await fetchProductMaterialList();  //등록 후 새로운 리스트 반환
-            window.alert("저장되었습니다.");
-            setIsInsertModalVisible(false);
-            setFilteredProductData(savedData);
-        } catch (error) {
-            notify('error', '등록 실패', '데이터 등록 중 오류가 발생했습니다.', 'top');
-        }
-    };
-    //등록 모달창 ok 눌렀을 때 실행되는 함수
-    const handleHazardousInsertOk = async () => {
-
-        await handleHazardousSave();
-    }
-    // 저장 버튼 클릭 시 실행되는 함수
-    const handleHazardousSave = async () => {
-        try {
-
-            if (!confirmSave) return;
-            console.log("저장버튼 클릭 시 materialHazardous : ",materialDataDetail.hazardousMaterial);
-            await updateMaterialHazardousList(materialDataDetail.id, materialDataDetail.hazardousMaterial);
-            const savedData = await fetchHazardousMaterialList();  //등록 후 새로운 리스트 반환
-            notify('success', '유해물질 등록', '유해물질 등록 성공', 'bottomRight')
-            setIsInsertModalVisible(false);
-            setFilterHazardousData(savedData);
-        } catch (error) {
-            notify('error', '등록 실패', '데이터 등록 중 오류가 발생했습니다.', 'top');
-        }
-    };
 
     return {
         data,
@@ -309,25 +202,18 @@ export const materialDataHook = (initialData) => {
         handleSave,
         handleUpdate,
         handleDelete,
-        updateModal,
-        handleUpdateOk,
-        handleUpdateCancel,
-        insertModal,
-        handleInsertOk,
         isInsertModalVisible,
         isUpdateModalVisible,
-        handleInsertCancel,
         handleOpenInsertModal,
         activeTabKey,
         handleTabChange,
         filteredProductData,
+        setFilteredProductData,
         filterHazardousData,
+        setFilterHazardousData,
         onMaterialRowClick,
         onProductRowClick,
-        handleDeleteProduct,
-        handleProductRowSelection,
-        handleProductInsertOk,
-        handleHazardousInsertOk
+
     };
 
 };

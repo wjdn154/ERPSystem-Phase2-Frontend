@@ -3,6 +3,7 @@ import {Form, Input, Select, Button, Divider, Row, Col, Upload, Space} from 'ant
 import { Typography, Paper, Box, Grid } from '@mui/material';
 import defaultImage from "../../../../assets/img/uploads/defaultImage.png";
 import {employmentStatusMap, employmentTypeMap} from "./WorkerListColumn.jsx";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload.js";
 
 const { Option } = Select;
 
@@ -93,29 +94,20 @@ const WorkerDetailSection = ({
                             </Divider>
                             <Row gutter={16}>
                                 <Col span={12}>
-                                    <Form.Item label="프로필 사진">
-                                        {/* 이미지 미리보기 */}
-                                        <div style={{ marginBottom: '20px' }}>
+                                    <Form.Item>
+                                        <div style={{ marginBottom: '1px' }}>
                                             <img
-                                                src={selectedFile ? URL.createObjectURL(selectedFile) : defaultImage}
-                                                alt="프로필 사진"
+                                                src={selectedFile
+                                                    ? URL.createObjectURL(selectedFile)
+                                                    : workerDetail?.profilePicture
+                                                        ? workerDetail?.profilePicture
+                                                        : '/src/assets/img/uploads/defaultImage.png'}
+                                                alt="미리보기 이미지"
                                                 style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                             />
                                         </div>
-                                        <Upload
-                                            beforeUpload={() => false} // 실제 업로드를 막기 위해 false 반환
-                                            onChange={(info) => {
-                                                const file = info.fileList[info.fileList.length - 1]?.originFileObj; // fileList의 마지막 파일 객체 사용
-                                                setSelectedFile(file); // 선택된 파일을 상태로 설정
-                                            }}
-                                            fileList={
-                                                selectedFile
-                                                    ? [{ uid: '-1', name: selectedFile.name, status: 'done', url: selectedFile.url }]
-                                                    : []
-                                            } // 파일 리스트 설정
-                                        >
-                                        </Upload>
                                     </Form.Item>
+
                                 </Col>
                             </Row>
                         </Form>

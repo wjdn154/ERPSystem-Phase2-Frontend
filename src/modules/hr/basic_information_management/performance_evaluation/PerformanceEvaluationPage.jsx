@@ -55,6 +55,20 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
     // 모달창 닫기 핸들러
     const handleModalCancel = () => setIsModalVisible(false);
 
+    const updatePerformance = async (performanceId, performanceData) => {
+        if (!performanceId) {
+            console.error("Performance ID가 없습니다.");
+            return;
+        }
+
+        try {
+            const response = await apiClient.post(`/api/performance/put/${performanceId}`, performanceData);
+            // 응답 처리
+        } catch (error) {
+            console.error("API 호출 오류:", error);
+        }
+    };
+
     // 모달창 데이터 가져오기 함수
     const fetchModalData = async (fieldName) => {
         setIsLoading(true);
@@ -100,7 +114,7 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
                 formData.append("formattedValues", JSON.stringify(formattedValues));
 
                 try {
-                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_PERFORMANCE_API(performanceParam.performanceId ) : EMPLOYEE_API.SAVE_PERFORMANCE_API;
+                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_PERFORMANCE_API(performanceParam.id ) : EMPLOYEE_API.SAVE_PERFORMANCE_API;
                     const response = await apiClient.post(API_PATH,formData,{
                         headers: { 'Content-Type': 'multipart/form-data' },
                     });
@@ -148,6 +162,8 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
         setActiveTabKey(key);
     };
 
+
+
     return (
         <Box sx={{ margin: '20px' }}>
             <Grid container spacing={3}>
@@ -156,7 +172,7 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
                         title="성과 평가 관리"
                         description={(
                             <Typography>
-                                성과 평가 관리 페이지는 <span>사원의 성과 평가 데이터를 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>개인별 또는 팀별 성과를 평가하고, 평가 결과를 기록</span>할 수 있으며, 이를 바탕으로 <span>보상이나 승진, 인사 조정</span>에 반영할 수 있음. 이를 통해 <span>사원의 성과를 체계적으로 관리</span>하고 인재 관리를 강화할 수 있음.
+                                성과 평가 관리 페이지는 <span>사원의 성과 평가 데이터를 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>평가 받은 개인별 성과를 조회</span>할 수 있으며, 이를 바탕으로 <span>보상이나 승진, 인사 조정</span>에 반영할 수 있음. 이를 통해 <span>사원의 성과를 체계적으로 관리</span>하고 인재 관리를 강화할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -258,8 +274,6 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
                             </Paper>
                         </Grow>
                     </Grid>
-                </Grid>
-            )}
             {editPerformance && (
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
@@ -332,6 +346,8 @@ const PerformanceEvaluationPage = ( {initialData} ) => {
                     </Grow>
                 </Grid>
             )}
+        </Grid>
+    )}
 
 
             {activeTabKey === '2' && (
