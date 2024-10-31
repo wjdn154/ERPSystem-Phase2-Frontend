@@ -54,7 +54,8 @@ const RetirementManagementPage = ({ initialData }) => {
                         title="급여 환경 설정"
                         description={(
                             <Typography>
-                                퇴사자 관리 페이지는 <span>퇴사한 사원의 정보를 기록하고 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>퇴사자의 퇴사일, 퇴사 사유</span> 등을 기록하고, 퇴사 후에도 <span>연말정산이나 인사 기록</span>에 필요한 정보를 조회할 수 있음. 이를 통해 <span>퇴사자의 기록을 체계적으로 보관</span>하고, 필요 시 재무 및 인사 처리에 활용할 수 있음.
+                                급여 환경 설정 페이지는 <span>회사의 직책 및 호봉체계별 급여 설정을 관리</span>하는 기능을 제공함.<br/>
+                                이 페이지에서는 <span>직책별, 호봉별 지급 설정을 제공</span> 하며 <span>인사 기초 급여 지급</span>에 필요한 기준 정보를 관리할 수 있음. 이를 통해 필요 시 재무 및 인사 처리에 활용할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
