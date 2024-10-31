@@ -94,6 +94,7 @@ const LoginPage = () => {
             // 로그인 성공 시 메인 페이지로 이동
             navigate('/integration', { state: { login: true } });
         } catch (error) {
+
             notify('error', '로그인 실패', error.response.data, 'top');
         }
     };

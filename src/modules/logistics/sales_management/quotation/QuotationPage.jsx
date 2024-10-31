@@ -5,7 +5,7 @@ import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './QuotationUtil.jsx';
 import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, InputNumber, notification, Upload, Divider, Tooltip} from 'antd';
 import dayjs from 'dayjs';
-import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
+import {DownSquareOutlined, SearchOutlined, PlusOutlined, CheckOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
@@ -311,7 +311,7 @@ const QuotationPage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
+    // 입력 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
         setQuotationParam((prevState) => ({
             ...prevState,
@@ -359,49 +359,18 @@ const QuotationPage = ({initialData}) => {
     //     return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
     // };
 
-    // API를 사용해 부가세 계산
-    const calculateVat = async (quantity, price, vatTypeId, index) => {
-        try {
-            const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
-                vatTypeId,
-                quantity,
-                price,
-            });
-            const vatAmount = response.data;
 
-            console.log('vatAmount: ', vatAmount)
 
-            const updatedDetails = [...quotationDetails];
-            updatedDetails[index].vat = vatAmount;
+    const updateField = (fieldName, value, index) => {
 
-            setQuotationDetails(updatedDetails);
-            setQuotationParam({
-                ...quotationParam,
-                quotationDetails: updatedDetails,
-            });
-        } catch (error) {
-            console.error("부가세 계산 중 오류 발생:", error);
-        }
-    };
 
-    const updateField = (fieldName, value) => {
         const updatedDetails = [...quotationParam.quotationDetails];
 
         console.log('editingRow: ', editingRow)
 
-        updatedDetails[editingRow][fieldName] = value;
+        updatedDetails[index][fieldName] = value;
 
         console.log('updatedDetails: ', updatedDetails)
-
-        // 수량이나 단가가 변경되면 공급가액을 재계산
-        if (fieldName === 'quantity' || fieldName === 'price') {
-            const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
-
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
-        }
 
         setQuotationParam((prevParams) => ({
             ...prevParams,
@@ -486,6 +455,8 @@ const QuotationPage = ({initialData}) => {
                             productId: item.productId,
                             quantity: item.quantity,
                             remarks: item.remarks,
+                            supplyPrice: item.supplyPrice,
+                            vat: item.vat,
                         })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
                         remarks: values.remarks
                     };
@@ -549,7 +520,74 @@ const QuotationPage = ({initialData}) => {
         });
     };
 
+    // API를 사용해 부가세 계산
+    const calculateVat = async (quantity, price, vatTypeId, index) => {
+        try {
+            const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
+                vatTypeId,
+                quantity,
+                price,
+            });
+            const vatAmount = response.data;
+
+            console.log('vatAmount: ', vatAmount);
+
+            console.log(quotationParam)
+            // quotationDetails가 배열인지 확인하고, index가 유효한지 확인
+
+
+           const supplyPrice = quotationParam.quotationDetails[index].supplyPrice = quantity * price;
+            console.log(supplyPrice)
+           const vat = quotationParam.quotationDetails[index].vat = vatAmount;
+
+
+            updateField('supplyPrice', supplyPrice, index)
+            updateField('vat', vat, index)
+
+            setQuotationDetails(quotationParam);
+
+        } catch (error) {
+            console.error("부가세 계산 중 오류 발생:", error);
+        }
+    };
+
+    const handleQuantityChange = (value, index) => {
+        setEditingRow(index)
+        const updatedDetails = [...quotationParam.quotationDetails];
+        updatedDetails[index].quantity = value;
+
+        setQuotationParam((prevParam) => ({
+            ...prevParam,
+            quotationDetails: updatedDetails,
+        }));
+        setEditingRow(null);
+
+    };
+
+    const saveEdit = async (id, event, index) => {
+        event.stopPropagation();
+
+        console.log(id);
+
+
+        const record = quotationParam.quotationDetails[id];
+        console.log(record)
+
+        const quantity = Number(record.quantity);
+        const price = record.price;
+
+        const vatTypeId = quotationParam.vatType ? quotationParam.vatType.code : quotationParam.vatCode;
+
+        if (quantity && price && vatTypeId) {
+            await calculateVat(quantity, price, vatTypeId, id); // 필요한 데이터로 부가세 계산 API 호출
+        } else {
+            console.error("필수 데이터가 부족합니다: 수량, 단가, 과세 유형을 입력해주세요.");
+        }
+
+    };
+
     const columns = [
+
         {
             title: <div className="title-text">상태</div>,
             dataIndex: 'status',
@@ -588,11 +626,11 @@ const QuotationPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '10%',
         },
         {
@@ -780,10 +818,10 @@ const QuotationPage = ({initialData}) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>견적서 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(quotationParam.date)}
@@ -972,14 +1010,22 @@ const QuotationPage = ({initialData}) => {
                                                         key: 'quantity',
                                                         align: 'center',
                                                         render: (text, record, index) => (
-
-                                                            <Input
-                                                                value={text}
-                                                                onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                                className="small-text"
-                                                            />
+                                                            <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                                <Input
+                                                                    value={record.quantity}
+                                                                    onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                                    className="small-text"
+                                                                    style={{ flex: 1 }}
+                                                                />
+                                                                <Tooltip title="저장">
+                                                                    <CheckOutlined
+                                                                        style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                        onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                                    />
+                                                                </Tooltip>
+                                                            </div>
                                                         ),
-                                                        width: '6%'
+                                                        width: '10%',
                                                     },
                                                     {
                                                         title: '단가',
@@ -1448,10 +1494,10 @@ const QuotationPage = ({initialData}) => {
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>견적서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(quotationParam.date)}
@@ -1511,12 +1557,12 @@ const QuotationPage = ({initialData}) => {
                                         </Col>
 
                                         <Col span={6}>
-                                            <Form.Item name="journalEntry">
+                                            <Form.Item name="journalEntryCode">
                                                 <Space.Compact>
                                                     <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
                                                     <Select
                                                         style={{ width: '70%' }}
-                                                        value={quotationParam.journalEntryCode}
+                                                        value={quotationDetails.journalEntryCode}
                                                         onChange={(value) => {
                                                             setQuotationParam((prevState) => ({
                                                                 ...prevState,
@@ -1640,14 +1686,22 @@ const QuotationPage = ({initialData}) => {
                                                 key: 'quantity',
                                                 align: 'center',
                                                 render: (text, record, index) => (
-
-                                                    <Input
-                                                        value={text}
-                                                        onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                        className="small-text"
-                                                    />
+                                                    <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                        <Input
+                                                            value={record.quantity}
+                                                            onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                            className="small-text"
+                                                            style={{ flex: 1 }}
+                                                        />
+                                                        <Tooltip title="저장">
+                                                            <CheckOutlined
+                                                                style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                            />
+                                                        </Tooltip>
+                                                    </div>
                                                 ),
-                                                width: '6%'
+                                                width: '10%',
                                             },
                                             {
                                                 title: '단가',

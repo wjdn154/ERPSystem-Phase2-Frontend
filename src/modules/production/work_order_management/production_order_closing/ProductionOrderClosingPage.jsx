@@ -96,6 +96,7 @@ const ProductionOrderClosingPage = ({ initialData }) => {
 
         try {
             const response = await apiClient.post(PRODUCTION_API.PRODUCTION_ORDER_CLOSE_API, closureParams);
+            console.log(response);
 
             const updatedData = searchData.map((item) =>
                 item.id === saveParams.id ? {
@@ -107,6 +108,7 @@ const ProductionOrderClosingPage = ({ initialData }) => {
                     closed: true,
                 } : item
             );
+            console.log(updatedData);
 
             setSearchData(updatedData);
 

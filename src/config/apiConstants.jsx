@@ -217,6 +217,7 @@ export const LOGISTICS_API = {
     
     
     RECEIVING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/receiving-orders/`, // 입고 지시서 목록 조회 API
+    RECEIVING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/${id}`, // 입고지시서 상세 정보 조회 API
     RECEIVING_ORDER_CREATE_API: `${API_BASE_URL}/api/logistics/receiving-orders/create`, // 입고 지시서 등록 API
 
     // 영업 관리

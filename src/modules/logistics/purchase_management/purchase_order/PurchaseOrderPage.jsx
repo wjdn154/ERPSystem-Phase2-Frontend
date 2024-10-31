@@ -24,7 +24,7 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
-import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
+import {DownSquareOutlined, SearchOutlined, PlusOutlined, CheckOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
@@ -102,10 +102,7 @@ const PurchaseOrderPage = ({initialData}) => {
     const calculateSupplyPrice = (quantity, price) => {
         return quantity * price;
     };
-
-    const calculateVat = (supplyPrice) => {
-        return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
-    };
+    
 
     // 수량 또는 단가 변경 시 공급가액과 부가세를 자동 계산하는 함수
     const updateSupplyAndVat = (quantity, price, recordKey) => {
@@ -118,31 +115,7 @@ const PurchaseOrderPage = ({initialData}) => {
         updateField('vat', vat, recordKey);
         console.log('vat', vat)
     };
-
-    const updateField = (fieldName, value) => {
-        const updatedDetails = [...purchaseOrderParam.purchaseOrderDetails];
-
-        console.log('editingRow: ', editingRow)
-
-        updatedDetails[editingRow][fieldName] = value;
-
-        console.log('updatedDetails: ', updatedDetails)
-
-        // 수량이나 단가가 변경되면 공급가액을 재계산
-        if (fieldName === 'quantity' || fieldName === 'price') {
-            const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
-
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
-        }
-
-        setPurchaseOrderParam((prevParams) => ({
-            ...prevParams,
-            purchaseOrderDetails: updatedDetails,
-        }));
-    };
+    
 
     // 입력 필드 클릭 시 모달 열기
     const handleInputClick = (fieldName, index) => {
@@ -165,7 +138,7 @@ const PurchaseOrderPage = ({initialData}) => {
         }
     };
 
-    // 등록 일자 변경 핸들러
+    // 입력 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
         setPurchaseOrderParam((prevState) => ({
             ...prevState,
@@ -569,6 +542,89 @@ const PurchaseOrderPage = ({initialData}) => {
         });
     };
 
+    const updateField = (fieldName, value, index) => {
+
+
+        const updatedDetails = [...purchaseOrderParam.purchaseOrderDetails];
+
+        console.log('editingRow: ', editingRow)
+
+        updatedDetails[index][fieldName] = value;
+
+        console.log('updatedDetails: ', updatedDetails)
+
+        setPurchaseOrderParam((prevParams) => ({
+            ...prevParams,
+            purchaseOrderDetails: updatedDetails,
+        }));
+    };
+
+    // API를 사용해 부가세 계산
+    const calculateVat = async (quantity, price, vatTypeId, index) => {
+        try {
+            const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
+                vatTypeId,
+                quantity,
+                price,
+            });
+            const vatAmount = response.data;
+
+            console.log('vatAmount: ', vatAmount);
+
+            console.log(purchaseOrderParam)
+            // quotationDetails가 배열인지 확인하고, index가 유효한지 확인
+
+
+            const supplyPrice = purchaseOrderParam.purchaseOrderDetails[index].supplyPrice = quantity * price;
+            console.log(supplyPrice)
+            const vat = purchaseOrderParam.purchaseOrderDetails[index].vat = vatAmount;
+
+
+            updateField('supplyPrice', supplyPrice, index)
+            updateField('vat', vat, index)
+
+            setPurchaseOrderDetails(purchaseOrderParam);
+
+        } catch (error) {
+            console.error("부가세 계산 중 오류 발생:", error);
+        }
+    };
+
+    const handleQuantityChange = (value, index) => {
+        setEditingRow(index)
+        const updatedDetails = [...purchaseOrderParam.purchaseOrderDetails];
+        updatedDetails[index].quantity = value;
+
+        setPurchaseOrderParam((prevParam) => ({
+            ...prevParam,
+            purchaseOrderDetails: updatedDetails,
+        }));
+        setEditingRow(null);
+
+    };
+
+    const saveEdit = async (id, event, index) => {
+        event.stopPropagation();
+
+        console.log(id);
+
+
+        const record = purchaseOrderParam.purchaseOrderDetails[id];
+        console.log(record)
+
+        const quantity = Number(record.quantity);
+        const price = record.price;
+
+        const vatTypeId = purchaseOrderParam.vatType ? purchaseOrderParam.vatType.code : purchaseOrderParam.vatCode;
+
+        if (quantity && price && vatTypeId) {
+            await calculateVat(quantity, price, vatTypeId, id); // 필요한 데이터로 부가세 계산 API 호출
+        } else {
+            console.error("필수 데이터가 부족합니다: 수량, 단가, 과세 유형을 입력해주세요.");
+        }
+
+    };
+
     const columns = [
         {
             title: <div className="title-text">상태</div>,
@@ -589,18 +645,18 @@ const PurchaseOrderPage = ({initialData}) => {
                         break;
                     default:
                         color = 'gray'; // 기본 색상
-                        value = '상태 알 수 없음';
+                        value = '미확인';
                 }
                 return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
             },
             width: '10%',
         },
         {
-            title: <div className="title-text">발주 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '10%',
         },
         {
@@ -767,6 +823,7 @@ const PurchaseOrderPage = ({initialData}) => {
                                                 try {
                                                     const response = await apiClient.post(LOGISTICS_API.PURCHASE_ORDER_DETAIL_API(id));
                                                     setDetailPurchaseOrder(response.data);
+                                                    console.log(response.data)
                                                     setPurchaseOrderDetails(detailPurchaseOrder.purchaseOrderDetails)
                                                     setEditPurchaseOrder(true);
 
@@ -794,17 +851,17 @@ const PurchaseOrderPage = ({initialData}) => {
                                             onFinish={(values) => { handleFormSubmit(values, 'update') }}
                                         >
                                             {/* 발주서 정보 */}
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매서 정보</Divider>
+                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주서 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(purchaseOrderParam.date)}
-                                                            onChange={handleDeliveryDateChange}
+                                                            onChange={handleRegiDateChange}
                                                         />
                                                     </Form.Item>
                                                 </Col>
@@ -889,28 +946,6 @@ const PurchaseOrderPage = ({initialData}) => {
                                                                 <Select.Option value="1">현금</Select.Option>
                                                                 <Select.Option value="2">외상</Select.Option>
                                                                 <Select.Option value="3">카드</Select.Option>
-
-                                                            </Select>
-                                                        </Space.Compact>
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <Form.Item name="journalEntry">
-                                                        <Space.Compact>
-                                                            <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="분개유형" disabled />
-                                                            <Select
-                                                                style={{ width: '70%' }}
-                                                                value={purchaseOrderParam.journalEntryCode}
-                                                                onChange={(value) => {
-                                                                    setPurchaseOrderParam((prevState) => ({
-                                                                        ...prevState,
-                                                                        journalEntryCode: value,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <Select.Option value="4">현금</Select.Option>
-                                                                <Select.Option value="5">외상</Select.Option>
-                                                                <Select.Option value="6">카드</Select.Option>
 
                                                             </Select>
                                                         </Space.Compact>
@@ -1032,14 +1067,22 @@ const PurchaseOrderPage = ({initialData}) => {
                                                         key: 'quantity',
                                                         align: 'center',
                                                         render: (text, record, index) => (
-
-                                                            <Input
-                                                                value={text}
-                                                                onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                                className="small-text"
-                                                            />
+                                                            <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                                <Input
+                                                                    value={record.quantity}
+                                                                    onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                                    className="small-text"
+                                                                    style={{ flex: 1 }}
+                                                                />
+                                                                <Tooltip title="저장">
+                                                                    <CheckOutlined
+                                                                        style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                        onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                                    />
+                                                                </Tooltip>
+                                                            </div>
                                                         ),
-                                                        width: '6%'
+                                                        width: '10%',
                                                     },
                                                     {
                                                         title: '단가',
@@ -1122,34 +1165,34 @@ const PurchaseOrderPage = ({initialData}) => {
                 <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                     <Grow in={true} timeout={200}>
                         <Paper elevation={3} sx={{ height: '100%' }}>
-                            <Typography variant="h6" sx={{ padding: '20px' }}>발주서 작성</Typography>
+                            <Typography variant="h6" sx={{ padding: '20px' }}>발주서 상세정보 및 수정</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
-                                    layout="vertical"
+                                    initialValues={detailPurchaseOrder}
                                     form={registrationForm}
                                     onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
-                                    {/* 발주서 요청 정보 */}
-                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주서 정보</Divider>
+                                    {/* 발주서 정보 */}
+                                    <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
-                                                    p
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(purchaseOrderParam.date)}
                                                     onChange={handleRegiDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>
+
                                         <Col>
                                             <Typography>납기 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '납기 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '출하예정일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(purchaseOrderParam.deliveryDate)}
@@ -1159,7 +1202,7 @@ const PurchaseOrderPage = ({initialData}) => {
                                         </Col>
                                     </Row>
 
-                                    <Row gutter={16}>
+                                    <Row gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col span={6}>
                                             <Form.Item style={{ marginBottom: 0 }} >
                                                 <Input
@@ -1171,7 +1214,7 @@ const PurchaseOrderPage = ({initialData}) => {
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={6}>
+                                        <Col span={8}>
                                             <Form.Item style={{ marginBottom: 0 }} >
                                                 <Input
                                                     addonBefore="입고창고"
@@ -1193,6 +1236,21 @@ const PurchaseOrderPage = ({initialData}) => {
                                                 />
                                             </Form.Item>
                                         </Col>
+                                    </Row>
+
+                                    <Row gutter={16} >
+                                        <Col span={6}>
+                                            <Form.Item style={{ marginBottom: 0 }} >
+                                                <Input
+                                                    addonBefore="과세 유형"
+                                                    value={displayValues.vatType}
+                                                    onClick={() => handleInputClick('vatType')}
+                                                    onFocus={(e) => e.target.blur()}
+                                                    suffix={<DownSquareOutlined />}
+                                                />
+                                            </Form.Item>
+                                        </Col>
+
                                         <Col span={6}>
                                             <Form.Item name="journalEntry">
                                                 <Space.Compact>
@@ -1216,9 +1274,16 @@ const PurchaseOrderPage = ({initialData}) => {
                                             </Form.Item>
                                         </Col>
 
+                                        <Col span={6}>
+                                            <Form.Item name="electronicTaxInvoiceStatus" valuePropName="checked">
+                                                <Checkbox>세금계산서 발행 여부</Checkbox>
+                                            </Form.Item>
+                                        </Col>
+
                                     </Row>
 
                                     <Row gutter={16}>
+
                                         <Col span={6}>
                                             <Form.Item name="currency">
                                                 <Space.Compact>
@@ -1261,30 +1326,20 @@ const PurchaseOrderPage = ({initialData}) => {
                                                     <Input
                                                         addonBefore="환율"
                                                         value={purchaseOrderParam.exchangeRate}
+                                                        onClick={() => handleInputClick('exchangeRate')}
                                                         onFocus={(e) => e.target.blur()}
                                                     />
                                                 </Form.Item>
                                             </Col>
                                         )}
+
+
                                         <Col span={12}>
                                             <Form.Item name="remarks">
                                                 <Input addonBefore="비고" />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={6}>
-                                            <Form.Item name="electronicTaxInvoiceStatus">
-                                                <Checkbox
-                                                    onChange={(e) => {
-                                                        setPurchaseOrderParam((prevState) => ({
-                                                            ...prevState,
-                                                            electronicTaxInvoiceStatus: e.target.checked ? "PUBLISHED" : "UNPUBLISHED",
-                                                        }));
-                                                    }}
-                                                >
-                                                    세금계산서 발행 여부
-                                                </Checkbox>
-                                            </Form.Item>
-                                        </Col>
+
                                     </Row>
 
                                     {/* 발주서 상세 항목 */}
@@ -1334,14 +1389,22 @@ const PurchaseOrderPage = ({initialData}) => {
                                                 key: 'quantity',
                                                 align: 'center',
                                                 render: (text, record, index) => (
-
-                                                    <Input
-                                                        value={text}
-                                                        onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                        className="small-text"
-                                                    />
+                                                    <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                        <Input
+                                                            value={record.quantity}
+                                                            onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                            className="small-text"
+                                                            style={{ flex: 1 }}
+                                                        />
+                                                        <Tooltip title="저장">
+                                                            <CheckOutlined
+                                                                style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                            />
+                                                        </Tooltip>
+                                                    </div>
                                                 ),
-                                                width: '6%'
+                                                width: '10%',
                                             },
                                             {
                                                 title: '단가',
@@ -1394,8 +1457,9 @@ const PurchaseOrderPage = ({initialData}) => {
                                         })}
 
                                     />
-                                    <Divider style={{ marginBottom: '10px' }} />
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', paddingBottom: '10px' }}>
+
+                                    <Divider style={{ marginBottom: '10px'}} />
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                                         <Button type="default" onClick={handleAddRow} style={{ marginRight: '10px' }}>
                                             <PlusOutlined /> 항목 추가
                                         </Button>
@@ -1408,8 +1472,9 @@ const PurchaseOrderPage = ({initialData}) => {
                                             저장
                                         </Button>
                                     </Box>
-
                                 </Form>
+
+
                             </Grid>
                         </Paper>
                     </Grow>
