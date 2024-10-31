@@ -11,14 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '자본 분석',
-            children: (
-                <Typography>
-                    자본 항목을 분석하고, 자본 변동 내역을 확인할 수 있는 탭임.
-                </Typography>
-            ),
-        },
     ];
 }

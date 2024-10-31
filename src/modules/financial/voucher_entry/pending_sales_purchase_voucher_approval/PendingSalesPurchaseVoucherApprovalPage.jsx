@@ -54,7 +54,7 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="미결 매입매출전표 승인"
+                        title="매입매출전표 승인"
                         description={(
                             <Typography>
                                 미결 매입매출 전표승인 페이지는 <span>미결 상태의 전표를 승인하는 기능</span>을 제공함. 이 페이지를 통해 승인자는 <span>거래 내역을 검토하고 승인 또는 반려</span>할 수 있음.<br/>
@@ -589,11 +589,6 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                     </Grid>
                 </Grid>
             )}
-
-            {activeTabKey === '2' && (
-                <TemporarySection />
-            )}
-
         </Box>
     );
 };

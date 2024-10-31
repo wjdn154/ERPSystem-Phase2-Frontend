@@ -11,14 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '분개장 필터',
-            children: (
-                <Typography>
-                    특정 날짜, 계정과목, 거래처별로 거래 내역을 필터링할 수 있는 탭임.
-                </Typography>
-            ),
-        },
     ];
 }
