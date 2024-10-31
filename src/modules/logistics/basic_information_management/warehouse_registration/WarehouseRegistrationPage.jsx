@@ -1,6 +1,21 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {Box, Grid, Card, Paper, Typography, Divider, Grow} from '@mui/material';
-import {Table, Tag, Input, Form, Space, Button, Modal, Tree, Select, Row, Col, Checkbox, Spin} from 'antd';
+import {
+    Table,
+    Tag,
+    Input,
+    Form,
+    Space,
+    Button,
+    Modal,
+    Tree,
+    Select,
+    Row,
+    Col,
+    Checkbox,
+    Spin,
+    notification
+} from 'antd';
 import {LOGISTICS_API, PRODUCTION_API} from '../../../../config/apiConstants';
 import apiClient from '../../../../config/apiClient';
 import {useNotificationContext} from '../../../../config/NotificationContext';
@@ -11,12 +26,16 @@ import {DownSquareOutlined, SearchOutlined} from "@ant-design/icons";
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {id} from "date-fns/locale";
 
+const {Option} = Select;
+const {confirm} = Modal;
+
 const WarehouseRegistrationPage = ({initialData}) => {
     const notify = useNotificationContext(); // 알림 메시지 컨텍스트 사용
     const [isLoading, setIsLoading] = useState(false);
     const [warehouseList, setWarehouseList] = useState(initialData); // 창고 목록
     const [warehouseDetail, setWarehouseDetail] = useState(false);
     const [editWarehouse, setEditWarehouse] = useState(false);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
     const [form] = Form.useForm(); // 폼 인스턴스 생성
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
     const [warehouseParam, setWarehouseParam] = useState(false);
@@ -26,12 +45,53 @@ const WarehouseRegistrationPage = ({initialData}) => {
     const [modalData, setModalData] = useState(null);
     const [initialModalData, setInitialModalData] = useState(null);
     const [initialModalRequests, setInitialModalRequests] = useState([]);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
+    const [checkedKeys, setCheckedKeys] = useState([]); // Keys for checked groups in Tree
+    const [expandedKeys, setExpandedKeys] = useState([]);
     const [activeTabKey, setActiveTabKey] = useState('1'); // 활성화된 탭 키
 
     const handleFormSubmit = async (values) => {
+        confirm({
+            title: '수정 확인',
+            content: '정말로 수정하시겠습니까?',
+            okText: '확인',
+            cancelText: '취소',
+            onOk: async () => {
+                const warehouseId = warehouseParam.id;
 
+                const warehouseData = {
+                    code: values.code,
+                    name: values.name,
+                    warehouseType: values.warehouseType,
+                    processDetailId: warehouseParam.productionProcess.id,
+                    hierarchyGroups: warehouseParam.hierarchyGroups.map((group) => ({
+                        id: group.id,
+                        code: group.code,
+                        name: group.name,
+                    })),
+                    isActive: values.isActive,
+                };
+                try {
+                    // 서버에 PUT 요청 전송하여 데이터 업데이트
+                    const API_PATH = LOGISTICS_API.WAREHOUSE_UPDATE_API(warehouseId);
+                    await apiClient.put(API_PATH, warehouseData);
+                    setEditWarehouse(false);
+                    // 성공 알림
+                    notify('success', '창고 수정', '창고 수정이 성공적으로 수정되었습니다.', 'bottomRight');
+                } catch (error) {
+                    // 오류 알림
+                    notify('error', '수정 실패', '창고를 수정하는 중 오류가 발생했습니다.', 'top');
+                }
+            },
+            onCancel() {
+                notification.warning({
+                    message: '수정 취소',
+                    description: '수정이 취소되었습니다.',
+                    placement: 'bottomRight',
+                });
+            },
+        });
     }
+
 
     const handleTabChange = (key) => {
         setActiveTabKey(key); // 선택된 탭으로 변경
@@ -68,6 +128,9 @@ const WarehouseRegistrationPage = ({initialData}) => {
 
             setModalData(modalData);
             setInitialModalData(modalData);
+
+            // 트리 모든 노드의 키를 가져와 expandedKeys에 설정
+            setExpandedKeys(getAllKeys(modalData));
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
@@ -75,31 +138,112 @@ const WarehouseRegistrationPage = ({initialData}) => {
         }
     }
 
-    const handleModalSelect = (record) => {
-        switch (currentField) {
-            case 'productionProcess':
-                setWarehouseParam((prevParams) => ({
-                    ...prevParams,
-                    productionProcess: {
-                        id: record.id,
-                        code: record.code,
-                        name: record.name,
-                    },
-                }));
-                setDisplayValues((prevValues) => ({
-                    ...prevValues,
-                    productionProcess : `[${record.code}] ${record.name}`,
-                }));
-                form.setFieldsValue({
-                    productionProcess: `[${record.code}] ${record.name}`,
-                });
-                break;
+    // 트리의 모든 키를 가져오는 함수
+    const getAllKeys = (data) => {
+        const keys = [];
+        const findKeys = (nodes) => {
+            nodes.forEach((node) => {
+                keys.push(node.key); // key를 가져옵니다.
+                if (node.children) findKeys(node.children);
+            });
+        };
+        findKeys(data);
+        return keys;
+    };
 
-            case 'hierarchyGroupName':
-                break
+    useEffect(() => {
+        if (isModalVisible && modalData) {
+            // 모달이 열릴 때 트리를 모두 펼칩니다.
+            setExpandedKeys(getAllKeys(convertToTreeData(modalData)));
         }
-        setIsModalVisible(false);
-    }
+    }, [isModalVisible, modalData]);
+
+    const handleModalSelect = (record) => {
+        if (currentField === 'productionProcess') {
+            setWarehouseParam((prevParams) => ({
+                ...prevParams,
+                productionProcess: {
+                    id: record.id,
+                    code: record.code,
+                    name: record.name,
+                },
+            }));
+            setDisplayValues((prevValues) => ({
+                ...prevValues,
+                productionProcess: `[${record.code}] ${record.name}`,
+            }));
+            form.setFieldsValue({
+                productionProcess: `[${record.code}] ${record.name}`,
+            });
+            setIsModalVisible(false); // productionProcess 선택 후 모달 닫기
+        } else if (currentField === 'hierarchyGroupName') {
+            // hierarchyGroupName 처리 부분 수정
+            setWarehouseParam((prevParams) => ({
+                ...prevParams,
+                hierarchyGroups: [
+                    ...(prevParams.hierarchyGroups || []),
+                    {
+                        id: record.id,
+                        code: record.hierarchyGroupCode,
+                        name: record.hierarchyGroupName,
+                    },
+                ],
+            }));
+            setDisplayValues((prevValues) => ({
+                ...prevValues,
+                hierarchyGroups: [
+                    ...(prevValues.hierarchyGroups || []),
+                    {
+                        id: record.id,
+                        code: record.hierarchyGroupCode,
+                        name: record.hierarchyGroupName,
+                    },
+                ],
+            }));
+            // 여기서 form.setFieldsValue는 사용하지 않아 Input에 값이 들어가지 않게 함
+        }
+    };
+
+    // 트리 데이터를 변환하는 함수
+    const convertToTreeData = (data, parentKey = '') =>
+        data.map((item) => ({
+            title: `[${item.hierarchyGroupCode}] ${item.hierarchyGroupName}`, // 표시될 제목
+            key: `${parentKey}-${item.id.toString()}`, // 부모 key와 현재 id 결합
+            hierarchyGroupCode: item.hierarchyGroupCode, // 코드 추가
+            hierarchyGroupName: item.hierarchyGroupName, // 이름 추가
+            children: item.childGroups ? convertToTreeData(item.childGroups, `${parentKey}-${item.id.toString()}`) : [],
+        }));
+
+    // Tree onCheck 핸들러 수정
+    const handleTreeCheck = (checkedKeysValue, {checkedNodes}) => {
+        setCheckedKeys(checkedKeysValue);
+        const selectedGroups = checkedNodes.map(node => ({
+            id: node.key,
+            code: node.hierarchyGroupCode,
+            name: node.hierarchyGroupName,
+        }));
+        setDisplayValues((prevValues) => ({
+            ...prevValues,
+            hierarchyGroups: selectedGroups,
+        }));
+    };
+
+    const handleTagRemove = (id) => {
+        setDisplayValues((prevValues) => ({
+            ...prevValues,
+            hierarchyGroups: prevValues.hierarchyGroups
+                ? prevValues.hierarchyGroups.filter((group) => group.id !== id)
+                : [],
+        }));
+
+        setWarehouseParam((prevParams) => ({
+            ...prevParams,
+            hierarchyGroups: prevParams.hierarchyGroups
+                ? prevParams.hierarchyGroups.filter((group) => group.id !== id)
+                : [],
+        }));
+    };
+
 
     useEffect(() => {
         if (!warehouseDetail) return;
@@ -196,7 +340,11 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                             },
                                         ]}
                                         rowKey={(record) => record.id}
-                                        pagination={{pageSize: 15, position: ['bottomCenter'], showSizeChanger: false}}
+                                        pagination={{
+                                            pageSize: 15,
+                                            position: ['bottomCenter'],
+                                            showSizeChanger: false
+                                        }}
                                         size="small"
                                         rowSelection={{
                                             type: 'radio',
@@ -212,9 +360,12 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                                 const id = record.id;
                                                 try {
                                                     const response = await apiClient.post(LOGISTICS_API.WAREHOUSE_DETAIL_API(id));
-                                                    console.log(response.data);
+                                                    console.log('상세:',response.data);
+                                                    setWarehouseParam(response.data);
                                                     setWarehouseDetail(response.data);
+                                                    setModalData(null);
                                                     setEditWarehouse(true);
+                                                    setDisplayValues({});
                                                     notify('success', '품목 조회', '품목 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -227,7 +378,8 @@ const WarehouseRegistrationPage = ({initialData}) => {
                         </Grow>
                     </Grid>
                     {editWarehouse && (
-                        <Grid item xs={12} md={12} sx={{minWidth: '1000px !important', maxWidth: '1500px !important'}}>
+                        <Grid item xs={12} md={12}
+                              sx={{minWidth: '1000px !important', maxWidth: '1500px !important'}}>
                             <Grow in={true} timeout={200}>
                                 <Paper elevation={3} sx={{height: '100%'}}>
                                     <Typography variant="h6" sx={{padding: '20px'}}>창고 상세 정보</Typography>
@@ -263,9 +415,9 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                                             }))
                                                         }}
                                                     >
-                                                        <Select.Option value="WAREHOUSE">창고</Select.Option>
-                                                        <Select.Option value="FACTORY">공장</Select.Option>
-                                                        <Select.Option value="OUTSOURCING_FACTORY">외주 공장</Select.Option>
+                                                        <Option value="WAREHOUSE">창고</Option>
+                                                        <Option value="FACTORY">공장</Option>
+                                                        <Option value="OUTSOURCING_FACTORY">외주 공장</Option>
                                                     </Select>
                                                 </Space.Compact>
                                             </Form.Item>
@@ -283,12 +435,20 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                                     addonBefore="계층그룹"
                                                     onClick={() => handleInputClick('hierarchyGroupName')} // 클릭 시 모달 표시
                                                     prefix={
-                                                        displayValues.hierarchyGroups && displayValues.hierarchyGroups.map(group => (
-                                                            <Tag key={group.id} color="blue" closable={false}>
-                                                                [{group.code}] {group.name}
-                                                            </Tag>
-                                                        ))
+                                                        displayValues.hierarchyGroups && displayValues.hierarchyGroups.length > 0
+                                                            ? displayValues.hierarchyGroups.map((group) => (
+                                                                <Tag
+                                                                    key={group.id}
+                                                                    color="blue"
+                                                                    closable={true} // closable을 true로 설정
+                                                                    onClose={() => handleTagRemove(group.id)} // 태그 삭제 핸들러 추가
+                                                                >
+                                                                    [{group.code}] {group.name}
+                                                                </Tag>
+                                                            ))
+                                                            : null // 선택된 항목이 없을 때는 태그가 표시되지 않음
                                                     }
+                                                    value="" // Input의 value를 비워둬서 텍스트로 들어가지 않도록 함
                                                     onFocus={(e) => e.target.blur()}
                                                     suffix={<DownSquareOutlined/>}
                                                 />
@@ -318,7 +478,8 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                                         {currentField === 'productionProcess' && (
                                                             <>
                                                                 <Typography id="modal-modal-title" variant="h6"
-                                                                            component="h2" sx={{marginBottom: '20px'}}>
+                                                                            component="h2"
+                                                                            sx={{marginBottom: '20px'}}>
                                                                     생산공정 선택
                                                                 </Typography>
                                                                 <Input
@@ -374,17 +535,19 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                                                 )}
                                                             </>
                                                         )}
+                                                        // Modal 내부 Tree 설정 부분 수정
                                                         {currentField === 'hierarchyGroupName' && (
                                                             <>
                                                                 <Typography id="modal-modal-title" variant="h6"
-                                                                            component="h2" sx={{marginBottom: '20px'}}>
+                                                                            component="h2"
+                                                                            sx={{marginBottom: '20px'}}>
                                                                     계층그룹 선택
                                                                 </Typography>
                                                                 <Input
                                                                     placeholder="검색"
                                                                     prefix={<SearchOutlined/>}
                                                                     onChange={(e) => {
-                                                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
+                                                                        const value = e.target.value.toLowerCase();
                                                                         if (!value) {
                                                                             setModalData(initialModalData);
                                                                         } else {
@@ -401,11 +564,21 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                                                 />
                                                                 {modalData && (
                                                                     <>
+                                                                        <Tree
+                                                                            checkable
+                                                                            checkStrictly={true} // 상위-하위 개별 선택이 가능하도록 설정
+                                                                            expandedKeys={expandedKeys}
+                                                                            checkedKeys={checkedKeys}
+                                                                            onExpand={(keys) => setExpandedKeys(keys)}
+                                                                            onCheck={handleTreeCheck} // 수정된 핸들러 사용
+                                                                            treeData={convertToTreeData(modalData)}
+                                                                        />
 
                                                                     </>
                                                                 )}
                                                             </>
                                                         )}
+
                                                         <Box sx={{
                                                             mt: 2,
                                                             display: 'flex',
