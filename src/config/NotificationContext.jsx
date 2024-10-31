@@ -13,7 +13,7 @@ export const NotificationProvider = ({ children }) => {
             message,
             description,
             placement,
-            duration: 1,
+            duration: 2,
         });
     };
 
