@@ -249,11 +249,6 @@ const PendingVoucherApprovalPage = () => {
                                             <Button
                                                 type="danger"
                                                 onClick={() => {
-                                                    if (!selectedVouchers) {
-                                                        notify('warning', '전표 선택', '반려할 전표를 선택해주세요.', 'bottomRight');
-                                                        return;
-                                                    }
-
                                                     confirm({
                                                         title: '매입매출 전표 반려 확인',
                                                         content: '정말 매입매출 전표를 반려 하시겠습니까?',
@@ -261,6 +256,10 @@ const PendingVoucherApprovalPage = () => {
                                                         cancelText: '취소',
                                                         async onOk() {
                                                             try {
+                                                                if (selectedVouchers.length === 0) {
+                                                                    notify('warning', '전표 선택', '반려할 전표를 선택해주세요.', 'bottomRight');
+                                                                    return;
+                                                                }
 
                                                                 console.log(dayjs(selectedDate).format('YYYY-MM-DD'));
                                                                 console.log(selectedVouchers);
@@ -292,7 +291,7 @@ const PendingVoucherApprovalPage = () => {
                                                     });
                                                 }}
                                             >
-                                                반려
+                                                전표 반려
                                             </Button>
 
                                             <Button
@@ -309,6 +308,11 @@ const PendingVoucherApprovalPage = () => {
                                                         okText: '확인',
                                                         cancelText: '취소',
                                                         async onOk() {
+                                                            if (selectedVouchers.length === 0) {
+                                                                notify('warning', '전표 선택', '승인할 전표를 선택해주세요.', 'bottomRight');
+                                                                return;
+                                                            }
+
                                                             try {
                                                                 console.log(dayjs(selectedDate).format('YYYY-MM-DD'));
                                                                 console.log(selectedVouchers);
