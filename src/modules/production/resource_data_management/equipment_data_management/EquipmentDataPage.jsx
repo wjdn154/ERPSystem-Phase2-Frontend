@@ -252,7 +252,7 @@ const EquipmentDataPage = ({initialData}) => {
                                                 <Form.Item>
                                                     <Input
                                                         addonBefore="구매 비용"
-                                                        value={formatNumberWithComma(equipmentDataDetail.cost )}
+                                                        value={equipmentDataDetail.cost }
                                                         onChange={(e) => handleInputChange(e, 'cost')}
                                                     />
                                                 </Form.Item>

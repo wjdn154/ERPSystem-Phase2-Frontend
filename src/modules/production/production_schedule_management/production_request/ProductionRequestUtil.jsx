@@ -11,14 +11,6 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '의뢰 등록',
-            children: (
-                <Typography>
-                    생산 의뢰 등록: 새로운 생산 의뢰를 등록하는 탭으로, 제품명, 수량, 납기일 등의 정보를 입력할 수 있음.
-                </Typography>
-            ),
-        },
+
     ];
 }
