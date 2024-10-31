@@ -603,10 +603,10 @@ const ShippingOrderPage = ({initialData}) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="출하"
+                        title="출하지시서"
                         description={(
                             <Typography>
-                                출하 페이지는 <span>고객에게 실제로 상품을 출하하는 과정</span>을 관리함. 이 페이지에서는 <span>출하 상태를 확인, 수정</span>할 수 있으며, <span>출하 완료</span>된 상품들의 내역을 기록함. 출하가 완료되면 <span>송장 번호</span>와 <span>배송 상태</span>를 확인할 수 있는 기능도 제공됨.
+                                출하 페이지는 <span>고객에게 실제로 상품을 출하하는 과정</span>을 관리함. 이 페이지에서는 <span>출하 상태를 확인, 수정</span>할 수 있으며, <span>출하 완료</span>된 상품들의 내역을 기록함.
                             </Typography>
                         )}
                         tabItems={tabItems()}
