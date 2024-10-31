@@ -10,6 +10,7 @@ import isBetween from 'dayjs/plugin/isBetween'; // isBetween 플러그인 추가
 import { SearchOutlined } from "@ant-design/icons";
 import apiClient from "../../../../config/apiClient.jsx";
 import { PRODUCTION_API } from "../../../../config/apiConstants.jsx";
+import {tabItems} from "./MonthlyWorkReportUtil.jsx";
 
 const { RangePicker } = DatePicker;
 
@@ -152,6 +153,7 @@ const MonthlyWorkReportPage = () => {
                                 생산 월보 등록 페이지는 <span>월간 생산 성과를 집계하고 보고하는 곳</span>임. 이 페이지에서는 <span>한 달 동안의 생산 실적, 작업 시간, 불량 발생률</span> 등을 등록하고, 월간 목표 달성 여부를 확인할 수 있음. 월간 보고서를 통해 <span>전체 생산 흐름</span>을 파악하고, <span>장기적인 생산 계획 수립</span>에 기여함.
                             </Typography>
                         )}
+                        tabItems={tabItems()}
                         activeTabKey={activeTabKey}
                         handleTabChange={handleTabChange}
                     />

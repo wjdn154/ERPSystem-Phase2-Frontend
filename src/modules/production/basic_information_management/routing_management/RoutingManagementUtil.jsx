@@ -122,14 +122,6 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: 'Routing 등록',
-            children: (
-                <Typography>
-                    새로운 제품의 공정 경로를 설정하고, 순서와 공정 간 의존성을 관리할 수 있음.
-                </Typography>
-            ),
-        },
+
     ];
 }
