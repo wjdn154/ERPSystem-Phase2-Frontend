@@ -293,7 +293,7 @@ const ShippingOrderPage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
+    // 입력 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
         setShippingOrderParam((prevState) => ({
             ...prevState,
@@ -553,11 +553,11 @@ const ShippingOrderPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '15%',
         },
         {
@@ -745,10 +745,10 @@ const ShippingOrderPage = ({initialData}) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출하지시서 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(shippingOrderParam.date)}
@@ -761,7 +761,7 @@ const ShippingOrderPage = ({initialData}) => {
                                                     <Typography>출하예정일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(shippingOrderParam.shippingDate)}
@@ -1248,10 +1248,10 @@ const ShippingOrderPage = ({initialData}) => {
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>출하지시서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(shippingOrderParam.date)}
@@ -1264,7 +1264,7 @@ const ShippingOrderPage = ({initialData}) => {
                                             <Typography>납기 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(shippingOrderParam.shippingDate)}

@@ -321,7 +321,6 @@ const SalePlanPage = ({initialData}) => {
         const updatedDetails = [...salePlanParam.salePlanDetails];
 
         setEditingRow(index);
-        console.log('PRICE: ', value)
 
         updatedDetails[index][field] = value;
 
@@ -515,11 +514,11 @@ const SalePlanPage = ({initialData}) => {
 
     const columns = [
         {
-            title: <div className="title-text">등록 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '10%',
         },
         {
@@ -719,10 +718,10 @@ const SalePlanPage = ({initialData}) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={salePlanParam.date ? dayjs(salePlanParam.date) : null}
@@ -1149,55 +1148,7 @@ const SalePlanPage = ({initialData}) => {
                                 )}
                             </>
                         )}
-                        {/* 과세 유형 선택 모달 */}
-                        {currentField === 'vatType' && (
-                            <>
-                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
-                                    과세 유형 선택
-                                </Typography>
-                                <Input
-                                    placeholder="검색"
-                                    prefix={<SearchOutlined />}
-                                    onChange={(e) => {
-                                        const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
-                                        if (!value) {
-                                            setModalData(initialModalData);
-                                        } else {
-                                            const filtered = initialModalData.filter((item) => {
-                                                return (
-                                                    (item.code && item.code.toString().toLowerCase().includes(value)) ||
-                                                    (item.name && item.name.toLowerCase().includes(value))
-                                                );
-                                            });
-                                            setModalData(filtered);
-                                        }
-                                    }}
-                                    style={{ marginBottom: 16 }}
-                                />
-                                {modalData && (
 
-                                    <Table
-                                        columns={[
-                                            { title: '코드', dataIndex: 'code', key: 'code', align: 'center' },
-                                            { title: '과세명', dataIndex: 'name', key: 'name', align: 'center' }
-                                        ]}
-                                        dataSource={modalData}
-                                        rowKey="code"
-                                        size="small"
-                                        pagination={{
-                                            pageSize: 15,
-                                            position: ['bottomCenter'],
-                                            showSizeChanger: false,
-                                            showTotal: (total) => `총 ${total}개`,
-                                        }}
-                                        onRow={(record) => ({
-                                            style: { cursor: 'pointer' },
-                                            onClick: () => handleModalSelect(record) // 선택 시 처리
-                                        })}
-                                    />
-                                )}
-                            </>
-                        )}
 
                         {/* 품목 선택 모달 */}
                         {currentField === 'product' && (
@@ -1287,10 +1238,10 @@ const SalePlanPage = ({initialData}) => {
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>판매계획 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(salePlanParam.date)}

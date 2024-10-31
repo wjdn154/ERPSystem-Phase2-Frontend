@@ -25,7 +25,8 @@ const Register = () => {
 
     useEffect(() => {
         if(registerError) {
-            notify('error', '로그인 실패', registerError, 'top');
+            // notify('error', '회원가입 실패', registerError, 'top');
+            notify('warning', '회원가입 실패', '사용자를 등록한 후 회원가입 할 수 있습니다.', 'bottomRight');
             setRegisterError('');
         }
     }, [registerError]);

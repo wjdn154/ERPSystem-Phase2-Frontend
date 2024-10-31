@@ -11,14 +11,6 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '지시 마감',
-            children: (
-                <Typography>
-                    작업 지시 등록: 새로운 작업 지시를 등록하고, 작업 내용 및 일정을 입력할 수 있음.
-                </Typography>
-            ),
-        },
+
     ];
 }

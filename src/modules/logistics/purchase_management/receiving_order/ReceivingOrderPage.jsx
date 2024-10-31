@@ -52,7 +52,11 @@ const ReceivingOrderPage = ({initialData}) => {
         form.setFieldsValue({
             receivingOrderOrderDetails: receivingOrderDetails,
         })
-        setReceivingOrderParam(detailReceivingOrder);
+
+        setReceivingOrderParam((prevParam) => ({
+            ...prevParam,
+            ...detailReceivingOrder,
+        }));
 
         setDisplayValues({
             managerName: detailReceivingOrder.managerCode ? `[${detailReceivingOrder.managerCode}] ${detailReceivingOrder.managerName}` : null,
@@ -74,16 +78,27 @@ const ReceivingOrderPage = ({initialData}) => {
     const [searchData, setSearchData] = useState(null);
 
     const handleTabChange = (key) => {
+
+        setActiveTabKey(key);
         setEditReceivingOrder(false);
         setEditingRow(null);
-        setReceivingOrderDetails(null)
-        setDetailReceivingOrder([]);
+        setReceivingOrderParam({
+            receivingOrderDetails: [],
+            date: dayjs().format('YYYY-MM-DD'),
+            deliveryDate: dayjs().format('YYYY-MM-DD'),
+        });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        })
+        setDetailReceivingOrder(receivingOrderDetails.receivingOrderOrderDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
 
-        setActiveTabKey(key);
     };
 
     // 날짜 선택 처리
@@ -301,18 +316,6 @@ const ReceivingOrderPage = ({initialData}) => {
 
         updatedDetails[index][field] = value;
 
-        if (field === 'quantity') {
-            const quantity = value;
-
-            const price = updatedDetails[index].price;
-
-            updatedDetails[index].supplyPrice = quantity * price; // 공급가액 = 수량 * 단가
-
-            updateSupplyAndVat(quantity, price, index);
-
-        }
-
-
         setReceivingOrderDetails(updatedDetails); // 상태 업데이트
         setReceivingOrderParam( {
             ...receivingOrderParam,
@@ -403,7 +406,7 @@ const ReceivingOrderPage = ({initialData}) => {
                         managerId: receivingOrderParam.manager ? receivingOrderParam.manager.id : receivingOrderParam.managerId,
                         warehouseId: receivingOrderParam.warehouse ? receivingOrderParam.warehouse.id : receivingOrderParam.warehouseId,
                         date: receivingOrderParam.date,
-                        shippingDate: receivingOrderParam.shippingDate,
+                        deliveryDate: receivingOrderParam.deliveryDate,
                         items: Array.isArray(receivingOrderParam.receivingOrderDetails
                         ) ? receivingOrderParam.receivingOrderDetails.map(item => ({
                             productId: item.productId,
@@ -500,11 +503,11 @@ const ReceivingOrderPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '15%',
         },
         {
@@ -1186,8 +1189,8 @@ const ReceivingOrderPage = ({initialData}) => {
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
                                     initialValues={detailReceivingOrder}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
                                     {/* 입고지시서 정보 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>입고지시서 정보</Divider>
@@ -1200,7 +1203,7 @@ const ReceivingOrderPage = ({initialData}) => {
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(receivingOrderParam.date)}
-                                                    onChange={handleDeliveryDateChange}
+                                                    onChange={handleRegiDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>
@@ -1213,7 +1216,7 @@ const ReceivingOrderPage = ({initialData}) => {
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(receivingOrderParam.deliveryDate)}
-                                                    onChange={handleRegiDateChange}
+                                                    onChange={handleDeliveryDateChange}
                                                 />
                                             </Form.Item>
                                         </Col>

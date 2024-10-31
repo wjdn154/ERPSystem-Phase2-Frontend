@@ -11,14 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '사용자 등록/수정',
-            children: (
-                <Typography>
-                    신규 사용자를 등록하거나 기존 사용자 정보를 수정할 수 있는 탭임.
-                </Typography>
-            ),
-        },
     ];
 }

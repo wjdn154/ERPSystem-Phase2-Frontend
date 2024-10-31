@@ -188,7 +188,7 @@ const EquipmentDataDetailSection = ({
                             <Input
                                 addonBefore="제조사"
                                 value={equipmentDataDetail.manufacturer}
-                                onChange={(e) => handleInputChange(e, 'equipmentName')}
+                                onChange={(e) => handleInputChange(e, 'manufacturer')}
                             />
                         </Form.Item>
                     </Col>

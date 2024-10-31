@@ -241,7 +241,7 @@ const MaterialDataPage = ({initialData}) => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="자재 관리"
+                        title="자재 정보 관리"
                         description={(
                             <Typography>
                                 자재 정보 관리 페이지는 <span>생산에 필요한 자재의 기본 정보</span>를 관리하며, 자재의 <span>재고 및 자재 흐름</span>을 체계적으로 관리할 수 있음.
