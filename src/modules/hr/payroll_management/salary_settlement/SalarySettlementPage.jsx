@@ -689,7 +689,7 @@ const SalarySettlementPage = () => {
                                                                             form.setFieldsValue({ allowances: updatedAllowances });
                                                                         }}
                                                                         disabled={isFinalized}
-                                                                        style={{ textAlign: 'right' }}
+                                                                        style={{ textAlign: 'right', marginBottom:'-10px' }}
                                                                     />
                                                                 </Form.Item>
 
