@@ -22,6 +22,7 @@ export const equipmentDataHook = (initialData) => {
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); //수정 모달 상태
     const notify = useNotificationContext(); // 알림 컨텍스트 사용
 
+
     const equipmentMemoizedData = useMemo(() => data, [data]);
 
     //데이터가 변경될 때마다 컴포넌트를 새로 렌더링
@@ -48,16 +49,13 @@ export const equipmentDataHook = (initialData) => {
 
     // 행 선택 시 설비정보 상세 정보를 가져오는 로직
     const handleSelectedRow = async (selectedRow) => {
-
-        console.log('선택된 행 : ',selectedRow);
+        
         if(!selectedRow) return;
         setSelectedRow(selectedRow);
         setShowDetail(false);   //상세정보 로딩중일때 기존 상세정보 숨기기
 
         try {
-            console.log('selectedRow.id : ',selectedRow.id);
             const detail = await fetchEquipmentDataDetail(selectedRow.id);     //비동기 api 호출
-            console.log('fetch detail : ',detail);
             // 원래 설비 번호를 따로 저장 (originalEquipmentNum)
             setEquipmentDataDetail({
                 ...detail,
@@ -65,7 +63,7 @@ export const equipmentDataHook = (initialData) => {
             });
 
         } catch (error) {
-            console.error("API에서 데이터를 가져오는 중 오류 발생:", error);
+            notify('error', '조회 실패', 'API에서 데이터를 가져오는 중 오류 발생', 'top');
         }
     };
 
@@ -94,14 +92,14 @@ export const equipmentDataHook = (initialData) => {
             installDate: null,
             operationStatus: '',
             cost: '',
-            equipmentImg: ''
+            imagePath: ''
         });
     };
 
     // 저장 버튼 클릭 시 실행되는 함수
     const handleSave = async () => {
         try {
-            console.log("저장버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
+            
             await saveEquipmentDataDetail(equipmentDataDetail);
             const savedData = await fetchEquipmentData();
             notify('success', '설비 등록', '설비 등록 성공', 'bottomRight')
@@ -120,39 +118,6 @@ export const equipmentDataHook = (initialData) => {
         }
     };
 
-    //등록 버튼 클릭 시 모달 창 띄우는 함수
-    const insertEquipmentModal = () => {
-        setIsInsertModalVisible(true);
-    };
-    //등록 취소 버튼 클릭 함수
-    const handleInsertCancel = () => {
-        setIsInsertModalVisible(false);
-    }
-
-    //수정 버튼 클릭 시 모달창 띄우는 함수
-    const showModal = () => {
-        setIsUpdateModalVisible(true);
-    };
-
-
-    const handleUpdateCancel = () => {
-        setIsUpdateModalVisible(false);
-    };
-
-    // 수정 버튼 클릭 시 실행되는 함수
-    const handleUpdate = async () => {
-        try {
-            console.log("수정버튼 클릭시 id : ",equipmentDataDetail.id);
-            console.log("수정버튼 클릭 시 equipmentDataDetail : ",equipmentDataDetail);
-
-            await updateEquipmentDataDetail(equipmentDataDetail.id, equipmentDataDetail);
-            const updatedData = await fetchEquipmentData();
-            setData(updatedData);
-            notify('success', '설비 수정', '설비 수정 성공.', 'bottomRight');
-        } catch (error) {
-            notify('error', '수정 실패', '데이터 수정 중 오류가 발생했습니다.', 'top');
-        }
-    }
 
     //삭제 버튼 선택 클릭 시 실행되는 함수
     const handleDelete = async () => {
@@ -176,12 +141,10 @@ export const equipmentDataHook = (initialData) => {
         })
     }
 
-
-
-
     return {
         data,
         showDetail,
+        setShowDetail,
         selectedRow,
         handleSelectedRow,
         handleRowSelection,
@@ -189,16 +152,12 @@ export const equipmentDataHook = (initialData) => {
         setEquipmentDataDetail,
         handleInputChange,
         handleSave,
-        handleUpdate,
         handleDelete,
-        showModal,
-        handleUpdateCancel,
-        insertEquipmentModal,
         isInsertModalVisible,
         isUpdateModalVisible,
-        handleInsertCancel,
         handleOpenInsertModal,
-        handleCostInput
+        handleCostInput,
+        setData
     };
 
 };

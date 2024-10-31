@@ -292,7 +292,7 @@ const SalaryRegistrationPage = ({ initialData }) => {
                                             },
                                         ]}
                                         rowKey="id"
-                                        pagination={false}
+                                        pagination={{pageSize: 10, position: ['bottomCenter'], showSizeChanger: false}}
                                         size="small"
                                         style={{ marginBottom: '20px' }}
                                         rowSelection={{

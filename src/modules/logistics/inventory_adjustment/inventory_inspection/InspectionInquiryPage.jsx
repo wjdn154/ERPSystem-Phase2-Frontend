@@ -294,6 +294,7 @@ const InspectionInquiryPage = () => {
                                         </Row>
                                     </Form>
                                 </Grid>
+                                <Grid sx={{margin: '20px'}}>
                                 <Table
                                     dataSource={inspectionListData}
                                     columns={[
@@ -375,6 +376,7 @@ const InspectionInquiryPage = () => {
                                         },
                                     })}
                                 />
+                                </Grid>
                             </Paper>
                         </Grow>
                     </Grid>

@@ -32,14 +32,12 @@ export default function DashboardPage({ initialData }) {
         }));
     }, [initialData]);
 
-    console.log(reportData);
-
     return (
         <main className="flex-1 overflow-y-auto p-4">
             <div className="max-w-8xl my-10 mx-20">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <DashboardWidget icon={AttachMoneyIcon} title={reportData.widgets.financeName}  value={`₩${new Intl.NumberFormat('ko-KR').format(reportData.widgets.financeValue)}`} color="bg-blue-500" />
-                    <DashboardWidget icon={GroupsIcon} title="총 직원 수" value={reportData.widgets.hrValue} color="bg-green-500" />
+                    <DashboardWidget icon={GroupsIcon} title="총 직원 수" value={`${reportData.widgets.hrValue} 명`} color="bg-green-500" />
                     <DashboardWidget icon={LocalShippingIcon} title="재고 현황" value={reportData.widgets.logisticsValue} color="bg-yellow-500" />
                     <DashboardWidget icon={PrecisionManufacturingIcon} title={reportData.widgets.productionName} value={`${new Intl.NumberFormat('ko-KR').format(reportData.widgets.productionValue)} EA`} color="bg-purple-500" />
                 </div>
@@ -179,7 +177,7 @@ function ActivityTimeline({reportData}) {
     return (
         <div className="flow-root">
             <ul className="-mb-8">
-                {activitiesToShow.map((item, itemIdx) => (
+                {activitiesToShow.length > 0 ? activitiesToShow.map((item, itemIdx) => (
                     <li key={item.id}>
                         <div className="relative pb-8">
                             {itemIdx !== activitiesToShow.length - 1 ? (
@@ -210,7 +208,11 @@ function ActivityTimeline({reportData}) {
                             </div>
                         </div>
                     </li>
-                ))}
+                )) : (
+                    <div className="flex items-center justify-center h-32">
+                        <span className="text-gray-400">활동 내역이 없습니다.</span>
+                    </div>
+                )}
             </ul>
             {reportData.activities.length > 4 && (
                 <div className="mt-4 flex justify-end">

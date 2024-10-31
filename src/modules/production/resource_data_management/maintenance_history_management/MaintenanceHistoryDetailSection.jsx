@@ -21,7 +21,11 @@ const MaintenanceHistoryDetailSection = ({
                                         handleUpdate
                                     }) =>{
 
-
+    const formatNumberWithComma = (value) => {
+        // value가 숫자인 경우 문자열로 변환
+        const stringValue = String(value);
+        return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위마다 콤마 추가
+    };
     return(
     <Paper elevation={3} sx={{p: 2}}>
         <Typography variant="h6" marginBottom={'20px'}>설비 유지보수 상세 정보</Typography>
@@ -85,7 +89,7 @@ const MaintenanceHistoryDetailSection = ({
                         <Form.Item>
                             <Input
                                 addonBefore="유지보수 비용"
-                                value={maintenanceDataDetail.maintenanceCost}
+                                value={formatNumberWithComma(maintenanceDataDetail.maintenanceCost)}
                                 onChange={(e) => handleInputChange(e, 'maintenanceCost')}
                             />
                         </Form.Item>

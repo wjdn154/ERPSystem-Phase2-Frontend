@@ -44,6 +44,10 @@ const PurchaseRequestPage = ( {initialData} ) => {
     const [initialModalData, setInitialModalData] = useState(null);
 
     useEffect(() => {
+        setSearchData(purchaseRequestList);
+    }, [purchaseRequestList]);
+
+    useEffect(() => {
 
         if(!detailPurchaseRequest) return;
 
@@ -51,7 +55,11 @@ const PurchaseRequestPage = ( {initialData} ) => {
         form.setFieldsValue({
             purchaseRequestDetails: purchaseRequestDetails,
         })
-        setPurchaseRequestParam(detailPurchaseRequest);
+
+        setPurchaseRequestParam((prevParam) => ({
+            ...prevParam,
+            ...detailPurchaseRequest,
+        }));
 
         console.log("Updated searchParams:", searchParams);
 
@@ -111,15 +119,26 @@ const PurchaseRequestPage = ( {initialData} ) => {
 
 
     const handleTabChange = (key) => {
+        setActiveTabKey(key);
         setEditPurchaseRequest(false);
         setEditingRow(null);
-        setDetailPurchaseRequest([]);
+        setPurchaseRequestParam({
+            purchaseRequestDetails: [],
+            date: dayjs().format('YYYY-MM-DD'),
+            deliveryDate: dayjs().format('YYYY-MM-DD'),
+        });
+        setSearchParams({
+            startDate: null,
+            endDate: null,
+            clientId: null,
+            state: null,
+        });
+        setDetailPurchaseRequest(purchaseRequestParam.purchaseRequestDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
         registrationForm.setFieldValue('isActive', true);
 
-        setActiveTabKey(key);
     };
 
     // 입력 필드 클릭 시 모달 열기
@@ -211,10 +230,11 @@ const PurchaseRequestPage = ( {initialData} ) => {
 
                 updatedDetails[editingRow].client.clientName = record.clientName;
                 updatedDetails[editingRow].client.clientId = record.clientId;
+                updateField('productId', record.id, editingRow);
                 updateField('productCode', record.code, editingRow);
                 updateField('productName', record.name, editingRow);
                 updateField('price', record.purchasePrice, editingRow);
-
+                updateField('remarks', record.remarks, editingRow)
 
                 setPurchaseRequestParam((prevParams) => ({
                     ...prevParams,
@@ -259,12 +279,11 @@ const PurchaseRequestPage = ( {initialData} ) => {
             onOk: async () => {
                 try {
                     const purchaseRequestData = {
-                        managerId: purchaseRequestParam.managerId,
-                        warehouseId: purchaseRequestParam.warehouseId,
+                        managerId: purchaseRequestParam.manager ? purchaseRequestParam.manager.id : purchaseRequestParam.managerId,
+                        warehouseId: purchaseRequestParam.warehouse ? purchaseRequestParam.warehouse.id : purchaseRequestParam.warehouseId,
                         currencyId: purchaseRequestParam.currencyId,
                         date: purchaseRequestParam.date,
                         deliveryDate: purchaseRequestParam.deliveryDate,
-                        vatType: purchaseRequestParam.vatType,
                         items: Array.isArray(purchaseRequestParam.purchaseRequestDetails
                         ) ? purchaseRequestParam.purchaseRequestDetails.map(item => ({
                             productId: item.productId,
@@ -276,7 +295,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
 
                     console.log('Sending data to API:', purchaseRequestData); // API로 전송할 데이터 확인
 
-                    const API_PATH = type === 'update' ? LOGISTICS_API.PURCHASE_REQUEST_UPDATE_API(purchaseRequestParam.id) : LOGISTICS_API.PURCHASE_ORDER_CREATE_API;
+                    const API_PATH = type === 'update' ? LOGISTICS_API.PURCHASE_REQUEST_UPDATE_API(purchaseRequestParam.id) : LOGISTICS_API.PURCHASE_REQUEST_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
 
                     const response = await apiClient[method](API_PATH, purchaseRequestData, {
@@ -291,19 +310,31 @@ const PurchaseRequestPage = ( {initialData} ) => {
                         setPurchaseRequestList((prevList) =>
                             prevList.map((order) => (order.id === updatedData.id ? updatedData : order))
                         );
+                        setPurchaseRequestDetails(updatedData.purchaseRequestDetails);
                     } else {
                         setPurchaseRequestList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
                     }
 
+                    handleSearch()
+
+                    setSearchParams({
+                        startDate: null,
+                        endDate: null,
+                        clientId: null,
+                        state: null,
+                    });
+
                     setEditPurchaseRequest(false);
-                    setDetailPurchaseRequest(null);
-                    setPurchaseRequestParam(null);
+                    setPurchaseRequestParam({
+                        purchaseRequestDetails: [],
+                    });
+                    setDetailPurchaseRequest(purchaseRequestParam.purchaseRequestDetails || []);
                     setDisplayValues({});
 
                     type === 'update'
-                        ? notify('success', '발주서 수정', '발주서 정보 수정 성공.', 'bottomRight')
-                        : notify('success', '발주서 저장', '발주서 정보 저장 성공.', 'bottomRight');
+                        ? notify('success', '발주요청 수정', '발주요청 정보 수정 성공.', 'bottomRight')
+                        : notify('success', '발주요청 저장', '발주요청 정보 저장 성공.', 'bottomRight');
                 } catch (error) {
                     console.error('Error saving data:', error); // 오류 로그 출력
                     notify('error', '저장 실패', '데이터 저장 중 오류가 발생했습니다.', 'top');
@@ -355,7 +386,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
     const handleRegiDateChange = (date) => {
         setPurchaseRequestParam((prevState) => ({
             ...prevState,
-            date: dayjs(date),
+            date: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
     };
 
@@ -363,7 +394,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
     const handleDeliveryDateChange = (date) => {
         setPurchaseRequestParam((prevState) => ({
             ...prevState,
-            deliveryDate: dayjs(date),
+            deliveryDate: date ? dayjs(date).format('YYYY-MM-DD') : null,
         }));
     };
 
@@ -634,7 +665,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
 
                                     </Form>
                                     <Table
-                                        dataSource={Object.values(searchParams).every(value => value === null) ? purchaseRequestList : searchData}
+                                        dataSource={searchData}
                                         columns={columns}
                                         rowKey={(record) => record.id}
                                         pagination={{ pageSize: 10, position: ['bottomCenter'], showSizeChanger: false }}
@@ -657,6 +688,9 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                     setPurchaseRequestDetails(detailPurchaseRequest)
                                                     setEditPurchaseRequest(true);
 
+                                                    console.log('response.data: ', response.data)
+
+                                                    console.log('purchaseRequestDetails: ', purchaseRequestDetails)
                                                     notify('success', '발주요청 조회', '발주요청 정보 조회 성공.', 'bottomRight')
                                                 } catch (error) {
                                                     notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
@@ -710,8 +744,8 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                             </Row>
 
                                             <Row gutter={16}>
-                                                <Col span={6}>
-                                                    <Form.Item style={{ marginBottom: 0 }} >
+                                                <Col span={8}>
+                                                    <Form.Item style={{ marginBottom: '16px' }} >
                                                         <Input
                                                             addonBefore="담당자"
                                                             value={displayValues.managerName}
@@ -721,7 +755,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                         />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={6}>
+                                                <Col span={8}>
                                                     <Form.Item style={{ marginBottom: 0 }} >
                                                         <Input
                                                             addonBefore="입고창고"
@@ -732,16 +766,11 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                         />
                                                     </Form.Item>
                                                 </Col>
-                                                <Col span={4}>
-                                                    <Form.Item name="vatType" valuePropName="checked">
-                                                        <Checkbox>부가세 적용 여부</Checkbox>
-                                                    </Form.Item>
-                                                </Col>
                                             </Row>
 
                                             {/*  */}
                                             <Row gutter={16}>
-                                                <Col span={6}>
+                                                <Col span={8}>
                                                     <Form.Item name="currency">
                                                         <Space.Compact>
                                                             <Input style={{ width: '60%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="통화 종류" disabled />
@@ -749,9 +778,19 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                                 style={{ width: '70%' }}
                                                                 value={purchaseRequestParam.currency}
                                                                 onChange={(value) => {
+                                                                    const currencyIdMapping = {
+                                                                        KRW: 6,
+                                                                        USD: 1,
+                                                                        EUR: 2,
+                                                                        JPY: 3,
+                                                                        CNY: 4,
+                                                                        GBP: 5,
+                                                                    };
+
                                                                     setPurchaseRequestParam((prevState) => ({
-                                                                        ...prevState,
+                                                                        ...prevrState,
                                                                         currency: value,
+                                                                        currencyId: currencyIdMapping[value],
                                                                     }));
                                                                 }}
                                                             >
@@ -768,7 +807,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
 
 
                                                 {(purchaseRequestParam.currency !== '한국 [원]' && purchaseRequestParam.currency !== 'KRW') && (
-                                                    <Col span={6}>
+                                                    <Col span={10}>
                                                         <Form.Item  style={{ marginBottom: 0 }} >
                                                             <Input
                                                                 addonBefore="환율"
@@ -855,14 +894,6 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                         title: '공급가액',
                                                         dataIndex: 'supplyPrice',
                                                         key: 'supplyPrice',
-                                                        align: 'center',
-                                                        render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
-                                                    },
-                                                    {
-                                                        title: '부가세',
-                                                        dataIndex: 'vat',
-                                                        key: 'vat',
                                                         align: 'center',
                                                         render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
 
@@ -1190,8 +1221,8 @@ const PurchaseRequestPage = ( {initialData} ) => {
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
                                 <Form
                                     initialValues={detailPurchaseRequest}
-                                    form={form}
-                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                    form={registrationForm}
+                                    onFinish={(values) => { handleFormSubmit(values, 'register') }}
                                 >
                                     {/* 발주 요청 정보 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주요청 정보</Divider>
@@ -1224,7 +1255,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
 
                                     <Row gutter={16}>
                                         <Col span={6}>
-                                            <Form.Item style={{ marginBottom: 0 }} >
+                                            <Form.Item style={{ marginBottom: '16px' }} >
                                                 <Input
                                                     addonBefore="담당자"
                                                     value={displayValues.managerName}
@@ -1245,11 +1276,6 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={4}>
-                                            <Form.Item name="vatType" valuePropName="checked">
-                                                <Checkbox>부가세 적용 여부</Checkbox>
-                                            </Form.Item>
-                                        </Col>
                                     </Row>
 
                                     {/*  */}
@@ -1262,9 +1288,19 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                         style={{ width: '70%' }}
                                                         value={purchaseRequestParam.currency}
                                                         onChange={(value) => {
+                                                            const currencyIdMapping = {
+                                                                KRW: 6,
+                                                                USD: 1,
+                                                                EUR: 2,
+                                                                JPY: 3,
+                                                                CNY: 4,
+                                                                GBP: 5,
+                                                            };
+
                                                             setPurchaseRequestParam((prevState) => ({
                                                                 ...prevState,
                                                                 currency: value,
+                                                                currencyId: currencyIdMapping[value],
                                                             }));
                                                         }}
                                                     >
@@ -1368,14 +1404,6 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                                 title: '공급가액',
                                                 dataIndex: 'supplyPrice',
                                                 key: 'supplyPrice',
-                                                align: 'center',
-                                                render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
-
-                                            },
-                                            {
-                                                title: '부가세',
-                                                dataIndex: 'vat',
-                                                key: 'vat',
                                                 align: 'center',
                                                 render: (text) => <div className="small-text" style={{ textAlign: 'right' }}>{formatNumberWithComma(text)}</div>,
 

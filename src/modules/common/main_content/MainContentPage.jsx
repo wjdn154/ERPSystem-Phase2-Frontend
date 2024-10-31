@@ -205,9 +205,13 @@ import PendingSalesPurchaseVoucherApprovalPage
     from "../../financial/voucher_entry/pending_sales_purchase_voucher_approval/PendingSalesPurchaseVoucherApprovalPage.jsx";
 import SalaryEnvironmentSettingsPage
     from "../../hr/basic_information_management/salary_environment_setting/SalaryEnvironmentSettingsPage.jsx";
+
+import SalePlanPage from "../../logistics/sales_management/sales_plan/SalePlanPage.jsx";
+
 import SalaryRegistrationPage from "../../hr/payroll_management/salary_registration/SalaryRegistrationPage.jsx";
 import ProductionOrderClosingPage
     from "../../production/work_order_management/production_order_closing/ProductionOrderClosingPage.jsx";
+
 
 // 필요한 페이지 컴포넌트들
 
@@ -225,7 +229,7 @@ const componentsMap = { AccountSubjectPage, EquipmentDataPage, MaintenanceHistor
     ApplicantManagementPage, ApplicationManagementPage, InterviewManagementPage, JobOfferManagementPage, SalarySettlementPage, DeductionManagementPage,
     PaymentItemManagementPage, SocialInsurancePage, PayStatementPage, RetirementBenefitEstimationPage, RetirementSettlementPage, PensionManagementPage,
     WithholdingTaxDeclarationPage, LocalIncomeTaxDeclarationPage, PaymentStatementIssuancePage, BusinessIncomeManagementPage, OtherIncomeManagementPage,
-    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, ShipmentInstructionPage, ShippingOrderPage,
+    ProductManagementPage, ItemGroupManagementPage, WarehouseRegistrationPage, QuotationPage, OrderFormPage, SalesPage, SalePlanPage ,ShipmentInstructionPage, ShippingOrderPage,
     PurchaseRequestPage, PurchasePlanPage, PriceRequestPage, PurchaseOrderPage, PurchasePage, ReceivingOrderPage: ReceivingOrderPage, ReturnRequestPage, ReturnStatusPage,
     ShipmentInstructionInquiryPage, ShipmentInstructionEntryPage, ShipmentInquiryPage, ShipmentEntryPage, ShipmentStatusPage, IncomingSchedulePage,
     IncomingProcessingPage, OutgoingSchedulePage, OutgoingStatusPage, OutgoingProcessingPage, AdjustmentProgressPage, InspectionInquiryPage, InspectionStatusPage,
