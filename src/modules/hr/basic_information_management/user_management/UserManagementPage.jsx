@@ -1,17 +1,120 @@
-import React, {useMemo, useState} from 'react';
-import { Box, Grid, Grow } from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import { Box, Grid, Grow, Paper, Typography } from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './UserManagementUtil.jsx';
-import {Typography} from '@mui/material';
-import {Button} from 'antd';
+import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, Spin, Select, notification, Upload} from 'antd';
+import apiClient from '../../../../config/apiClient.jsx';
+import {EMPLOYEE_API} from '../../../../config/apiConstants.jsx';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
+import { Divider } from 'antd';
+import { useNotificationContext } from "../../../../config/NotificationContext.jsx";
+import {DownSquareOutlined, EyeInvisibleOutlined, EyeOutlined, SearchOutlined} from "@ant-design/icons";
+const { Option } = Select;
+const { confirm } = Modal;
 
-const UserManagementPage = () => {
-    const [activeTabKey, setActiveTabKey] = useState('1');
+
+const UserManagementPage = ({initialData}) => {
+    const notify = useNotificationContext(); // 알림 컨텍스트 사용
+    const [form] = Form.useForm(); // 폼 인스턴스 생성
+    const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
+    const [userList, setUserList] = useState(initialData); // 사원 목록 상태
+    const [activeTabKey, setActiveTabKey] = useState('1'); // 활성 탭 키 상태
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
+    const [editUser, setEditUser] = useState(false); // 사원 수정 탭 활성화 여부 상태
+    const [fetchUserData, setFetchUserData] = useState(false); // 사원 조회한 정보 상태
+    const [userParam, setUserParam] = useState(false); // 수정할 사원 정보 상태
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+    const [currentField, setCurrentField] = useState(''); // 모달 분기할 필드 상태
+    const [modalData, setModalData] = useState(null); // 모달 데이터 상태
+    const [isModalVisible, setIsModalVisible] = useState(false); // 모달 활성화 여부
+    const [displayValues, setDisplayValues] = useState({});
+    const [initialModalData, setInitialModalData] = useState(null);
+
+    useEffect(() => {
+        if (!fetchUserData) return; // 선택된 사원 데이터가 없으면 종료
+        console.log('fetchUserData:', fetchUserData); // Employee 데이터 확인
+
+        // firstName과 lastName을 조합해서 employeeName 필드에 설정
+        form.setFieldsValue({
+            ...fetchUserData,
+            employeeName: `${fetchUserData.lastName}${fetchUserData.firstName}`
+        });
+        setUserParam(fetchUserData);
+
+        setDisplayValues({});
+    }, [fetchUserData, form]);
+
+    const togglePasswordVisibility = (record) => {
+        setUserList((prevList) =>
+            prevList.map((user) =>
+                user.id === record.id ? { ...user, passwordVisible: !user.passwordVisible } : user
+            )
+        );
+    };
+
 
     const handleTabChange = (key) => {
+        setEditUser(false);
+        setFetchUserData(null);
+        setUserParam({});
+        setDisplayValues({});
+        form.resetFields();
+        registrationForm.resetFields(); // 2탭 폼 초기화
+        registrationForm.setFieldValue(true);
         setActiveTabKey(key);
     };
+
+    const columns = [
+        {
+            title: <div className="title-text">사용자 아이디</div>,
+            dataIndex: 'usersId',
+            key: 'usersId',
+            align: 'center',
+            render: (text) => <div className="small-text">{text}</div>,
+        },
+        {
+            title: <div className="title-text">사용자 이름</div>,
+            dataIndex: 'userName',
+            key: 'userName',
+            align: 'center',
+            render: (text) => <div className="small-text">{text}</div>,
+        },
+        {
+            title: <div className="title-text">사원번호</div>,
+            dataIndex: 'employeeNumber',
+            key: 'employeeNumber',
+            align: 'center',
+            render: (text) => <div className="small-text">{text}</div>,
+        },
+        {
+            title: <div className="title-text">사원이름</div>,
+            dataIndex: 'employeeName',
+            key: 'employeeName',
+            align: 'center',
+            render: (text, record) => (
+                <div className="small-text">
+                    {record.lastName}{record.firstName}
+                </div>
+            ),
+        },
+        {
+            title: <div className="title-text">비밀번호</div>,
+            dataIndex: 'password',
+            key: 'password',
+            align: 'center',
+            render: (text, record) => (
+                <div className="small-text">
+                    {record.passwordVisible ? text : '●●●●●●'}
+                    <span
+                        onClick={() => togglePasswordVisibility(record)}
+                        style={{ marginLeft: 8, cursor: 'pointer' }}
+                    >
+                        {record.passwordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                    </span>
+                </div>
+            ),
+        },
+    ];
 
     return (
         <Box sx={{ margin: '20px' }}>
@@ -33,11 +136,51 @@ const UserManagementPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection />
-                            </div>
+                            <Paper elevation={3} sx={{ height: '100%' }}>
+                                <Typography variant="h6" sx={{ padding: '20px' }}>사용자 목록</Typography>
+                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Table
+                                        dataSource={userList}
+                                        columns={columns}
+                                        rowKey={(record) => record.id}
+                                        pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
+                                        size="small"
+                                        rowSelection={{
+                                            type: 'radio',
+                                            selectedRowKeys,
+                                            onChange:async (newSelectedRowKeys) => {
+                                                setSelectedRowKeys(newSelectedRowKeys);
+                                                const id = newSelectedRowKeys[0];
+                                                try {
+                                                    const response = await apiClient.post(EMPLOYEE_API.USERS_DATA_DETAIL_API(id));
+                                                    setFetchUserData(response.data);
+                                                    setEditUser(true);
+                                                    notify('success', '사용자 조회', '사용자 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                            }
+                                        }}
+                                        onRow={(record) => ({
+                                            style: { cursor: 'pointer' },
+                                            onClick: async () => {
+                                                setSelectedRowKeys([record.id]);
+                                                const id = record.id;
+                                                try {
+                                                    const response = await apiClient.post(EMPLOYEE_API.USERS_DATA_DETAIL_API(id));
+                                                    setFetchUserData(response.data);
+                                                    setEditUser(true);
+                                                    notify('success', '사용자 조회', '사용자 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                            },
+                                        })}
+                                    />
+                                </Grid>
+                            </Paper>
                         </Grow>
                     </Grid>
                 </Grid>

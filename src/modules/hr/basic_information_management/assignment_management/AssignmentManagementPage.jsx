@@ -398,23 +398,28 @@ const AssignmentManagementPage = ({ initialData }) => {
                                                 },
                                             ]}
                                             rowKey={(record) => record.id}
-                                            pagination={{
-                                                pageSize: 15,
-                                                position: ['bottomCenter'],
-                                                showSizeChanger: false
-                                            }}
+                                            pagination={{ pageSize: 15, position: ['bottomCenter'], showSizeChanger: false }}
                                             size="small"
                                             rowSelection={{
                                                 type: 'radio',
                                                 selectedRowKeys,
-                                                onChange: (newSelectedRowKeys) => {
+                                                onChange: async (newSelectedRowKeys) => {
                                                     setSelectedRowKeys(newSelectedRowKeys);
+                                                    const id = newSelectedRowKeys[0];
+                                                    try {
+                                                        const response = await apiClient.post(EMPLOYEE_API.TRANSFER_DETAIL_DATA_API(id));
+                                                        setFetchTransferData(response.data);
+                                                        setEditTransfer(true);
+                                                        notify('success', '발령 조회', '발령 정보 조회 성공.', 'bottomRight')
+                                                    } catch (error) {
+                                                        notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                    }
                                                 }
                                             }}
                                             onRow={(record) => ({
-                                                style: {cursor: 'pointer'},
+                                                style: { cursor: 'pointer' },
                                                 onClick: async () => {
-                                                    setSelectedRowKeys([record.id]); // 클릭한 행의 키로 상태 업데이트
+                                                    setSelectedRowKeys([record.id]);
                                                     const id = record.id;
                                                     try {
                                                         const response = await apiClient.post(EMPLOYEE_API.TRANSFER_DETAIL_DATA_API(id));

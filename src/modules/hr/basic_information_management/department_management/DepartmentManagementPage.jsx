@@ -255,13 +255,33 @@ const DepartmentManagementPage = ({ initialData }) => {
                                         rowSelection={{
                                             type: 'radio',
                                             selectedRowKeys,
-                                            onChange: (newSelectedRowKeys) => {
+                                            onChange: async (newSelectedRowKeys) => {
                                                 setSelectedRowKeys(newSelectedRowKeys);
+                                                const id = newSelectedRowKeys[0];
+                                                try {
+                                                    const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_DETAIL_API(id));
+                                                    setFetchDepartmentData(response.data);
+                                                    setEditDepartment(true);
+                                                    notify('success', '부서 조회', '부서 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
                                             }
                                         }}
                                         onRow={(record) => ({
                                             style: { cursor: 'pointer' },
-                                            onClick: () => handleRowClick(record),
+                                            onClick: async () => {
+                                                setSelectedRowKeys([record.id]);
+                                                const id = record.id;
+                                                try {
+                                                    const response = await apiClient.post(EMPLOYEE_API.DEPARTMENT_DATA_DETAIL_API(id));
+                                                    setFetchDepartmentData(response.data);
+                                                    setEditDepartment(true);
+                                                    notify('success', '부서 조회', '부서 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
+                                            },
                                         })}
                                     />
                                 </Grid>
