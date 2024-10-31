@@ -38,7 +38,10 @@ const EmployeeManagementPage = ({ initialData }) => {
     const fetchJobTitles = async () => {
         try{
             const response = await apiClient.post(EMPLOYEE_API.JOB_TITLE_DATA_API);
+            console.log("API Response for Transfer Types:", response.data);
+
             setJobTitles(response.data);
+
         } catch(error){
             notification.error({
                 message: '직책 목록 조회 실패',
@@ -231,7 +234,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                     employmentType: employeeParam.employmentType,
                     email: values.email,
                     address: values.address,
-                    householdHead: values.householdHead, // 체크박스 값 처리
+                    isHouseholdHead: values.isHouseholdHead, // 체크박스 값 처리
                     hireDate: values.hireDate,
                     profilePicture: employeeParam.profilePicture, // 프로필 URL
                     registrationNumber: values.registrationNumber,
@@ -250,6 +253,7 @@ const EmployeeManagementPage = ({ initialData }) => {
                     code: employeeParam.bankAccountDTO.code,
 
                 };
+                console.log("만수이",formattedValues);
                  // console.log(" sss:"  +values);
                  // console.log(values);
                 console.log("employeeParam2",employeeParam);
@@ -268,14 +272,16 @@ const EmployeeManagementPage = ({ initialData }) => {
                          headers: { 'Content-Type': 'multipart/form-data' },
                     });
                     const updatedData = response.data;
-
+                    console.log("만수이 2",updatedData)
                     if (type === 'update') {
                         setEmployeeList((prevList) =>
                             prevList.map((employee) => employee.id === updatedData.id ? updatedData : employee)
                         );
+                        console.log('Updated Employee List:', employeeList);
                     } else {
                         setEmployeeList((prevList) => [...prevList, updatedData]);
                         registrationForm.resetFields();
+                        console.log('New Employee List:', employeeList);
                     }
                     setEditEmployee(false);
                     setFetchEmployeeData(null);
@@ -525,8 +531,17 @@ const EmployeeManagementPage = ({ initialData }) => {
                                         rowSelection={{
                                             type: 'radio',
                                             selectedRowKeys,
-                                            onChange: (newSelectedRowKeys) => {
+                                            onChange: async (newSelectedRowKeys) => {
                                                 setSelectedRowKeys(newSelectedRowKeys);
+                                                const id = newSelectedRowKeys[0];
+                                                try {
+                                                    const response = await apiClient.get(EMPLOYEE_API.EMPLOYEE_DATA_DETAIL_API(id));
+                                                    setFetchEmployeeData(response.data);
+                                                    setEditEmployee(true);
+                                                    notify('success', '사원 조회', '사원 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
                                             }
                                         }}
                                         onRow={(record) => ({
@@ -1129,8 +1144,9 @@ const EmployeeManagementPage = ({ initialData }) => {
                                                                     ...prevState,
                                                                     departmentId: option.id, // `data-*` 속성을 사용해 부서 ID 설정
                                                                     departmentCode: value, // 부서 코드 설정
-                                                                    departmentName: option.departmentname, // 부서명 설정
+                                                                    departmentName: option.departmentName, // 부서명 설정
                                                                 }));
+                                                                console.log("확인",departments);
                                                             }}
                                                         >
                                                             {departments.map((dept) => (
