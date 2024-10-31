@@ -130,7 +130,7 @@ export const EMPLOYEE_API = {
 
     //  인사관리 - 근태
     ATTENDANCE_DATA_API: `${API_BASE_URL}/api/hr/attendance/records/all`,
-    ATTENDANCE_DETAIL_DATA_API:(employeeId) => `${API_BASE_URL}/api/hr/records/${employeeId}`,
+    ATTENDANCE_DETAIL_DATA_API:(id) => `${API_BASE_URL}/api/hr/attendance/records/${id}`,
     SAVE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/check-in`,
     DELETE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/del`,
     UPDATE_ATTENDANCE_API: `${API_BASE_URL}/api/hr/attendance/update`,
@@ -149,10 +149,8 @@ export const EMPLOYEE_API = {
     // 인사관리  - 발령
     SAVE_TRANSFER_API: `${API_BASE_URL}/api/hr/transfer/create`,
     TRANSFER_DATA_API: `${API_BASE_URL}/api/hr/transfer/all`,
-    SAVE_TRANSFER_TYPE_API:  `${API_BASE_URL}/api/hr/transferType/register`,
     UPDATE_TRANSFER_API:(id) => `${API_BASE_URL}/api/hr/transfer/update/${id}`,
     TRANSFER_DETAIL_DATA_API:(id)=> `${API_BASE_URL}/api/hr/transfer/detail/${id}`,
-    UPDATE_TRANSFER_TYPE_API:(id) => `${API_BASE_URL}/api/hr/transferType/update/${id}`,
 
 
     //  인사관리 - 급여
@@ -168,15 +166,16 @@ export const EMPLOYEE_API = {
     NATIONAL_PENSION_API: `${API_BASE_URL}/api/hr/national_pension/show`, // 국민연금 조회
     INCOME_TAX_API: `${API_BASE_URL}/api/hr/incometax/show`, // 소득세 조회
 
-    // 국민연금 조회
-    // 소득세 조회
     EMPLOYMENT_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/employment_insurance_pension/calculator`, // 고용보험 연금 계산
     HEALTH_INSURANCE_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/health_insurance_pension/calculator`, // 건강보험 연금 계산
     NATIONAL_PENSION_CALCULATOR_API: `${API_BASE_URL}/api/hr/national_pension/calculator`, // 국민연금 계산
 
-
-
-
+    SALARY_LEDGER_SHOW_API: `${API_BASE_URL}/api/hr/salaryledger/show`, // 급여 조회
+    SALARY_LEDGER_UPDATE_API: `${API_BASE_URL}/api/hr/salaryledger/update`, // 급여 수정
+    SALARY_LEDGER_CALCULATION_API: `${API_BASE_URL}/api/hr/salaryledger/calculation`, // 급여 자동 계산
+    SALARY_LEDGER_DEADLINE_API: `${API_BASE_URL}/api/hr/salaryledger/deadlineon`, // 마감 처리
+    SALARY_LEDGER_DEADLINE_OFF_API: `${API_BASE_URL}/api/hr/salaryledger/deadlineoff`, // 마감 해제
+    SALARY_LEDGER_DATE_API: `${API_BASE_URL}/api/hr/salaryLedgerDate/show`, // 지급일 목록 조회
 }
 // 물류관리
 export const LOGISTICS_API = {
