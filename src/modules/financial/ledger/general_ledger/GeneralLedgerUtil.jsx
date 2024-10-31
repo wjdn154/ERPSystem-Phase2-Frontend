@@ -11,14 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '잔액 관리',
-            children: (
-                <Typography>
-                    계정과목별로 잔액을 확인 하고 분석할 수 있는 탭임.
-                </Typography>
-            ),
-        },
     ];
 }

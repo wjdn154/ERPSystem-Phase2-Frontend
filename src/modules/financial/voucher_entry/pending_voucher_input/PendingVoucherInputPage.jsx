@@ -267,10 +267,12 @@ const PendingVoucherInputPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="일반전표 입력"
+                        title="일반전표입력"
                         description={(
                             <Typography>
-                                일반전표 입력 페이지는 <span>아직 승인되지 않은 전표</span>를 등록하고 관리하는 기능을 제공합니다. 이 페이지에서는 <span>거래 내역, 적요, 금액, 계정과목</span> 등을 입력하여 <span>미결 상태의 전표를 작성</span>할 수 있으며, 전표 승인 전까지 <span>수정 및 검토</span>가 가능합니다. 이를 통해 <span>전표 처리 과정</span>을 효율적으로 관리하고 추적할 수 있습니다.
+                                일반전표 입력 페이지는 <span>아직 승인되지 않은 전표</span>를 등록하고 관리하는 기능을 제공합니다.<br/>
+                                이 페이지에서는 <span>거래 내역, 적요, 금액, 계정과목</span> 등을 입력하여 <span>미결 상태의 전표를 작성</span>할 수 있으며, 전표 승인 전까지 <span>검토</span>가 가능합니다.<br/>
+                                이를 통해 <span>전표 처리 과정</span>을 효율적으로 관리하고 추적할 수 있습니다.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -726,14 +728,6 @@ const PendingVoucherInputPage = () => {
                                 </Grid>
                             </Paper>
                         </Grow>
-                    </Grid>
-                </Grid>
-            )}
-
-            {activeTabKey === '2' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{ minWidth: '500px !important', maxWidth: '700px !important' }}>
-                        <TemporarySection />
                     </Grid>
                 </Grid>
             )}
