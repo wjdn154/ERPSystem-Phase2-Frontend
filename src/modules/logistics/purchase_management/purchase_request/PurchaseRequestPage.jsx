@@ -382,7 +382,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
     };
 
 
-    // 등록 일자 변경 핸들러
+    // 입력 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
         setPurchaseRequestParam((prevState) => ({
             ...prevState,
@@ -526,10 +526,12 @@ const PurchaseRequestPage = ( {initialData} ) => {
             width: '15%'
         },
         {
-            title: <div className="title-text">발주 요청 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
+
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
         },
         {
             title: <div className="title-text">거래처명</div>,
@@ -721,10 +723,10 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주요청 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(purchaseRequestParam.date)}
@@ -1231,10 +1233,10 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>발주요청 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(purchaseRequestParam.date)}

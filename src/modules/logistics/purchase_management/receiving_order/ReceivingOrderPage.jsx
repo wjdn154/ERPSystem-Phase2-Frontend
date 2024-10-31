@@ -503,11 +503,11 @@ const ReceivingOrderPage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">입력 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '15%',
         },
         {

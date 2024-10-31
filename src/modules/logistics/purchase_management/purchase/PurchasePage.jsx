@@ -319,7 +319,7 @@ const PurchasePage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
+    // 입력 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
         setPurchaseParam((prevState) => ({
             ...prevState,
@@ -579,11 +579,12 @@ const PurchasePage = ({initialData}) => {
             width: '10%',
         },
         {
-            title: <div className="title-text">구매 일자</div>,
+            title: <div className="title-text">입력 일자-No</div>,
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '10%',
         },
         {
@@ -773,7 +774,7 @@ const PurchasePage = ({initialData}) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매서 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
                                                     <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
@@ -1441,7 +1442,7 @@ const PurchasePage = ({initialData}) => {
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>구매서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
                                             <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
