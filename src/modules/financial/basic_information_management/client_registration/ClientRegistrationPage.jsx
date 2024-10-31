@@ -445,8 +445,18 @@ const ClientRegistrationPage = ( {initialData} ) => {
                                         rowSelection={{
                                             type: 'radio',
                                             selectedRowKeys,
-                                            onChange: (newSelectedRowKeys) => {
+                                            onChange: async (newSelectedRowKeys) => {
                                                 setSelectedRowKeys(newSelectedRowKeys);
+                                                const id = newSelectedRowKeys[0];
+                                                try {
+                                                    const response = await apiClient.post(FINANCIAL_API.FETCH_CLIENT_API(id));
+                                                    setFetchClientData(response.data);
+                                                    setEditClient(true);
+
+                                                    notify('success', '거래처 조회', '거래처 정보 조회 성공.', 'bottomRight')
+                                                } catch (error) {
+                                                    notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
+                                                }
                                             }
                                         }}
                                         onRow={(record) => ({
