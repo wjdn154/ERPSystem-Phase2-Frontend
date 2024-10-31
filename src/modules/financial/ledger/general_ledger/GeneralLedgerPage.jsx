@@ -148,7 +148,8 @@ const GeneralLedgerPage = () => {
                         title="총계정원장"
                         description={(
                             <Typography>
-                                총계정원장 페이지는 <span>기업의 모든 계정과목에 대한 총괄적인 거래 내역을 관리</span>하는 페이지임. 이 페이지를 통해 <span>전체 재무 상태를 한눈에 파악</span>할 수 있으며, 각 계정과목의 <span>거래 내역과 잔액</span>을 종합적으로 관리할 수 있음.
+                                총계정원장 페이지는 <span>기업의 모든 계정과목에 대한 총괄적인 거래 내역을 관리</span>하는 페이지임. <br/>
+                                이 페이지를 통해 <span>전체 재무 상태를 한눈에 파악</span>할 수 있으며, 각 계정과목의 <span>거래 내역과 잔액</span>을 종합적으로 관리할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
