@@ -38,10 +38,9 @@ const AttendanceManagementPage = ( {initialData} ) => {
             const response = await apiClient.post(EMPLOYEE_API.ATTENDANCE_DATA_API);
             const attendanceData = response.data.map(item => ({
                 ...item,
-                fullName: `${item.lastName || ''}${item.firstName || ''}`,  // 성과 이름을 결합하여 fullName 필드로 설정
             }));
             setAttendanceList(attendanceData);
-            console.log("근태 데이터:", response.data);
+            console.log("근태 데이터:", attendanceData);
         } catch(error){
             notification.error({
                 message: '근태 목록 조회 실패',
@@ -89,14 +88,18 @@ const AttendanceManagementPage = ( {initialData} ) => {
     };
 
 
-
+// 시간 형식 변환 함수
+    const formatTime = (datetime) => {
+        return datetime ? new Date(datetime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '';
+    };
 
     useEffect(() => {
         if(!fetchAttendanceData) return;
-        console.log('Fetched Employee Data:', fetchAttendanceData);
         form.setFieldsValue({
             ...fetchAttendanceData,
-            fullName: `${fetchAttendanceData.lastName}${fetchAttendanceData.firstName}`
+                employeeName: fetchAttendanceData.employeeName || `${fetchAttendanceData.lastName || ''} ${fetchAttendanceData.firstName || ''}`,
+                checkInTime: formatTime(fetchAttendanceData.checkInTime),
+                checkOutTime: formatTime(fetchAttendanceData.checkOutTime),
         });
         setAttendanceParam(fetchAttendanceData);
 
@@ -162,14 +165,14 @@ const AttendanceManagementPage = ( {initialData} ) => {
             okText: '확인',
             cancelText: '취소',
             onOk: async () => {
-                const fullName = values.employeeName || '';
-
+                const employeeName = values.employeeName || '';
                 const formattedValues = {
                     id: values.id,
                     employeeId:values.employeeId,
-                    employeeName:values.employeeName,
+                    employeeName:attendanceParam.employeeName,
                     employeeNumber: attendanceParam.employeeNumber,
                     attendancesCode: values.attendancesCode,
+                    positionId:values.positionId,
                     positionName: values.positionName,
                     date: attendanceParam.date,
                     checkInTime: attendanceParam.checkInTime,
@@ -179,7 +182,7 @@ const AttendanceManagementPage = ( {initialData} ) => {
 
                 try {
                     //console.log(formattedValues);
-                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_ATTENDANCE_API(attendanceParam.id)  : EMPLOYEE_API.SAVE_ATTENDANCE_API;
+                    const API_PATH = type === 'update' ? EMPLOYEE_API.UPDATE_ATTENDANCE_API(attendanceParam)  : EMPLOYEE_API.SAVE_ATTENDANCE_API;
                     console.log("확인용 : ", formattedValues);
                     const response = await apiClient.post(API_PATH, formattedValues, {
                         headers: {
@@ -192,7 +195,7 @@ const AttendanceManagementPage = ( {initialData} ) => {
 
                     if (type === 'update') {
                         setAttendanceList((prevList) =>
-                            prevList.map((attendacne) => attendances.id === updatedData.id ? updatedData : attendacne)
+                            prevList.map((attendance) => attendances.id === updatedData.id ? updatedData : attendance)
                         );
                     } else {
                         setAttendanceList((prevList) => [...prevList, updatedData]);
@@ -289,6 +292,10 @@ const AttendanceManagementPage = ( {initialData} ) => {
                                                 key: 'checkInTime',
                                                 align: 'center',
                                                 render: (text) => {
+                                                    // 출근 시간이 없으면 "X" 표시
+                                                    if (!text) {
+                                                        return <div className="small-text">X</div>;
+                                                    }
                                                     const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
                                                         hour: '2-digit',
                                                         minute: '2-digit',
@@ -302,6 +309,9 @@ const AttendanceManagementPage = ( {initialData} ) => {
                                                 key: 'checkOutTime',
                                                 align: 'center',
                                                 render: (text) => {
+                                                    if (!text) {
+                                                        return <div className="small-text">퇴근 시간이 없음</div>;
+                                                    }
                                                     const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
                                                         hour: '2-digit',
                                                         minute: '2-digit',
@@ -388,129 +398,92 @@ const AttendanceManagementPage = ( {initialData} ) => {
                         <Paper elevation={3} sx={{ height: '100%' }}>
                             <Typography variant="h6" sx={{ padding: '20px' }}>근태기록 수정</Typography>
                             <Grid sx={{ padding: '0px 20px 0px 20px' }}>
-                                <Table
-                                    dataSource={fetchAttendanceData ? [fetchAttendanceData] : []} // 객체를 배열로 감싸서 전달
-                                    columns={[
-                                        {
-                                            title: <div className="title-text">근태코드</div>,
-                                            dataIndex: 'attendanceCode',
-                                            key: 'attendanceCode',
-                                            align: 'center',
-                                            render: (text) => <div className="small-text">{text}</div>,
-                                        },
-                                        {
-                                            title: <div className="title-text">사원번호</div>,
-                                            dataIndex: 'employeeNumber',
-                                            key: 'employeeNumber',
-                                            align: 'center',
-                                            render: (text) => <div className="small-text">{text}</div>,
-                                        },
-                                        {
-                                            title: <div className="title-text">사원이름</div>,
-                                            dataIndex: 'employeeName',
-                                            key: 'employeeName',
-                                            align: 'center',
-                                            render: (text) => <div className="small-text">{text}</div>,
-                                        },
-                                        {
-                                            title: <div className="title-text">직위</div>,
-                                            dataIndex: 'positionName',
-                                            key: 'positionName',
-                                            align: 'center',
-                                            render: (text) => <div className="small-text">{text}</div>,
-                                        },
-                                        {
-                                            title: <div className="title-text">날짜</div>,
-                                            dataIndex: 'date',
-                                            key: 'date',
-                                            align: 'center',
-                                            render: (text) => <div className="small-text">{text}</div>,
-                                        },
-                                        {
-                                            title: <div className="title-text">출근시간</div>,
-                                            dataIndex: 'checkInTime',
-                                            key: 'checkInTime',
-                                            align: 'center',
-                                            render: (text) => {
-                                                const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                }) : '';
-                                                return <div className="small-text">{formattedTime}</div>;
-                                            },
-                                        },
-                                        {
-                                            title: <div className="title-text">퇴근시간</div>,
-                                            dataIndex: 'checkOutTime',
-                                            key: 'checkOutTime',
-                                            align: 'center',
-                                            render: (text) => {
-                                                const formattedTime = text ? new Date(text).toLocaleTimeString('ko-KR', {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                }) : '';
-                                                return <div className="small-text">{formattedTime}</div>;
-                                            },
-                                        },
-                                        {
-                                            title: <div className="title-text">근무상태</div>,
-                                            dataIndex: 'status',
-                                            key: 'status',
-                                            align: 'center',
-                                            render: (text) => {
-                                                let value;
-                                                switch (text) {
-                                                    case 'PRESENT':
-                                                        value = '출근';
-                                                        break;
-                                                    case 'ABSENT':
-                                                        value = '결근';
-                                                        break;
-                                                    case 'LEAVE':
-                                                        value = '휴가';
-                                                        break;
-                                                    case 'PUBLIC_HOLIDAY':
-                                                        value = '공휴일';
-                                                        break;
-                                                    case 'EARLY_LEAVE':
-                                                        value = '조퇴';
-                                                        break;
-                                                    case 'LATE':
-                                                        value = '지각';
-                                                        break;
-                                                    case 'BUSINESS_TRIP':
-                                                        value = '출장';
-                                                        break;
-                                                    case 'TRAINING':
-                                                        value = '교육';
-                                                        break;
-                                                    case 'SABBATICAL':
-                                                        value = '휴직';
-                                                        break;
-                                                    case 'SICK_LEAVE':
-                                                        value = '병가';
-                                                        break;
-                                                    case 'REMOTE_WORK':
-                                                        value = '자택 근무';
-                                                        break;
-                                                    case 'ON_DUTY':
-                                                        value = '근무';
-                                                        break;
-                                                    case 'OVERTIME':
-                                                        value = '야근';
-                                                        break;
-                                                    case 'SHIFT_WORK':
-                                                        value = '교대 근무';
-                                                        break;
-                                                    case 'LATE_AND_EARLY_LEAVE':
-                                                        value = '지각 및 조퇴';
-                                                        break;
-                                                }
-                                                return <div className="small-text">{value}</div>;
-                                            },
-                                        },
-                                    ]}
-                                />
+                                <Form
+                                    initialValues={fetchAttendanceData}
+                                    form={form}
+                                    onFinish={(values) => { handleFormSubmit(values, 'update') }}
+                                >
+                                    <Row gutter={16}>
+                                        <Col span={6}>
+                                            <Form.Item name="attendanceCode" rules={[{ required: true, message: '근태코드를 입력하세요.' }]}>
+                                                <Input addonBefore="근태코드" disabled />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="employeeNumber" rules={[{ required: true, message: '사원번호를 입력하세요.' }]}>
+                                                <Input addonBefore="사원번호" disabled/>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="employeeName" rules={[{ required: true, message: '사원이름을 입력하세요.' }]}>
+                                                <Input addonBefore="사원이름" disabled/>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="positionName" rules={[{ required: true, message: '직위를 입력하세요.' }]}>
+                                                <Input addonBefore="직위" disabled/>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={16}>
+                                        <Col span={6}>
+                                            <Form.Item name="date" rules={[{ required: true, message: '날짜를 입력하세요.' }]}>
+                                                <Input addonBefore="날짜" />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="checkInTime" rules={[{ required: true, message: '출근시간을 입력하세요.' }]}>
+                                                <Input addonBefore="출근시간" />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={6}>
+                                            <Form.Item name="checkOutTime" rules={[{ required: true, message: '퇴근시간을 입력하세요.' }]}>
+                                                <Input addonBefore="퇴근시간"/>
+                                            </Form.Item>
+                                        </Col>
+
+                                    </Row>
+                                    <Row gutter={16}>
+                                    <Col span={6}>
+                                        <Form.Item name="productType">
+                                            <Space.Compact>
+                                                <Input style={{ width: '40%', backgroundColor: '#FAFAFA', color: '#000', textAlign: 'center' }} defaultValue="근무상태" disabled />
+                                                <Select
+                                                    style={{ width: '60%' }}
+                                                    value={attendanceParam.status}
+                                                    onChange={(value) => {
+                                                        setAttendanceParam((prevState) => ({
+                                                            ...prevState,
+                                                            status: value,
+                                                        }));
+                                                    }}
+                                                >
+                                                    <Option value="PRESENT">출근</Option>
+                                                    <Option value="ABSENT">결근</Option>
+                                                    <Option value="LEAVE">휴가</Option>
+                                                    <Option value="PUBLIC_HOLIDAY">공휴일</Option>
+                                                    <Option value="EARLY_LEAVE">조퇴</Option>
+                                                    <Option value="LATE">지각</Option>
+                                                    <Option value="BUSINESS_TRIP">출장</Option>
+                                                    <Option value="TRAINING">교육</Option>
+                                                    <Option value="SABBATICAL">휴직</Option>
+                                                    <Option value="SICK_LEAVE">병가</Option>
+                                                    <Option value="REMOTE_WORK">자택 근무</Option>
+                                                    <Option value="ON_DUTY">근무</Option>
+                                                    <Option value="OVERTIME">야근</Option>
+                                                    <Option value="SHIFT_WORK">교대 근무</Option>
+                                                    <Option value="LATE_AND_EARLY_LEAVE">지각 및 조퇴</Option>
+                                                </Select>
+                                            </Space.Compact>
+                                        </Form.Item>
+                                    </Col>
+                                    </Row>
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                                        <Button type="primary" htmlType="submit">
+                                            저장
+                                        </Button>
+                                    </Box>
+                                </Form>
                             </Grid>
                         </Paper>
                     </Grow>

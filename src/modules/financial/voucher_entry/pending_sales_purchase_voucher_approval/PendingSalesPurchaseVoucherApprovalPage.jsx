@@ -54,7 +54,7 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
                     <WelcomeSection
-                        title="미결 매입매출전표 승인"
+                        title="매입매출전표 승인"
                         description={(
                             <Typography>
                                 미결 매입매출 전표승인 페이지는 <span>미결 상태의 전표를 승인하는 기능</span>을 제공함. 이 페이지를 통해 승인자는 <span>거래 내역을 검토하고 승인 또는 반려</span>할 수 있음.<br/>
@@ -497,11 +497,6 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                             <Button
                                                 type="danger"
                                                 onClick={() => {
-                                                    if (!selectedVouchers) {
-                                                        notify('warning', '전표 선택', '반려할 전표를 선택해주세요.', 'bottomRight');
-                                                        return;
-                                                    }
-
                                                     confirm({
                                                         title: '매입매출 전표 반려 확인',
                                                         content: '정말 매입매출 전표를 반려 하시겠습니까?',
@@ -509,6 +504,10 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                         cancelText: '취소',
                                                         async onOk() {
                                                             try {
+                                                                if (selectedVouchers.length === 0) {
+                                                                    notify('warning', '전표 선택', '반려할 매출매입 전표를 선택해주세요.', 'bottomRight');
+                                                                    return;
+                                                                }
 
                                                                 // 미결 전표 반려 API 호출
                                                                 const response = await apiClient.post(FINANCIAL_API.SALE_AND_PURCHASE_UNRESOLVED_VOUCHER_APPROVE_API, {
@@ -536,17 +535,12 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                     });
                                                 }}
                                             >
-                                                반려
+                                                매출매입 전표 반려
                                             </Button>
 
                                             <Button
                                                 type="primary"
                                                 onClick={async () => {
-                                                    if (!selectedVouchers) {
-                                                        notify('warning', '전표 선택', '승인할 전표를 선택해주세요.', 'bottomRight');
-                                                        return;
-                                                    }
-
                                                     confirm({
                                                         title: '매입매출 전표 승인 확인',
                                                         content: '정말 매입매출 전표를 승인 하시겠습니까?',
@@ -554,6 +548,10 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                         cancelText: '취소',
                                                         async onOk() {
                                                             try {
+                                                                if (selectedVouchers.length === 0) {
+                                                                    notify('warning', '전표 선택', '승인할 매출매입 전표를 선택해주세요.', 'bottomRight');
+                                                                    return;
+                                                                }
                                                                 const response = await apiClient.post(FINANCIAL_API.SALE_AND_PURCHASE_UNRESOLVED_VOUCHER_APPROVE_API, {
                                                                     searchDate: dayjs(selectedDate).format('YYYY-MM-DD'),
                                                                     searchVoucherNumberList: selectedVouchers,
@@ -579,7 +577,7 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                                                     });
                                                 }}
                                             >
-                                                승인
+                                                매출매입 전표 승인
                                             </Button>
                                         </Box>
                                     </Grid>
@@ -589,11 +587,6 @@ const PendingSalesPurchaseVoucherApprovalPage = () => {
                     </Grid>
                 </Grid>
             )}
-
-            {activeTabKey === '2' && (
-                <TemporarySection />
-            )}
-
         </Box>
     );
 };

@@ -9,7 +9,7 @@ export const tabItems = () => {
     return [
         {
             key: '1',
-            label: '계정과목 목록 및 상세 내용',
+            label: '계정과목 목록',
             children: <Typography>재무회계에서 사용되는 모든 계정과목을 리스트 형태로 보여주는 부분으로, 기업의 모든 거래 및 재무 데이터를 분류하고 관리하는 데 필수적인 역할을 함.</Typography>, // 탭 클릭 시 보여질 내용
         },
         {

@@ -41,9 +41,9 @@ export const subMenuItems = {
         {
             text: '기초정보관리',
             items: [
-                { text: '거래처등록', component: 'ClientRegistrationPage', apiPath: FINANCIAL_API.FETCH_CLIENT_LIST_API, url: '/finance/basic-info/client-registration', requiredPermission: 'clientRegistrationPermission', permissionLevel: 'GENERAL' },  // 거래처등록 권한
-                { text: '계정과목및적요등록', component: 'AccountSubjectPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/finance/basic-info/account-subject', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL' },  // 계정과목 및 적요 등록 권한
-                { text: '환경등록', component: 'SystemEnvironmentSettingsPage', apiPath: FINANCIAL_API.JOURNAL_ENTRY_TYPE_API, url: '/finance/basic-info/environment', requiredPermission: 'environmentPermission', permissionLevel: 'GENERAL' },  // 환경등록 권한
+                { text: '거래처관리', component: 'ClientRegistrationPage', apiPath: FINANCIAL_API.FETCH_CLIENT_LIST_API, url: '/finance/basic-info/client-registration', requiredPermission: 'clientRegistrationPermission', permissionLevel: 'GENERAL' },  // 거래처등록 권한
+                { text: '계정과목관리', component: 'AccountSubjectPage', apiPath: FINANCIAL_API.ACCOUNT_SUBJECTS_API, url: '/finance/basic-info/account-subject', requiredPermission: 'accountSubjectPermission', permissionLevel: 'GENERAL' },  // 계정과목 및 적요 등록 권한
+                { text: '환경설정관리', component: 'SystemEnvironmentSettingsPage', apiPath: FINANCIAL_API.JOURNAL_ENTRY_TYPE_API, url: '/finance/basic-info/environment', requiredPermission: 'environmentPermission', permissionLevel: 'GENERAL' },  // 환경등록 권한
             ]
         },
         {
@@ -52,8 +52,8 @@ export const subMenuItems = {
                 { text: '일반전표입력', component: 'PendingVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/pending-entry', requiredPermission: 'generalVoucherPermission', permissionLevel: 'GENERAL' },  // 미결전표입력 권한
                 { text: '일반전표승인', component: 'PendingVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-approval', requiredPermission: 'generalVoucherPermission', permissionLevel: 'ADMIN' },
                 { text: '매입매출전표입력', component: 'PendingSalesPurchaseVoucherInputPage', apiPath: undefined, url: '/finance/voucher-management/sales-purchase', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'GENERAL' },  // 매입매출전표입력 권한
-                { text: '미결매입매출전표승인', component: 'PendingSalesPurchaseVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-sales-purchase-voucher-approval', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'ADMIN' },
-                { text: '전자세금계산서발행', component: 'ElectronicTaxInvoicePage', apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한
+                { text: '매입매출전표승인', component: 'PendingSalesPurchaseVoucherApprovalPage', apiPath: undefined, url: '/finance/voucher-management/pending-sales-purchase-voucher-approval', requiredPermission: 'salesPurchaseVoucherPermission', permissionLevel: 'ADMIN' },
+                { text: '전자세금계산서발행', component: 'ElectronicTaxInvoicePage', apiPath: undefined, url: '/finance/voucher-management/electronic-tax', requiredPermission: 'electronicTaxPermission', permissionLevel: 'GENERAL' },  // 전자세금계산서발행 권한  *삭제할꺼*
             ]
         },
         {
@@ -67,7 +67,7 @@ export const subMenuItems = {
                 { text: '분개장', component: 'JournalPage', apiPath: undefined, url: '/finance/ledger-management/journal', requiredPermission: 'journalPermission', permissionLevel: 'GENERAL' },  // 분개장 권한
                 { text: '총계정원장', component: 'GeneralLedgerPage', apiPath: undefined, url: '/finance/ledger-management/general-ledger', requiredPermission: 'generalLedgerPermission', permissionLevel: 'GENERAL' },  // 총계정원장 권한
                 { text: '매입매출장', component: 'SalesPurchaseLedgerPage', apiPath: undefined, url: '/finance/ledger-management/sales-purchase', requiredPermission: 'salesPurchaseLedgerPermission', permissionLevel: 'GENERAL' },  // 매입매출장 권한
-                { text: '세금계산서(계산서)현황', component: 'TaxInvoiceStatusPage', apiPath: undefined, url: '/finance/ledger-management/tax-invoice', requiredPermission: 'taxInvoicePermission', permissionLevel: 'GENERAL' },  // 세금계산서(계산서)현황 권한
+                { text: '세금계산서현황', component: 'TaxInvoiceStatusPage', apiPath: undefined, url: '/finance/ledger-management/tax-invoice', requiredPermission: 'taxInvoicePermission', permissionLevel: 'GENERAL' },  // 세금계산서(계산서)현황 권한
                 { text: '전표출력', component: 'VoucherPrintPage', apiPath: undefined, url: '/finance/ledger-management/voucher-print', requiredPermission: 'voucherPrintPermission', permissionLevel: 'GENERAL' },  // 전표출력 권한
             ]
         },
@@ -123,7 +123,7 @@ export const subMenuItems = {
             text: '기초 정보 관리',
             items: [
                 { text: '사원 관리', component: 'EmployeeManagementPage', apiPath: EMPLOYEE_API.EMPLOYEE_DATA_API, url: '/hr/basic-info/employee-management', requiredPermission: 'employeeManagementPermission', permissionLevel: 'GENERAL' },  // 사원 관리 권한
-                { text: '사용자 관리', component: 'UserManagementPage', apiPath: EMPLOYEE_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한
+                { text: '사용자 관리', component: 'UserManagementPage', apiPath: EMPLOYEE_API.USERS_DATA_API, url: '/hr/basic-info/user-management', requiredPermission: 'userManagementPermission', permissionLevel: 'GENERAL' },  // 사용자 관리 권한 *삭제할꺼*
                 { text: '부서 관리', component: 'DepartmentManagementPage', apiPath: EMPLOYEE_API.DEPARTMENT_DATA_API, url: '/hr/basic-info/department-management', requiredPermission: 'departmentManagementPermission', permissionLevel: 'GENERAL' },  // 부서 관리 권한
                 { text: '발령 관리', component: 'AssignmentManagementPage', apiPath: EMPLOYEE_API.TRANSFER_DATA_API, url: '/hr/basic-info/assignment-management', requiredPermission: 'assignmentManagementPermission', permissionLevel: 'GENERAL' },  // 발령 관리 권한
                 { text: '성과 평가 관리', component: 'PerformanceEvaluationPage', apiPath: EMPLOYEE_API.PERFORMANCE_DATA_API, url: '/hr/basic-info/performance-evaluation', requiredPermission: 'performanceEvaluationPermission', permissionLevel: 'GENERAL' },  // 성과 평가 관리 권한
