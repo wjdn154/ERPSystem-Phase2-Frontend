@@ -11,14 +11,6 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '일보 등록',
-            children: (
-                <Typography>
-                    일보 등록: 새로운 일간 생산 일보를 등록하고, 생산된 제품 수량과 작업 결과를 입력할 수 있음.
-                </Typography>
-            ),
-        },
+
     ];
 }

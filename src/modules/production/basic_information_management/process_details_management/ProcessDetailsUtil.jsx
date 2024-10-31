@@ -13,15 +13,6 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '공정 등록',
-            children: (
-                <Typography>
-                    새로운 공정을 등록하여 공정 단계, 소요 시간 등을 입력할 수 있음.
-                </Typography>
-            ),
-        },
     ];
 }
 
