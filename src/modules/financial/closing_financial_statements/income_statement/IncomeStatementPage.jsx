@@ -81,7 +81,7 @@ const IncomeStatementPage = () => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={6} sx={{ minWidth: '300px !important', maxWidth: '1500px !important' }}>
+                    <Grid item xs={12} md={4} sx={{ minWidth: '450px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{ height: '100%' }}>
                                 <Typography variant="h6" sx={{ padding: '20px' }} >손익계산서 조회</Typography>
@@ -136,7 +136,7 @@ const IncomeStatementPage = () => {
                                                 dataIndex: 'name',
                                                 key: 'name',
                                                 align: 'center',
-                                                width: '30%',
+                                                width: '40%',
                                                 render: (text, record) => handleRenderName(record.level, text),
                                             },
                                             {

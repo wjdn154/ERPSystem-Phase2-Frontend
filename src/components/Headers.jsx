@@ -40,43 +40,50 @@ function Headers() {
                         setModule(response.data.module);
                         setPermissionLevel(response.data.permission);
 
-                        eventSourceRef.current = new EventSource(COMMON_API.NOTIFICATION_SUBSCRIBE_API(
-                            decodedToken.employeeId,
-                            decodedToken["X-Tenant-ID"],
-                            response.data.module,
-                            response.data.permission
-                        ));
+                        const createEventSource = () => {
+                            eventSourceRef.current = new EventSource(COMMON_API.NOTIFICATION_SUBSCRIBE_API(
+                                decodedToken.employeeId,
+                                decodedToken["X-Tenant-ID"],
+                                response.data.module,
+                                response.data.permission
+                            ));
 
-                        eventSourceRef.current.addEventListener("subscribe", async (event) => {
-                            console.log("구독 성공:", event.data);
-                            try {
-                                const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
-                                setNotificationItems(response2.data);
-                                setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
-                            } catch (error) {
-                                console.error("알림 목록 조회 에러:", error);
-                            }
-                        });
-
-                        eventSourceRef.current.addEventListener("notification", async (event) => {
-                            console.log(event.data);
-                            notify('info', "알림", event.data, 'topRight');
-                            setTimeout(async () => {
+                            eventSourceRef.current.addEventListener("subscribe", async (event) => {
+                                console.log("SSE 구독 성공:", event.data);
                                 try {
                                     const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
                                     setNotificationItems(response2.data);
                                     setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
                                 } catch (error) {
-                                    console.error("알림 생성 에러:", error);
+                                    console.error("알림 목록 조회 에러:", error);
                                 }
-                            }, 300);  // 300ms 지연
-                        });
+                            });
 
+                            eventSourceRef.current.addEventListener("notification", async (event) => {
+                                console.log(event.data);
+                                notify('info', "알림", event.data, 'topRight');
+                                setTimeout(async () => {
+                                    try {
+                                        const response2 = await apiClient.post(COMMON_API.CREATE_NOTIFICATION_API(decodedToken.employeeId, response.data.module, response.data.permission));
+                                        setNotificationItems(response2.data);
+                                        setUnreadCount(response2.data.filter((item) => !item.readStatus).length);
+                                    } catch (error) {
+                                        console.error("알림 생성 에러:", error);
+                                    }
+                                }, 300);  // 300ms 지연
+                            });
 
-                        eventSourceRef.current.onerror = (error) => {
-                            console.error("SSE 연결 에러:", error);
-                            eventSourceRef.current.close();
+                            eventSourceRef.current.onerror = (error) => {
+                                console.error("SSE 연결 에러:", error);
+                                eventSourceRef.current.close();
+                                eventSourceRef.current = null;
+
+                                // 일정 시간 후 재연결 시도
+                                setTimeout(createEventSource, 1000);  // 1초 후 재연결
+                            };
                         };
+
+                        createEventSource();
                     }
                 } catch (error) {
                     console.error("사용자 정보 조회 에러:", error);
@@ -117,8 +124,6 @@ function Headers() {
     const markAsRead = async (notificationId) => {
         try {
             const response = await apiClient.post(COMMON_API.MARK_AS_READ_NOTIFICATION_API(employeeId, notificationId));
-            console.log("읽음 처리 결과:", response.data);
-            console.log("읽음 처리 결과:", notificationItems);
             setNotificationItems((prevItems) =>
                 prevItems.map((item) =>
                     item.notification.id === notificationId ? { ...item, readStatus: true } : item
