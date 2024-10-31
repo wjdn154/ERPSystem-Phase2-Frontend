@@ -5,7 +5,7 @@ import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './PurchaseUtil.jsx';
 import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, InputNumber, notification, Upload, Divider, Tooltip} from 'antd';
 import dayjs from 'dayjs';
-import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
+import {DownSquareOutlined, SearchOutlined, PlusOutlined, CheckOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
@@ -359,51 +359,6 @@ const PurchasePage = ({initialData}) => {
         return quantity * price;
     };
 
-    const calculateVat = async () => {
-        let vatAmount = 0;
-
-        const searchVatTypeId = (await apiClient.post(FINANCIAL_API.VAT_TYPE_ID_API, { vatTypeCode: detailPurchase.vatCode})).data;
-
-        return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
-    };
-
-    // 수량 또는 단가 변경 시 공급가액과 부가세를 자동 계산하는 함수
-    const updateSupplyAndVat = (quantity, price, recordKey) => {
-
-        const supplyPrice = calculateSupplyPrice(quantity, price);
-
-        const vat = calculateVat(supplyPrice);
-
-        updateField('supplyPrice', supplyPrice, recordKey);
-        updateField('vat', vat, recordKey);
-        console.log('vat', vat)
-    };
-
-    const updateField = (fieldName, value) => {
-        const updatedDetails = [...purchaseParam.purchaseDetails];
-
-        console.log('editingRow: ', editingRow)
-
-        updatedDetails[editingRow][fieldName] = value;
-
-        console.log('updatedDetails: ', updatedDetails)
-
-        // 수량이나 단가가 변경되면 공급가액을 재계산
-        if (fieldName === 'quantity' || fieldName === 'price') {
-            const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
-
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
-        }
-
-        setPurchaseParam((prevParams) => ({
-            ...prevParams,
-            purchaseDetails: updatedDetails,
-        }));
-    };
-
     const handleRowSelectionChange = (selectedRowKeys) => {
         setSelectedDetailRowKeys(selectedRowKeys);  // 선택된 행의 키 상태 업데이트
         console.log('선택된 행 키:', selectedRowKeys);  // 선택된 키 출력
@@ -538,6 +493,89 @@ const PurchasePage = ({initialData}) => {
                 });
             },
         });
+    };
+
+    const updateField = (fieldName, value, index) => {
+
+
+        const updatedDetails = [...purchaseParam.purchaseDetails];
+
+        console.log('editingRow: ', editingRow)
+
+        updatedDetails[index][fieldName] = value;
+
+        console.log('updatedDetails: ', updatedDetails)
+
+        setPurchaseParam((prevParams) => ({
+            ...prevParams,
+            purchaseDetails: updatedDetails,
+        }));
+    };
+
+    // API를 사용해 부가세 계산
+    const calculateVat = async (quantity, price, vatTypeId, index) => {
+        try {
+            const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
+                vatTypeId,
+                quantity,
+                price,
+            });
+            const vatAmount = response.data;
+
+            console.log('vatAmount: ', vatAmount);
+
+            console.log(purchaseParam)
+            // quotationDetails가 배열인지 확인하고, index가 유효한지 확인
+
+
+            const supplyPrice = purchaseParam.purchaseDetails[index].supplyPrice = quantity * price;
+            console.log(supplyPrice)
+            const vat = purchaseParam.purchaseDetails[index].vat = vatAmount;
+
+
+            updateField('supplyPrice', supplyPrice, index)
+            updateField('vat', vat, index)
+
+            setPurchaseDetails(purchaseParam);
+
+        } catch (error) {
+            console.error("부가세 계산 중 오류 발생:", error);
+        }
+    };
+
+    const handleQuantityChange = (value, index) => {
+        setEditingRow(index)
+        const updatedDetails = [...purchaseParam.purchaseDetails];
+        updatedDetails[index].quantity = value;
+
+        setPurchaseParam((prevParam) => ({
+            ...prevParam,
+            purchaseDetails: updatedDetails,
+        }));
+        setEditingRow(null);
+
+    };
+
+    const saveEdit = async (id, event, index) => {
+        event.stopPropagation();
+
+        console.log(id);
+
+
+        const record = purchaseParam.purchaseDetails[id];
+        console.log(record)
+
+        const quantity = Number(record.quantity);
+        const price = record.price;
+
+        const vatTypeId = purchaseParam.vatType ? purchaseParam.vatType.code : purchaseParam.vatCode;
+
+        if (quantity && price && vatTypeId) {
+            await calculateVat(quantity, price, vatTypeId, id); // 필요한 데이터로 부가세 계산 API 호출
+        } else {
+            console.error("필수 데이터가 부족합니다: 수량, 단가, 과세 유형을 입력해주세요.");
+        }
+
     };
 
     const columns = [
@@ -966,14 +1004,22 @@ const PurchasePage = ({initialData}) => {
                                                         key: 'quantity',
                                                         align: 'center',
                                                         render: (text, record, index) => (
-
-                                                            <Input
-                                                                value={text}
-                                                                onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                                className="small-text"
-                                                            />
+                                                            <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                                <Input
+                                                                    value={record.quantity}
+                                                                    onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                                    className="small-text"
+                                                                    style={{ flex: 1 }}
+                                                                />
+                                                                <Tooltip title="저장">
+                                                                    <CheckOutlined
+                                                                        style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                        onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                                    />
+                                                                </Tooltip>
+                                                            </div>
                                                         ),
-                                                        width: '6%'
+                                                        width: '10%',
                                                     },
                                                     {
                                                         title: '단가',
@@ -1634,14 +1680,22 @@ const PurchasePage = ({initialData}) => {
                                                 key: 'quantity',
                                                 align: 'center',
                                                 render: (text, record, index) => (
-
-                                                    <Input
-                                                        value={text}
-                                                        onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                        className="small-text"
-                                                    />
+                                                    <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                        <Input
+                                                            value={record.quantity}
+                                                            onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                            className="small-text"
+                                                            style={{ flex: 1 }}
+                                                        />
+                                                        <Tooltip title="저장">
+                                                            <CheckOutlined
+                                                                style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                            />
+                                                        </Tooltip>
+                                                    </div>
                                                 ),
-                                                width: '6%'
+                                                width: '10%',
                                             },
                                             {
                                                 title: '단가',
