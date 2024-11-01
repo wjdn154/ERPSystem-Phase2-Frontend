@@ -972,18 +972,18 @@ const OrderFormPage = ({initialData}) => {
                                                 </Col>
 
 
-                                                {(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (
-                                                    <Col span={6}>
-                                                        <Form.Item  style={{ marginBottom: 0 }} >
-                                                            <Input
-                                                                addonBefore="환율"
-                                                                value={orderParam.exchangeRate}
-                                                                onClick={() => handleInputClick('exchangeRate')}
-                                                                onFocus={(e) => e.target.blur()}
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                )}
+                                                {/*{(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (*/}
+                                                {/*    <Col span={6}>*/}
+                                                {/*        <Form.Item  style={{ marginBottom: 0 }} >*/}
+                                                {/*            <Input*/}
+                                                {/*                addonBefore="환율"*/}
+                                                {/*                value={orderParam.exchangeRate}*/}
+                                                {/*                onClick={() => handleInputClick('exchangeRate')}*/}
+                                                {/*                onFocus={(e) => e.target.blur()}*/}
+                                                {/*            />*/}
+                                                {/*        </Form.Item>*/}
+                                                {/*    </Col>*/}
+                                                {/*)}*/}
 
 
                                                 <Col span={12}>
@@ -1663,18 +1663,18 @@ const OrderFormPage = ({initialData}) => {
                                         </Col>
 
 
-                                        {(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (
-                                            <Col span={6}>
-                                                <Form.Item  style={{ marginBottom: 0 }} >
-                                                    <Input
-                                                        addonBefore="환율"
-                                                        value={orderParam.exchangeRate}
-                                                        onClick={() => handleInputClick('exchangeRate')}
-                                                        onFocus={(e) => e.target.blur()}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                        )}
+                                        {/*{(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (*/}
+                                        {/*    <Col span={6}>*/}
+                                        {/*        <Form.Item  style={{ marginBottom: 0 }} >*/}
+                                        {/*            <Input*/}
+                                        {/*                addonBefore="환율"*/}
+                                        {/*                value={orderParam.exchangeRate}*/}
+                                        {/*                onClick={() => handleInputClick('exchangeRate')}*/}
+                                        {/*                onFocus={(e) => e.target.blur()}*/}
+                                        {/*            />*/}
+                                        {/*        </Form.Item>*/}
+                                        {/*    </Col>*/}
+                                        {/*)}*/}
 
 
                                         <Col span={12}>
