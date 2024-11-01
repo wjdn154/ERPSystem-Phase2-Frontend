@@ -11,14 +11,6 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: 'MPS 등록',
-            children: (
-                <Typography>
-                    주생산계획 등록: 새로운 주생산계획을 수립하고, 기간별 목표 및 세부 일정을 설정할 수 있음.
-                </Typography>
-            ),
-        },
+
     ];
 }

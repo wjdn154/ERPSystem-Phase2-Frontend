@@ -168,14 +168,14 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: 'Green BOM',
-            children: (
-                <Typography>
-                    친환경 자재명세서를 조회하고, 필요한 경우 수정 및 삭제할 수 있음.
-                </Typography>
-            ),
-        },
+        // {
+        //     key: '2',
+        //     label: 'Green BOM',
+        //     children: (
+        //         <Typography>
+        //             친환경 자재명세서를 조회하고, 필요한 경우 수정 및 삭제할 수 있음.
+        //         </Typography>
+        //     ),
+        // },
     ];
 }

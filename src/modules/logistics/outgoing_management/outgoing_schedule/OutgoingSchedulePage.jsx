@@ -497,7 +497,7 @@ const OutgoingSchedulePage = ({initialData}) => {
                         title="출고"
                         description={(
                             <Typography>
-                                출고지시서 페이지는 <span>회사에서 출고할 물품을 창고에서 출고하도록 지시</span>하는 문서를 관리합니다. 이 페이지에서는 <span>출고지시서를 생성, 수정, 삭제</span>할 수 있으며, 물품의 <span>출고 일정과 장소</span>를 지정할 수 있습니다. 또한, <span>출고 과정에서 발생하는 문제</span>도 이 페이지에서 관리됩니다.                            </Typography>
+                                출고 페이지는 <span>회사에서 출고할 물품을 창고에서 출고하도록 지시</span>하는 문서를 관리합니다. 이 페이지에서는 <span>출고지시서를 생성, 수정, 삭제</span>할 수 있으며, 물품의 <span>출고 일정과 장소</span>를 지정할 수 있습니다. 또한, <span>출고 과정에서 발생하는 문제</span>도 이 페이지에서 관리됩니다.                            </Typography>
                         )}
                         tabItems={tabItems()}
                         activeTabKey={activeTabKey}

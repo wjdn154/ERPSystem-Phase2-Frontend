@@ -57,7 +57,6 @@ const LoginPage = () => {
                 value: company.id
             }));
         } catch (error) {
-            console.error('회사 검색 중 오류 발생', error);
             return [];
         }
     };
@@ -94,6 +93,7 @@ const LoginPage = () => {
             // 로그인 성공 시 메인 페이지로 이동
             navigate('/integration', { state: { login: true } });
         } catch (error) {
+
             notify('error', '로그인 실패', error.response.data, 'top');
         }
     };

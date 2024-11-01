@@ -217,6 +217,7 @@ export const LOGISTICS_API = {
     
     
     RECEIVING_ORDER_LIST_API: `${API_BASE_URL}/api/logistics/receiving-orders/`, // 입고 지시서 목록 조회 API
+    RECEIVING_ORDER_DETAIL_API: (id) => `${API_BASE_URL}/api/logistics/receiving-orders/${id}`, // 입고지시서 상세 정보 조회 API
     RECEIVING_ORDER_CREATE_API: `${API_BASE_URL}/api/logistics/receiving-orders/create`, // 입고 지시서 등록 API
 
     // 영업 관리
@@ -269,6 +270,7 @@ export const LOGISTICS_API = {
     RECEIVING_SCHEDULE_PROCESS_API: () => `${API_BASE_URL}/api/logistics/receivingSchedules/process`, // 입고 처리 요청 API
     RECEIVING_SCHEDULE_WAITING_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/receivingSchedules/waiting?startDate=${startDate}&endDate=${endDate}`, // 특정 날짜 범위 내 대기 중인 입고 일정 조회 API
     INVENTORY_BY_LOCATION_API: (locationId) => `${API_BASE_URL}/api/logistics/inventory/byLocation/${locationId}`, // 특정 위치의 재고 조회 API
+
     INVENTORY_BY_WAREHOUSE_API: (warehouseId) => `${API_BASE_URL}/api/logistics/inventory/warehouse/${warehouseId}`, // 특정 위치의 재고 조회 API
     RECEIVING_SCHEDULE_PROCESS_CREATE_API: (id) => `${API_BASE_URL}/api/logistics/receivingSchedules/process/${id}`, // ReceivingSchedule 입고 처리 API
     SHIPPING_ORDER_DETAILS_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/shipping-order-details/details?startDate=${startDate}&endDate=${endDate}`, // 특정 날짜 범위의 출하지시서 상세 정보 조회 API

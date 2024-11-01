@@ -206,8 +206,6 @@ const ShipmentEntryPage = () => {
                             comment: product.comment, // 비고 (옵션)
                         })),
                     };
-                    console.log(shipmentData);
-
 
                     const API_PATH = LOGISTICS_API.SHIPMENT_CREATE_API; // 수정 API 경로 (id 포함)
 

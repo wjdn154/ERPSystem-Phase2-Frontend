@@ -5,7 +5,7 @@ import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import { tabItems } from './OrderFormUtil.jsx';
 import {Space, Tag, Form, Table, Button, Col, Input, Row, Checkbox, Modal, DatePicker, Spin, Select, InputNumber, notification, Upload, Divider, Tooltip} from 'antd';
 import dayjs from 'dayjs';
-import {DownSquareOutlined, SearchOutlined, PlusOutlined} from "@ant-design/icons";
+import {DownSquareOutlined, SearchOutlined, PlusOutlined, CheckOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {EMPLOYEE_API, FINANCIAL_API, LOGISTICS_API} from "../../../../config/apiConstants.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
@@ -27,10 +27,10 @@ const OrderFormPage = ({initialData}) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [orderParam, setOrderParam] = useState({
-        purchaseOrderDetails: [], });
+        ordersDetails: [], });
     const [detailOrder, setDetailOrder] = useState(false);
     const [form] = Form.useForm();
-    const [purchaseOrderDetails, setOrdersDetails] = useState(detailOrder.purchaseOrderDetails || []);
+    const [ordersDetails, setOrdersDetails] = useState(detailOrder.ordersDetails || []);
     const [editOrder, setEditOrder] = useState(false);
     const [selectedDetailRowKeys, setSelectedDetailRowKeys] = useState([]); // 발주 요청 상세 항목의 선택된 키
     const [registrationForm] = Form.useForm(); // 폼 인스턴스 생성
@@ -51,7 +51,7 @@ const OrderFormPage = ({initialData}) => {
 
         form.setFieldsValue(detailOrder);
         form.setFieldsValue({
-            purchaseOrderDetails: purchaseOrderDetails,
+            ordersDetails: ordersDetails,
         })
         setOrderParam((prevParam) => ({
             ...prevParam,
@@ -84,7 +84,7 @@ const OrderFormPage = ({initialData}) => {
         setEditOrder(false);
         setEditingRow(null);
         setOrderParam({
-            purchaseOrderDetails: [],
+            ordersDetails: [],
             date: dayjs().format('YYYY-MM-DD'),
         });
         setSearchParams({
@@ -93,7 +93,7 @@ const OrderFormPage = ({initialData}) => {
             clientId: null,
             state: null,
         });
-        setDetailOrder(orderParam.purchaseOrderDetails || [])
+        setDetailOrder(orderParam.ordersDetails || [])
         setSelectedRowKeys(null)
         form.resetFields();
         registrationForm.resetFields();
@@ -265,7 +265,7 @@ const OrderFormPage = ({initialData}) => {
 
             case 'product':
                 // 제품 선택 시 해당 제품을 상태에 반영
-                const updatedDetails = [...orderParam.purchaseOrderDetails];
+                const updatedDetails = [...orderParam.ordersDetails];
 
                 console.log(editingRow)
 
@@ -284,7 +284,7 @@ const OrderFormPage = ({initialData}) => {
 
                 setOrderParam((prevParams) => ({
                     ...prevParams,
-                    purchaseOrderDetails: updatedDetails,
+                    ordersDetails: updatedDetails,
                 }));
                 setEditingRow(null);
                 break;
@@ -308,7 +308,7 @@ const OrderFormPage = ({initialData}) => {
         setIsModalVisible(false);
     };
 
-    // 등록 일자 변경 핸들러
+    // 입력 일자 변경 핸들러
     const handleRegiDateChange = (date) => {
         setOrderParam((prevState) => ({
             ...prevState,
@@ -326,7 +326,7 @@ const OrderFormPage = ({initialData}) => {
 
     // 필드 값 변경 시 호출되는 함수
     const handleFieldChange = (value, index, field) => {
-        const updatedDetails = [...orderParam.purchaseOrderDetails];
+        const updatedDetails = [...orderParam.ordersDetails];
 
         setEditingRow(index);
 
@@ -347,7 +347,7 @@ const OrderFormPage = ({initialData}) => {
         setOrdersDetails(updatedDetails); // 상태 업데이트
         setOrderParam( {
             ...orderParam,
-            purchaseOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+            ordersDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
         });
         setEditingRow(null);
     };
@@ -356,34 +356,8 @@ const OrderFormPage = ({initialData}) => {
         return quantity * price;
     };
 
-    const calculateVat = (supplyPrice) => {
-        return supplyPrice * 0.1;  // 부가세는 공급가액의 10%
-    };
 
-    const updateField = (fieldName, value) => {
-        const updatedDetails = [...orderParam.purchaseOrderDetails];
 
-        console.log('editingRow: ', editingRow)
-
-        updatedDetails[editingRow][fieldName] = value;
-
-        console.log('updatedDetails: ', updatedDetails)
-
-        // 수량이나 단가가 변경되면 공급가액을 재계산
-        if (fieldName === 'quantity' || fieldName === 'price') {
-            const { quantity, price } = updatedDetails[editingRow];
-            const supplyPrice = calculateSupplyPrice(quantity, price);
-            const vat = calculateVat(supplyPrice);
-
-            updatedDetails[editingRow].supplyPrice = supplyPrice;
-            updatedDetails[editingRow].vat = vat;
-        }
-
-        setOrderParam((prevParams) => ({
-            ...prevParams,
-            purchaseOrderDetails: updatedDetails,
-        }));
-    };
 
     const handleRowSelectionChange = (selectedRowKeys) => {
         setSelectedDetailRowKeys(selectedRowKeys);  // 선택된 행의 키 상태 업데이트
@@ -405,7 +379,7 @@ const OrderFormPage = ({initialData}) => {
         // 기존 항목에 새로운 항목 추가
         setOrderParam((prev) => ({
             ...prev,
-            purchaseOrderDetails: [...prev.purchaseOrderDetails, newRow],
+            ordersDetails: [...prev.ordersDetails, newRow],
         }));
     };
 
@@ -419,13 +393,13 @@ const OrderFormPage = ({initialData}) => {
             onOk: async () => {
                 try {
                     // 삭제 API 호출해서 해야함 (수정)
-                    const updatedDetails = [...orderParam.purchaseOrderDetails]; // 배열을 복사
+                    const updatedDetails = [...orderParam.ordersDetails]; // 배열을 복사
                     updatedDetails.splice(index, 1); // 인덱스에 해당하는 항목 삭제
 
                     setOrdersDetails(updatedDetails); // 상태 업데이트
                     setOrderParam((prev) => ({
                             ...prev,
-                            purchaseOrderDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
+                            ordersDetails: updatedDetails, // 최종 상태에 수정된 배열 반영
                         })
                     );
 
@@ -458,8 +432,8 @@ const OrderFormPage = ({initialData}) => {
                         vatId: orderParam.vatType ? Number(orderParam.vatType.code) : orderParam.vatId,
                         journalEntryCode: orderParam.journalEntryCode,
                         electronicTaxInvoiceStatus: orderParam.electronicTaxInvoiceStatus,
-                        items: Array.isArray(orderParam.purchaseOrderDetails
-                        ) ? orderParam.purchaseOrderDetails.map(item => ({
+                        items: Array.isArray(orderParam.ordersDetails
+                        ) ? orderParam.ordersDetails.map(item => ({
                             productId: item.productId,
                             quantity: item.quantity,
                             remarks: item.remarks,
@@ -482,7 +456,7 @@ const OrderFormPage = ({initialData}) => {
 
                     if (type === 'update') {
                         setOrderList((prevList) =>
-                            prevList.map((purchaseOrderDetails) => (purchaseOrderDetails.id === updatedData.id ? updatedData : purchaseOrderDetails))
+                            prevList.map((ordersDetails) => (ordersDetails.id === updatedData.id ? updatedData : ordersDetails))
                         );
                     } else {
                         setOrderList((prevList) => [...prevList, updatedData]);
@@ -500,9 +474,9 @@ const OrderFormPage = ({initialData}) => {
 
                     setEditOrder(false);
                     setOrderParam({
-                        purchaseOrderDetails: [],
+                        ordersDetails: [],
                     });
-                    setDetailOrder(orderParam.purchaseOrderDetails || []);
+                    setDetailOrder(orderParam.ordersDetails || []);
                     setDisplayValues({});
 
                     type === 'update'
@@ -521,6 +495,89 @@ const OrderFormPage = ({initialData}) => {
                 });
             },
         });
+    };
+
+    const updateField = (fieldName, value, index) => {
+
+
+        const updatedDetails = [...orderParam.ordersDetails];
+
+        console.log('editingRow: ', editingRow)
+
+        updatedDetails[index][fieldName] = value;
+
+        console.log('updatedDetails: ', updatedDetails)
+
+        setOrderParam((prevParams) => ({
+            ...prevParams,
+            ordersDetails: updatedDetails,
+        }));
+    };
+
+    // API를 사용해 부가세 계산
+    const calculateVat = async (quantity, price, vatTypeId, index) => {
+        try {
+            const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
+                vatTypeId,
+                quantity,
+                price,
+            });
+            const vatAmount = response.data;
+
+            console.log('vatAmount: ', vatAmount);
+
+            console.log(orderParam)
+            // quotationDetails가 배열인지 확인하고, index가 유효한지 확인
+
+
+            const supplyPrice = orderParam.ordersDetails[index].supplyPrice = quantity * price;
+            console.log(supplyPrice)
+            const vat = orderParam.ordersDetails[index].vat = vatAmount;
+
+
+            updateField('supplyPrice', supplyPrice, index)
+            updateField('vat', vat, index)
+
+            setQuotationDetails(orderParam);
+
+        } catch (error) {
+            console.error("부가세 계산 중 오류 발생:", error);
+        }
+    };
+
+    const handleQuantityChange = (value, index) => {
+        setEditingRow(index)
+        const updatedDetails = [...orderParam.ordersDetails];
+        updatedDetails[index].quantity = value;
+
+        setOrderParam((prevParam) => ({
+            ...prevParam,
+            ordersDetails: updatedDetails,
+        }));
+        setEditingRow(null);
+
+    };
+
+    const saveEdit = async (id, event, index) => {
+        event.stopPropagation();
+
+        console.log(id);
+
+
+        const record = orderParam.ordersDetails[id];
+        console.log(record)
+
+        const quantity = Number(record.quantity);
+        const price = record.price;
+
+        const vatTypeId = orderParam.vatType ? orderParam.vatType.code : orderParam.vatCode;
+
+        if (quantity && price && vatTypeId) {
+            await calculateVat(quantity, price, vatTypeId, id); // 필요한 데이터로 부가세 계산 API 호출
+        } else {
+            console.error("필수 데이터가 부족합니다: 수량, 단가, 과세 유형을 입력해주세요.");
+        }
+
     };
 
     const columns = [
@@ -566,7 +623,8 @@ const OrderFormPage = ({initialData}) => {
             dataIndex: 'date',
             key: 'date',
             align: 'center',
-            render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+
+            render: (text, record) => (text ? dayjs(text).format('YYYY-MM-DD') + " -" + record.id : ''),
             width: '10%',
         },
         {
@@ -623,7 +681,7 @@ const OrderFormPage = ({initialData}) => {
                         title="주문서"
                         description={(
                             <Typography>
-                                주문서 페이지는 <span>고객이 주문서에 따라 실제 주문을 넣을 때 사용하는 문서</span>를 관리함. 이 페이지에서는 <span>주문서를 생성, 수정, 삭제</span>할 수 있으며, 주문서는 <span>주문서와 연동</span>되어 자동으로 항목을 가져오거나 수동으로 추가할 수 있음. 각 주문서에는 <span>주문 날짜, 납기일, 결제 조건</span> 등 세부 사항을 입력할 수 있음.
+                                주문서 페이지는 <span>고객이 주문서에 따라 실제 주문을 넣을 때 사용하는 문서</span>를 관리함. 이 페이지에서는 <span>주문서를 생성, 수정, 삭제</span>할 수 있으며, 각 주문서에는 <span>주문 날짜, 납기일, 결제 조건</span> 등 세부 사항을 입력할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -762,10 +820,10 @@ const OrderFormPage = ({initialData}) => {
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>주문서 정보</Divider>
                                             <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                                 <Col>
-                                                    <Typography>등록 일자</Typography>
+                                                    <Typography>입력 일자</Typography>
                                                 </Col>
                                                 <Col>
-                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                                    <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                         <DatePicker
                                                             disabledDate={(current) => current && current.year() !== 2024}
                                                             value={dayjs(orderParam.date)}
@@ -914,18 +972,18 @@ const OrderFormPage = ({initialData}) => {
                                                 </Col>
 
 
-                                                {(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (
-                                                    <Col span={6}>
-                                                        <Form.Item  style={{ marginBottom: 0 }} >
-                                                            <Input
-                                                                addonBefore="환율"
-                                                                value={orderParam.exchangeRate}
-                                                                onClick={() => handleInputClick('exchangeRate')}
-                                                                onFocus={(e) => e.target.blur()}
-                                                            />
-                                                        </Form.Item>
-                                                    </Col>
-                                                )}
+                                                {/*{(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (*/}
+                                                {/*    <Col span={6}>*/}
+                                                {/*        <Form.Item  style={{ marginBottom: 0 }} >*/}
+                                                {/*            <Input*/}
+                                                {/*                addonBefore="환율"*/}
+                                                {/*                value={orderParam.exchangeRate}*/}
+                                                {/*                onClick={() => handleInputClick('exchangeRate')}*/}
+                                                {/*                onFocus={(e) => e.target.blur()}*/}
+                                                {/*            />*/}
+                                                {/*        </Form.Item>*/}
+                                                {/*    </Col>*/}
+                                                {/*)}*/}
 
 
                                                 <Col span={12}>
@@ -941,7 +999,7 @@ const OrderFormPage = ({initialData}) => {
                                             {/* 주문 상세 항목 */}
                                             <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>주문 상세 항목</Divider>
                                             <Table
-                                                dataSource={orderParam?.purchaseOrderDetails || []}
+                                                dataSource={orderParam?.ordersDetails || []}
                                                 columns={[
                                                     {
                                                         title: '품목',
@@ -968,14 +1026,22 @@ const OrderFormPage = ({initialData}) => {
                                                         key: 'quantity',
                                                         align: 'center',
                                                         render: (text, record, index) => (
-
-                                                            <Input
-                                                                value={text}
-                                                                onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                                className="small-text"
-                                                            />
+                                                            <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                                <Input
+                                                                    value={record.quantity}
+                                                                    onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                                    className="small-text"
+                                                                    style={{ flex: 1 }}
+                                                                />
+                                                                <Tooltip title="저장">
+                                                                    <CheckOutlined
+                                                                        style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                        onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                                    />
+                                                                </Tooltip>
+                                                            </div>
                                                         ),
-                                                        width: '6%'
+                                                        width: '10%',
                                                     },
                                                     {
                                                         title: '단가',
@@ -1444,10 +1510,10 @@ const OrderFormPage = ({initialData}) => {
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>주문서 정보</Divider>
                                     <Row align="middle" gutter={16} style={{ marginBottom: '16px' }}>
                                         <Col>
-                                            <Typography>등록 일자</Typography>
+                                            <Typography>입력 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(orderParam.date)}
@@ -1460,7 +1526,7 @@ const OrderFormPage = ({initialData}) => {
                                             <Typography>납기 일자</Typography>
                                         </Col>
                                         <Col>
-                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '등록 일자를 입력하세요.' }]}>
+                                            <Form.Item style={{ marginBottom: 0 }} rules={[{ required: true, message: '입력 일자를 입력하세요.' }]}>
                                                 <DatePicker
                                                     disabledDate={(current) => current && current.year() !== 2024}
                                                     value={dayjs(orderParam.deliveryDate)}
@@ -1597,18 +1663,18 @@ const OrderFormPage = ({initialData}) => {
                                         </Col>
 
 
-                                        {(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (
-                                            <Col span={6}>
-                                                <Form.Item  style={{ marginBottom: 0 }} >
-                                                    <Input
-                                                        addonBefore="환율"
-                                                        value={orderParam.exchangeRate}
-                                                        onClick={() => handleInputClick('exchangeRate')}
-                                                        onFocus={(e) => e.target.blur()}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
-                                        )}
+                                        {/*{(orderParam.currency !== '한국 [원]' && orderParam.currency !== 'KRW') && (*/}
+                                        {/*    <Col span={6}>*/}
+                                        {/*        <Form.Item  style={{ marginBottom: 0 }} >*/}
+                                        {/*            <Input*/}
+                                        {/*                addonBefore="환율"*/}
+                                        {/*                value={orderParam.exchangeRate}*/}
+                                        {/*                onClick={() => handleInputClick('exchangeRate')}*/}
+                                        {/*                onFocus={(e) => e.target.blur()}*/}
+                                        {/*            />*/}
+                                        {/*        </Form.Item>*/}
+                                        {/*    </Col>*/}
+                                        {/*)}*/}
 
 
                                         <Col span={12}>
@@ -1622,7 +1688,7 @@ const OrderFormPage = ({initialData}) => {
                                     {/* 주문 상세 항목 */}
                                     <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>주문 상세 항목</Divider>
                                     <Table
-                                        dataSource={orderParam?.purchaseOrderDetails || []}
+                                        dataSource={orderParam?.ordersDetails || []}
                                         columns={[
                                             {
                                                 title: '품목',
@@ -1649,14 +1715,22 @@ const OrderFormPage = ({initialData}) => {
                                                 key: 'quantity',
                                                 align: 'center',
                                                 render: (text, record, index) => (
-
-                                                    <Input
-                                                        value={text}
-                                                        onChange={(e) => handleFieldChange(e.target.value, index, 'quantity')}
-                                                        className="small-text"
-                                                    />
+                                                    <div style={{ display: 'flex', alignItems: 'center', padding: '4px', position: 'relative' }}>
+                                                        <Input
+                                                            value={record.quantity}
+                                                            onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                            className="small-text"
+                                                            style={{ flex: 1 }}
+                                                        />
+                                                        <Tooltip title="저장">
+                                                            <CheckOutlined
+                                                                style={{ cursor: 'pointer', color: 'blue', position: 'absolute', right: '10px' }}
+                                                                onClick={(event) => saveEdit(index, event)} // 수정 내용 저장
+                                                            />
+                                                        </Tooltip>
+                                                    </div>
                                                 ),
-                                                width: '6%'
+                                                width: '10%',
                                             },
                                             {
                                                 title: '단가',
