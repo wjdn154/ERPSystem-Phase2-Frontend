@@ -256,7 +256,7 @@ const MaterialDataPage = ({initialData}) => {
 
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={10} md={10} >
+                    <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1200px !important' }}>
                         <Grow in={true} timeout={200} >
                             <div>
                                 <MaterialListSection
@@ -269,7 +269,7 @@ const MaterialDataPage = ({initialData}) => {
                         </Grow>
                     </Grid>
                     {materialDataDetail && selectedRow &&(
-                        <Grid item xs={10} md={10}>
+                        <Grid item xs={12} md={12} sx={{ minWidth: '1000px !important', maxWidth: '1200px !important' }}>
                             <Grow in={true} timeout={200}>
                                 <Paper elevation={3} sx={{ padding: '20px', height: '100%', display: 'flex', flexDirection: 'column' }}>
                                     <Typography variant="h6" marginBottom="20px">
@@ -373,9 +373,10 @@ const MaterialDataPage = ({initialData}) => {
                                     columns={columns}
                                     rowKey={(record, index) => index}
                                     pagination={false}
+                                    size={'small'}
                                 />
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                                    <Button type="default" onClick={handleHazardousAddRow} style={{ marginRight: '10px' }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '20px' }}>
+                                    <Button type="default" onClick={handleHazardousAddRow} style={{ marginRight: '4px' }}>
                                         <PlusOutlined /> 항목 추가
                                     </Button>
                                 </Box>
