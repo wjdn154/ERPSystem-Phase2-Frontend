@@ -186,11 +186,11 @@ const UserManagementPage = ({initialData}) => {
             )}
 
             {editUser && (
-                <Grid item xs={12} md={12}
-                      sx={{minWidth: '1000px !important', maxWidth: '1500px !important'}}>
-                    <Grow in={true} timeout={200}>
-                        <Paper elevation={3} sx={{height: '100%'}}>
-                                <Typography variant="h6" sx={{padding: '20px'}}>사용자정보 수정</Typography>
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={12} sx={{ minWidth: '800px', maxWidth: '1200px', margin: 'auto' }}>
+                        <Grow in={true} timeout={200}>
+                            <Paper elevation={3} sx={{ padding: '20px' }}>
+                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>사용자 정보수정</Typography>
                                 <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                     <Form
                                         initialValues={fetchUserData}
@@ -238,6 +238,7 @@ const UserManagementPage = ({initialData}) => {
                             </Paper>
                         </Grow>
                     </Grid>
+                </Grid>
             )}
 
         </Box>
