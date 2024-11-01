@@ -54,7 +54,7 @@ const RetirementManagementPage = ({ initialData }) => {
                         title="급여 환경 설정"
                         description={(
                             <Typography>
-                               급여 환경 설정 페이지는 <span>호봉별 수당 체계를 기록하고 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>직책 및 적용일자, 호봉체계</span> 등을 기록하고, 호봉별 <span>각 수당들</span>에 필요한 정보를 조회할 수 있음. 이를 통해 <span>호봉별 수당 체계를 조회</span>하고, 필요 시 재무 및 인사 처리에 활용할 수 있음.
+                               급여 환경 설정 페이지는 <span>호봉별 수당 체계 관리</span>하는 기능을 제공함. 이 페이지에서는 <span>회사 내 각 직책에 대한 급여 및 수당 체계</span> 등을 기록하고 관리할 수 있음. 호봉별 <span>직책별 기본급, 각종 수당, 적용 기간</span>등에 정보를 조회할 수 있음. 이를 통해 회사의 재무 및 인사 관리에서<span>호봉별 급여 체계를 조회</span>하고, 필요 시 각 수당의 적용 기간과 금액을 체계적으로 관리할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
