@@ -38,7 +38,7 @@ export default function DashboardPage({ initialData }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <DashboardWidget icon={AttachMoneyIcon} title={reportData.widgets.financeName}  value={`₩${new Intl.NumberFormat('ko-KR').format(reportData.widgets.financeValue)}`} color="bg-blue-500" />
                     <DashboardWidget icon={GroupsIcon} title="총 직원 수" value={`${reportData.widgets.hrValue} 명`} color="bg-green-500" />
-                    <DashboardWidget icon={LocalShippingIcon} title="재고 현황" value={reportData.widgets.logisticsValue} color="bg-yellow-500" />
+                    <DashboardWidget icon={LocalShippingIcon} title="재고 현황" value={`${new Intl.NumberFormat('ko-KR').format(reportData.widgets.logisticsValue)} 개`} color="bg-yellow-500" />
                     <DashboardWidget icon={PrecisionManufacturingIcon} title={reportData.widgets.productionName} value={`${new Intl.NumberFormat('ko-KR').format(reportData.widgets.productionValue)} EA`} color="bg-purple-500" />
                 </div>
 
@@ -118,12 +118,9 @@ export default function DashboardPage({ initialData }) {
                 </div>
 
                 {/* Additional dashboard content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-1">
                     <Card title="최근 활동">
                         <ActivityTimeline reportData={reportData} />
-                    </Card>
-                    <Card title="생산 현황">
-                        <ProductionStatus/>
                     </Card>
                 </div>
             </div>

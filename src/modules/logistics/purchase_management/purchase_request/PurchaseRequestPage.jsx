@@ -1439,7 +1439,7 @@ const PurchaseRequestPage = ( {initialData} ) => {
                                             // onClick: () => setEditingRow(record.id),  // 행 클릭 시 해당 행의 id를 상태로 저장
                                         })}
                                     />
-]
+
                                     <Divider style={{ marginBottom: '10px'}} />
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', paddingBottom: '10px' }}>
                                         <Button type="default" onClick={handleAddRow} style={{ marginRight: '10px' }}>

@@ -430,12 +430,14 @@ const PurchasePage = ({initialData}) => {
                         date: purchaseParam.date,
                         vatId: purchaseParam.vatType ? purchaseParam.vatType.code : purchaseParam.vatCode,
                         journalEntryCode: purchaseParam.journalEntryCode,
-                        electronicTaxInvoiceStatus: purchaseParam.electronicTaxInvoiceStatus,
+                        electronicTaxInvoiceStatus: purchaseParam.electronicTaxInvoiceStatus ?  purchaseParam.electronicTaxInvoiceStatus: null,
                         items: Array.isArray(purchaseParam.purchaseDetails
                         ) ? purchaseParam.purchaseDetails.map(item => ({
                             productId: item.productId,
                             quantity: item.quantity,
                             remarks: item.remarks,
+                            supplyPrice: item.supplyPrice,
+                            vat: item.vat,
                         })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
                         remarks: values.remarks
                     };
@@ -515,6 +517,7 @@ const PurchasePage = ({initialData}) => {
     // API를 사용해 부가세 계산
     const calculateVat = async (quantity, price, vatTypeId, index) => {
         try {
+
             const response = await apiClient.post(FINANCIAL_API.VAT_AMOUNT_QUANTITY_PRICE_API, {
                 vatTypeId,
                 quantity,
@@ -1382,7 +1385,7 @@ const PurchasePage = ({initialData}) => {
                                                 )
                                             }
                                         ]}
-                                        dataSource={modalData[0].purchaseVatTypeShowDTO}
+                                        dataSource={modalData[0].salesVatTypeShowDTO}
                                         rowKey="code"
                                         size="small"
                                         pagination={{

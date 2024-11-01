@@ -10,6 +10,7 @@ export const tabItems = () => {
                     사원의 월별 급여 내역을 확인하고, 급여 정산 내역을 조회할 수 있음.
                 </Typography>
             ),
-        },
+        }
+
     ];
 }
