@@ -435,7 +435,9 @@ const OrderFormPage = ({initialData}) => {
                         items: Array.isArray(orderParam.ordersDetails
                         ) ? orderParam.ordersDetails.map(item => ({
                             productId: item.productId,
-                            quantity: item.quantity,
+                            quantity: Number(item.quantity),
+                            supplyPrice: item.supplyPrice,
+                            vat: item.vat,
                             remarks: item.remarks,
                         })) : [],  // items가 존재할 경우에만 map 실행, 없으면 빈 배열로 설정
                         remarks: values.remarks
@@ -443,7 +445,7 @@ const OrderFormPage = ({initialData}) => {
 
                     console.log('Sending data to API:', orderData); // API로 전송할 데이터 확인
 
-                    const API_PATH = type === 'update' ? LOGISTICS_API.ORDER_UPDATE_API(orderParam.id) : LOGISTICS_API.PURCHASE_ORDER_CREATE_API;
+                    const API_PATH = type === 'update' ? LOGISTICS_API.ORDER_UPDATE_API(orderParam.id) : LOGISTICS_API.ORDER_CREATE_API;
                     const method = type === 'update' ? 'put' : 'post';
 
                     const response = await apiClient[method](API_PATH, orderData, {

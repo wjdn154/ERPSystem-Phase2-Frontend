@@ -30,14 +30,14 @@ const UserManagementPage = ({initialData}) => {
     const [displayValues, setDisplayValues] = useState({});
     const [initialModalData, setInitialModalData] = useState(null);
 
+
     useEffect(() => {
-        if (!fetchUserData) return; // 선택된 사원 데이터가 없으면 종료
-        console.log('fetchUserData:', fetchUserData); // Employee 데이터 확인
+        if (!fetchUserData || !fetchUserData.employeeName) return;
 
         // firstName과 lastName을 조합해서 employeeName 필드에 설정
         form.setFieldsValue({
             ...fetchUserData,
-            employeeName: `${fetchUserData.lastName}${fetchUserData.firstName}`
+            employeeName: fetchUserData.employeeName,
         });
         setUserParam(fetchUserData);
 
@@ -186,11 +186,11 @@ const UserManagementPage = ({initialData}) => {
             )}
 
             {editUser && (
-                <Grid item xs={12} md={12}
-                      sx={{minWidth: '1000px !important', maxWidth: '1500px !important'}}>
-                    <Grow in={true} timeout={200}>
-                        <Paper elevation={3} sx={{height: '100%'}}>
-                                <Typography variant="h6" sx={{padding: '20px'}}>사용자정보 수정</Typography>
+                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
+                    <Grid item xs={12} sx={{ minWidth: '800px', maxWidth: '1200px', margin: 'auto' }}>
+                        <Grow in={true} timeout={200}>
+                            <Paper elevation={3} sx={{ padding: '20px' }}>
+                                <Typography variant="h6" sx={{ marginBottom: '20px' }}>사용자 정보수정</Typography>
                                 <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                     <Form
                                         initialValues={fetchUserData}
@@ -228,9 +228,8 @@ const UserManagementPage = ({initialData}) => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name="employeeName"
-                                                           rules={[{required: true, message: '사원이름을 입력하세요.'}]}>
-                                                    <Input addonBefore="사원이름" disabled/>
+                                                <Form.Item name="employeeName" rules={[{ required: true, message: '사원이름을 입력하세요.' }]}>
+                                                    <Input addonBefore="사원이름" disabled />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
@@ -239,6 +238,7 @@ const UserManagementPage = ({initialData}) => {
                             </Paper>
                         </Grow>
                     </Grid>
+                </Grid>
             )}
 
         </Box>

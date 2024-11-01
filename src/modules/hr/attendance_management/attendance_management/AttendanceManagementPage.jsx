@@ -231,7 +231,8 @@ const AttendanceManagementPage = ( {initialData} ) => {
                         title="근태 관리"
                         description={(
                             <Typography>
-                                근태 관리 페이지는 <span>사원의 출퇴근 기록 및 근무 현황</span>을 체계적으로 관리하는 기능을 제공함. 이 페이지에서는 사원의 <span>출근, 퇴근 시간과 근무 시간</span>을 기록하고, 이를 통해 <span>정확한 근태 관리</span>가 가능함. 또한 <span>결근, 지각, 조퇴</span> 등의 정보를 함께 기록하여 <span>근무 상태를 종합적으로 파악</span>하고 인사 평가 자료로 활용할 수 있음.
+                                근태 관리 페이지는 <span>사원의 출퇴근 기록 및 근무 현황</span>을 체계적으로 관리하는 기능을 제공함. <br/>
+                                이 페이지에서는 사원의 <span>출근, 퇴근 시간과 근무 시간</span>을 기록하고, 이를 통해 <span>정확한 근태 관리</span>가 가능함. 또한 <span>결근, 지각, 조퇴</span> 등의 정보를 함께 기록하여 <span>근무 상태를 종합적으로 파악</span>하고 인사 평가 자료로 활용할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}

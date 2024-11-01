@@ -16,7 +16,7 @@ export const tabItems = () => {
             label: '건강보험',
             children: (
                 <Typography>
-                    새로운 사회보험 항목을 등록하거나 기존 내역을 수정할 수 있음.
+                    새로운 건강보험 항목을 조회하고 기존 내역을 수정할 수 있음.
                 </Typography>
             ),
         },
@@ -25,7 +25,7 @@ export const tabItems = () => {
             label: '장기요양보험',
             children: (
                 <Typography>
-                    새로운 사회보험 항목을 등록하거나 기존 내역을 수정할 수 있음.
+                    새로운 장기요양보험 항목을 조회하고 기존 내역을 수정할 수 있음.
                 </Typography>
             ),
         },
@@ -34,7 +34,7 @@ export const tabItems = () => {
             label: '국민연금',
             children: (
                 <Typography>
-                    새로운 사회보험 항목을 등록하거나 기존 내역을 수정할 수 있음.
+                    새로운 국민연금 항목을 조회하고 기존 내역을 수정할 수 있음.
                 </Typography>
             ),
         },
@@ -43,7 +43,7 @@ export const tabItems = () => {
             label: '소득세',
             children: (
                 <Typography>
-                    새로운 사회보험 항목을 등록하거나 기존 내역을 수정할 수 있음.
+                    새로운 소득세 항목을 조회하고 기존 내역을 수정할 수 있음.
                 </Typography>
             ),
         },

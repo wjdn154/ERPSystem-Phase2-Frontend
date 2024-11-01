@@ -11,15 +11,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '2',
-            label: '휴가 신청/승인',
-            children: (
-                <Typography>
-                    새로운 휴가를 신청하거나 관리자가 이를 승인 및 반려할 수 있음.
-
-                </Typography>
-            ),
-        },
     ];
 }
