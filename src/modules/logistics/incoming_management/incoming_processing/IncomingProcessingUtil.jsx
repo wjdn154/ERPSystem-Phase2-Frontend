@@ -20,14 +20,5 @@ export const tabItems = () => {
                 </Typography>
             ),
         },
-        {
-            key: '3',
-            label: '입고 완료 현황',
-            children: (
-                <Typography>
-                    입고된 물품의 수량과 입고 날짜를 입력하고, 처리 상태를 업데이트할 수 있음.
-                </Typography>
-            ),
-        },
     ];
 }

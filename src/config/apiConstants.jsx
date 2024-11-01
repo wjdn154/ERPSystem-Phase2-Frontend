@@ -247,6 +247,8 @@ export const LOGISTICS_API = {
 
 
     INVENTORY_API: `${API_BASE_URL}/api/logistics/inventory/`, // 재고 조회 API
+    WAREHOUSE_INVENTORY_DETAIL_API: (locationId) => `${API_BASE_URL}/api/logistics/inventory/byLocation/${locationId}`, // 위치별 재고 조회 API
+
 
     //재고 실사 조회
     INVENTORY_INSPECTION_LIST_API: (startDate, endDate) => `${API_BASE_URL}/api/logistics/inventory/inspection/?startDate=${startDate}&endDate=${endDate}`,

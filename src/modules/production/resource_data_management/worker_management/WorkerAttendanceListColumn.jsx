@@ -33,6 +33,8 @@ export const
         key:'checkTime',
         width: '16%',  // 컬럼 너비 설정
         align: 'center',
+        render: (text) => `${text.slice(0, 10)} ${text.slice(11, 16)}`, // 날짜와 시간을 깔끔하게 표시
+
     },
     {
         title: <div className="title-text">퇴근시각</div>,
@@ -40,6 +42,8 @@ export const
         key:'checkoutTime',
         width: '16%',  // 컬럼 너비 설정
         align: 'center',
+        render: (text) => `${text.slice(0, 10)} ${text.slice(11, 16)}`, // 날짜와 시간을 깔끔하게 표시
+
     },
     {
         title: <div className="title-text">근무상태</div>,
