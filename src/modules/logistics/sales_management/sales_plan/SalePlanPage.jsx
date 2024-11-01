@@ -577,7 +577,7 @@ const SalePlanPage = ({initialData}) => {
                         title="판매계획"
                         description={(
                             <Typography>
-                                판매계획 페이지는 <span>완료된 거래와 관련된 판매계획 기록을 관리</span>하는 곳임. 이 페이지에서는 <span>판매계획 내역을 조회, 수정, 삭제</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음. 또한, <span>판매계획 실적</span>을 분석하여 보고서를 작성하는 기능도 포함되어 있음.
+                                판매계획 페이지는 <span>완료된 거래와 관련된 판매계획 기록을 관리</span>하는 곳임. 이 페이지에서는 <span>판매계획 내역을 조회, 수정, 삭제</span>할 수 있으며, <span>납품 완료 상태</span>와 <span>매출 정보</span>를 확인할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}

@@ -68,7 +68,6 @@ const IncomingProcessingPage = () => {
         try {
             const response = await apiClient.post(LOGISTICS_API.RECEIVING_SCHEDULE_WAITING_API(startDate, endDate));
             setWaitingProcessListData(response.data);
-            console.log(response.data);
             notify('success', '데이터 조회 성공', '입고 대기 데이터를 성공적으로 조회했습니다.', 'bottomRight');
         } catch (error) {
             notify('error', '데이터 조회 오류', '출하 목록 데이터를 조회하는 중 오류가 발생했습니다.', 'top');
@@ -83,7 +82,6 @@ const IncomingProcessingPage = () => {
         try {
             const response = await apiClient.post(LOGISTICS_API.RECEIVING_SCHEDULE_WAITING_RECEIPT_API(startDate, endDate));
             setReceivingOrderListData(response.data);
-            console.log(response.data);
             notify('success', '데이터 조회 성공', '출하 목록 데이터를 성공적으로 조회했습니다.', 'bottomRight');
         } catch (error) {
             notify('error', '데이터 조회 오류', '출하 목록 데이터를 조회하는 중 오류가 발생했습니다.', 'top');
@@ -124,7 +122,6 @@ const IncomingProcessingPage = () => {
 
         try {
             const response = await apiClient.post(apiPath);
-            console.log('모달데이터:', response.data);
             // 데이터가 문자열이고 JSON 배열 형식일 경우 파싱, 아니면 그대로 배열로 처리
             let data = response.data;
             if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
@@ -291,7 +288,6 @@ const IncomingProcessingPage = () => {
                         }))
                     };
 
-                    console.log('요청:', receivingOrderData);
 
                     // 수정 API 호출
                     const API_PATH = LOGISTICS_API.RECEIVING_ORDER_UPDATE_API(receivingOrderId);
@@ -602,7 +598,6 @@ const IncomingProcessingPage = () => {
                                                 setReceivingOrderDetailParam(response.data);
                                                 setReceivingOrderDetailData(response.data);
                                                 setEditReceivingOrder(true);
-                                                console.log('상세:', response.data);
 
                                                 notify('success', '품목 조회', '품목 정보 조회 성공.', 'bottomRight')
                                             } catch (error) {
@@ -1130,7 +1125,6 @@ const IncomingProcessingPage = () => {
                                         }))
                                     };
                                     handleReceivingScheduleProcess(formData); // 등록 요청
-                                    console.log('입고처리:', formData);
                                 }}
                             >
                                 <Form.Item

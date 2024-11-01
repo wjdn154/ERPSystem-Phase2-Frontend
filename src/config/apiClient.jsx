@@ -41,7 +41,6 @@ apiClient.interceptors.response.use(
         if (error.response && error.response.status === 401 && error.response.data.error === 'TOKEN_EXPIRED' && !originalRequest._retry) {
             originalRequest._retry = true; // 리프레시 시도 중인지 플래그 설정
 
-            console.log('액세스 토큰 만료. 리프레시 토큰으로 재시도')
             const refreshToken = Cookies.get('refreshToken'); // 리프레시 토큰 가져오기
 
             if (!refreshToken) {
@@ -57,20 +56,16 @@ apiClient.interceptors.response.use(
                     const newToken = res.data.token;
 
                     if (!newToken) {
-                        console.log('새 액세스 토큰이 없음. 로그아웃 필요');
                         return Promise.reject(error);
                     }
-                    console.log('새 액세스 토큰 발급:', newToken);
 
                     // 새 JWT 토큰을 쿠키에 저장
-                    Cookies.set('jwt', newToken);
 
                     // 원래 요청에 새로운 토큰을 추가하고 재시도
                     originalRequest.headers.Authorization = `Bearer ${newToken}`;
                     return apiClient(originalRequest);
                 }
             } catch (refreshError) {
-                console.log('리프레시 토큰 요청 에러:', refreshError);
                 return Promise.reject(refreshError);
             }
         }
