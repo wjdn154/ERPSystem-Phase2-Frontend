@@ -278,7 +278,6 @@ const SalarySettlementPage = () => {
                 employeeId: employee.id,
                 salaryLedgerDateId: selectedDateId,
             });
-            console.log('사원정보:', response.data);
 
             const data = response.data; // response.data를 변수 data에 저장
             setSalaryLedgerData({ ...data, employeeId: employee.id });

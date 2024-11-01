@@ -155,9 +155,6 @@ const ProductManagementPage = ( {initialData} ) => {
                     // 서버로 새로운 그룹 데이터 전송
                     const response = await apiClient.post(LOGISTICS_API.PRODUCT_GROUP_CREATE_API, newGroup);
                     const savedGroup = response.data;
-
-                    console.log("savedGroup: " + savedGroup);
-
                     notify('success', '품목 그룹 저장', '품목 그룹 저장 성공.', 'bottomRight')
                     setModalData((prevData) => [...prevData, savedGroup]);
                     setInitialModalData((prevData) => [...prevData, savedGroup]);
@@ -298,7 +295,6 @@ const ProductManagementPage = ( {initialData} ) => {
 
     // 폼 제출 핸들러
     const handleFormSubmit = async (values, type) => {
-        console.log('values: ', values)
         confirm({
             title: '저장 확인',
             content: '정말로 저장하시겠습니까?',

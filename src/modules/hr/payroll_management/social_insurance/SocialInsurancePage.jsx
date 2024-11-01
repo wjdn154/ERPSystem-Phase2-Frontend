@@ -63,10 +63,8 @@ const SocialInsurancePage = () => {
             const response = await apiClient.post(apiMapping[activeTabKey], { startDate, endDate, code })
             setInsuranceData(response.data)
             notify('success', '조회 성공', '데이터 조회 성공', 'bottomRight')
-            console.log(response)
         } catch (error) {
             notify('warning', '조회 실패', '데이터 조회 중 오류가 발생했습니다.', 'top');
-            console.error('handleSearch error:', error);
         } finally {
             setIsLoading(false);
         }
@@ -89,7 +87,6 @@ const SocialInsurancePage = () => {
             setInsuranceData(response.data);
 
         } catch (error) {
-            console.error("데이터 조회 실패 :", error)
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {
             setIsLoading(false);
@@ -98,7 +95,6 @@ const SocialInsurancePage = () => {
 
     // 페이지 로딩 시 데이터 조회
     useEffect(() => {
-        console.log("응답 데이터:", insuranceData); // 응답 데이터 확인
 
         fetchInsuranceData();
     }, [activeTabKey]);

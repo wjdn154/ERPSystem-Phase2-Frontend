@@ -33,6 +33,7 @@ const WarehouseRegistrationPage = ({initialData}) => {
     const notify = useNotificationContext(); // 알림 메시지 컨텍스트 사용
     const [isLoading, setIsLoading] = useState(false);
     const [warehouseList, setWarehouseList] = useState(initialData); // 창고 목록
+    const [hierarchyWarehouseList, setHierarchyWarehouseList] = useState(false);
     const [warehouseDetail, setWarehouseDetail] = useState(false);
     const [editWarehouse, setEditWarehouse] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 선택된 행 키 상태
@@ -47,6 +48,7 @@ const WarehouseRegistrationPage = ({initialData}) => {
     const [initialModalRequests, setInitialModalRequests] = useState([]);
     const [checkedKeys, setCheckedKeys] = useState([]); // Keys for checked groups in Tree
     const [expandedKeys, setExpandedKeys] = useState([]);
+    const [hierarchyGroups, setHierarchyGroups] = useState([]);
     const [activeTabKey, setActiveTabKey] = useState('1'); // 활성화된 탭 키
 
     const handleFormSubmit = async (values) => {
@@ -117,7 +119,6 @@ const WarehouseRegistrationPage = ({initialData}) => {
 
         try {
             const response = await apiClient.post(apiPath);
-            console.log(response.data);
 
             let data = response.data;
             if (typeof data === 'string' && data.startsWith('[') && data.endsWith(']')) {
@@ -150,6 +151,7 @@ const WarehouseRegistrationPage = ({initialData}) => {
         findKeys(data);
         return keys;
     };
+
 
     useEffect(() => {
         if (isModalVisible && modalData) {
@@ -204,11 +206,52 @@ const WarehouseRegistrationPage = ({initialData}) => {
         }
     };
 
+    const fetchHierarchyGroups = async () => {
+        setIsLoading(true);
+        try {
+            const response = await apiClient.post(LOGISTICS_API.HIERARCHY_GROUP_LIST_API);
+            const data = response.data;
+
+            const formattedData = Array.isArray(data) ? data : [data]; // 데이터가 배열이 아닌 경우 배열로 변환
+            setHierarchyGroups(formattedData); // 가져온 데이터를 상태에 설정
+
+            setExpandedKeys(getAllKeys(formattedData));
+
+        } catch (error) {
+            notify('error', '조회 오류', '계층 그룹 정보를 불러오는 중 오류가 발생했습니다.', 'top');
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        setExpandedKeys(getAllKeys(convertToTreeData(hierarchyGroups)))
+    }, [hierarchyGroups])
+
+    // 계층 그룹 선택 함수
+    const handleGroupSelect = async (selectedKeys, info) => {
+
+        if (selectedKeys.length > 0) {
+            const groupId = info.node.id; // 클릭한 계층 그룹 ID 가져오기
+            setIsLoading(true);
+            try {
+                const response = await apiClient.post(LOGISTICS_API.HIERARCHY_GROUP_WAREHOUSES_API(groupId));
+                setHierarchyWarehouseList(response.data); // 조회된 창고 목록 설정
+            } catch (error) {
+                notify('error', '창고 목록 조회 실패', '계층 그룹에 속한 창고 목록을 조회하는 중 오류가 발생했습니다.', 'top');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
+
     // 트리 데이터를 변환하는 함수
     const convertToTreeData = (data, parentKey = '') =>
         data.map((item) => ({
             title: `[${item.hierarchyGroupCode}] ${item.hierarchyGroupName}`, // 표시될 제목
             key: `${parentKey}-${item.id.toString()}`, // 부모 key와 현재 id 결합
+            id: item.id, // 각 노드에 id 추가
             hierarchyGroupCode: item.hierarchyGroupCode, // 코드 추가
             hierarchyGroupName: item.hierarchyGroupName, // 이름 추가
             children: item.childGroups ? convertToTreeData(item.childGroups, `${parentKey}-${item.id.toString()}`) : [],
@@ -268,6 +311,13 @@ const WarehouseRegistrationPage = ({initialData}) => {
             hierarchyGroups: warehouseDetail.hierarchyGroups,
         });
     }, [warehouseDetail, form]);
+
+    // activeTabKey가 "2"일 때 계층 그룹 목록 데이터를 가져옴
+    useEffect(() => {
+        if (activeTabKey === '2') {
+            fetchHierarchyGroups();
+        }
+    }, [activeTabKey]);
 
 
     return (
@@ -360,7 +410,6 @@ const WarehouseRegistrationPage = ({initialData}) => {
                                                 const id = record.id;
                                                 try {
                                                     const response = await apiClient.post(LOGISTICS_API.WAREHOUSE_DETAIL_API(id));
-                                                    console.log('상세:',response.data);
                                                     setWarehouseParam(response.data);
                                                     setWarehouseDetail(response.data);
                                                     setModalData(null);
@@ -606,15 +655,66 @@ const WarehouseRegistrationPage = ({initialData}) => {
 
             {activeTabKey === '2' && (
                 <Grid sx={{padding: '0px 20px 0px 20px'}} container spacing={3}>
-                    <Grid item xs={12} md={5} sx={{minWidth: '500px !important', maxWidth: '700px !important'}}>
+                            <Grid item xs={12} md={4} sx={{minWidth: '400px !important', maxWidth: '500px !important'}}>
+                                <Grow in={true} timeout={200}>
+                                    <Paper elevation={3} sx={{height: '100%'}}>
+                                        <Typography variant="h6" sx={{padding: '20px'}}>계층 그룹 목록</Typography>
+                                        <Grid sx={{padding: '0px 20px 0px 20px'}}>
+                                            <Tree
+                                                style={{marginBottom: '20px'}}
+                                                expandedKeys={expandedKeys}
+                                                onExpand={(keys) => setExpandedKeys(keys)}
+                                                treeData={convertToTreeData(hierarchyGroups)}
+                                                onSelect={handleGroupSelect} // 계층 그룹 클릭 이벤트
+                                            />
+                                        </Grid>
+                                    </Paper>
+                                </Grow>
+                            </Grid>
+                    <Grid item xs={12} md={6}
+                          sx={{minWidth: '400px !important', maxWidth: '800px !important'}}>
                         <Grow in={true} timeout={200}>
-                            <div>
-                                <TemporarySection/>
-                            </div>
-                        </Grow>
-                    </Grid>
+                            <Paper elevation={3} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{padding: '20px'}}>창고 목록</Typography>
+                                <Grid sx={{padding: '0px 20px 0px 20px'}}>
+                                    <Table
+                                        dataSource={hierarchyWarehouseList}
+                                        columns={[
+                                            {
+                                                title: <div className="title-text">창고 유형</div>,
+                                                dataIndex: 'warehouseType',
+                                                key: 'warehouseType',
+                                                align: 'center',
+                                                render: (type) => (
+                                                    <Tag color={type === 'WAREHOUSE' ? 'green' : 'blue'}>
+                                                        {type === 'WAREHOUSE' ? '창고' : '공장'}
+                                                    </Tag>
+                                                ),
+                                            },
+                                            {
+                                                title: <div className="title-text">창고 코드</div>,
+                                                        dataIndex: 'warehouseCode',
+                                                        key: 'warehouseCode',
+                                                        align: 'center',
+                                                    },
+                                                    {
+                                                        title: <div className="title-text">창고 이름</div>,
+                                                        dataIndex: 'warehouseName',
+                                                        key: 'warehouseName',
+                                                        align: 'center',
+                                                    }
+                                                ]}
+                                                rowKey={(record) => record.id}
+                                                pagination={{pageSize: 15, position: ['bottomCenter'], showSizeChanger: false}}
+                                                size="small"
+                                            />
+                                        </Grid>
+                                    </Paper>
+                                </Grow>
+                            </Grid>
                 </Grid>
             )}
+
         </Box>
     );
 };
