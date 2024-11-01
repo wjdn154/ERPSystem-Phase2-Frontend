@@ -190,7 +190,7 @@ const PurchaseOrderPage = ({initialData}) => {
             clientSearch: clientSearch.clientId ?`[${clientSearch.clientCode}] ${clientSearch.clientName}` : null,
             vatType: detailPurchaseOrder.vatCode ? `[${detailPurchaseOrder.vatCode}] ${detailPurchaseOrder.vatName}` : null
 
-        }, [detailPurchaseOrder, form, purchaseOrderDetails]);
+        });
 
     }, [detailPurchaseOrder], form);
 
