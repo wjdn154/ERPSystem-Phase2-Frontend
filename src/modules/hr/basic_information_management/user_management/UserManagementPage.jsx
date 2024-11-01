@@ -30,14 +30,14 @@ const UserManagementPage = ({initialData}) => {
     const [displayValues, setDisplayValues] = useState({});
     const [initialModalData, setInitialModalData] = useState(null);
 
+
     useEffect(() => {
-        if (!fetchUserData) return; // 선택된 사원 데이터가 없으면 종료
-        console.log('fetchUserData:', fetchUserData); // Employee 데이터 확인
+        if (!fetchUserData || !fetchUserData.employeeName) return;
 
         // firstName과 lastName을 조합해서 employeeName 필드에 설정
         form.setFieldsValue({
             ...fetchUserData,
-            employeeName: `${fetchUserData.lastName}${fetchUserData.firstName}`
+            employeeName: fetchUserData.employeeName,
         });
         setUserParam(fetchUserData);
 
@@ -228,9 +228,8 @@ const UserManagementPage = ({initialData}) => {
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
-                                                <Form.Item name="employeeName"
-                                                           rules={[{required: true, message: '사원이름을 입력하세요.'}]}>
-                                                    <Input addonBefore="사원이름" disabled/>
+                                                <Form.Item name="employeeName" rules={[{ required: true, message: '사원이름을 입력하세요.' }]}>
+                                                    <Input addonBefore="사원이름" disabled />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
