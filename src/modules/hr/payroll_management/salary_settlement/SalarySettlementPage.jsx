@@ -1,15 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import { Box, Grid, Grow, Paper, Typography } from '@mui/material';
+import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import {Select, Spin, Table, Button, DatePicker, Input, Modal, Tag, Row, Form, Space, Col, Divider} from 'antd';
 import dayjs from 'dayjs';
 import apiClient from "../../../../config/apiClient.jsx";
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
-import { tabItems } from './SalarySettlementUtil.jsx';
+import {tabItems} from './SalarySettlementUtil.jsx';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import {DownSquareOutlined, ReloadOutlined, SearchOutlined} from "@ant-design/icons";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import {EMPLOYEE_API} from "../../../../config/apiConstants.jsx";
-const { RangePicker } = DatePicker;
+
+const {RangePicker} = DatePicker;
 
 const SalarySettlementPage = () => {
     const notify = useNotificationContext();
@@ -56,14 +57,11 @@ const SalarySettlementPage = () => {
 
     useEffect(() => {
         if (salaryLedgerData) {
-            console.log("Received finalized value:", typeof salaryLedgerData?.finalized, salaryLedgerData?.finalized);
-
-            console.log("Updated SalaryLedgerData:", salaryLedgerData);
-            console.log("Updating isFinalized:", salaryLedgerData.finalized);
             form.setFieldsValue({
                 allowances: salaryLedgerData.allowances || [],
             })
             setIsFinalized(salaryLedgerData.finalized);
+            setIsEditable(!salaryLedgerData.finalized); // finalized가 true이면 수정 불가능하게
         }
     }, [salaryLedgerData]);
 
@@ -94,10 +92,8 @@ const SalarySettlementPage = () => {
     const fetchSalaryDates = async () => {
         try {
             const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_DATE_API);
-            console.log("급여지급일 목록:", response.data);  // API 응답 확인
             setSalaryDates(response.data);
         } catch (error) {
-            console.error("급여지급일 조회 오류:", error);  // 자세한 오류 로그
             notify('error', '지급일 조회 실패', '지급일 정보를 불러오는 중 오류가 발생했습니다.', 'top');
         }
     };
@@ -108,7 +104,6 @@ const SalarySettlementPage = () => {
             const response = await apiClient.post(EMPLOYEE_API.EMPLOYEE_DATA_API);
             setEmployees(response.data);
         } catch (error) {
-            console.error("전체 사원 목록 조회 오류:", error);
             notify('error', '사원 조회 실패', '전체 사원 목록을 불러오는 중 오류가 발생했습니다.', 'top');
         }
     };
@@ -120,7 +115,6 @@ const SalarySettlementPage = () => {
             return;
         }
 
-        console.log("Request Payload:", { employeeId, salaryLedgerDateId: selectedDateId });
         setIsLoading(true);
         try {
             const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_SHOW_API, {
@@ -128,22 +122,17 @@ const SalarySettlementPage = () => {
                 salaryLedgerDateId: selectedDateId,
             });
             const data = response.data;
-            // setSalaryLedgerData(data);
             form.setFieldsValue(data);
 
-            // 상태를 설정합니다.
-            // setIsFinalized(data.finalized);
 
             if (data && typeof data.finalized === "boolean") {
                 setSalaryLedgerData(data);
                 setIsFinalized(data.finalized); // 정확한 상태 설정
             } else {
-                console.warn("Invalid data format received.");
             }
 
         } catch (error) {
             notify('error', '조회 실패', '급여 정보를 조회하는 중 오류가 발생했습니다.', 'top');
-            console.error("fetchSalaryLedger error: ", error);
 
         } finally {
             setIsLoading(false);
@@ -151,7 +140,6 @@ const SalarySettlementPage = () => {
     };
 
     const handleFormSubmit = async (values) => {
-        console.log('폼 제출 값:', values); // 제출된 값을 확인
 
         if (isFinalized) {
             notify('warning', '수정 불가', '마감된 급여는 수정할 수 없습니다.');
@@ -162,7 +150,6 @@ const SalarySettlementPage = () => {
             notify('success', '수정 완료', '급여 정산 정보가 수정되었습니다.');
             fetchSalaryLedger(); // 수정 후 데이터 갱신
         } catch (error) {
-            console.error('급여 정보 수정 오류:', error);
             notify('error', '수정 실패', '급여 정보 수정 중 오류가 발생했습니다.', 'top');
         }
     };
@@ -183,14 +170,12 @@ const SalarySettlementPage = () => {
     const calculateSalary = async () => {
         const currentFormValues = form.getFieldsValue();
         setFormBackup(currentFormValues); // 백업 저장
-        console.log("Request Payload of calculateSalary:", { salaryLedgerId: salaryLedgerData.ledgerId });
 
         if (!salaryLedgerData?.ledgerId) {
             notify('error', '계산 오류', '급여 정보가 존재하지 않습니다.');
             return;
         }
 
-        console.log("Is Finalized (Before API Call):", salaryLedgerData.finalized);
         if (salaryLedgerData?.finalized) {
             notify('warning', '마감된 급여', '이미 마감된 급여는 계산할 수 없습니다.');
             return;
@@ -201,30 +186,23 @@ const SalarySettlementPage = () => {
                 salaryLedgerId: salaryLedgerData.ledgerId,
             });
 
-            console.log("API Response Data:", response.data); // 응답 데이터 확인
-            console.log("After Calculation - isFinalized:", response.data.finalized);
 
             // 응답 데이터를 상태와 폼에 반영
-            const updatedData = { ...form.getFieldsValue(), ...response.data }; // 기존 폼 값과 병합
+            const updatedData = {...form.getFieldsValue(), ...response.data}; // 기존 폼 값과 병합
             setSalaryLedgerData(updatedData);
             form.setFieldsValue(updatedData); // 폼 값 동기화
             // 계산 후 finalized 상태 확인
-            console.log("After Calculation - isFinalized:", updatedData.finalized);
             setIsFinalized(response.data.finalized);
 
-            console.log("Is Finalized (After API Call):", updatedData.finalized); // 마감 상태 확인
             notify('success', '계산 완료', '급여 자동 계산이 완료되었습니다.', 'bottomRight');
         } catch (error) {
 // 에러 발생 시 응답 객체에서 finalized 여부를 확인
-            console.error("Calculation Error:", error);
             form.setFieldsValue(formBackup);
 
             const finalized = error?.response?.data?.finalized ?? salaryLedgerData.finalized;
-            console.log("Error Calculation - isFinalized:", finalized);
 
             setIsFinalized(finalized); // 에러 발생 시에도 상태 갱신
             notify('error', '계산 실패', '자동 계산 중 오류가 발생했습니다.', 'top');
-            console.error("Calculation Error:", error); // 오류 로그
         }
     };
 
@@ -235,23 +213,27 @@ const SalarySettlementPage = () => {
         updatedAllowances[index].amount = numericValue;
 
         // 상태와 폼 값 동기화
-        form.setFieldsValue({ allowances: updatedAllowances });
-        setSalaryLedgerData((prev) => ({ ...prev, allowances: updatedAllowances }));
+        form.setFieldsValue({allowances: updatedAllowances});
+        setSalaryLedgerData((prev) => ({...prev, allowances: updatedAllowances}));
     };
-
 
 
 // 마감 처리
     const handleDeadline = async () => {
-        if (!salaryLedgerData?.ledgerId) return;
+        if (!salaryLedgerData?.employeeId || !salaryLedgerData?.ledgerId) {
+            notify('warning', '마감 처리 불가', '사원 정보 또는 급여 데이터가 올바르지 않습니다.', 'top');
+            return;
+        }
+        console.log(salaryLedgerData.ledgerId);
         try {
             const response = await apiClient.post(EMPLOYEE_API.SALARY_LEDGER_DEADLINE_API, {
                 salaryLedgerId: salaryLedgerData.ledgerId,
             });
 
             const updatedData = { ...salaryLedgerData, finalized: response.data.finalized };
-            setSalaryLedgerData(updatedData); // 데이터 갱신
-            setIsFinalized(response.data.finalized); // 상태 동기화
+            setSalaryLedgerData(updatedData); // 상태 갱신
+            setIsFinalized(response.data.finalized); // finalized 상태를 동기화
+
             notify('success', '마감 처리 완료', response.data.message, 'bottomRight');
         } catch (error) {
             notify('error', '마감 실패', '마감 처리 중 오류가 발생했습니다.', 'top');
@@ -266,7 +248,7 @@ const SalarySettlementPage = () => {
                 salaryLedgerId: salaryLedgerData.ledgerId,
             });
 
-            const updatedData = { ...salaryLedgerData, finalized: response.data.finalized };
+            const updatedData = {...salaryLedgerData, finalized: response.data.finalized};
             setSalaryLedgerData(updatedData);
             setIsFinalized(response.data.finalized); // 상태 동기화
             notify('success', '마감 해제 완료', response.data.message, 'bottomRight');
@@ -284,7 +266,6 @@ const SalarySettlementPage = () => {
     // 사원 선택 시 급여 데이터 조회
     const handleEmployeeSelect = async (employee) => {
         setEmployeeId(employee.id);
-        console.log("Selected Employee: ", employee.id); // 로그 추가
 
         // 급여 지급일 코드가 선택되지 않은 경우 안내
         if (!selectedDateId) {
@@ -298,33 +279,35 @@ const SalarySettlementPage = () => {
                 salaryLedgerDateId: selectedDateId,
             });
 
-            console.log("Server Response:", response.data); // 로그 추가
-
             const data = response.data; // response.data를 변수 data에 저장
-            setSalaryLedgerData(response.data);
+            setSalaryLedgerData({ ...data, employeeId: employee.id });
             form.setFieldsValue(response.data);
-            setIsFinalized(data.finalized); // 여기서 상태 업데이트가 필요
-
+            setIsFinalized(data.finalized || false); // finalized 상태 설정
             notify('success', '조회 성공', '급여 정보를 조회했습니다.', 'bottomRight');
         } catch (error) {
             notify('error', '조회 오류', '급여 정산 정보 조회 중 오류가 발생했습니다.');
-            console.error("handleEmployeeSelect error: ", error)
         }
     };
 
     // 모달에서 지급일 코드 선택 시 처리
     const handleDateSelect = (record) => {
-        console.log("Selecting Date:", record);  // 모달 선택 로그
         setSelectedDateId(record.id);  // 상태 변경
         setDisplayValue(`[${record.code}] ${record.description}`);  // 표시할 값 설정
+
+        form.resetFields(); // 폼 데이터 초기화
+        setSalaryLedgerData(null);
+        setIsFinalized(false); // 마감 상태 초기화
+        setSelectedRowKeys([]); // 선택한 행 초기화
+        setEmployeeId(null); // 사원 ID 초기화
+
         setTimeout(() => setIsModalVisible(false), 0);
 
-        console.log("Confirmed Selected Date ID:", record.id);  // 로그 추가
     };
 
 
+
     return (
-        <Box sx={{ margin: '20px' }}>
+        <Box sx={{margin: '20px'}}>
             <Grid container spacing={3}>
                 {/* 왼쪽: 사원 목록 */}
                 <Grid item xs={12} md={12}>
@@ -332,7 +315,9 @@ const SalarySettlementPage = () => {
                         title="급여 정산"
                         description={(
                             <Typography>
-                                급여 정산 페이지는 <span>사원의 근로 시간과 지급 항목</span>을 기반으로 매월 급여를 계산하는 기능을 제공함. 이 페이지에서는 <span>근로 시간, 연장 근무, 야근, 공제 항목</span> 등을 입력하여 <span>정확한 급여 계산</span>을 진행할 수 있으며, 자동으로 각종 <span>세금과 보험료</span>가 반영된 금액을 확인할 수 있음. 이를 통해 사원의 급여 정산을 효율적으로 관리할 수 있음.
+                                급여 정산 페이지는 <span>사원의 근로 시간과 지급 항목</span>을 기반으로 매월 급여를 계산하는 기능을 제공함. 이 페이지에서는 <span>근로 시간, 연장 근무, 야근, 공제 항목</span> 등을
+                                입력하여 <span>정확한 급여 계산</span>을 진행할 수 있으며, 자동으로 각종 <span>세금과 보험료</span>가 반영된 금액을 확인할 수 있음.
+                                이를 통해 사원의 급여 정산을 효율적으로 관리할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -343,31 +328,35 @@ const SalarySettlementPage = () => {
             </Grid>
 
             {activeTabKey === '1' && (
-                <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={12} md={3} sx={{ maxWidth: '300px' }}>
+                <Grid sx={{padding: '0px 20px 0px 20px'}} container spacing={3}>
+                    <Grid item xs={12} md={4} sx={{minWidth: '500px'}}>
                         <Grow in={true} timeout={200}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }} >급여정산 정보</Typography>
-                                <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                            <Paper elevation={3} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{padding: '20px'}}>급여정산 정보</Typography>
+                                <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                     <Form layout="vertical">
-                                        <Row gutter={16} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between'}}>
+                                        <Row gutter={16} style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-end',
+                                            justifyContent: 'space-between'
+                                        }}>
                                             <Col span={16}>
                                                 <Form.Item
                                                     label="지급일 코드"
                                                     required
                                                     tooltip="검색할 급여지급일의 코드를 선택하세요"
-                                                    >
+                                                >
                                                     <Form.Item
                                                         noStyle
-                                                        rules={[{ required: true, message: '급여지급일 코드를 선택하세요' }]}
+                                                        rules={[{required: true, message: '급여지급일 코드를 선택하세요'}]}
                                                     >
                                                         <Input
                                                             placeholder="급여지급일 코드"
                                                             value={displayValue} // 선택된 값 표시
                                                             onClick={handleInputClick} // Input 클릭 시 모달 열기
                                                             className="search-input"
-                                                            style={{ width: '100%' }}
-                                                            suffix={<DownSquareOutlined />}
+                                                            style={{width: '100%'}}
+                                                            suffix={<DownSquareOutlined/>}
                                                         />
                                                     </Form.Item>
                                                 </Form.Item>
@@ -375,9 +364,9 @@ const SalarySettlementPage = () => {
                                             <Col span={8}>
                                                 <Form.Item>
                                                     <Button
-                                                        style={{ width: '100px' }}
+                                                        style={{width: '100px'}}
                                                         type="default"
-                                                        icon={<ReloadOutlined />}  // 초기화 아이콘 사용
+                                                        icon={<ReloadOutlined/>}  // 초기화 아이콘 사용
                                                         onClick={handleReset}  // 초기화 함수 호출
                                                         block
                                                     >
@@ -397,15 +386,16 @@ const SalarySettlementPage = () => {
                                         footer={null}
                                     >
                                         {isLoading ? (
-                                            <Spin />
+                                            <Spin/>
                                         ) : (
                                             <>
-                                                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                                                <Typography id="modal-modal-title" variant="h6" component="h2"
+                                                            sx={{marginBottom: '20px'}}>
                                                     급여지급일 코드 선택
                                                 </Typography>
                                                 <Input
                                                     placeholder="검색"
-                                                    prefix={<SearchOutlined />}
+                                                    prefix={<SearchOutlined/>}
                                                     onChange={(e) => {
                                                         const value = e.target.value.toLowerCase(); // 입력값을 소문자로 변환
                                                         if (!value) {
@@ -426,7 +416,7 @@ const SalarySettlementPage = () => {
                                                         }
                                                     }}
 
-                                                    style={{ marginBottom: 16 }}
+                                                    style={{marginBottom: 16}}
                                                 />
                                                 {modalData && (
                                                     <Table
@@ -437,33 +427,45 @@ const SalarySettlementPage = () => {
                                                                 key: 'code',
                                                                 align: 'center',
                                                                 width: '20%',
-                                                                render: (text) => <div className="small-text">{text}</div>
+                                                                render: (text) => <div
+                                                                    className="small-text">{text}</div>
                                                             },
                                                             {
                                                                 title: <div className="title-text">설명</div>,
                                                                 dataIndex: 'description',
                                                                 key: 'description',
                                                                 align: 'center',
-                                                                render: (text) => <div className="small-text">{text}</div>
+                                                                render: (text) => <div
+                                                                    className="small-text">{text}</div>
                                                             },
                                                             {
                                                                 title: <div className="title-text">시작일</div>,
                                                                 dataIndex: 'startDate',
                                                                 key: 'startDate',
                                                                 align: 'center',
-                                                                render: (text) => <div className="small-text">{text}</div>
+                                                                render: (text) => <div
+                                                                    className="small-text">{text}</div>
                                                             },
                                                             {
                                                                 title: <div className="title-text">마감일</div>,
                                                                 dataIndex: 'endDate',
                                                                 key: 'endDate',
                                                                 align: 'center',
-                                                                render: (text) => <div className="small-text">{text}</div>
+                                                                render: (text) => <div
+                                                                    className="small-text">{text}</div>
                                                             },
                                                         ]}
                                                         dataSource={salaryDates}
-                                                        rowKey="id"
+                                                        rowKey={(record) => record.id}
                                                         size={'small'}
+                                                        rowSelection={{
+                                                            type: 'radio',
+                                                            selectedRowKeys,
+                                                            onChange: (newSelectedRowKeys) => {
+                                                                setSelectedRowKeys(newSelectedRowKeys);
+                                                                form.resetFields();
+                                                            },
+                                                        }}
                                                         pagination={{
                                                             pageSize: 15,
                                                             position: ['bottomCenter'],
@@ -471,21 +473,24 @@ const SalarySettlementPage = () => {
                                                             showTotal: (total) => `총 ${total}개`,
                                                         }}
                                                         onRow={(record) => ({
+                                                            style: { cursor: 'pointer' },
                                                             onClick: () => handleDateSelect(record),
                                                         })}
                                                     />
                                                 )}
                                             </>
                                         )}
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                                            <Button onClick={() => {setIsModalVisible(false)}} type="primary">
+                                        <Box sx={{display: 'flex', justifyContent: 'flex-end', marginTop: '20px'}}>
+                                            <Button onClick={() => {
+                                                setIsModalVisible(false)
+                                            }} type="primary">
                                                 닫기
                                             </Button>
                                         </Box>
                                     </Modal>
                                     {/* 사원 정보 테이블 */}
-                                    <Typography variant="h6" sx={{ padding: '20px' }} >사원 정보</Typography>
-                                    <Grid sx={{ padding: '0px 20px 0px 20px' }}>
+                                    <Typography variant="h6" sx={{padding: '20px'}}>사원 정보</Typography>
+                                    <Grid sx={{padding: '0px 20px 0px 20px'}}>
                                         <Table
                                             dataSource={employees} // 필터링된 사원 목록 사용
                                             columns={[
@@ -534,18 +539,22 @@ const SalarySettlementPage = () => {
                                                                     color = 'gray'; // 기본 색상
                                                             }
 
-                                                            return <Tag style={{ marginLeft: '5px' }} color={color}>{value}</Tag>;
+                                                            return <Tag key={record.id} style={{marginLeft: '5px'}} color={color}>{value}</Tag>;
                                                         }
                                                         return '';
                                                     }
                                                 },
                                             ]}
-                                            rowKey="id"
-                                            pagination={{pageSize: 25, position: ['bottomCenter'], showSizeChanger: false}}
+                                            rowKey={(record) => record.id}
+                                            pagination={{
+                                                pageSize: 15,
+                                                position: ['bottomCenter'],
+                                                showSizeChanger: false
+                                            }}
                                             size="small"
-                                            style={{ marginBottom: '20px' }}
+                                            style={{marginBottom: '20px'}}
                                             onRow={(record) => ({
-                                                style: { cursor: 'pointer' },
+                                                style: {cursor: 'pointer'},
                                                 onClick: async () => {
                                                     await handleEmployeeSelect(record); // 사원 선택 후 급여 정보 조회
                                                     setSelectedRowKeys([record.id]); // 선택한 행 강조
@@ -563,93 +572,95 @@ const SalarySettlementPage = () => {
                         </Grow>
                     </Grid>
 
-                    <Grid item xs={12} md={6} sx={{ minWidth: '400px'}}>
+                    <Grid item xs={12} md={8} sx={{minWidth: '500px'}}>
                         <Grow in={true} timeout={200}>
-                            <Paper elevation={3} sx={{ height: '100%' }}>
-                                <Typography variant="h6" sx={{ padding: '20px' }}>공제항목 및 수당목록</Typography>
-                                <Grid sx={{ padding: '0px 20px 20px 20px' }}>
+                            <Paper elevation={3} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{padding: '20px'}}>공제항목 및 수당목록</Typography>
+                                <Grid sx={{padding: '0px 20px 20px 20px'}}>
                                     <Form
                                         form={form}
-                                        initialValues={salaryLedgerData} // 초기 값 설정
                                         onFinish={(values) => handleFormSubmit(values)}
                                     >
                                         <Row gutter={32}>
                                             {/* 공제 항목: 왼쪽에 세로로 배치 */}
                                             <Col span={12}>
-                                                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>공제항목</Divider>
-
-                                                <Form.Item name="nationalPensionAmount">
-                                                    <Input
-                                                        addonBefore="국민연금"
-                                                        onChange={(e) => {
-                                                            const numericValue = handleNumericInput(e.target.value); // 숫자만 추출
-                                                                form.setFieldsValue({ nationalPensionAmount: value });
-                                                        }}
-                                                        onBlur={(e) => {
-                                                            const formattedValue = formatNumberWithComma(e.target.value);
-                                                            form.setFieldsValue({ nationalPensionAmount: formattedValue });
-                                                        }}
-                                                        disabled={isFinalized}
-                                                        value={form.getFieldValue('nationalPensionAmount')} // 폼 값 유지
-
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item name="privateSchoolPensionAmount">
-                                                    <Input
-                                                        addonBefore="사학연금"
-                                                        onChange={(e) => form.setFieldsValue({ privateSchoolPensionAmount: e.target.value })}
-                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
-
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item name="healthInsurancePensionAmount">
-                                                    <Input
-                                                        addonBefore="건강보험"
-                                                        onChange={(e) => form.setFieldsValue({ healthInsurancePensionAmount: e.target.value })}
-                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
-
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item name="employmentInsuranceAmount">
-                                                    <Input
-                                                        addonBefore="고용보험"
-                                                        onChange={(e) => form.setFieldsValue({ employmentInsuranceAmount: e.target.value })}
-                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
-
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item name="longTermCareInsurancePensionAmount">
-                                                    <Input
-                                                        addonBefore="장기요양보험"
-                                                        onChange={(e) => form.setFieldsValue({ employmentInsuranceAmount: e.target.value })}
-                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
-
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item name="incomeTaxAmount">
-                                                    <Input
-                                                        addonBefore="소득세"
-                                                        onChange={(e) => form.setFieldsValue({ incomeTaxAmount: e.target.value })}
-                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item name="localIncomeTaxPensionAmount">
-                                                    <Input
-                                                        addonBefore="지방소득세"
-                                                        onChange={(e) => form.setFieldsValue({ localIncomeTaxPensionAmount: e.target.value })}
-                                                        disabled={isFinalized}  // 마감 시 수정 불가 처리
-
-                                                    />
-                                                </Form.Item>
-                                                {/* 공제 총액 표시 */}
-                                                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>공제총액</Divider>
-                                                <Typography>
-                                                    {salaryLedgerData?.totalDeductionAmount?.toLocaleString()} 원
-                                                </Typography>
+                                                <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>공제 항목</Divider>
+                                                <Table
+                                                    dataSource={[
+                                                        { key: '1', name: '국민연금', amount: salaryLedgerData?.nationalPensionAmount || 0, field: 'nationalPensionAmount' },
+                                                        { key: '2', name: '사학연금', amount: salaryLedgerData?.privateSchoolPensionAmount || 0, field: 'privateSchoolPensionAmount' },
+                                                        { key: '3', name: '건강보험', amount: salaryLedgerData?.healthInsurancePensionAmount || 0, field: 'healthInsurancePensionAmount' },
+                                                        { key: '4', name: '고용보험', amount: salaryLedgerData?.employmentInsuranceAmount || 0, field: 'employmentInsuranceAmount' },
+                                                        { key: '5', name: '장기요양보험', amount: salaryLedgerData?.longTermCareInsurancePensionAmount || 0, field: 'longTermCareInsurancePensionAmount' },
+                                                        { key: '6', name: '소득세', amount: salaryLedgerData?.incomeTaxAmount || 0, field: 'incomeTaxAmount' },
+                                                        { key: '7', name: '지방소득세', amount: salaryLedgerData?.localIncomeTaxPensionAmount || 0, field: 'localIncomeTaxPensionAmount' },
+                                                    ]}
+                                                    columns={[
+                                                        {
+                                                            title: <div className="title-text">공제 항목명</div>,
+                                                            dataIndex: 'name',
+                                                            key: 'name',
+                                                            align: 'center',
+                                                            render: (text) => <div className="small-text">{text}</div>,
+                                                        },
+                                                        {
+                                                            title: <div className="title-text">금액</div>,
+                                                            dataIndex: 'amount',
+                                                            key: 'amount',
+                                                            align: 'center',
+                                                            render: (_, record) => (
+                                                                <Form.Item name={record.field} style={{ marginBottom: '10px' }}>
+                                                                    <Input
+                                                                        addonAfter="원"
+                                                                        value={form.getFieldValue(record.field)}
+                                                                        onChange={(e) => {
+                                                                            const numericValue = handleNumericInput(e.target.value);
+                                                                            form.setFieldsValue({ [record.field]: numericValue });
+                                                                        }}
+                                                                        onBlur={(e) => {
+                                                                            const formattedValue = formatNumberWithComma(e.target.value);
+                                                                            form.setFieldsValue({ [record.field]: formattedValue });
+                                                                        }}
+                                                                        disabled={isFinalized}
+                                                                        style={{
+                                                                            textAlign: 'right',
+                                                                        }}
+                                                                    />
+                                                                </Form.Item>
+                                                            ),
+                                                        },
+                                                    ]}
+                                                    pagination={false}
+                                                    size="small"
+                                                    bordered
+                                                    summary={() => (
+                                                        <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                            <Table.Summary.Cell index={0}>
+                                                                <div className="medium-text">공제 총액</div>
+                                                            </Table.Summary.Cell>
+                                                            <Table.Summary.Cell index={1}>
+                                                                <div style={{ textAlign: 'right' }} className="medium-text">
+                                                                    {[
+                                                                        salaryLedgerData?.nationalPensionAmount || 0,
+                                                                        salaryLedgerData?.privateSchoolPensionAmount || 0,
+                                                                        salaryLedgerData?.healthInsurancePensionAmount || 0,
+                                                                        salaryLedgerData?.employmentInsuranceAmount || 0,
+                                                                        salaryLedgerData?.longTermCareInsurancePensionAmount || 0,
+                                                                        salaryLedgerData?.incomeTaxAmount || 0,
+                                                                        salaryLedgerData?.localIncomeTaxPensionAmount || 0,
+                                                                    ]
+                                                                        .reduce((acc, curr) => acc + Number(curr), 0)
+                                                                        .toLocaleString()} 원
+                                                                </div>
+                                                            </Table.Summary.Cell>
+                                                        </Table.Summary.Row>
+                                                    )}
+                                                />
                                             </Col>
                                             {/* 수당 항목: 오른쪽에 테이블로 구성 */}
                                             <Col span={12}>
-                                            <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>수당 목록</Divider>
+                                                <Divider orientation={'left'} orientationMargin="0"
+                                                         style={{marginTop: '0px', fontWeight: 600}}>수당 목록</Divider>
                                                 <Table
                                                     dataSource={salaryLedgerData?.allowances || []}
                                                     columns={[
@@ -670,8 +681,8 @@ const SalarySettlementPage = () => {
                                                                 <Form.Item
                                                                     name={['allowances', index, 'amount']}
                                                                     // initialValue={record.amount || 0} initialValues 대신 폼 필드로 값 설정
-                                                                    rules={[{ required: true, message: '금액을 입력하세요' }]}
-                                                                    style={{ marginBottom: '10px' }}
+                                                                    rules={[{required: true, message: '금액을 입력하세요'}]}
+                                                                    style={{marginBottom: '10px'}}
                                                                 >
                                                                     <Input
                                                                         addonAfter="원"
@@ -680,22 +691,26 @@ const SalarySettlementPage = () => {
                                                                             const numericValue = handleNumericInput(e.target.value);
                                                                             const updatedAllowances = [...form.getFieldValue('allowances')];
                                                                             updatedAllowances[index].amount = numericValue || '0';
-                                                                            form.setFieldsValue({ allowances: updatedAllowances });
+                                                                            form.setFieldsValue({allowances: updatedAllowances});
                                                                         }}
                                                                         onBlur={(e) => {
                                                                             const formattedValue = formatNumberWithComma(e.target.value);
                                                                             const updatedAllowances = [...form.getFieldValue('allowances')];
                                                                             updatedAllowances[index].amount = formattedValue;
-                                                                            form.setFieldsValue({ allowances: updatedAllowances });
+                                                                            form.setFieldsValue({allowances: updatedAllowances});
                                                                         }}
                                                                         disabled={isFinalized}
-                                                                        style={{ textAlign: 'right', marginBottom: '-10px' }}
+                                                                        style={{
+                                                                            textAlign: 'right',
+                                                                            marginBottom: '-10px'
+                                                                        }}
                                                                     />
                                                                 </Form.Item>
 
                                                             ),
                                                         },
                                                     ]}
+                                                    rowKey={(record) => record.id}  // 고유한 id 사용
                                                     pagination={false}
                                                     size="small"
                                                     bordered
@@ -706,12 +721,17 @@ const SalarySettlementPage = () => {
                                                     rowClassName={() => 'custom-row'} // 줄 간격을 커스터마이즈할 클래스 추가
                                                     summary={() => (
                                                         salaryLedgerData?.allowances?.length > 0 && (
-                                                            <Table.Summary.Row style={{ textAlign: 'center', backgroundColor: '#FAFAFA' }}>
+                                                            <Table.Summary.Row style={{
+                                                                textAlign: 'center',
+                                                                backgroundColor: '#FAFAFA',
+                                                            }}
+                                                            >
                                                                 <Table.Summary.Cell index={0}>
                                                                     <div className="medium-text">합계</div>
                                                                 </Table.Summary.Cell>
                                                                 <Table.Summary.Cell index={1}>
-                                                                    <div style={{ textAlign: 'right' }} className="medium-text">
+                                                                    <div style={{textAlign: 'right'}}
+                                                                         className="medium-text">
                                                                         {salaryLedgerData?.allowances
                                                                             .reduce((acc, curr) => acc + curr.amount, 0)
                                                                             .toLocaleString()} 원
@@ -720,37 +740,44 @@ const SalarySettlementPage = () => {
                                                             </Table.Summary.Row>
                                                         )
                                                     )}
+                                                    scroll={{ y: 450 }}  // 테이블 세로 스크롤 높이 설정
                                                 />
 
                                             </Col>
                                         </Row>
-                                        <Divider orientation={'left'} orientationMargin="0" style={{ marginTop: '0px', fontWeight: 600 }}>합계</Divider>
+                                        <Divider orientation={'left'} orientationMargin="0"
+                                                 style={{marginTop: '0px', fontWeight: 600}}>합계</Divider>
 
                                         {/* 집계 항목들 */}
                                         <Row gutter={16}>
                                             <Col span={6}>
                                                 <Form.Item name="nonTaxableAmount">
-                                                    <Input addonBefore="비과세 금액" readOnly />
+                                                    <Input addonBefore="비과세 금액" readOnly/>
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
                                                 <Form.Item name="taxableAmount">
-                                                    <Input addonBefore="과세 금액" readOnly />
+                                                    <Input addonBefore="과세 금액" readOnly/>
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
                                                 <Form.Item name="taxableIncome">
-                                                    <Input addonBefore="과세 소득" readOnly />
+                                                    <Input addonBefore="과세 소득" readOnly/>
                                                 </Form.Item>
                                             </Col>
                                             <Col span={6}>
                                                 <Form.Item name="netPayment">
-                                                    <Input addonBefore="차인지급액" readOnly />
+                                                    <Input addonBefore="차인지급액" readOnly/>
                                                 </Form.Item>
                                             </Col>
                                         </Row>
 
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: '10px'}}>
+                                        <Box sx={{
+                                            display: 'flex',
+                                            justifyContent: 'flex-end',
+                                            marginTop: '20px',
+                                            gap: '10px'
+                                        }}>
                                             <Button onClick={calculateSalary}>
                                                 계산
                                             </Button>

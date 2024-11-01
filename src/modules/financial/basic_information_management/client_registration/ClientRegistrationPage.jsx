@@ -75,7 +75,6 @@ const ClientRegistrationPage = ( {initialData} ) => {
             const response = await apiClient.post(apiPath);
             setModalData(response.data);
             setInitialModalData(response.data);
-            console.log('response.data', response.data);
         } catch (error) {
             notify('error', '조회 오류', '데이터 조회 중 오류가 발생했습니다.', 'top');
         } finally {

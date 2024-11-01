@@ -57,7 +57,6 @@ const LoginPage = () => {
                 value: company.id
             }));
         } catch (error) {
-            console.error('회사 검색 중 오류 발생', error);
             return [];
         }
     };

@@ -558,7 +558,7 @@ const ReceivingOrderPage = ({initialData}) => {
                         title="입고지시서"
                         description={(
                             <Typography>
-                                입고지시서 페이지는 <span>입고지시서한 물품이 회사에 도착하기 전에 해당 물품을 창고로 입고하도록 지시</span>하는 문서를 관리함. 이 페이지에서는 <span>입고지시서를 생성, 수정, 삭제</span>할 수 있으며, 물품의 <span>입고 일정과 장소</span>를 지정할 수 있음. <span>입고 과정에서 발생하는 문제</span>도 이 페이지에서 관리됨.
+                                입고지시서 페이지는 <span>입고지시서한 물품이 회사에 도착하기 전에 해당 물품을 창고로 입고하도록 지시</span>하는 문서를 관리함. 이 페이지에서는 <span>입고지시서를 생성, 수정, 삭제</span>할 수 있으며, 물품의 <span>입고 일정과 장소</span>를 지정할 수 있음.
                             </Typography>
                         )}
                         tabItems={tabItems()}

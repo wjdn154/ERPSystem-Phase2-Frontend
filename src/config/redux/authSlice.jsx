@@ -30,7 +30,6 @@ const authSlice = createSlice({
                     state.userNickname = decodedToken.userNickname;
                     state.companyId = decodedToken.companyId;
                 } catch (error) {
-                    console.error('유효하지 않은 토큰:', error);
                     state.token = null;
                     state.userNickname = null;
                     state.companyId = null;
