@@ -51,7 +51,6 @@ const ProtectedRoute = ({ children, requiredPermission, permissionLevel }) => {
         }
 
     } catch (e) {
-        console.error('JWT 토큰 디코딩 중 오류 발생', e);
         // 5. JWT 토큰이 유효하지 않거나 오류가 있으면 로그인 페이지로 리디렉트
         localStorage.removeItem('token');
         localStorage.removeItem('permission');

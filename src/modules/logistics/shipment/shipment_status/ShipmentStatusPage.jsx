@@ -314,8 +314,7 @@ const ShipmentStatusPage = () => {
                         description={(
                             <Typography>
                                 출하현황 페이지는 <span>출하된 상품의 현재 상태와 진행 상황</span>을 실시간으로 확인할 수 있는 곳임. 이 페이지에서는 <span>출하가 진행 중인 상태</span>와 <span>출하 완료 여부</span>를
-                                확인할 수 있으며, <span>출하 목록</span>을 조회하여 각 출하의 상태를 추적함. 또한, <span>출하된 물품의 송장 번호</span>와 배송
-                                상태를 한눈에 확인할 수 있어 물류 과정을 효율적으로 관리할 수 있음.
+                                확인할 수 있으며, <span>출하 목록</span>을 조회하여 각 출하의 상태를 추적함.
                             </Typography>
                         )}
                         tabItems={tabItems()}
@@ -391,7 +390,7 @@ const ShipmentStatusPage = () => {
                                                 dataIndex: 'quantity',
                                                 key: 'quantity',
                                                 align: 'center',
-                                                render: (text) => <div className="small-text">{text}</div>
+                                                render: (text) => <div style={{textAlign:'right'}} className="small-text">{text}</div>
                                             },
                                             {
                                                 title: <div className="title-text">창고명</div>,
@@ -450,16 +449,24 @@ const ShipmentStatusPage = () => {
                                             },
                                         })}
                                         summary={() => (
-                                            <Table.Summary fixed>
-                                                <Table.Summary.Row>
-                                                    <Table.Summary.Cell colSpan={2} align="center">
-                                                        총 수량 합계
+                                            <Table.Summary>
+                                                <Table.Summary.Row style={{textAlign:'center'}}>
+                                                    <Table.Summary.Cell index={0}/>
+                                                    <Table.Summary.Cell index={1}>
+                                                        <div className="medium-text">
+                                                            총 수량 합계
+                                                        </div>
                                                     </Table.Summary.Cell>
-                                                    <Table.Summary.Cell/>
-                                                    <Table.Summary.Cell align="center">
-                                                        {totalQuantity}
+                                                    <Table.Summary.Cell index={2}/>
+                                                    <Table.Summary.Cell index={3}>
+                                                        <div style={{textAlign:"right"}} className="medium-text">
+                                                            {totalQuantity}
+                                                        </div>
                                                     </Table.Summary.Cell>
-                                                    <Table.Summary.Cell colSpan={4} />
+                                                    <Table.Summary.Cell index={4}/>
+                                                    <Table.Summary.Cell index={5}/>
+                                                    <Table.Summary.Cell index={6}/>
+                                                    <Table.Summary.Cell index={7}/>
                                                 </Table.Summary.Row>
                                             </Table.Summary>
                                         )}

@@ -222,8 +222,7 @@ const OutgoingProcessingPage = () => {
                             description={(
                                 <Typography>
                                     출고처리 페이지는 <span>출고 예정된 상품을 실제로 출고하는 과정을 기록하고 관리</span>하는 곳임. 이 페이지에서는 <span>출고 처리된 품목의 수량, 출고 날짜, 송장 번호</span> 등을
-                                    입력할 수 있으며, 출고가 완료되면 해당 정보가 기록되어 <span>물류 추적</span>이 가능해짐. 이로써 출고 관리의 투명성을 유지하고,
-                                    고객에게 <span>정확한 배송 정보를 제공</span>할 수 있음.
+                                    입력할 수 있으며, 출고가 완료되면 해당 정보가 기록되어 <span>물류 추적</span>이 가능해짐.
                                 </Typography>
                             )}
                             tabItems={tabItems()}
