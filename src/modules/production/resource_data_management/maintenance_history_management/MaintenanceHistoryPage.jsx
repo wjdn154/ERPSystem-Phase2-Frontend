@@ -142,7 +142,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
             {/* 설비정보 리스트 영역 */}
             {activeTabKey === '1' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={9} md={9}>
+                    <Grid item xs={12} md={12}>
                         <Grow in={true} timeout={200}>
                             <div>
                                 <MaintenanceHistoryListSection
@@ -163,7 +163,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
                             </div>
                         </Grow>
                     </Grid>
-                        <Grid item xs={9} md={9} >
+                        <Grid item xs={12} md={12} >
                             {maintenanceDataDetail && (
                                 <Grow in={showDetail} timeout={200} key={maintenanceDataDetail.id}>
                                     <div>
@@ -188,7 +188,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
             )}
             {activeTabKey === '2' && (
                 <Grid sx={{ padding: '0px 20px 0px 20px' }} container spacing={3}>
-                    <Grid item xs={9} md={9} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>
+                    <Grid item xs={10} md={10} sx={{ minWidth: '500px !important', maxWidth: '1500px !important' }}>
                         <Grow in={true} timeout={200}>
                             <Paper elevation={3} sx={{p: 2}}>
                                 <Typography variant="h6" marginBottom={'20px'}>설비 유지보수 정보 등록</Typography>
@@ -258,7 +258,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
                                             </Col>
                                         </Row>
                                         <Row gutter={16}>
-                                            <Col span={6}>
+                                            <Col span={8}>
                                                 <Form.Item>
                                                     <Input.Group compact>
                                                         <Input
@@ -276,7 +276,7 @@ const MaintenanceHistoryPage = ({initialData}) => {
                                                     </Input.Group>
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={6}>
+                                            <Col span={8}>
                                                 <Input.Group compact>
                                                     <Input
                                                         style={{ width: '55%' }}

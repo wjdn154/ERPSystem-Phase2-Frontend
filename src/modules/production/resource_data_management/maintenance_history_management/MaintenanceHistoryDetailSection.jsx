@@ -127,7 +127,7 @@ const MaintenanceHistoryDetailSection = ({
                     </Col>
                 </Row>
                 <Row gutter={16}>
-                    <Col span={6}>
+                    <Col span={8}>
                         <Form.Item>
                             <Input.Group compact>
                                 <Input
@@ -145,7 +145,7 @@ const MaintenanceHistoryDetailSection = ({
                             </Input.Group>
                         </Form.Item>
                     </Col>
-                    <Col span={6}>
+                    <Col span={8}>
                         <Input.Group compact>
                             <Input
                                 style={{ width: '55%' }}
