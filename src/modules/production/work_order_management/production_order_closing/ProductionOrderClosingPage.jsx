@@ -2,14 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {Box, Grid, Grow, Paper, Typography} from '@mui/material';
 import WelcomeSection from '../../../../components/WelcomeSection.jsx';
 import {tabItems} from './ProductionOrderClosingUtil.jsx';
-import {Button, Col, DatePicker, Form, InputNumber, Row, Table, Tag} from 'antd';
+import {Button, Col, DatePicker, Form, InputNumber, notification, Row, Table, Tag} from 'antd';
 import TemporarySection from "../../../../components/TemporarySection.jsx";
 import dayjs from "dayjs";
 import {useNotificationContext} from "../../../../config/NotificationContext.jsx";
 import apiClient from "../../../../config/apiClient.jsx";
-import {PRODUCTION_API} from "../../../../config/apiConstants.jsx";
+import {EMPLOYEE_API, PRODUCTION_API} from "../../../../config/apiConstants.jsx";
 
-const ProductionOrderClosingPage = ({ initialData }) => {
+const ProductionOrderClosingPage = () => {
     const [form] = Form.useForm();
     const notify = useNotificationContext();
     const [activeTabKey, setActiveTabKey] = useState('1');
@@ -26,8 +26,19 @@ const ProductionOrderClosingPage = ({ initialData }) => {
     });
 
     useEffect(() => {
-        setSearchData(initialData);
+        fetchData();
     }, []);
+
+    const fetchData = async () => {
+        try{
+            const response = await apiClient.post(PRODUCTION_API.PRODUCTION_ORDER_LIST_API);
+            setSearchData(response.data);
+            notify('success', '작업 지시 목록 불러오기 성공', '작업 지시 목록을 성공적으로 불러왔습니다.');
+        } catch(error){
+            notify('error', '오류 발생', '작업 지시 목록을 불러오는 중 오류가 발생했습니다.');
+        }
+    };
+
 
     useEffect(() => {
         if (form && selectedRowKeys) {

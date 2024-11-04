@@ -193,7 +193,7 @@ export const subMenuItems = {
             items: [
                 { text: '작업지시등록', component: 'ProductionOrderRegistrationPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order', requiredPermission: 'productionOrderPermission', permissionLevel: 'GENERAL' },
                 { text: '작업지시확정', component: 'ProductionOrderConfirmationPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_UNCONFIRMED_LIST_API, url: '/production/common-scheduling/production-order-confirmation', requiredPermission: 'productionOrderConfirmationPermission', permissionLevel: 'GENERAL' },
-                { text: '작업지시마감', component: 'ProductionOrderClosingPage', apiPath: PRODUCTION_API.PRODUCTION_ORDER_LIST_API, url: '/production/common-scheduling/production-order-closing', requiredPermission: 'productionOrderClosingPermission', permissionLevel: 'GENERAL' },
+                { text: '작업지시마감', component: 'ProductionOrderClosingPage', apiPath: undefined, url: '/production/common-scheduling/production-order-closing', requiredPermission: 'productionOrderClosingPermission', permissionLevel: 'GENERAL' },
             ]
         },
         {

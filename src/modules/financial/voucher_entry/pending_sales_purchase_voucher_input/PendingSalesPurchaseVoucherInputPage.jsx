@@ -57,8 +57,6 @@ const PendingSalesPurchaseVoucherInputPage = () => {
             }));
         }
 
-        console.log(voucher);
-
         setDisplayValues((prevValues) => ({
             ...prevValues,
             [currentField]: formattedValue,
@@ -132,7 +130,6 @@ const PendingSalesPurchaseVoucherInputPage = () => {
             // const searchVatTypeId = await apiClient.post(FINANCIAL_API.VAT_TYPE_ID_API(voucher.vatTypeCode));
             const searchVatTypeId = (await apiClient.post(FINANCIAL_API.VAT_TYPE_ID_API, { vatTypeCode: voucher.vatTypeCode})).data;
             // const searchVatTypeId = voucher.vatTypeCode;
-            console.log(searchVatTypeId);
 
             if (voucher.supplyAmount) {
                 // 공급가액을 기준으로 부가세 계산
@@ -242,7 +239,6 @@ const PendingSalesPurchaseVoucherInputPage = () => {
             });
 
             setSearchData(response.data);
-            console.log(response.data);
             notify('success', '조회 성공', '전표 목록 데이터 조회 성공.', 'bottomRight');
 
         } catch (err) {
@@ -666,7 +662,6 @@ const PendingSalesPurchaseVoucherInputPage = () => {
                                                                         voucherId,
                                                                     }
                                                                 );
-                                                                console.log('상세 정보:', response.data);
                                                                 setVoucherDetails((prevDetails) => ({
                                                                     ...prevDetails,
                                                                     [record.voucherNumber]: response.data,
@@ -894,49 +889,49 @@ const PendingSalesPurchaseVoucherInputPage = () => {
                                                     dataIndex: "vatTypeCode",
                                                     key: "vatTypeCode",
                                                     align: "center",
-                                                    render: (text, record) => <span className="small-text">{record.formattedVatTypeCode}</span>,
+                                                    render: (text, record) => <div className="small-text">{record.formattedVatTypeCode}</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">품목</div>,
                                                     dataIndex: "itemName",
                                                     key: "itemName",
                                                     align: "center",
-                                                    render: (text) => <span className="small-text">{text}</span>,
+                                                    render: (text) => <div className="small-text">{text}</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">수량</div>,
                                                     dataIndex: "quantity",
                                                     key: "quantity",
                                                     align: "center",
-                                                    render: (text) => text ? <span className="small-text">{Number(text).toLocaleString()}</span> : null,
+                                                    render: (text) => text ? <div className="small-text">{Number(text).toLocaleString()}</div> : <div className="small-text">0</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">단가</div>,
                                                     dataIndex: "unitPrice",
                                                     key: "unitPrice",
                                                     align: "center",
-                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }}>0</div>,
+                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }} className="small-text">0</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">공급가액</div>,
                                                     dataIndex: "supplyAmount",
                                                     key: "supplyAmount",
                                                     align: "center",
-                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }}>0</div>,
+                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }} className="small-text">0</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">부가세</div>,
                                                     dataIndex: "vatAmount",
                                                     key: "vatAmount",
                                                     align: "center",
-                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }}>0</div>,
+                                                    render: (text) => text ? <div style={{ textAlign: 'right' }} className="small-text">{Number(text).toLocaleString()}</div> : <div style={{ textAlign: 'right' }} className="small-text">0</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">거래처</div>,
                                                     dataIndex: "clientCode",
                                                     key: "clientCode",
                                                     align: "center",
-                                                    render: (text, record) => <span className="small-text">{record.formattedClientCode}</span>,
+                                                    render: (text, record) => <div className="small-text">{record.formattedClientCode}</div>,
                                                 },
                                                 {
                                                     title: <div className="title-text">분개유형</div>,
@@ -1059,14 +1054,14 @@ const PendingSalesPurchaseVoucherInputPage = () => {
                                                 dataIndex: 'vatTypeCode',
                                                 key: 'vatTypeCode',
                                                 align: 'center',
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                             {
                                                 title: <div className="title-text">부가세명</div>,
                                                 dataIndex: 'vatTypeName',
                                                 key: 'vatTypeName',
                                                 align: 'center',
-                                                render: (text) => <span className="small-text">{text}</span>,
+                                                render: (text) => <div className="small-text">{text}</div>,
                                             },
                                         ]}
                                         dataSource={modalData}
@@ -1119,14 +1114,14 @@ const PendingSalesPurchaseVoucherInputPage = () => {
                                                 dataIndex: 'code',
                                                 key: 'code',
                                                 align: 'center',
-                                                render: (text) => <span className="small-text">{text}</span>
+                                                render: (text) => <div className="small-text">{text}</div>
                                             },
                                             {
                                                 title: <div className="title-text">거래처명</div>,
                                                 dataIndex: 'printClientName',
                                                 key: 'printClientName',
                                                 align: 'center',
-                                                render: (text) => <span className="small-text">{text}</span>
+                                                render: (text) => <div className="small-text">{text}</div>
                                             },
                                         ]}
                                         dataSource={modalData}
